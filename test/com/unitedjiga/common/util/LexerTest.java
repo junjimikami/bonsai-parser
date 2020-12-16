@@ -47,6 +47,10 @@ import org.junit.Test;
  */
 public class LexerTest {
 
+    private static final char[] DIGITS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+    private static final char[] ZERO_TO_EIGHT = {'0', '1', '2', '3', '4', '5', '6', '7', '8'};
+    private static final char[] ONE_TO_NINE = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
+
     public LexerTest() {
     }
 
@@ -91,7 +95,7 @@ public class LexerTest {
          * step1.中置記法を逆ポーランド記法へ変換
          */
         try (Lexer lexer = new Lexer(new StringReader(expr1))) {
-            lexer.useWhitespace(' ').useWord('0', '9');
+            lexer.setWhitespaceChars(' ').setWordChars(DIGITS);
 
             Deque<Character> stack = new LinkedList<>();
             while (lexer.hasNext()) {
@@ -129,7 +133,7 @@ public class LexerTest {
          * step2.逆ポーランド記法の数式を計算
          */
         try (Lexer lexer = new Lexer(new StringReader(expr2.toString()))) {
-            lexer.useWhitespace(' ').useWord('0', '9');
+            lexer.setWhitespaceChars(' ').setWordChars(DIGITS);
 
             Deque<Double> stack = new LinkedList<>();
             while (lexer.hasNext()) {
@@ -306,14 +310,14 @@ public class LexerTest {
 //    @Test(expected = IndexOutOfBoundsException.class)
     public void test5() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace((char) -1);
+        lexer.setWhitespaceChars((char) -1);
         fail();
     }
 
     @Test
     public void test6_1() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0');
+        lexer.setWhitespaceChars('0');
         assertTrue(lexer.hasNext());
         assertEquals("1", lexer.next());
         assertEquals("0", lexer.skippedWhitespace());
@@ -323,7 +327,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test6_2() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0');
+        lexer.setWhitespaceChars('0');
         assertFalse(lexer.hasNextWord());
         lexer.nextWord();
         fail();
@@ -332,7 +336,7 @@ public class LexerTest {
     @Test
     public void test6_3() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0');
+        lexer.setWhitespaceChars('0');
         assertTrue(lexer.hasNextChar());
         assertEquals('1', lexer.nextChar());
         assertEquals("0", lexer.skippedWhitespace());
@@ -342,7 +346,7 @@ public class LexerTest {
     @Test
     public void test6_4() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0');
+        lexer.setWhitespaceChars('0');
         assertEquals("1", lexer.peek());
         assertEquals("1", lexer.peek());
     }
@@ -350,7 +354,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test6_5() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0');
+        lexer.setWhitespaceChars('0');
         lexer.peekWord();
         fail();
     }
@@ -358,7 +362,7 @@ public class LexerTest {
     @Test
     public void test6_6() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0');
+        lexer.setWhitespaceChars('0');
         assertEquals('1', lexer.peekChar());
         assertEquals('1', lexer.peekChar());
     }
@@ -366,7 +370,7 @@ public class LexerTest {
     @Test
     public void test7_1() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0').reset('0');
+        lexer.setWhitespaceChars('0').reset('0');
         assertTrue(lexer.hasNext());
         assertEquals("0", lexer.next());
         assertEquals("", lexer.skippedWhitespace());
@@ -376,7 +380,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test7_2() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0').reset('0');
+        lexer.setWhitespaceChars('0').reset('0');
         assertFalse(lexer.hasNextWord());
         lexer.nextWord();
         fail();
@@ -385,7 +389,7 @@ public class LexerTest {
     @Test
     public void test7_3() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0').reset('0');
+        lexer.setWhitespaceChars('0').reset('0');
         assertTrue(lexer.hasNextChar());
         assertEquals('0', lexer.nextChar());
         assertEquals("", lexer.skippedWhitespace());
@@ -395,7 +399,7 @@ public class LexerTest {
     @Test
     public void test7_4() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0').reset('0');
+        lexer.setWhitespaceChars('0').reset('0');
         assertEquals("0", lexer.peek());
         assertEquals("0", lexer.peek());
     }
@@ -403,7 +407,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test7_5() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0').reset('0');
+        lexer.setWhitespaceChars('0').reset('0');
         lexer.peekWord();
         fail();
     }
@@ -411,7 +415,7 @@ public class LexerTest {
     @Test
     public void test7_6() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0').reset('0');
+        lexer.setWhitespaceChars('0').reset('0');
         assertEquals('0', lexer.peekChar());
         assertEquals('0', lexer.peekChar());
     }
@@ -419,7 +423,7 @@ public class LexerTest {
     @Test
     public void test8_1() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0').reset();
+        lexer.setWhitespaceChars('0').reset();
         assertTrue(lexer.hasNext());
         assertEquals("0", lexer.next());
         assertEquals("", lexer.skippedWhitespace());
@@ -429,7 +433,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test8_2() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0').reset();
+        lexer.setWhitespaceChars('0').reset();
         assertFalse(lexer.hasNextWord());
         lexer.nextWord();
         fail();
@@ -438,7 +442,7 @@ public class LexerTest {
     @Test
     public void test8_3() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0').reset();
+        lexer.setWhitespaceChars('0').reset();
         assertTrue(lexer.hasNextChar());
         assertEquals('0', lexer.nextChar());
         assertEquals("", lexer.skippedWhitespace());
@@ -448,7 +452,7 @@ public class LexerTest {
     @Test
     public void test8_4() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0').reset();
+        lexer.setWhitespaceChars('0').reset();
         assertEquals("0", lexer.peek());
         assertEquals("0", lexer.peek());
     }
@@ -456,7 +460,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test8_5() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0').reset();
+        lexer.setWhitespaceChars('0').reset();
         lexer.peekWord();
         fail();
     }
@@ -464,7 +468,7 @@ public class LexerTest {
     @Test
     public void test8_6() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0').reset();
+        lexer.setWhitespaceChars('0').reset();
         assertEquals('0', lexer.peekChar());
         assertEquals('0', lexer.peekChar());
     }
@@ -472,7 +476,7 @@ public class LexerTest {
     @Test
     public void test9_1() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0').useWhitespace('0');
+        lexer.setWordChars('0').setWhitespaceChars('0');
         assertTrue(lexer.hasNext());
         assertEquals("1", lexer.next());
         assertEquals("0", lexer.skippedWhitespace());
@@ -482,7 +486,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test9_2() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0').useWhitespace('0');
+        lexer.setWordChars('0').setWhitespaceChars('0');
         assertFalse(lexer.hasNextWord());
         lexer.nextWord();
         fail();
@@ -491,7 +495,7 @@ public class LexerTest {
     @Test
     public void test9_3() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0').useWhitespace('0');
+        lexer.setWordChars('0').setWhitespaceChars('0');
         assertTrue(lexer.hasNextChar());
         assertEquals('1', lexer.nextChar());
         assertEquals("0", lexer.skippedWhitespace());
@@ -501,7 +505,7 @@ public class LexerTest {
     @Test
     public void test9_4() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0').useWhitespace('0');
+        lexer.setWordChars('0').setWhitespaceChars('0');
         assertEquals("1", lexer.peek());
         assertEquals("1", lexer.peek());
     }
@@ -509,7 +513,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test9_5() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0').useWhitespace('0');
+        lexer.setWordChars('0').setWhitespaceChars('0');
         lexer.peekWord();
         fail();
     }
@@ -517,7 +521,7 @@ public class LexerTest {
     @Test
     public void test9_6() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0').useWhitespace('0');
+        lexer.setWordChars('0').setWhitespaceChars('0');
         assertEquals('1', lexer.peekChar());
         assertEquals('1', lexer.peekChar());
     }
@@ -525,7 +529,7 @@ public class LexerTest {
     @Test
     public void test10_1() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('9').useWord('0', '8');
+        lexer.setWhitespaceChars('9').setWordChars(ZERO_TO_EIGHT);
         assertTrue(lexer.hasNext());
         assertEquals("012345678", lexer.next());
         assertEquals("", lexer.skippedWhitespace());
@@ -535,7 +539,7 @@ public class LexerTest {
     @Test
     public void test10_2() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('9').useWord('0', '8');
+        lexer.setWhitespaceChars('9').setWordChars(ZERO_TO_EIGHT);
         assertTrue(lexer.hasNextWord());
         assertEquals("012345678", lexer.nextWord());
         assertEquals("", lexer.skippedWhitespace());
@@ -545,7 +549,7 @@ public class LexerTest {
     @Test(expected = NoSuchElementException.class)
     public void test10_3() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('9').useWord('0', '8');
+        lexer.setWhitespaceChars('9').setWordChars(ZERO_TO_EIGHT);
         assertFalse(lexer.hasNextChar());
         lexer.nextChar();
         fail();
@@ -554,7 +558,7 @@ public class LexerTest {
     @Test
     public void test10_4() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('9').useWord('0', '8');
+        lexer.setWhitespaceChars('9').setWordChars(ZERO_TO_EIGHT);
         assertEquals("012345678", lexer.peek());
         assertEquals("012345678", lexer.peek());
     }
@@ -562,7 +566,7 @@ public class LexerTest {
     @Test
     public void test10_5() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('9').useWord('0', '8');
+        lexer.setWhitespaceChars('9').setWordChars(ZERO_TO_EIGHT);
         assertEquals("012345678", lexer.peekWord());
         assertEquals("012345678", lexer.peekWord());
     }
@@ -570,22 +574,22 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test10_6() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('9').useWord('0', '8');
+        lexer.setWhitespaceChars('9').setWordChars(ZERO_TO_EIGHT);
         lexer.peekChar();
         fail();
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void test11() {
-        Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('8', '0');
-        fail();
-    }
+//    @Test(expected = IndexOutOfBoundsException.class)
+//    public void test11() {
+//        Lexer lexer = new Lexer(new StringReader("0123456789"));
+//        lexer.setWhitespace('8', '0');
+//        fail();
+//    }
 
     @Test
     public void test12_1() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0', '8');
+        lexer.setWhitespaceChars(ZERO_TO_EIGHT);
         assertTrue(lexer.hasNext());
         assertEquals("9", lexer.next());
         assertEquals("012345678", lexer.skippedWhitespace());
@@ -595,7 +599,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test12_2() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0', '8');
+        lexer.setWhitespaceChars(ZERO_TO_EIGHT);
         assertFalse(lexer.hasNextWord());
         lexer.nextWord();
         fail();
@@ -604,7 +608,7 @@ public class LexerTest {
     @Test
     public void test12_3() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0', '8');
+        lexer.setWhitespaceChars(ZERO_TO_EIGHT);
         assertTrue(lexer.hasNextChar());
         assertEquals('9', lexer.nextChar());
         assertEquals("012345678", lexer.skippedWhitespace());
@@ -614,7 +618,7 @@ public class LexerTest {
     @Test
     public void test12_4() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0', '8');
+        lexer.setWhitespaceChars(ZERO_TO_EIGHT);
         assertEquals("9", lexer.peek());
         assertEquals("9", lexer.peek());
     }
@@ -622,7 +626,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test12_5() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0', '8');
+        lexer.setWhitespaceChars(ZERO_TO_EIGHT);
         lexer.peekWord();
         fail();
     }
@@ -630,7 +634,7 @@ public class LexerTest {
     @Test
     public void test12_6() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0', '8');
+        lexer.setWhitespaceChars(ZERO_TO_EIGHT);
         assertEquals('9', lexer.peekChar());
         assertEquals('9', lexer.peekChar());
     }
@@ -638,7 +642,7 @@ public class LexerTest {
     @Test
     public void test13_1() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0', '8').reset('0', '8');
+        lexer.setWhitespaceChars(ZERO_TO_EIGHT).reset(ZERO_TO_EIGHT);
         assertTrue(lexer.hasNext());
         assertEquals("0", lexer.next());
         assertEquals("", lexer.skippedWhitespace());
@@ -648,7 +652,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test13_2() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0', '8').reset('0', '8');
+        lexer.setWhitespaceChars(ZERO_TO_EIGHT).reset(ZERO_TO_EIGHT);
         assertFalse(lexer.hasNextWord());
         lexer.nextWord();
         fail();
@@ -657,7 +661,7 @@ public class LexerTest {
     @Test
     public void test13_3() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0', '8').reset('0', '8');
+        lexer.setWhitespaceChars(ZERO_TO_EIGHT).reset(ZERO_TO_EIGHT);
         assertTrue(lexer.hasNextChar());
         assertEquals('0', lexer.nextChar());
         assertEquals("", lexer.skippedWhitespace());
@@ -667,7 +671,7 @@ public class LexerTest {
     @Test
     public void test13_4() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0', '8').reset('0', '8');
+        lexer.setWhitespaceChars(ZERO_TO_EIGHT).reset(ZERO_TO_EIGHT);
         assertEquals("0", lexer.peek());
         assertEquals("0", lexer.peek());
     }
@@ -675,7 +679,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test13_5() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0', '8').reset('0', '8');
+        lexer.setWhitespaceChars(ZERO_TO_EIGHT).reset(ZERO_TO_EIGHT);
         lexer.peekWord();
         fail();
     }
@@ -683,7 +687,7 @@ public class LexerTest {
     @Test
     public void test13_6() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0', '8').reset('0', '8');
+        lexer.setWhitespaceChars(ZERO_TO_EIGHT).reset(ZERO_TO_EIGHT);
         assertEquals('0', lexer.peekChar());
         assertEquals('0', lexer.peekChar());
     }
@@ -691,7 +695,7 @@ public class LexerTest {
     @Test
     public void test14_1() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0', '8').reset();
+        lexer.setWhitespaceChars(ZERO_TO_EIGHT).reset();
         assertTrue(lexer.hasNext());
         assertEquals("0", lexer.next());
         assertEquals("", lexer.skippedWhitespace());
@@ -701,7 +705,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test14_2() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0', '8').reset();
+        lexer.setWhitespaceChars(ZERO_TO_EIGHT).reset();
         assertFalse(lexer.hasNextWord());
         lexer.nextWord();
         fail();
@@ -710,7 +714,7 @@ public class LexerTest {
     @Test
     public void test14_3() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0', '8').reset();
+        lexer.setWhitespaceChars(ZERO_TO_EIGHT).reset();
         assertTrue(lexer.hasNextChar());
         assertEquals('0', lexer.nextChar());
         assertEquals("", lexer.skippedWhitespace());
@@ -720,7 +724,7 @@ public class LexerTest {
     @Test
     public void test14_4() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0', '8').reset();
+        lexer.setWhitespaceChars(ZERO_TO_EIGHT).reset();
         assertEquals("0", lexer.peek());
         assertEquals("0", lexer.peek());
     }
@@ -728,7 +732,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test14_5() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0', '8').reset();
+        lexer.setWhitespaceChars(ZERO_TO_EIGHT).reset();
         lexer.peekWord();
         fail();
     }
@@ -736,7 +740,7 @@ public class LexerTest {
     @Test
     public void test14_6() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0', '8').reset();
+        lexer.setWhitespaceChars(ZERO_TO_EIGHT).reset();
         assertEquals('0', lexer.peekChar());
         assertEquals('0', lexer.peekChar());
     }
@@ -744,7 +748,7 @@ public class LexerTest {
     @Test
     public void test15_1() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0', '8').useWhitespace('0', '8');
+        lexer.setWordChars(ZERO_TO_EIGHT).setWhitespaceChars(ZERO_TO_EIGHT);
         assertTrue(lexer.hasNext());
         assertEquals("9", lexer.next());
         assertEquals("012345678", lexer.skippedWhitespace());
@@ -754,7 +758,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test15_2() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0', '8').useWhitespace('0', '8');
+        lexer.setWordChars(ZERO_TO_EIGHT).setWhitespaceChars(ZERO_TO_EIGHT);
         assertFalse(lexer.hasNextWord());
         lexer.nextWord();
         fail();
@@ -763,7 +767,7 @@ public class LexerTest {
     @Test
     public void test15_3() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0', '8').useWhitespace('0', '8');
+        lexer.setWordChars(ZERO_TO_EIGHT).setWhitespaceChars(ZERO_TO_EIGHT);
         assertTrue(lexer.hasNextChar());
         assertEquals('9', lexer.nextChar());
         assertEquals("012345678", lexer.skippedWhitespace());
@@ -773,7 +777,7 @@ public class LexerTest {
     @Test
     public void test15_4() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0', '8').useWhitespace('0', '8');
+        lexer.setWordChars(ZERO_TO_EIGHT).setWhitespaceChars(ZERO_TO_EIGHT);
         assertEquals("9", lexer.peek());
         assertEquals("9", lexer.peek());
     }
@@ -781,7 +785,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test15_5() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0', '8').useWhitespace('0', '8');
+        lexer.setWordChars(ZERO_TO_EIGHT).setWhitespaceChars(ZERO_TO_EIGHT);
         lexer.peekWord();
         fail();
     }
@@ -789,7 +793,7 @@ public class LexerTest {
     @Test
     public void test15_6() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0', '8').useWhitespace('0', '8');
+        lexer.setWordChars(ZERO_TO_EIGHT).setWhitespaceChars(ZERO_TO_EIGHT);
         assertEquals('9', lexer.peekChar());
         assertEquals('9', lexer.peekChar());
     }
@@ -797,7 +801,7 @@ public class LexerTest {
     @Test
     public void test16_1() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('1', '9');
+        lexer.setWhitespaceChars(ONE_TO_NINE);
         assertTrue(lexer.hasNext());
         assertEquals("0", lexer.next());
         assertEquals("", lexer.skippedWhitespace());
@@ -807,7 +811,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test16_2() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('1', '9');
+        lexer.setWhitespaceChars(ONE_TO_NINE);
         assertFalse(lexer.hasNextWord());
         lexer.nextWord();
         fail();
@@ -816,7 +820,7 @@ public class LexerTest {
     @Test
     public void test16_3() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('1', '9');
+        lexer.setWhitespaceChars(ONE_TO_NINE);
         assertTrue(lexer.hasNextChar());
         assertEquals('0', lexer.nextChar());
         assertEquals("", lexer.skippedWhitespace());
@@ -826,7 +830,7 @@ public class LexerTest {
     @Test
     public void test16_4() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('1', '9');
+        lexer.setWhitespaceChars(ONE_TO_NINE);
         assertEquals("0", lexer.peek());
         assertEquals("0", lexer.peek());
     }
@@ -834,7 +838,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test16_5() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('1', '9');
+        lexer.setWhitespaceChars(ONE_TO_NINE);
         lexer.peekWord();
         fail();
     }
@@ -842,7 +846,7 @@ public class LexerTest {
     @Test
     public void test16_6() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('1', '9');
+        lexer.setWhitespaceChars(ONE_TO_NINE);
         assertEquals('0', lexer.peekChar());
         assertEquals('0', lexer.peekChar());
     }
@@ -851,14 +855,14 @@ public class LexerTest {
 //    @Test(expected = IndexOutOfBoundsException.class)
     public void test17() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord((char) -1);
+        lexer.setWordChars((char) -1);
         fail();
     }
 
     @Test
     public void test18_1() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0');
+        lexer.setWordChars('0');
         assertTrue(lexer.hasNext());
         assertEquals("0", lexer.next());
         assertEquals("", lexer.skippedWhitespace());
@@ -868,7 +872,7 @@ public class LexerTest {
     @Test
     public void test18_2() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0');
+        lexer.setWordChars('0');
         assertTrue(lexer.hasNextWord());
         assertEquals("0", lexer.nextWord());
         assertEquals("", lexer.skippedWhitespace());
@@ -878,7 +882,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test18_3() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0');
+        lexer.setWordChars('0');
         assertFalse(lexer.hasNextChar());
         lexer.nextChar();
         fail();
@@ -887,7 +891,7 @@ public class LexerTest {
     @Test
     public void test18_4() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0');
+        lexer.setWordChars('0');
         assertEquals("0", lexer.peek());
         assertEquals("0", lexer.peek());
     }
@@ -895,7 +899,7 @@ public class LexerTest {
     @Test
     public void test18_5() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0');
+        lexer.setWordChars('0');
         assertEquals("0", lexer.peekWord());
         assertEquals("0", lexer.peekWord());
     }
@@ -903,7 +907,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test18_6() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0');
+        lexer.setWordChars('0');
         lexer.peekChar();
         fail();
     }
@@ -911,7 +915,7 @@ public class LexerTest {
     @Test
     public void test19_1() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0').reset('0');
+        lexer.setWordChars('0').reset('0');
         assertTrue(lexer.hasNext());
         assertEquals("0", lexer.next());
         assertEquals("", lexer.skippedWhitespace());
@@ -921,7 +925,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test19_2() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0').reset('0');
+        lexer.setWordChars('0').reset('0');
         assertFalse(lexer.hasNextWord());
         lexer.nextWord();
         fail();
@@ -930,7 +934,7 @@ public class LexerTest {
     @Test
     public void test19_3() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0').reset('0');
+        lexer.setWordChars('0').reset('0');
         assertTrue(lexer.hasNextChar());
         assertEquals('0', lexer.nextChar());
         assertEquals("", lexer.skippedWhitespace());
@@ -940,7 +944,7 @@ public class LexerTest {
     @Test
     public void test19_4() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0').reset('0');
+        lexer.setWordChars('0').reset('0');
         assertEquals("0", lexer.peek());
         assertEquals("0", lexer.peek());
     }
@@ -948,7 +952,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test19_5() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0').reset('0');
+        lexer.setWordChars('0').reset('0');
         lexer.peekWord();
         fail();
     }
@@ -956,7 +960,7 @@ public class LexerTest {
     @Test
     public void test19_6() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0').reset('0');
+        lexer.setWordChars('0').reset('0');
         assertEquals('0', lexer.peekChar());
         assertEquals('0', lexer.peekChar());
     }
@@ -964,7 +968,7 @@ public class LexerTest {
     @Test
     public void test20_1() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0').reset();
+        lexer.setWordChars('0').reset();
         assertTrue(lexer.hasNext());
         assertEquals("0", lexer.next());
         assertEquals("", lexer.skippedWhitespace());
@@ -974,7 +978,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test20_2() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0').reset();
+        lexer.setWordChars('0').reset();
         assertFalse(lexer.hasNextWord());
         lexer.nextWord();
         fail();
@@ -983,7 +987,7 @@ public class LexerTest {
     @Test
     public void test20_3() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0').reset();
+        lexer.setWordChars('0').reset();
         assertTrue(lexer.hasNextChar());
         assertEquals('0', lexer.nextChar());
         assertEquals("", lexer.skippedWhitespace());
@@ -993,7 +997,7 @@ public class LexerTest {
     @Test
     public void test20_4() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0').reset();
+        lexer.setWordChars('0').reset();
         assertEquals("0", lexer.peek());
         assertEquals("0", lexer.peek());
     }
@@ -1001,7 +1005,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test20_5() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0').reset();
+        lexer.setWordChars('0').reset();
         lexer.peekWord();
         fail();
     }
@@ -1009,7 +1013,7 @@ public class LexerTest {
     @Test
     public void test20_6() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0').reset();
+        lexer.setWordChars('0').reset();
         assertEquals('0', lexer.peekChar());
         assertEquals('0', lexer.peekChar());
     }
@@ -1017,7 +1021,7 @@ public class LexerTest {
     @Test
     public void test21_1() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0').useWord('0');
+        lexer.setWhitespaceChars('0').setWordChars('0');
         assertTrue(lexer.hasNext());
         assertEquals("0", lexer.next());
         assertEquals("", lexer.skippedWhitespace());
@@ -1027,7 +1031,7 @@ public class LexerTest {
     @Test
     public void test21_2() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0').useWord('0');
+        lexer.setWhitespaceChars('0').setWordChars('0');
         assertTrue(lexer.hasNextWord());
         assertEquals("0", lexer.nextWord());
         assertEquals("", lexer.skippedWhitespace());
@@ -1037,7 +1041,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test21_3() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0').useWord('0');
+        lexer.setWhitespaceChars('0').setWordChars('0');
         assertFalse(lexer.hasNextChar());
         lexer.nextChar();
         fail();
@@ -1046,7 +1050,7 @@ public class LexerTest {
     @Test
     public void test21_4() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0').useWord('0');
+        lexer.setWhitespaceChars('0').setWordChars('0');
         assertEquals("0", lexer.peek());
         assertEquals("0", lexer.peek());
     }
@@ -1054,7 +1058,7 @@ public class LexerTest {
     @Test
     public void test21_5() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0').useWord('0');
+        lexer.setWhitespaceChars('0').setWordChars('0');
         assertEquals("0", lexer.peekWord());
         assertEquals("0", lexer.peekWord());
     }
@@ -1062,22 +1066,22 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test21_6() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0').useWord('0');
+        lexer.setWhitespaceChars('0').setWordChars('0');
         lexer.peekChar();
         fail();
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void test22() {
-        Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('8', '0');
-        fail();
-    }
+//    @Test(expected = IndexOutOfBoundsException.class)
+//    public void test22() {
+//        Lexer lexer = new Lexer(new StringReader("0123456789"));
+//        lexer.setWordChar('8', '0');
+//        fail();
+//    }
 
     @Test
     public void test23_1() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0', '8');
+        lexer.setWordChars(ZERO_TO_EIGHT);
         assertTrue(lexer.hasNext());
         assertEquals("012345678", lexer.next());
         assertEquals("", lexer.skippedWhitespace());
@@ -1087,7 +1091,7 @@ public class LexerTest {
     @Test
     public void test23_2() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0', '8');
+        lexer.setWordChars(ZERO_TO_EIGHT);
         assertTrue(lexer.hasNextWord());
         assertEquals("012345678", lexer.nextWord());
         assertEquals("", lexer.skippedWhitespace());
@@ -1097,7 +1101,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test23_3() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0', '8');
+        lexer.setWordChars(ZERO_TO_EIGHT);
         assertFalse(lexer.hasNextChar());
         lexer.nextChar();
         fail();
@@ -1106,7 +1110,7 @@ public class LexerTest {
     @Test
     public void test23_4() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0', '8');
+        lexer.setWordChars(ZERO_TO_EIGHT);
         assertEquals("012345678", lexer.peek());
         assertEquals("012345678", lexer.peek());
     }
@@ -1114,7 +1118,7 @@ public class LexerTest {
     @Test
     public void test23_5() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0', '8');
+        lexer.setWordChars(ZERO_TO_EIGHT);
         assertEquals("012345678", lexer.peekWord());
         assertEquals("012345678", lexer.peekWord());
     }
@@ -1122,7 +1126,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test23_6() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0', '8');
+        lexer.setWordChars(ZERO_TO_EIGHT);
         lexer.peekChar();
         fail();
     }
@@ -1130,7 +1134,7 @@ public class LexerTest {
     @Test
     public void test24_1() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0', '8').reset('0', '8');
+        lexer.setWordChars(ZERO_TO_EIGHT).reset(ZERO_TO_EIGHT);
         assertTrue(lexer.hasNext());
         assertEquals("0", lexer.next());
         assertEquals("", lexer.skippedWhitespace());
@@ -1140,7 +1144,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test24_2() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0', '8').reset('0', '8');
+        lexer.setWordChars(ZERO_TO_EIGHT).reset(ZERO_TO_EIGHT);
         assertFalse(lexer.hasNextWord());
         lexer.nextWord();
         fail();
@@ -1149,7 +1153,7 @@ public class LexerTest {
     @Test
     public void test24_3() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0', '8').reset('0', '8');
+        lexer.setWordChars(ZERO_TO_EIGHT).reset(ZERO_TO_EIGHT);
         assertTrue(lexer.hasNextChar());
         assertEquals('0', lexer.nextChar());
         assertEquals("", lexer.skippedWhitespace());
@@ -1159,7 +1163,7 @@ public class LexerTest {
     @Test
     public void test24_4() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0', '8').reset('0', '8');
+        lexer.setWordChars(ZERO_TO_EIGHT).reset(ZERO_TO_EIGHT);
         assertEquals("0", lexer.peek());
         assertEquals("0", lexer.peek());
     }
@@ -1167,7 +1171,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test24_5() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0', '8').reset('0', '8');
+        lexer.setWordChars(ZERO_TO_EIGHT).reset(ZERO_TO_EIGHT);
         lexer.peekWord();
         fail();
     }
@@ -1175,7 +1179,7 @@ public class LexerTest {
     @Test
     public void test24_6() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0', '8').reset('0', '8');
+        lexer.setWordChars(ZERO_TO_EIGHT).reset(ZERO_TO_EIGHT);
         assertEquals('0', lexer.peekChar());
         assertEquals('0', lexer.peekChar());
     }
@@ -1183,7 +1187,7 @@ public class LexerTest {
     @Test
     public void test25_1() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0', '8').reset();
+        lexer.setWordChars(ZERO_TO_EIGHT).reset();
         assertTrue(lexer.hasNext());
         assertEquals("0", lexer.next());
         assertEquals("", lexer.skippedWhitespace());
@@ -1193,7 +1197,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test25_2() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0', '8').reset();
+        lexer.setWordChars(ZERO_TO_EIGHT).reset();
         assertFalse(lexer.hasNextWord());
         lexer.nextWord();
         fail();
@@ -1202,7 +1206,7 @@ public class LexerTest {
     @Test
     public void test25_3() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0', '8').reset();
+        lexer.setWordChars(ZERO_TO_EIGHT).reset();
         assertTrue(lexer.hasNextChar());
         assertEquals('0', lexer.nextChar());
         assertEquals("", lexer.skippedWhitespace());
@@ -1212,7 +1216,7 @@ public class LexerTest {
     @Test
     public void test25_4() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0', '8').reset();
+        lexer.setWordChars(ZERO_TO_EIGHT).reset();
         assertEquals("0", lexer.peek());
         assertEquals("0", lexer.peek());
     }
@@ -1220,7 +1224,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test25_5() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0', '8').reset();
+        lexer.setWordChars(ZERO_TO_EIGHT).reset();
         lexer.peekWord();
         fail();
     }
@@ -1228,7 +1232,7 @@ public class LexerTest {
     @Test
     public void test25_6() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWord('0', '8').reset();
+        lexer.setWordChars(ZERO_TO_EIGHT).reset();
         assertEquals('0', lexer.peekChar());
         assertEquals('0', lexer.peekChar());
     }
@@ -1236,7 +1240,7 @@ public class LexerTest {
     @Test
     public void test26_1() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0', '8').useWord('0', '8');
+        lexer.setWhitespaceChars(ZERO_TO_EIGHT).setWordChars(ZERO_TO_EIGHT);
         assertTrue(lexer.hasNext());
         assertEquals("012345678", lexer.next());
         assertEquals("", lexer.skippedWhitespace());
@@ -1246,7 +1250,7 @@ public class LexerTest {
     @Test
     public void test26_2() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0', '8').useWord('0', '8');
+        lexer.setWhitespaceChars(ZERO_TO_EIGHT).setWordChars(ZERO_TO_EIGHT);
         assertTrue(lexer.hasNextWord());
         assertEquals("012345678", lexer.nextWord());
         assertEquals("", lexer.skippedWhitespace());
@@ -1256,7 +1260,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test26_3() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0', '8').useWord('0', '8');
+        lexer.setWhitespaceChars(ZERO_TO_EIGHT).setWordChars(ZERO_TO_EIGHT);
         assertFalse(lexer.hasNextChar());
         lexer.nextChar();
         fail();
@@ -1265,7 +1269,7 @@ public class LexerTest {
     @Test
     public void test26_4() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0', '8').useWord('0', '8');
+        lexer.setWhitespaceChars(ZERO_TO_EIGHT).setWordChars(ZERO_TO_EIGHT);
         assertEquals("012345678", lexer.peek());
         assertEquals("012345678", lexer.peek());
     }
@@ -1273,7 +1277,7 @@ public class LexerTest {
     @Test
     public void test26_5() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0', '8').useWord('0', '8');
+        lexer.setWhitespaceChars(ZERO_TO_EIGHT).setWordChars(ZERO_TO_EIGHT);
         assertEquals("012345678", lexer.peekWord());
         assertEquals("012345678", lexer.peekWord());
     }
@@ -1281,7 +1285,7 @@ public class LexerTest {
     @Test(expected = InputMismatchException.class)
     public void test26_6() {
         Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.useWhitespace('0', '8').useWord('0', '8');
+        lexer.setWhitespaceChars(ZERO_TO_EIGHT).setWordChars(ZERO_TO_EIGHT);
         lexer.peekChar();
         fail();
     }
@@ -1294,12 +1298,12 @@ public class LexerTest {
         fail();
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void test28() {
-        Lexer lexer = new Lexer(new StringReader("0123456789"));
-        lexer.reset('8', '0');
-        fail();
-    }
+//    @Test(expected = IndexOutOfBoundsException.class)
+//    public void test28() {
+//        Lexer lexer = new Lexer(new StringReader("0123456789"));
+//        lexer.reset('8', '0');
+//        fail();
+//    }
 
 
     @Test(expected = UncheckedIOException.class)
@@ -1404,8 +1408,8 @@ public class LexerTest {
     public void testXXX2() {
         System.out.println("com.unitedjiga.common.util.LexerTest.testXXX2()");
         try (Lexer lexer = new Lexer(new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("Lexer.html"))))) {
-            lexer.useWhitespace((char) 0x00, (char) 0x20)
-                 .useWord((char) 0x21, (char) 0xff);
+            IntStream.rangeClosed(0x00, 0x20).forEach(i -> lexer.setWhitespaceChars((char)i));
+            IntStream.rangeClosed(0x21, 0xff).forEach(i -> lexer.setWordChars((char)i));
             while (lexer.hasNext()) {
                 String token = lexer.next();
                 System.out.print(lexer.skippedWhitespace());

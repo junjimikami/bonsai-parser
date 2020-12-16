@@ -36,6 +36,7 @@ import java.util.InputMismatchException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.stream.IntStream;
 
 /**
  * 文字ストリームを字句解析して文字とワードを読み込むLexer(=Lexical Analyzer)です。
@@ -72,6 +73,7 @@ public final class Lexer implements Iterator<String>, Closeable {
     private final StreamTokenizer st;
     private final StringBuilder wsBuffer = new StringBuilder();
     private final BitSet wsChars = new BitSet();
+    private final BitSet ltChars = new BitSet();
     private String ws = "";
 
     /**
@@ -90,15 +92,18 @@ public final class Lexer implements Iterator<String>, Closeable {
         st.resetSyntax();
     }
 
+    private boolean tryGet(BitSet bit, int c) {
+        return c >= 0 && bit.get(c);
+    }
+
     private int nextToken() {
         try {
             st.nextToken();
-            while (st.ttype >= 0 && wsChars.get(st.ttype)) {
+            while (tryGet(wsChars, st.ttype)) {
                 wsBuffer.append((char) st.ttype);
                 st.nextToken();
             }
             return st.ttype;
-
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }
@@ -141,6 +146,22 @@ public final class Lexer implements Iterator<String>, Closeable {
      */
     public boolean hasNextChar() {
         return peekToken() >= 0;
+    }
+
+    /**
+     * 
+     * @return 
+     */
+    public boolean hasNextInLine() {
+        return hasNext() && !tryGet(ltChars, st.ttype);
+    }
+
+    /**
+     * 
+     * @return 
+     */
+    public boolean hasTrailingWhitespace() {
+        return !trailingWhitespace().isEmpty();
     }
 
     /**
@@ -321,6 +342,7 @@ public final class Lexer implements Iterator<String>, Closeable {
      */
     public Lexer reset() {
         wsChars.clear();
+        ltChars.clear();
         st.resetSyntax();
         return this;
     }
@@ -331,49 +353,36 @@ public final class Lexer implements Iterator<String>, Closeable {
      * @param ch 設定する文字
      * @return このLexer
      */
-    public Lexer reset(char ch) {
-        wsChars.clear(ch);
-        st.ordinaryChar(ch);
+    public Lexer reset(char... ch) {
+        for (char c : ch) {
+            wsChars.clear(c);
+            ltChars.clear(c);
+            st.ordinaryChar(c);
+        }
         return this;
     }
 
     /**
-     * 指定範囲の文字を通常文字に戻します。
-     *
-     * @param low 設定する文字範囲の最小値
-     * @param hi 設定する文字範囲の最大値
-     * @return このLexer
-     * @throws IndexOutOfBoundsException lowがhiよりも大きい場合
+     * 
+     * @param ch
+     * @return 
      */
-    public Lexer reset(char low, char hi) {
-        wsChars.clear(low, hi + 1);
-        st.ordinaryChars(low, hi);
-        return this;
+    public Lexer setWordChars(char... ch) {
+        reset(ch);
+        for (char c : ch) {
+            st.wordChars(c, c);
+        }
+        return this;        
     }
 
     /**
-     * 指定の文字をワード構成文字に設定します。
-     *
-     * @param ch 設定する文字
-     * @return このLexer
+     * 
+     * @param low
+     * @param hi
+     * @return 
      */
-    public Lexer useWord(char ch) {
-        wsChars.clear(ch);
-        st.wordChars(ch, ch);
-        return this;
-    }
-
-    /**
-     * 指定範囲の文字をワード構成文字に設定します。
-     *
-     * @param low 設定する文字範囲の最小値
-     * @param hi 設定する文字範囲の最大値
-     * @return このLexer
-     * @throws IndexOutOfBoundsException lowがhiよりも大きい場合
-     */
-    public Lexer useWord(char low, char hi) {
-        wsChars.clear(low, hi + 1);
-        st.wordChars(low, hi);
+    public Lexer setWordCharRange(char low, char hi) {
+        IntStream.rangeClosed(low, hi).forEach(ch -> setWordChars((char) ch));
         return this;
     }
 
@@ -383,26 +392,27 @@ public final class Lexer implements Iterator<String>, Closeable {
      * @param ch 設定する文字
      * @return このLexer
      */
-    public Lexer useWhitespace(char ch) {
-        wsChars.set(ch);
-        st.ordinaryChar(ch);
+    public Lexer setWhitespaceChars(char... ch) {
+        reset(ch);
+        for (char c : ch) {
+            wsChars.set(c);
+        }
         return this;
     }
 
     /**
-     * 指定範囲の文字を空白文字に設定します。
-     *
-     * @param low 設定する文字範囲の最小値
-     * @param hi 設定する文字範囲の最大値
-     * @return このLexer
-     * @throws IndexOutOfBoundsException lowがhiよりも大きい場合
+     * 
+     * @param ch
+     * @return 
      */
-    public Lexer useWhitespace(char low, char hi) {
-        wsChars.set(low, hi + 1);
-        st.ordinaryChars(low, hi);
+    public Lexer setLineTerminatorChars(char... ch) {
+        reset(ch);
+        for (char c : ch) {
+            ltChars.set(c);
+        }
         return this;
     }
-
+            
     /**
      * 文字ストリームを閉じます。
      *
