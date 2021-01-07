@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.util;
+package com.unitedjiga.common.parsing;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -40,6 +40,8 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import com.unitedjiga.common.parsing.Lexer;
 
 /**
  *
@@ -68,6 +70,24 @@ public class LexerTest {
 
     @After
     public void tearDown() {
+    }
+
+    @Test
+    public void sample2() {
+    	String input = "_a__b___c____|____d___e__f_";
+    	try (Lexer lexer = new Lexer(new StringReader(input))) {
+			lexer.setWhitespaceChars('_').setLineTerminatorChars('|');
+			while (lexer.hasNext()) {
+				if (lexer.hasNextInLine()) {
+					System.out.println(lexer.trailingWhitespace());
+					System.out.println(lexer.next());
+				} else {
+					System.out.println(">" + lexer.trailingWhitespace());
+					System.out.println(">" + lexer.next());
+				}
+			}
+			System.out.println(">>" + lexer.trailingWhitespace());
+		}
     }
 
     /**

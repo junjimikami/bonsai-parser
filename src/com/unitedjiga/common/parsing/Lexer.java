@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.util;
+package com.unitedjiga.common.parsing;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -434,7 +434,28 @@ public final class Lexer implements Iterator<String>, Closeable {
      */
     @Override
     public String toString() {
-        return st.toString();
+    	StringBuilder sb = new StringBuilder("Next: ");
+    	sb.append("[");
+    	sb.append(trailingWhitespace());
+    	sb.append("] ");
+    	if (hasNextInLine()) {
+    		if (hasNextChar()) {
+    	    	sb.append("CHAR'");
+    			sb.append(peekChar());
+    	    	sb.append("'");
+    		} else if (hasNextWord()) {
+    	    	sb.append("WORD\"");
+    			sb.append(peekWord());
+    	    	sb.append("\"");
+    		}
+		} else if (hasNext()) {
+	    	sb.append("EOL[");
+			sb.append(peekChar());
+	    	sb.append("]");
+		} else {
+			sb.append("EOF");
+		}
+        return sb.toString();
     }
 
 }
