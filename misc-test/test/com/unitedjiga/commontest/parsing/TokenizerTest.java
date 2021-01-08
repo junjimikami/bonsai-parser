@@ -1,4 +1,4 @@
-package com.unitedjiga.common.parsing;
+package com.unitedjiga.commontest.parsing;
 
 import static org.junit.jupiter.api.Assertions.*;
 

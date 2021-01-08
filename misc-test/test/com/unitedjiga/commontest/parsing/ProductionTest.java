@@ -1,6 +1,8 @@
-package com.unitedjiga.common.parsing;
+package com.unitedjiga.commontest.parsing;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import com.unitedjiga.common.parsing.Lexer;
 import com.unitedjiga.common.parsing.NonTerminalSymbol;
+import com.unitedjiga.common.parsing.ParsingException;
 import com.unitedjiga.common.parsing.Production;
 import com.unitedjiga.common.parsing.SingletonSymbol;
 import com.unitedjiga.common.parsing.Symbol;
