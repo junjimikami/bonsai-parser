@@ -61,7 +61,8 @@ class OrProduction extends AbstractProduction {
 			if (!anyMatch(getFirstSet(i, followSet), tokenizer)) {
 				continue;
 			}
-			Symbol symbol = elements.get(i).interpret(tokenizer, getFollowSet(i, followSet));
+//			Symbol symbol = elements.get(i).interpret(tokenizer, getFollowSet(i, followSet));
+			Symbol symbol = elements.get(i).interpret(tokenizer, followSet);
 			return newSingleton(this, Optional.of(symbol));
 		}
 		if (anyMatch(getFirstSet(followSet), tokenizer)) {

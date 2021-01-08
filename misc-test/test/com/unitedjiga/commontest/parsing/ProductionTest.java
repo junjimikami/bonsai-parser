@@ -22,6 +22,9 @@ import com.unitedjiga.common.parsing.TerminalSymbol;
 import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.TokenizerFactory;
 
+import static com.unitedjiga.common.parsing.Production.of;
+import static com.unitedjiga.common.parsing.Production.oneOf;
+
 class ProductionTest {
 
 	static SymbolVisitor<Void, String> printer = new SymbolVisitor<Void, String>() {
@@ -37,7 +40,7 @@ class ProductionTest {
 		public Void visitSingleton(SingletonSymbol s, String p) {
 			System.out.print(p);
 			System.out.println(s.getOrigin()  + ":" + s.getKind() + "=\"" + s + "\"");
-			s.forEach(e -> e.accept(this, " " + p));
+			s.forEach(e -> e.accept(this, "  " + p));
 			return null;
 		}
 		
@@ -45,14 +48,9 @@ class ProductionTest {
 		public Void visitNonTerminal(NonTerminalSymbol s, String p) {
 			System.out.print(p);
 			System.out.println(s.getOrigin()  + ":" + s.getKind() + "=\"" + s + "\"");
-			s.forEach(e -> e.accept(this, " " + p));
+			s.forEach(e -> e.accept(this, "  " + p));
 			return null;
-		}
-		
-		@Override
-		public Void visit(Symbol s, String p) {
-			throw new AssertionError();
-		}
+		}		
 	};
 	static void testSuccess(Production p, String in) {
 		testSuccess(p, in, Lexer::reset);
@@ -344,11 +342,11 @@ class ProductionTest {
 		testSuccess(A, "01");
 		testSuccess(A, "010");
 		testSuccess(A, "0101");
+		testSuccess(A, "010110");
 		testFailure(A, "1");
-		testFailure(A, "010110");
 	}
 	@Test
-	void test1_XXX() throws IOException {
+	void test1_XXX1() throws IOException {
 		/*
 		 file = [header CRLF] record *(CRLF record) [CRLF]
 		 header = name *(COMMA name)
@@ -396,5 +394,26 @@ class ProductionTest {
 		sb.append("Meet the Beatles!,20 January 1964").append("\r\n");
 //		sb.append("Meet the Beatles!,20 January 1964");
 		testSuccess(file, sb.toString());
+	}
+	@Test
+	void test1_XXX2() throws IOException {
+		Production CR = of("\\r");
+		Production LF = of("\\n");
+		Production lineTerminator = oneOf(LF, of(CR, LF.opt()));
+		Production commentHead = of("/", oneOf("/", "\\*"));
+		Production commentTail = of("\\*", of("/").opt());
+		Production comment = oneOf(commentHead, commentTail);
+		Production input = oneOf(lineTerminator, comment, ".").repeat();
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("//");
+		sb.append("\n");
+		sb.append("/*");
+		sb.append("\r");
+		sb.append("*");
+		sb.append("\r");
+		sb.append("\n");
+		sb.append("*/");
+		testSuccess(input, sb.toString());
 	}
 }

@@ -29,7 +29,9 @@ public interface SymbolVisitor<R, P> {
 		return visit(s, null);
 	}
 
-	R visit(Symbol s, P p);
+	default R visit(Symbol s, P p) {
+		return s.accept(this, p);
+	}
 	
 	R visitTerminal(TerminalSymbol s, P p);
 	

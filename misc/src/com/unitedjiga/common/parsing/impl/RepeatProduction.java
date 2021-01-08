@@ -25,6 +25,7 @@ package com.unitedjiga.common.parsing.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -52,7 +53,7 @@ class RepeatProduction extends AbstractProduction {
 		List<Symbol> list = new ArrayList<>();
 		while (anyMatch(getFirstSet(Collections.emptySet()), tokenizer)) {
 //			list.add(element.interpret(tokenizer, Collections.emptySet()));
-			list.add(element.interpret(tokenizer, followSet));
+			list.add(element.interpret(tokenizer, getFirstSet(followSet)));
 		}
 		if (!list.isEmpty()) {
 			return newNonTerminal(this, list);
@@ -65,7 +66,11 @@ class RepeatProduction extends AbstractProduction {
 
 	@Override
 	Set<TermProduction> getFirstSet(Set<TermProduction> followSet) {
-		return element.getFirstSet(followSet);
+//		return element.getFirstSet(followSet);
+		Set<TermProduction> set = new HashSet<>();
+		set.addAll(element.getFirstSet(followSet));
+		set.addAll(followSet);
+		return set;
 	}
 
 	@Override
