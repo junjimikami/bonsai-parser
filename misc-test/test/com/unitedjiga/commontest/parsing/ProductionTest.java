@@ -53,34 +53,33 @@ class ProductionTest {
 		}		
 	};
 	static void testSuccess(Production p, String in) {
-		testSuccess(p, in, Lexer::reset);
+//		testSuccess(p, in, Lexer::reset);
 //		assertTrue(p.asPattern().matcher(in).matches());
+//
+
+		TokenizerFactory tf = TokenizerFactory.newInstance();
+		try (Tokenizer tzer = tf.createTokenizer(new StringReader(in))) {
+			Symbol s = p.parse(tzer);
+			s.accept(printer, "+-");
+		}
+	}
+//	static void testSuccess(Production p, String in, Consumer<Lexer> c) {
+////		assertTrue(p.asPattern().matcher(in).matches());
 //
 //		try (Lexer lexer = new Lexer(new StringReader(in));
 //				Tokenizer tzer = TokenizerFactory.createTokenizer(lexer)) {
+//			c.accept(lexer);
 //			Symbol s = p.parse(tzer);
 //			s.accept(printer, "+-");
 //		} catch (IOException e) {
 //			fail(e);
 //		}
-	}
-	static void testSuccess(Production p, String in, Consumer<Lexer> c) {
-//		assertTrue(p.asPattern().matcher(in).matches());
-
-		try (Lexer lexer = new Lexer(new StringReader(in));
-				Tokenizer tzer = TokenizerFactory.createTokenizer(lexer)) {
-			c.accept(lexer);
-			Symbol s = p.parse(tzer);
-			s.accept(printer, "+-");
-		} catch (IOException e) {
-			fail(e);
-		}
-	}
+//	}
 	static void testFailure(Production p, String in) {
 //		assertFalse(p.asPattern().matcher(in).matches());
 
-		try (Lexer lexer = new Lexer(new StringReader(in));
-				Tokenizer tzer = TokenizerFactory.createTokenizer(lexer)) {
+		TokenizerFactory tf = TokenizerFactory.newInstance();
+		try (Tokenizer tzer = tf.createTokenizer(new StringReader(in))) {
 			assertThrows(ParsingException.class, () -> {
 				try {
 					p.parse(tzer);
@@ -88,8 +87,6 @@ class ProductionTest {
 					System.out.println(e);
 					throw e;
 				}});
-		} catch (IOException e) {
-			fail();
 		}
 	}
 	static void testInit(Production p) {
@@ -416,4 +413,14 @@ class ProductionTest {
 		sb.append("*/");
 		testSuccess(input, sb.toString());
 	}
+//	@Test
+//	void test1_XXX3() throws IOException {
+//		Production stringCharacter = of(" *[^\"]+");
+//		Production stringLiteral = of("\"", stringCharacter.repeat(), " *\"");
+//
+//		StringBuilder sb = new StringBuilder();
+//		sb.append("\" abc def \"");
+//		testSuccess(stringLiteral, sb.toString(),
+//				l -> l.setWordCharRange('a', 'z').setWhitespaceChars(' '));
+//	}
 }

@@ -23,7 +23,9 @@
  */
 package com.unitedjiga.common.parsing;
 
-import java.io.IOException;
+import java.io.Reader;
+
+import com.unitedjiga.common.parsing.impl.DefaultTokenizerFactory;
 
 /**
  * 
@@ -31,57 +33,10 @@ import java.io.IOException;
  *
  */
 public interface TokenizerFactory {
-
-	static Tokenizer createTokenizer(Lexer lexer) {
-		class LexerToken implements Token {
-			private String value;
-			private String skippedWhitespace;
-			LexerToken(String value, String skippedWhitespace) {
-				this.value = value;
-				this.skippedWhitespace = skippedWhitespace;
-			}
-
-			@Override
-			public String getValue() {
-				return value;
-			}
-
-			@Override
-			public String skippedWhitespace() {
-				return skippedWhitespace;
-			}			
-			
-			@Override
-			public String toString() {
-				return skippedWhitespace + value;
-			}
-		}
-		return new Tokenizer() {
-			
-			@Override
-			public void close() throws IOException {
-				lexer.close();
-			}
-			
-			@Override
-			public Token peek() {
-				return new LexerToken(lexer.hasNext() ? lexer.peek() : "", lexer.trailingWhitespace());
-			}
-			
-			@Override
-			public Token next() {
-				return new LexerToken(lexer.next(), lexer.skippedWhitespace());
-			}
-			
-			@Override
-			public boolean hasNext() {
-				return lexer.hasNext();
-			}
-			
-			@Override
-			public String toString() {
-				return lexer.toString();
-			}
-		};
+	
+	static TokenizerFactory newInstance() {
+		return new DefaultTokenizerFactory();
 	}
+
+	Tokenizer createTokenizer(Reader r);
 }

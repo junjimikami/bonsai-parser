@@ -32,7 +32,7 @@ public interface Symbol {
 	enum Kind {
 		TERMINAL {
 			@Override
-			boolean isSingleton() {
+			boolean isTerminal() {
 				return true;
 			}
 		},

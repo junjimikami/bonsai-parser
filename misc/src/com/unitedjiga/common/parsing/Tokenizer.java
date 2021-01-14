@@ -41,5 +41,8 @@ public interface Tokenizer extends Iterator<Token>, Closeable {
     Token peek();
 
     @Override
+    void close();
+
+    @Override
     String toString();
 }

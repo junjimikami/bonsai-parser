@@ -23,54 +23,13 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import java.util.Collections;
-import java.util.Set;
-import java.util.regex.Pattern;
-
-import com.unitedjiga.common.parsing.ParsingException;
-import com.unitedjiga.common.parsing.Symbol;
-import com.unitedjiga.common.parsing.Token;
-import com.unitedjiga.common.parsing.Tokenizer;
+import com.unitedjiga.common.parsing.SingletonSymbol;
 
 /**
- *
+ * 
  * @author Junji Mikami
+ *
  */
-class TermProduction extends AbstractProduction {
-    private final Pattern pattern;
+abstract class AbstractSingletonSymbol extends AbstractNonTerminalSymbol implements SingletonSymbol {
 
-    TermProduction(CharSequence regex) {
-        pattern = Pattern.compile(regex.toString());
-    }
-
-    @Override
-    Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
-        if (matches(tokenizer.peek())) {
-        	return tokenizer.next();
-        }
-        throw new ParsingException(Messages.RULE_MISMATCH.format(getFirstSet(followSet), tokenizer.peek()));
-    }
-
-    @Override
-    Set<TermProduction> getFirstSet(Set<TermProduction> followSet) {
-        return Collections.singleton(this);
-    }
-    
-    @Override
-    boolean isOption() {
-    	return false;
-    }
-
-    @Override
-    public Pattern asPattern() {
-    	return pattern;
-    }
-
-    boolean matches(Token t) {
-    	return pattern.matcher(t.toString()).matches();
-    }
-
-    static final TermProduction EOF = new TermProduction("") {
-    	
-    };
 }

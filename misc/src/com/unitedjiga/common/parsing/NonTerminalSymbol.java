@@ -23,11 +23,13 @@
  */
 package com.unitedjiga.common.parsing;
 
+import java.util.List;
+
 /**
  *
  * @author Junji Mikami
  */
-public interface NonTerminalSymbol extends Symbol, Iterable<Symbol> {
+public interface NonTerminalSymbol extends Symbol, List<Symbol> {
     
 	@Override
 	default Kind getKind() {
@@ -40,6 +42,4 @@ public interface NonTerminalSymbol extends Symbol, Iterable<Symbol> {
 	}
 
 	Production getOrigin();
-	
-	boolean isEmpty();
 }

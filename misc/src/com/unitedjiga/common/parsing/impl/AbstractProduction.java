@@ -24,8 +24,8 @@
 package com.unitedjiga.common.parsing.impl;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -80,12 +80,7 @@ abstract class AbstractProduction implements Production {
     	return set.stream().anyMatch(p -> p.matches(tokenizer.peek()));
     }
     static NonTerminalSymbol newNonTerminal(Production origin, List<Symbol> list) {
-    	return new NonTerminalSymbol() {
-			
-			@Override
-			public Iterator<Symbol> iterator() {
-				return list.iterator();
-			}
+    	return new AbstractNonTerminalSymbol() {
 			
 			@Override
 			public Production getOrigin() {
@@ -93,18 +88,23 @@ abstract class AbstractProduction implements Production {
 			}
 
 			@Override
-			public boolean isEmpty() {
-				return list.isEmpty();
-			}
-			
-			@Override
 			public String toString() {
 				return list.stream().map(Symbol::toString).collect(Collectors.joining());
+			}
+
+			@Override
+			public ListIterator<Symbol> listIterator(int index) {
+				return list.listIterator(index);
+			}
+
+			@Override
+			public int size() {
+				return list.size();
 			}
     	};
     }
     static SingletonSymbol newSingleton(Production origin, Optional<Symbol> symbol) {
-    	return new SingletonSymbol() {
+    	return new AbstractSingletonSymbol() {
 			
 			@Override
 			public Production getOrigin() {
@@ -117,18 +117,18 @@ abstract class AbstractProduction implements Production {
 			}
 
 			@Override
-			public boolean isEmpty() {
-				return symbol.isEmpty();
-			}
-
-			@Override
-			public Iterator<Symbol> iterator() {
-				return symbol.stream().iterator();
-			}
-
-			@Override
 			public String toString() {
 				return symbol.stream().map(Symbol::toString).collect(Collectors.joining());
+			}
+
+			@Override
+			public ListIterator<Symbol> listIterator(int index) {
+				return symbol.stream().collect(Collectors.toUnmodifiableList()).listIterator(index);
+			}
+
+			@Override
+			public int size() {
+				return (int) symbol.stream().count();
 			}
     	};
     }

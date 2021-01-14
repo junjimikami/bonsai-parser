@@ -24,7 +24,6 @@
 package com.unitedjiga.common.parsing.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -61,7 +60,6 @@ class OrProduction extends AbstractProduction {
 			if (!anyMatch(getFirstSet(i, followSet), tokenizer)) {
 				continue;
 			}
-//			Symbol symbol = elements.get(i).interpret(tokenizer, getFollowSet(i, followSet));
 			Symbol symbol = elements.get(i).interpret(tokenizer, followSet);
 			return newSingleton(this, Optional.of(symbol));
 		}
@@ -87,14 +85,6 @@ class OrProduction extends AbstractProduction {
 		assert 0 <= i && i < elements.size();
 		return elements.get(i).getFirstSet(followSet);
 	}
-
-	private Set<TermProduction> getFollowSet(int i, Set<TermProduction> followSet) {
-		assert 0 <= i && i < elements.size();
-    	if (elements.get(i).isOption()) {
-    		return followSet;
-    	}
-    	return Collections.emptySet();
-    }
 
 	@Override
 	boolean isOption() {
