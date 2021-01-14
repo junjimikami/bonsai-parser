@@ -29,8 +29,6 @@ package com.unitedjiga.common.parsing;
  */
 public interface Token extends TerminalSymbol {
     
-	String skippedWhitespace();
-		
 	@Override
 	String toString();
 }

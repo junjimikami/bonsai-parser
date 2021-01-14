@@ -63,7 +63,8 @@ class AndProduction extends AbstractProduction {
 			}
             return newNonTerminal(this, list);
         }
-        throw new ParsingException(Messages.RULE_MISMATCH.format(getFirstSet(followSet), tokenizer.peek()));
+        Object[] args = {getFirstSet(followSet), tokenizer.hasNext() ? tokenizer.peek() : "EOF"};
+        throw new ParsingException(Messages.RULE_MISMATCH.format(args));
     }
 
     @Override

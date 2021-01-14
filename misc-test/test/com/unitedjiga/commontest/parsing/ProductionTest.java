@@ -5,7 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
+import java.util.ListIterator;
 import java.util.function.Consumer;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +21,7 @@ import com.unitedjiga.common.parsing.SingletonSymbol;
 import com.unitedjiga.common.parsing.Symbol;
 import com.unitedjiga.common.parsing.SymbolVisitor;
 import com.unitedjiga.common.parsing.TerminalSymbol;
+import com.unitedjiga.common.parsing.Token;
 import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.TokenizerFactory;
 
@@ -53,9 +56,7 @@ class ProductionTest {
 		}		
 	};
 	static void testSuccess(Production p, String in) {
-//		testSuccess(p, in, Lexer::reset);
 //		assertTrue(p.asPattern().matcher(in).matches());
-//
 
 		TokenizerFactory tf = TokenizerFactory.newInstance();
 		try (Tokenizer tzer = tf.createTokenizer(new StringReader(in))) {
@@ -63,18 +64,6 @@ class ProductionTest {
 			s.accept(printer, "+-");
 		}
 	}
-//	static void testSuccess(Production p, String in, Consumer<Lexer> c) {
-////		assertTrue(p.asPattern().matcher(in).matches());
-//
-//		try (Lexer lexer = new Lexer(new StringReader(in));
-//				Tokenizer tzer = TokenizerFactory.createTokenizer(lexer)) {
-//			c.accept(lexer);
-//			Symbol s = p.parse(tzer);
-//			s.accept(printer, "+-");
-//		} catch (IOException e) {
-//			fail(e);
-//		}
-//	}
 	static void testFailure(Production p, String in) {
 //		assertFalse(p.asPattern().matcher(in).matches());
 
@@ -343,6 +332,19 @@ class ProductionTest {
 		testFailure(A, "1");
 	}
 	@Test
+	void test1_007() throws IOException {
+		Production C = Production.of("0");
+		Production B = Production.of("1");
+		Production A = Production.of(B.opt(), C.opt());
+		testInit(A);
+
+		testSuccess(A, "");
+		testSuccess(A, "1");
+		testSuccess(A, "0");
+		testSuccess(A, "10");
+		testFailure(A, "11");
+	}
+	@Test
 	void test1_XXX1() throws IOException {
 		/*
 		 file = [header CRLF] record *(CRLF record) [CRLF]
@@ -413,14 +415,110 @@ class ProductionTest {
 		sb.append("*/");
 		testSuccess(input, sb.toString());
 	}
-//	@Test
-//	void test1_XXX3() throws IOException {
-//		Production stringCharacter = of(" *[^\"]+");
-//		Production stringLiteral = of("\"", stringCharacter.repeat(), " *\"");
-//
-//		StringBuilder sb = new StringBuilder();
-//		sb.append("\" abc def \"");
-//		testSuccess(stringLiteral, sb.toString(),
-//				l -> l.setWordCharRange('a', 'z').setWhitespaceChars(' '));
-//	}
+	@Test
+	void test1_XXX3() {
+		class TestTokenizerFactory implements TokenizerFactory {
+			//LINE_TERMINATORS
+			Production LINE_TERMINATOR = oneOf(
+					of("\\n"),
+					of(of("\\r"), of("\\n").opt()));
+			//WHITE_SPACES
+			Production WHITE_SPACE = oneOf(
+					"\\x20",
+					"\\t",
+					"\\f",
+					LINE_TERMINATOR);
+			//COMMENTS
+			Production COMMENT = oneOf(
+					of("/", oneOf("/", "\\*")),
+					of("\\*", of("/").opt()));
+			//OPERATORS
+			Production OPERATOR = oneOf(
+					of("=", of("=").opt()),
+					of(">", of("=").opt()),
+					of("<", of("=").opt()));
+			//IDENTIFIERS
+			Production IDENTIFIER = of("\\p{Alpha}", of("\\p{Alnum}").repeat());
+			//INPUT
+			Production INPUT = oneOf(
+					WHITE_SPACE,
+					COMMENT,
+					OPERATOR,
+					IDENTIFIER).repeat();
+			
+			SymbolVisitor<Tokenizer, Tokenizer> visitor = new SymbolVisitor<>() {
+				
+				@Override
+				public Tokenizer visitTerminal(TerminalSymbol s, Tokenizer p) {
+					throw new AssertionError();
+				}
+				
+				@Override
+				public Tokenizer visitSingleton(SingletonSymbol s, Tokenizer p) {
+					throw new AssertionError();
+				}
+				
+				@Override
+				public Tokenizer visitNonTerminal(NonTerminalSymbol s, Tokenizer p) {
+					return new Tokenizer() {
+						ListIterator<Symbol> list = s.listIterator();
+						
+						@Override
+						public Token peek() {
+							try {
+								return newToken(list.next().toString());
+							} finally {
+								list.previous();
+							}
+						}
+						
+						@Override
+						public Token next() {
+							return newToken(list.next().toString());
+						}
+						
+						@Override
+						public boolean hasNext() {
+							return list.hasNext();
+						}
+						
+						@Override
+						public void close() {
+							p.close();
+						}
+					};
+				}
+				
+				private Token newToken(String value) {
+					return new Token() {
+						
+						@Override
+						public String getValue() {
+							return value;
+						}
+					};
+				}
+			};
+
+			@Override
+			public Tokenizer createTokenizer(Reader r) {
+				TokenizerFactory tf = TokenizerFactory.newInstance();
+				Tokenizer tzer = tf.createTokenizer(r);
+				Symbol s = INPUT.parse(tzer);
+				return s.accept(visitor, tzer);
+			}
+			
+		}
+
+		String in = "abc=D12\r\n"
+				+ "= == < <= > >=\r"
+				+ "//Comment line\n"
+				+ "/*\n"
+				+ "*Comment block\n"
+				+ "*/";
+		TokenizerFactory tf = new TestTokenizerFactory();
+		try (Tokenizer tzer = tf.createTokenizer(new StringReader(in))) {
+			tzer.forEachRemaining(t -> System.out.println("|" + t.getValue()));
+		}
+	}
 }

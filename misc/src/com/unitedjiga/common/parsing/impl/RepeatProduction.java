@@ -61,7 +61,9 @@ class RepeatProduction extends AbstractProduction {
 		if (anyMatch(followSet, tokenizer)) {
 			return newNonTerminal(this, list);
 		}
-        throw new ParsingException(Messages.RULE_MISMATCH.format(getFirstSet(followSet), tokenizer.peek()));
+        Object[] args = {getFirstSet(followSet), tokenizer.hasNext() ? tokenizer.peek() : "EOF"};
+        throw new ParsingException(Messages.RULE_MISMATCH.format(args));
+//        throw new ParsingException(Messages.RULE_MISMATCH.format(getFirstSet(followSet), tokenizer.peek()));
 	}
 
 	@Override

@@ -77,7 +77,7 @@ abstract class AbstractProduction implements Production {
     	if (!tokenizer.hasNext()) {
 			return set.contains(TermProduction.EOF);
 		}
-    	return set.stream().anyMatch(p -> p.matches(tokenizer.peek()));
+    	return set.stream().anyMatch(p -> p.matches(tokenizer));
     }
     static NonTerminalSymbol newNonTerminal(Production origin, List<Symbol> list) {
     	return new AbstractNonTerminalSymbol() {

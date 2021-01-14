@@ -48,14 +48,9 @@ public class DefaultTokenizerFactory implements TokenizerFactory {
 
 		@Override
 		public String getValue() {
-			return ch != -1 ? Character.toString(ch) : "";
+			return Character.toString(ch);
 		}
 
-		@Override
-		public String skippedWhitespace() {
-			return "";
-		}
-		
 		@Override
 		public String toString() {
 			return getValue();
@@ -77,7 +72,11 @@ public class DefaultTokenizerFactory implements TokenizerFactory {
 			
 			@Override
 			public Token peek() {
-				return new CharToken(peekChar());
+				int ch = peekChar();
+				if (ch != -1) {
+					return new CharToken(ch);
+				}
+				throw new NoSuchElementException();
 			}
 			
 			@Override

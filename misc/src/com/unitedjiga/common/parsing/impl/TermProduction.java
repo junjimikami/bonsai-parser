@@ -45,10 +45,12 @@ class TermProduction extends AbstractProduction {
 
     @Override
     Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
-        if (matches(tokenizer.peek())) {
+        if (matches(tokenizer)) {
         	return tokenizer.next();
         }
-        throw new ParsingException(Messages.RULE_MISMATCH.format(getFirstSet(followSet), tokenizer.peek()));
+        Object[] args = {getFirstSet(followSet), tokenizer.hasNext() ? tokenizer.peek() : "EOF"};
+        throw new ParsingException(Messages.RULE_MISMATCH.format(args));
+//        throw new ParsingException(Messages.RULE_MISMATCH.format(getFirstSet(followSet), tokenizer.peek()));
     }
 
     @Override
@@ -66,11 +68,15 @@ class TermProduction extends AbstractProduction {
     	return pattern;
     }
 
-    boolean matches(Token t) {
-    	return pattern.matcher(t.toString()).matches();
+    boolean matches(Tokenizer tokenizer) {
+    	if (!tokenizer.hasNext()) {
+			return false;
+		}
+    	Token t = tokenizer.peek();
+    	return pattern.matcher(t.getValue()).matches();
     }
 
-    static final TermProduction EOF = new TermProduction("") {
+    static final TermProduction EOF = new TermProduction("EOF") {
     	
     };
 }
