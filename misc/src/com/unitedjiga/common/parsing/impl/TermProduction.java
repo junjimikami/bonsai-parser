@@ -76,7 +76,5 @@ class TermProduction extends AbstractProduction {
     	return pattern.matcher(t.getValue()).matches();
     }
 
-    static final TermProduction EOF = new TermProduction("EOF") {
-    	
-    };
+    static final TermProduction EOF = new TermProduction("EOF") {};
 }

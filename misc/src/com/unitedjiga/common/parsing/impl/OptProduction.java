@@ -47,16 +47,17 @@ class OptProduction extends AbstractProduction {
 
 	@Override
     Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
-        if (anyMatch(getFirstSet(Collections.emptySet()), tokenizer)) {
+        if (anyMatch(getFirstSet(), tokenizer)) {
         	Symbol symbol = element.interpret(tokenizer, followSet);
         	return newSingleton(this, Optional.of(symbol));
         }
-        if (anyMatch(followSet, tokenizer)) {
-        	return newSingleton(this, Optional.empty());
-        }
-        Object[] args = {getFirstSet(followSet), tokenizer.hasNext() ? tokenizer.peek() : "EOF"};
-        throw new ParsingException(Messages.RULE_MISMATCH.format(args));
-//        throw new ParsingException(Messages.RULE_MISMATCH.format(getFirstSet(followSet), tokenizer.peek()));
+    	return newSingleton(this, Optional.empty());
+//        if (anyMatch(followSet, tokenizer)) {
+//        	return newSingleton(this, Optional.empty());
+//        }
+//        Object[] args = {getFirstSet(followSet), tokenizer.hasNext() ? tokenizer.peek() : "EOF"};
+//        throw new ParsingException(Messages.RULE_MISMATCH.format(args));
+////        throw new ParsingException(Messages.RULE_MISMATCH.format(getFirstSet(followSet), tokenizer.peek()));
     }
 
     @Override

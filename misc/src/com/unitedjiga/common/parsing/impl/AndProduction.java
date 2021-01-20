@@ -73,7 +73,7 @@ class AndProduction extends AbstractProduction {
 			return followSet;
 		}
     	Set<TermProduction> set = new HashSet<>();
-    	set.addAll(elements.get(0).getFirstSet(Collections.emptySet()));
+    	set.addAll(elements.get(0).getFirstSet());
     	set.addAll(getFollowSet(0, followSet));
         return set;
     }
@@ -87,7 +87,7 @@ class AndProduction extends AbstractProduction {
 			return followSet;
 		}
     	Set<TermProduction> set = new HashSet<>();
-		set.addAll(elements.get(i + 1).getFirstSet(Collections.emptySet()));
+		set.addAll(elements.get(i + 1).getFirstSet());
 		set.addAll(getFollowSet(i + 1, followSet));
     	return set;
     }

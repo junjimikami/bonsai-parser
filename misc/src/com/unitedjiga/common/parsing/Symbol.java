@@ -54,6 +54,20 @@ public interface Symbol {
 	}
 
 	Kind getKind();
+	
+	default Token asToken() {
+		return new Token() {
+			
+			@Override
+			public String getValue() {
+				return Symbol.this.toString();
+			}
+			@Override
+			public String toString() {
+				return getValue();
+			}
+		};
+	}
 
 	<R, P> R accept(SymbolVisitor<R, P> v, P p);
 

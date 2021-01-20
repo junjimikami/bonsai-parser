@@ -35,7 +35,9 @@ public interface SymbolVisitor<R, P> {
 	
 	R visitTerminal(TerminalSymbol s, P p);
 	
-	R visitSingleton(SingletonSymbol s, P p);
-	
 	R visitNonTerminal(NonTerminalSymbol s, P p);
+	
+	default R visitSingleton(SingletonSymbol s, P p) {
+		return visitNonTerminal(s, p);
+	}
 }

@@ -44,12 +44,18 @@ import com.unitedjiga.common.parsing.Tokenizer;
 abstract class AbstractProduction implements Production {
     
     @Override
-    public Symbol parse(Tokenizer tokenizer) {
-    	Symbol symbol = interpret(tokenizer, Collections.singleton(TermProduction.EOF));
+    public Symbol parseRemaining(Tokenizer tokenizer) {
+//    	Symbol symbol = interpret(tokenizer, Collections.singleton(TermProduction.EOF));
+    	Symbol symbol = parse(tokenizer);
     	if (tokenizer.hasNext()) {
 	        throw new ParsingException(Messages.TOO_MANY_TOKEN.format(tokenizer.peek()));
 		}
 		return symbol;
+    }
+
+    @Override
+    public Symbol parse(Tokenizer tokenizer) {
+    	return interpret(tokenizer, Collections.singleton(TermProduction.EOF));
     }
     
     @Override
@@ -68,6 +74,9 @@ abstract class AbstractProduction implements Production {
     }
 
     abstract Set<TermProduction> getFirstSet(Set<TermProduction> followSet);
+    Set<TermProduction> getFirstSet() {
+    	return getFirstSet(Collections.emptySet());
+    }
     
     abstract Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet);
     

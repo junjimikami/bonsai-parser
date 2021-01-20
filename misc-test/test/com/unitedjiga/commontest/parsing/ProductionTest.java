@@ -1,13 +1,16 @@
 package com.unitedjiga.commontest.parsing;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ListIterator;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -39,13 +42,13 @@ class ProductionTest {
 			return null;
 		}
 		
-		@Override
-		public Void visitSingleton(SingletonSymbol s, String p) {
-			System.out.print(p);
-			System.out.println(s.getOrigin()  + ":" + s.getKind() + "=\"" + s + "\"");
-			s.forEach(e -> e.accept(this, "  " + p));
-			return null;
-		}
+//		@Override
+//		public Void visitSingleton(SingletonSymbol s, String p) {
+//			System.out.print(p);
+//			System.out.println(s.getOrigin()  + ":" + s.getKind() + "=\"" + s + "\"");
+//			s.forEach(e -> e.accept(this, "  " + p));
+//			return null;
+//		}
 		
 		@Override
 		public Void visitNonTerminal(NonTerminalSymbol s, String p) {
@@ -56,22 +59,22 @@ class ProductionTest {
 		}		
 	};
 	static void testSuccess(Production p, String in) {
-//		assertTrue(p.asPattern().matcher(in).matches());
+		assertTrue(p.asPattern().matcher(in).matches());
 
 		TokenizerFactory tf = TokenizerFactory.newInstance();
 		try (Tokenizer tzer = tf.createTokenizer(new StringReader(in))) {
-			Symbol s = p.parse(tzer);
+			Symbol s = p.parseRemaining(tzer);
 			s.accept(printer, "+-");
 		}
 	}
 	static void testFailure(Production p, String in) {
-//		assertFalse(p.asPattern().matcher(in).matches());
+		assertFalse(p.asPattern().matcher(in).matches());
 
 		TokenizerFactory tf = TokenizerFactory.newInstance();
 		try (Tokenizer tzer = tf.createTokenizer(new StringReader(in))) {
 			assertThrows(ParsingException.class, () -> {
 				try {
-					p.parse(tzer);
+					p.parseRemaining(tzer);
 				} catch (ParsingException e) {
 					System.out.println(e);
 					throw e;
@@ -418,6 +421,7 @@ class ProductionTest {
 	@Test
 	void test1_XXX3() {
 		class TestTokenizerFactory implements TokenizerFactory {
+			//Phase1
 			//LINE_TERMINATORS
 			Production LINE_TERMINATOR = oneOf(
 					of("\\n"),
@@ -444,68 +448,69 @@ class ProductionTest {
 					WHITE_SPACE,
 					COMMENT,
 					OPERATOR,
-					IDENTIFIER).repeat();
+					IDENTIFIER);//.repeat();
 			
-			SymbolVisitor<Tokenizer, Tokenizer> visitor = new SymbolVisitor<>() {
+			//Phase2
+			Production END_OF_LINE_COMMENT = of("//", of(".+").repeat());
+			Production TRADITIONAL_COMMNET = of("/\\*", of("(?!\\*/)(?s:.+)").repeat(), "\\*/");
+			Production INPUT2 = oneOf(
+					END_OF_LINE_COMMENT,
+					TRADITIONAL_COMMNET,
+					"(?s:.+)");//.repeat();
+
+			class TestTokenizer implements Tokenizer {
+				private Tokenizer tzer;
+				private Production p;
+				private Token t;
+				public TestTokenizer(Tokenizer tzer, Production p) {
+					this.tzer = tzer;
+					this.p = p;
+				}
+
+				@Override
+				public boolean hasNext() {
+					if (t != null) {
+						return true;
+					}
+					return tzer.hasNext();
+				}
+
+				@Override
+				public Token next() {
+					try {
+						return peek();
+					} finally {
+						t = null;
+					}
+				}
+
+				@Override
+				public Token peek() {
+					if (t == null) {
+						Symbol s = p.parse(tzer);
+						t = s.asToken();
+					}
+					return t;
+				}
+
+				@Override
+				public void close() {
+					tzer.close();
+				}
 				
 				@Override
-				public Tokenizer visitTerminal(TerminalSymbol s, Tokenizer p) {
-					throw new AssertionError();
+				public String toString() {
+					return tzer.toString();
 				}
-				
-				@Override
-				public Tokenizer visitSingleton(SingletonSymbol s, Tokenizer p) {
-					throw new AssertionError();
-				}
-				
-				@Override
-				public Tokenizer visitNonTerminal(NonTerminalSymbol s, Tokenizer p) {
-					return new Tokenizer() {
-						ListIterator<Symbol> list = s.listIterator();
-						
-						@Override
-						public Token peek() {
-							try {
-								return newToken(list.next().toString());
-							} finally {
-								list.previous();
-							}
-						}
-						
-						@Override
-						public Token next() {
-							return newToken(list.next().toString());
-						}
-						
-						@Override
-						public boolean hasNext() {
-							return list.hasNext();
-						}
-						
-						@Override
-						public void close() {
-							p.close();
-						}
-					};
-				}
-				
-				private Token newToken(String value) {
-					return new Token() {
-						
-						@Override
-						public String getValue() {
-							return value;
-						}
-					};
-				}
-			};
+			}
 
 			@Override
 			public Tokenizer createTokenizer(Reader r) {
 				TokenizerFactory tf = TokenizerFactory.newInstance();
 				Tokenizer tzer = tf.createTokenizer(r);
-				Symbol s = INPUT.parse(tzer);
-				return s.accept(visitor, tzer);
+				tzer = new TestTokenizer(tzer, INPUT);
+				tzer = new TestTokenizer(tzer, INPUT2);
+				return tzer;
 			}
 			
 		}
@@ -514,8 +519,8 @@ class ProductionTest {
 				+ "= == < <= > >=\r"
 				+ "//Comment line\n"
 				+ "/*\n"
-				+ "*Comment block\n"
-				+ "*/";
+				+ " *Comment block\n"
+				+ " */";
 		TokenizerFactory tf = new TestTokenizerFactory();
 		try (Tokenizer tzer = tf.createTokenizer(new StringReader(in))) {
 			tzer.forEachRemaining(t -> System.out.println("|" + t.getValue()));

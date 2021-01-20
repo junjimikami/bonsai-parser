@@ -40,6 +40,7 @@ public interface Production extends CharSequence {
     	return Productions.getInstance().oneOf(regex);
     }
 
+    Symbol parseRemaining(Tokenizer tokenizer);
     Symbol parse(Tokenizer tokenizer);
 
     Production opt();

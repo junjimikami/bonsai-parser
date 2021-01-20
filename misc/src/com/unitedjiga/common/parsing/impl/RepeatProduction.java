@@ -51,26 +51,30 @@ class RepeatProduction extends AbstractProduction {
 	@Override
 	Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
 		List<Symbol> list = new ArrayList<>();
-		while (anyMatch(getFirstSet(Collections.emptySet()), tokenizer)) {
+		while (anyMatch(getFirstSet(), tokenizer)) {
 //			list.add(element.interpret(tokenizer, Collections.emptySet()));
-			list.add(element.interpret(tokenizer, getFirstSet(followSet)));
+			list.add(element.interpret(tokenizer, getFollowSet(followSet)));
 		}
 		if (!list.isEmpty()) {
 			return newNonTerminal(this, list);
 		}
-		if (anyMatch(followSet, tokenizer)) {
-			return newNonTerminal(this, list);
-		}
-        Object[] args = {getFirstSet(followSet), tokenizer.hasNext() ? tokenizer.peek() : "EOF"};
-        throw new ParsingException(Messages.RULE_MISMATCH.format(args));
-//        throw new ParsingException(Messages.RULE_MISMATCH.format(getFirstSet(followSet), tokenizer.peek()));
+		return newNonTerminal(this, Collections.emptyList());
+//		if (anyMatch(followSet, tokenizer)) {
+//			return newNonTerminal(this, list);
+//		}
+//        Object[] args = {getFirstSet(followSet), tokenizer.hasNext() ? tokenizer.peek() : "EOF"};
+//        throw new ParsingException(Messages.RULE_MISMATCH.format(args));
+////        throw new ParsingException(Messages.RULE_MISMATCH.format(getFirstSet(followSet), tokenizer.peek()));
 	}
 
 	@Override
 	Set<TermProduction> getFirstSet(Set<TermProduction> followSet) {
-//		return element.getFirstSet(followSet);
+		return element.getFirstSet(followSet);
+	}
+
+	private Set<TermProduction> getFollowSet(Set<TermProduction> followSet) {
 		Set<TermProduction> set = new HashSet<>();
-		set.addAll(element.getFirstSet(followSet));
+		set.addAll(element.getFirstSet());
 		set.addAll(followSet);
 		return set;
 	}
