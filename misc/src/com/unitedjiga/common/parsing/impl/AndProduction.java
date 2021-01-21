@@ -55,15 +55,15 @@ class AndProduction extends AbstractProduction {
 
     @Override
     Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
-        List<Symbol> list = new ArrayList<>();
         if (anyMatch(getFirstSet(followSet), tokenizer)) {
+        	List<Symbol> list = new ArrayList<>();
         	for (int i = 0; i < elements.size(); i++) {
 				list.add(elements.get(i)
 						.interpret(tokenizer, getFollowSet(i, followSet)));
 			}
             return newNonTerminal(this, list);
         }
-        Object[] args = {getFirstSet(followSet), tokenizer.hasNext() ? tokenizer.peek() : "EOF"};
+        Object[] args = {getFirstSet(followSet), tryNext(tokenizer)};
         throw new ParsingException(Messages.RULE_MISMATCH.format(args));
     }
 

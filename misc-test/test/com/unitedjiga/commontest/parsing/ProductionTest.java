@@ -16,7 +16,6 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.unitedjiga.common.parsing.Lexer;
 import com.unitedjiga.common.parsing.NonTerminalSymbol;
 import com.unitedjiga.common.parsing.ParsingException;
 import com.unitedjiga.common.parsing.Production;
@@ -27,6 +26,7 @@ import com.unitedjiga.common.parsing.TerminalSymbol;
 import com.unitedjiga.common.parsing.Token;
 import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.TokenizerFactory;
+import com.unitedjiga.common.util.Lexer;
 
 import static com.unitedjiga.common.parsing.Production.of;
 import static com.unitedjiga.common.parsing.Production.oneOf;

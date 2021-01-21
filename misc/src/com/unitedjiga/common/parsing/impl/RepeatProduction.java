@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import com.unitedjiga.common.parsing.ParsingException;
 import com.unitedjiga.common.parsing.Symbol;
 import com.unitedjiga.common.parsing.Tokenizer;
 
@@ -52,19 +51,12 @@ class RepeatProduction extends AbstractProduction {
 	Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
 		List<Symbol> list = new ArrayList<>();
 		while (anyMatch(getFirstSet(), tokenizer)) {
-//			list.add(element.interpret(tokenizer, Collections.emptySet()));
 			list.add(element.interpret(tokenizer, getFollowSet(followSet)));
 		}
 		if (!list.isEmpty()) {
 			return newNonTerminal(this, list);
 		}
 		return newNonTerminal(this, Collections.emptyList());
-//		if (anyMatch(followSet, tokenizer)) {
-//			return newNonTerminal(this, list);
-//		}
-//        Object[] args = {getFirstSet(followSet), tokenizer.hasNext() ? tokenizer.peek() : "EOF"};
-//        throw new ParsingException(Messages.RULE_MISMATCH.format(args));
-////        throw new ParsingException(Messages.RULE_MISMATCH.format(getFirstSet(followSet), tokenizer.peek()));
 	}
 
 	@Override

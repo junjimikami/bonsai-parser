@@ -66,9 +66,8 @@ class OrProduction extends AbstractProduction {
 		if (anyMatch(getFirstSet(followSet), tokenizer)) {
 			return newSingleton(this, Optional.empty());
 		}
-        Object[] args = {getFirstSet(followSet), tokenizer.hasNext() ? tokenizer.peek() : "EOF"};
+        Object[] args = {getFirstSet(followSet), tryNext(tokenizer)};
         throw new ParsingException(Messages.RULE_MISMATCH.format(args));
-//        throw new ParsingException(Messages.RULE_MISMATCH.format(getFirstSet(followSet), tokenizer.peek()));
 	}
 
 	@Override

@@ -48,9 +48,8 @@ class TermProduction extends AbstractProduction {
         if (matches(tokenizer)) {
         	return tokenizer.next();
         }
-        Object[] args = {getFirstSet(followSet), tokenizer.hasNext() ? tokenizer.peek() : "EOF"};
+        Object[] args = {getFirstSet(followSet), tryNext(tokenizer)};
         throw new ParsingException(Messages.RULE_MISMATCH.format(args));
-//        throw new ParsingException(Messages.RULE_MISMATCH.format(getFirstSet(followSet), tokenizer.peek()));
     }
 
     @Override
@@ -75,6 +74,4 @@ class TermProduction extends AbstractProduction {
     	Token t = tokenizer.peek();
     	return pattern.matcher(t.getValue()).matches();
     }
-
-    static final TermProduction EOF = new TermProduction("EOF") {};
 }

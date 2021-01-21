@@ -23,12 +23,10 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import com.unitedjiga.common.parsing.ParsingException;
 import com.unitedjiga.common.parsing.Symbol;
 import com.unitedjiga.common.parsing.Tokenizer;
 
@@ -52,12 +50,6 @@ class OptProduction extends AbstractProduction {
         	return newSingleton(this, Optional.of(symbol));
         }
     	return newSingleton(this, Optional.empty());
-//        if (anyMatch(followSet, tokenizer)) {
-//        	return newSingleton(this, Optional.empty());
-//        }
-//        Object[] args = {getFirstSet(followSet), tokenizer.hasNext() ? tokenizer.peek() : "EOF"};
-//        throw new ParsingException(Messages.RULE_MISMATCH.format(args));
-////        throw new ParsingException(Messages.RULE_MISMATCH.format(getFirstSet(followSet), tokenizer.peek()));
     }
 
     @Override

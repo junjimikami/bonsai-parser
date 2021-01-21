@@ -43,9 +43,10 @@ import com.unitedjiga.common.parsing.Tokenizer;
  */
 abstract class AbstractProduction implements Production {
     
+    private static final TermProduction EOF = new TermProduction("EOF") {};
+
     @Override
     public Symbol parseRemaining(Tokenizer tokenizer) {
-//    	Symbol symbol = interpret(tokenizer, Collections.singleton(TermProduction.EOF));
     	Symbol symbol = parse(tokenizer);
     	if (tokenizer.hasNext()) {
 	        throw new ParsingException(Messages.TOO_MANY_TOKEN.format(tokenizer.peek()));
@@ -55,7 +56,7 @@ abstract class AbstractProduction implements Production {
 
     @Override
     public Symbol parse(Tokenizer tokenizer) {
-    	return interpret(tokenizer, Collections.singleton(TermProduction.EOF));
+    	return interpret(tokenizer, Collections.singleton(EOF));
     }
     
     @Override
@@ -84,7 +85,7 @@ abstract class AbstractProduction implements Production {
 
     static boolean anyMatch(Set<TermProduction> set, Tokenizer tokenizer) {
     	if (!tokenizer.hasNext()) {
-			return set.contains(TermProduction.EOF);
+			return set.contains(EOF);
 		}
     	return set.stream().anyMatch(p -> p.matches(tokenizer));
     }
@@ -140,5 +141,9 @@ abstract class AbstractProduction implements Production {
 				return (int) symbol.stream().count();
 			}
     	};
+    }
+    
+    static Object tryNext(Tokenizer tokenizer) {
+    	return tokenizer.hasNext() ? tokenizer.peek() : "EOF";
     }
 }
