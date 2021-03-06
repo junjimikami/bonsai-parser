@@ -31,21 +31,21 @@ import com.unitedjiga.common.parsing.Production;
  *
  */
 public final class Productions {
-	private static final Productions instance = new Productions();
-	
-	private Productions() {
-		
-	}
+    private static final Productions instance = new Productions();
 
-	public static Productions getInstance() {
-		return instance;
-	}
+    private Productions() {
 
-	public Production of(CharSequence... regex) {
-		return new AndProduction(regex);
-	}
+    }
 
-	public Production oneOf(CharSequence... regex) {
-		return new OrProduction(regex);
-	}
+    public static Productions getInstance() {
+        return instance;
+    }
+
+    public Production of(CharSequence... regex) {
+        return new AndProduction(regex);
+    }
+
+    public Production oneOf(CharSequence... regex) {
+        return new OrProduction(regex);
+    }
 }

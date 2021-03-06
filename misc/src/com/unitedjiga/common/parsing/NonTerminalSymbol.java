@@ -30,16 +30,16 @@ import java.util.List;
  * @author Junji Mikami
  */
 public interface NonTerminalSymbol extends Symbol, List<Symbol> {
-    
-	@Override
-	default Kind getKind() {
-		return Kind.NON_TERMINAL;
-	}
 
-	@Override
-	default <R, P> R accept(SymbolVisitor<R, P> v, P p) {
-		return v.visitNonTerminal(this, p);
-	}
+    @Override
+    default Kind getKind() {
+        return Kind.NON_TERMINAL;
+    }
 
-	Production getOrigin();
+    @Override
+    default <R, P> R accept(SymbolVisitor<R, P> v, P p) {
+        return v.visitNonTerminal(this, p);
+    }
+
+    Production getOrigin();
 }

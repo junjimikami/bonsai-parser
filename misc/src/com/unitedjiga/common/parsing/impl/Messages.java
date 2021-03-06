@@ -30,18 +30,17 @@ import java.text.MessageFormat;
  *
  */
 enum Messages {
-	
-	TOO_MANY_TOKEN("expected EOF, but {0}."),
-	RULE_MISMATCH("expected {0}, but {1}.");
 
-	private String message;
+    TOO_MANY_TOKEN("expected EOF, but {0}."), RULE_MISMATCH("expected {0}, but {1}.");
 
-	Messages(String message) {
-		this.message = message;
-	}
+    private String message;
 
-	String format(Object...args) {
-		return MessageFormat.format(message, args);
-	}
+    Messages(String message) {
+        this.message = message;
+    }
+
+    String format(Object... args) {
+        return MessageFormat.format(message, args);
+    }
 
 }

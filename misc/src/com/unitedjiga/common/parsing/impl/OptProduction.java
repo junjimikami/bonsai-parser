@@ -35,35 +35,35 @@ import com.unitedjiga.common.parsing.Tokenizer;
  * @author Junji Mikami
  */
 class OptProduction extends AbstractProduction {
-	private final AbstractProduction element;
-	private final Pattern pattern;
-	
-	OptProduction(AbstractProduction p) {
-		element = p;
-    	pattern =  Pattern.compile("(" + element + ")?");
-	}
+    private final AbstractProduction element;
+    private final Pattern pattern;
 
-	@Override
+    OptProduction(AbstractProduction p) {
+        element = p;
+        pattern = Pattern.compile("(" + element + ")?");
+    }
+
+    @Override
     Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
         if (anyMatch(getFirstSet(), tokenizer)) {
-        	Symbol symbol = element.interpret(tokenizer, followSet);
-        	return newSingleton(this, Optional.of(symbol));
+            Symbol symbol = element.interpret(tokenizer, followSet);
+            return newSingleton(this, Optional.of(symbol));
         }
-    	return newSingleton(this, Optional.empty());
+        return newSingleton(this, Optional.empty());
     }
 
     @Override
     Set<TermProduction> getFirstSet(Set<TermProduction> followSet) {
-    	return element.getFirstSet(followSet);
+        return element.getFirstSet(followSet);
     }
-    
+
     @Override
     boolean isOption() {
-    	return true;
+        return true;
     }
 
     @Override
     public Pattern asPattern() {
-    	return pattern;
+        return pattern;
     }
 }

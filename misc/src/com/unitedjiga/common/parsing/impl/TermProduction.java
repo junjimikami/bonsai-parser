@@ -46,9 +46,9 @@ class TermProduction extends AbstractProduction {
     @Override
     Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
         if (matches(tokenizer)) {
-        	return tokenizer.next();
+            return tokenizer.next();
         }
-        Object[] args = {getFirstSet(followSet), tryNext(tokenizer)};
+        Object[] args = { getFirstSet(followSet), tryNext(tokenizer) };
         throw new ParsingException(Messages.RULE_MISMATCH.format(args));
     }
 
@@ -56,22 +56,22 @@ class TermProduction extends AbstractProduction {
     Set<TermProduction> getFirstSet(Set<TermProduction> followSet) {
         return Collections.singleton(this);
     }
-    
+
     @Override
     boolean isOption() {
-    	return false;
+        return false;
     }
 
     @Override
     public Pattern asPattern() {
-    	return pattern;
+        return pattern;
     }
 
     boolean matches(Tokenizer tokenizer) {
-    	if (!tokenizer.hasNext()) {
-			return false;
-		}
-    	Token t = tokenizer.peek();
-    	return pattern.matcher(t.getValue()).matches();
+        if (!tokenizer.hasNext()) {
+            return false;
+        }
+        Token t = tokenizer.peek();
+        return pattern.matcher(t.getValue()).matches();
     }
 }

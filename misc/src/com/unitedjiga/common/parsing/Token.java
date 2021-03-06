@@ -28,7 +28,7 @@ package com.unitedjiga.common.parsing;
  * @author Junji Mikami
  */
 public interface Token extends TerminalSymbol {
-    
-	@Override
-	String toString();
+
+    @Override
+    String toString();
 }

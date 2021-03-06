@@ -28,49 +28,49 @@ package com.unitedjiga.common.parsing;
  * @author Junji Mikami
  */
 public interface Symbol {
-    
-	enum Kind {
-		TERMINAL {
-			@Override
-			boolean isTerminal() {
-				return true;
-			}
-		},
-		NON_TERMINAL,
-		SINGLETON {
-			@Override
-			boolean isSingleton() {
-				return true;
-			}
-		};
-		
-		boolean isTerminal() {
-			return false;
-		}
-		
-		boolean isSingleton() {
-			return false;
-		}
-	}
 
-	Kind getKind();
-	
-	default Token asToken() {
-		return new Token() {
-			
-			@Override
-			public String getValue() {
-				return Symbol.this.toString();
-			}
-			@Override
-			public String toString() {
-				return getValue();
-			}
-		};
-	}
+    enum Kind {
+        TERMINAL {
+            @Override
+            boolean isTerminal() {
+                return true;
+            }
+        },
+        NON_TERMINAL, SINGLETON {
+            @Override
+            boolean isSingleton() {
+                return true;
+            }
+        };
 
-	<R, P> R accept(SymbolVisitor<R, P> v, P p);
+        boolean isTerminal() {
+            return false;
+        }
 
-	@Override
-	String toString();
+        boolean isSingleton() {
+            return false;
+        }
+    }
+
+    Kind getKind();
+
+    default Token asToken() {
+        return new Token() {
+
+            @Override
+            public String getValue() {
+                return Symbol.this.toString();
+            }
+
+            @Override
+            public String toString() {
+                return getValue();
+            }
+        };
+    }
+
+    <R, P> R accept(SymbolVisitor<R, P> v, P p);
+
+    @Override
+    String toString();
 }

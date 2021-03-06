@@ -31,13 +31,13 @@ import java.util.Iterator;
  * @author Junji Mikami
  */
 public interface Tokenizer extends Iterator<Token>, Closeable {
-    
+
     @Override
     boolean hasNext();
 
     @Override
     Token next();
-    
+
     Token peek();
 
     @Override

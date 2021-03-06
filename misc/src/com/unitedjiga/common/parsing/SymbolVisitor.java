@@ -25,19 +25,19 @@ package com.unitedjiga.common.parsing;
 
 public interface SymbolVisitor<R, P> {
 
-	default R visit(Symbol s) {
-		return visit(s, null);
-	}
+    default R visit(Symbol s) {
+        return visit(s, null);
+    }
 
-	default R visit(Symbol s, P p) {
-		return s.accept(this, p);
-	}
-	
-	R visitTerminal(TerminalSymbol s, P p);
-	
-	R visitNonTerminal(NonTerminalSymbol s, P p);
-	
-	default R visitSingleton(SingletonSymbol s, P p) {
-		return visitNonTerminal(s, p);
-	}
+    default R visit(Symbol s, P p) {
+        return s.accept(this, p);
+    }
+
+    R visitTerminal(TerminalSymbol s, P p);
+
+    R visitNonTerminal(NonTerminalSymbol s, P p);
+
+    default R visitSingleton(SingletonSymbol s, P p) {
+        return visitNonTerminal(s, p);
+    }
 }

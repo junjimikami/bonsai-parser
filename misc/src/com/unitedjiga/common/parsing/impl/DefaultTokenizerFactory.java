@@ -40,89 +40,94 @@ import com.unitedjiga.common.parsing.TokenizerFactory;
  */
 public class DefaultTokenizerFactory implements TokenizerFactory {
 
-	private static class CharToken implements Token {
-		private int ch;
-		public CharToken(int ch) {
-			this.ch = ch;
-		}
+    private static class CharToken implements Token {
+        private int ch;
 
-		@Override
-		public String getValue() {
-			return Character.toString(ch);
-		}
+        public CharToken(int ch) {
+            this.ch = ch;
+        }
 
-		@Override
-		public String toString() {
-			return getValue();
-		}
-	}
-	@Override
-	public Tokenizer createTokenizer(Reader r) {
-		return new Tokenizer() {
-			private final PushbackReader pr = new PushbackReader(r);
-			
-			@Override
-			public void close() {
-				try {
-					pr.close();
-				} catch (IOException e) {
-					throw new UncheckedIOException(e);
-				}
-			}
-			
-			@Override
-			public Token peek() {
-				int ch = peekChar();
-				if (ch != -1) {
-					return new CharToken(ch);
-				}
-				throw new NoSuchElementException();
-			}
-			
-			@Override
-			public Token next() {
-				int ch = read();
-				if (ch != -1) {
-					return new CharToken(ch);
-				}
-				throw new NoSuchElementException();
-			}
-			
-			@Override
-			public boolean hasNext() {
-				return peekChar() != -1;
-			}
-			
-			private int read() {
-				try {
-					return pr.read();
-				} catch (IOException e) {
-					throw new UncheckedIOException(e);
-				}
-			}
-			private void unread(int ch) {
-				try {
-					pr.unread(ch);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			private int peekChar() {
-				int ch = -1;
-				try {
-					ch = read();
-					return ch;
-				} finally {
-					if (ch != -1) {
-						unread(ch);
-					}
-				}
-			}
-			@Override
-			public String toString() {
-				return "Next: " + peekChar();
-			}
-		};
-	}
+        @Override
+        public String getValue() {
+            return Character.toString(ch);
+        }
+
+        @Override
+        public String toString() {
+            return getValue();
+        }
+    }
+
+    @Override
+    public Tokenizer createTokenizer(Reader r) {
+        return new Tokenizer() {
+            private final PushbackReader pr = new PushbackReader(r);
+
+            @Override
+            public void close() {
+                try {
+                    pr.close();
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
+
+            @Override
+            public Token peek() {
+                int ch = peekChar();
+                if (ch != -1) {
+                    return new CharToken(ch);
+                }
+                throw new NoSuchElementException();
+            }
+
+            @Override
+            public Token next() {
+                int ch = read();
+                if (ch != -1) {
+                    return new CharToken(ch);
+                }
+                throw new NoSuchElementException();
+            }
+
+            @Override
+            public boolean hasNext() {
+                return peekChar() != -1;
+            }
+
+            private int read() {
+                try {
+                    return pr.read();
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
+
+            private void unread(int ch) {
+                try {
+                    pr.unread(ch);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            private int peekChar() {
+                int ch = -1;
+                try {
+                    ch = read();
+                    return ch;
+                } finally {
+                    if (ch != -1) {
+                        unread(ch);
+                    }
+                }
+            }
+
+            @Override
+            public String toString() {
+                return "Next: " + peekChar();
+            }
+        };
+    }
 
 }

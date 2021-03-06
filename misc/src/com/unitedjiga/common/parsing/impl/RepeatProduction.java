@@ -39,45 +39,45 @@ import com.unitedjiga.common.parsing.Tokenizer;
  *
  */
 class RepeatProduction extends AbstractProduction {
-	private final AbstractProduction element;
-	private final Pattern pattern;
-	
-	RepeatProduction(AbstractProduction p) {
-		element = p;
-		pattern = Pattern.compile("(" + element + ")*");
-	}
+    private final AbstractProduction element;
+    private final Pattern pattern;
 
-	@Override
-	Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
-		List<Symbol> list = new ArrayList<>();
-		while (anyMatch(getFirstSet(), tokenizer)) {
-			list.add(element.interpret(tokenizer, getFollowSet(followSet)));
-		}
-		if (!list.isEmpty()) {
-			return newNonTerminal(this, list);
-		}
-		return newNonTerminal(this, Collections.emptyList());
-	}
+    RepeatProduction(AbstractProduction p) {
+        element = p;
+        pattern = Pattern.compile("(" + element + ")*");
+    }
 
-	@Override
-	Set<TermProduction> getFirstSet(Set<TermProduction> followSet) {
-		return element.getFirstSet(followSet);
-	}
+    @Override
+    Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
+        List<Symbol> list = new ArrayList<>();
+        while (anyMatch(getFirstSet(), tokenizer)) {
+            list.add(element.interpret(tokenizer, getFollowSet(followSet)));
+        }
+        if (!list.isEmpty()) {
+            return newNonTerminal(this, list);
+        }
+        return newNonTerminal(this, Collections.emptyList());
+    }
 
-	private Set<TermProduction> getFollowSet(Set<TermProduction> followSet) {
-		Set<TermProduction> set = new HashSet<>();
-		set.addAll(element.getFirstSet());
-		set.addAll(followSet);
-		return set;
-	}
+    @Override
+    Set<TermProduction> getFirstSet(Set<TermProduction> followSet) {
+        return element.getFirstSet(followSet);
+    }
 
-	@Override
-	boolean isOption() {
-		return true;
-	}
+    private Set<TermProduction> getFollowSet(Set<TermProduction> followSet) {
+        Set<TermProduction> set = new HashSet<>();
+        set.addAll(element.getFirstSet());
+        set.addAll(followSet);
+        return set;
+    }
 
-	@Override
-	public Pattern asPattern() {
-		return pattern;
-	}
+    @Override
+    boolean isOption() {
+        return true;
+    }
+
+    @Override
+    public Pattern asPattern() {
+        return pattern;
+    }
 }

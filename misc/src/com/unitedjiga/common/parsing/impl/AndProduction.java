@@ -42,67 +42,64 @@ import com.unitedjiga.common.parsing.Tokenizer;
 class AndProduction extends AbstractProduction {
     private final List<AbstractProduction> elements = new ArrayList<>();
     private final Pattern pattern;
-    
+
     AndProduction(CharSequence... production) {
         for (CharSequence cs : production) {
-			elements.add(cs instanceof AbstractProduction ?
-					(AbstractProduction) cs : new TermProduction(cs));
+            elements.add(cs instanceof AbstractProduction ? (AbstractProduction) cs : new TermProduction(cs));
         }
-    	pattern = elements.stream()
-    			.map(e -> "(" + e + ")")
-    			.collect(Collectors.collectingAndThen(Collectors.joining(), Pattern::compile));
+        pattern = elements.stream().map(e -> "(" + e + ")")
+                .collect(Collectors.collectingAndThen(Collectors.joining(), Pattern::compile));
     }
 
     @Override
     Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
         if (anyMatch(getFirstSet(followSet), tokenizer)) {
-        	List<Symbol> list = new ArrayList<>();
-        	for (int i = 0; i < elements.size(); i++) {
-				list.add(elements.get(i)
-						.interpret(tokenizer, getFollowSet(i, followSet)));
-			}
+            List<Symbol> list = new ArrayList<>();
+            for (int i = 0; i < elements.size(); i++) {
+                list.add(elements.get(i).interpret(tokenizer, getFollowSet(i, followSet)));
+            }
             return newNonTerminal(this, list);
         }
-        Object[] args = {getFirstSet(followSet), tryNext(tokenizer)};
+        Object[] args = { getFirstSet(followSet), tryNext(tokenizer) };
         throw new ParsingException(Messages.RULE_MISMATCH.format(args));
     }
 
     @Override
     Set<TermProduction> getFirstSet(Set<TermProduction> followSet) {
-    	if (elements.isEmpty()) {
-			return followSet;
-		}
-    	Set<TermProduction> set = new HashSet<>();
-    	set.addAll(elements.get(0).getFirstSet());
-    	set.addAll(getFollowSet(0, followSet));
+        if (elements.isEmpty()) {
+            return followSet;
+        }
+        Set<TermProduction> set = new HashSet<>();
+        set.addAll(elements.get(0).getFirstSet());
+        set.addAll(getFollowSet(0, followSet));
         return set;
     }
 
     private Set<TermProduction> getFollowSet(int i, Set<TermProduction> followSet) {
-    	assert 0 <= i && i < elements.size();
-    	if (!elements.get(i).isOption()) {
-			return Collections.emptySet();
-		}
-    	if (elements.size() - 1 == i) {
-			return followSet;
-		}
-    	Set<TermProduction> set = new HashSet<>();
-		set.addAll(elements.get(i + 1).getFirstSet());
-		set.addAll(getFollowSet(i + 1, followSet));
-    	return set;
+        assert 0 <= i && i < elements.size();
+        if (!elements.get(i).isOption()) {
+            return Collections.emptySet();
+        }
+        if (elements.size() - 1 == i) {
+            return followSet;
+        }
+        Set<TermProduction> set = new HashSet<>();
+        set.addAll(elements.get(i + 1).getFirstSet());
+        set.addAll(getFollowSet(i + 1, followSet));
+        return set;
     }
-        
+
     @Override
     boolean isOption() {
-    	if (elements.isEmpty()) {
-			return true;
-		}
-    	return elements.stream().allMatch(p -> p.isOption());
+        if (elements.isEmpty()) {
+            return true;
+        }
+        return elements.stream().allMatch(p -> p.isOption());
     }
 
     @Override
     public Pattern asPattern() {
-    	return pattern;
+        return pattern;
     }
 
 }

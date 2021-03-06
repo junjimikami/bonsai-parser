@@ -42,108 +42,112 @@ import com.unitedjiga.common.parsing.Tokenizer;
  * @author Junji Mikami
  */
 abstract class AbstractProduction implements Production {
-    
-    private static final TermProduction EOF = new TermProduction("EOF") {};
+
+    private static final TermProduction EOF = new TermProduction("EOF") {
+    };
 
     @Override
     public Symbol parseRemaining(Tokenizer tokenizer) {
-    	Symbol symbol = parse(tokenizer);
-    	if (tokenizer.hasNext()) {
-	        throw new ParsingException(Messages.TOO_MANY_TOKEN.format(tokenizer.peek()));
-		}
-		return symbol;
+        Symbol symbol = parse(tokenizer);
+        if (tokenizer.hasNext()) {
+            throw new ParsingException(Messages.TOO_MANY_TOKEN.format(tokenizer.peek()));
+        }
+        return symbol;
     }
 
     @Override
     public Symbol parse(Tokenizer tokenizer) {
-    	return interpret(tokenizer, Collections.singleton(EOF));
+        return interpret(tokenizer, Collections.singleton(EOF));
     }
-    
+
     @Override
     public Production opt() {
-    	return new OptProduction(this);
+        return new OptProduction(this);
     }
 
     @Override
     public Production repeat() {
-    	return new RepeatProduction(this);
+        return new RepeatProduction(this);
     }
 
     @Override
     public String toString() {
-    	return asPattern().pattern();
+        return asPattern().pattern();
     }
 
     abstract Set<TermProduction> getFirstSet(Set<TermProduction> followSet);
+
     Set<TermProduction> getFirstSet() {
-    	return getFirstSet(Collections.emptySet());
+        return getFirstSet(Collections.emptySet());
     }
-    
+
     abstract Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet);
-    
+
     abstract boolean isOption();
 
     static boolean anyMatch(Set<TermProduction> set, Tokenizer tokenizer) {
-    	if (!tokenizer.hasNext()) {
-			return set.contains(EOF);
-		}
-    	return set.stream().anyMatch(p -> p.matches(tokenizer));
+        if (!tokenizer.hasNext()) {
+            return set.contains(EOF);
+        }
+        return set.stream().anyMatch(p -> p.matches(tokenizer));
     }
+
     static NonTerminalSymbol newNonTerminal(Production origin, List<Symbol> list) {
-    	return new AbstractNonTerminalSymbol() {
-			
-			@Override
-			public Production getOrigin() {
-				return origin;
-			}
+        return new AbstractNonTerminalSymbol() {
 
-			@Override
-			public String toString() {
-				return list.stream().map(Symbol::toString).collect(Collectors.joining());
-			}
+            @Override
+            public Production getOrigin() {
+                return origin;
+            }
 
-			@Override
-			public ListIterator<Symbol> listIterator(int index) {
-				return list.listIterator(index);
-			}
+            @Override
+            public String toString() {
+                return list.stream().map(Symbol::toString).collect(Collectors.joining());
+            }
 
-			@Override
-			public int size() {
-				return list.size();
-			}
-    	};
+            @Override
+            public ListIterator<Symbol> listIterator(int index) {
+                return list.listIterator(index);
+            }
+
+            @Override
+            public int size() {
+                return list.size();
+            }
+        };
     }
+
     static SingletonSymbol newSingleton(Production origin, Optional<Symbol> symbol) {
-    	return new AbstractSingletonSymbol() {
-			
-			@Override
-			public Production getOrigin() {
-				return origin;
-			}
-			
-			@Override
-			public Symbol get() {
-				return symbol.get();
-			}
+        return new AbstractSingletonSymbol() {
 
-			@Override
-			public String toString() {
-				return symbol.stream().map(Symbol::toString).collect(Collectors.joining());
-			}
+            @Override
+            public Production getOrigin() {
+                return origin;
+            }
 
-			@Override
-			public ListIterator<Symbol> listIterator(int index) {
-				return symbol.stream().collect(Collectors.toUnmodifiableList()).listIterator(index);
-			}
+            @Override
+            public Symbol get() {
+                return symbol.get();
+            }
 
-			@Override
-			public int size() {
-				return (int) symbol.stream().count();
-			}
-    	};
+            @Override
+            public String toString() {
+                return symbol.stream().map(Symbol::toString).collect(Collectors.joining());
+            }
+
+            @Override
+            public ListIterator<Symbol> listIterator(int index) {
+                return symbol.stream().collect(Collectors.toUnmodifiableList()).listIterator(index);
+            }
+
+            @Override
+            public int size() {
+                return (int) symbol.stream().count();
+            }
+        };
     }
-    
+
     static Object tryNext(Tokenizer tokenizer) {
-    	return tokenizer.hasNext() ? tokenizer.peek() : "EOF";
+        return tokenizer.hasNext() ? tokenizer.peek() : "EOF";
     }
 }

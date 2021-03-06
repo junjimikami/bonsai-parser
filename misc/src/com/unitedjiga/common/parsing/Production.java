@@ -28,25 +28,28 @@ import java.util.regex.Pattern;
 import com.unitedjiga.common.parsing.impl.Productions;
 
 /**
- *
+ * 正規表現ベースの生成規則です。
+ * 
  * @author Junji Mikami
  */
 public interface Production extends CharSequence {
-    
+
     static Production of(CharSequence... regex) {
-    	return Productions.getInstance().of(regex);
+        return Productions.getInstance().of(regex);
     }
+
     static Production oneOf(CharSequence... regex) {
-    	return Productions.getInstance().oneOf(regex);
+        return Productions.getInstance().oneOf(regex);
     }
 
     Symbol parseRemaining(Tokenizer tokenizer);
+
     Symbol parse(Tokenizer tokenizer);
 
     Production opt();
-    
+
     Production repeat();
-    
+
     Pattern asPattern();
 
     @Override
@@ -63,7 +66,7 @@ public interface Production extends CharSequence {
     default int length() {
         return toString().length();
     }
-    
+
     @Override
     String toString();
 }

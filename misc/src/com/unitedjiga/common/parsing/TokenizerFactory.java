@@ -33,10 +33,14 @@ import com.unitedjiga.common.parsing.impl.DefaultTokenizerFactory;
  *
  */
 public interface TokenizerFactory {
-	
-	static TokenizerFactory newInstance() {
-		return new DefaultTokenizerFactory();
-	}
 
-	Tokenizer createTokenizer(Reader r);
+    static TokenizerFactory newInstance() {
+        return newDefaultInstance();
+    }
+
+    static TokenizerFactory newDefaultInstance() {
+        return new DefaultTokenizerFactory();
+    }
+
+    Tokenizer createTokenizer(Reader r);
 }

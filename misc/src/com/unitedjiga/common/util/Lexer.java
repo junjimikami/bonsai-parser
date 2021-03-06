@@ -42,11 +42,10 @@ import java.util.stream.IntStream;
  * 文字ストリームを字句解析して文字とワードを読み込むLexer(=Lexical Analyzer)です。
  * 初期設定では文字ストリームをすべて文字トークンに分割します。
  * {@code '\u005Cu0000'}から{@code '\u005Cu00ff'}の範囲の文字をワード構成文字、空白文字に指定できます。
- * 分割されたトークンは反復処理によって取得できます。
- * その際空白文字はスキップされますが取得可能です。
- * 次に例を示します。
+ * 分割されたトークンは反復処理によって取得できます。 その際空白文字はスキップされますが取得可能です。 次に例を示します。
  *
- * <pre>{@code
+ * <pre>
+ * {@code
  * try (Lexer lexer = new Lexer(...)) {
  *     lexer.useWhitespace(...)
  *          .useWord(...);
@@ -58,7 +57,8 @@ import java.util.stream.IntStream;
  *     System.out.print(lexer.trailingWhitespace());
  * }
  * ...
- * }</pre>
+ * }
+ * </pre>
  *
  * <p>
  * このクラスはjava.util.Scannerにインスパイアされていますが、入出力エラーの扱いが異なります。
@@ -150,7 +150,7 @@ public final class Lexer implements Iterator<String>, Closeable {
 
     /**
      * 
-     * @return 
+     * @return
      */
     public boolean hasNextInLine() {
         return hasNext() && !tryGet(ltChars, st.ttype);
@@ -158,7 +158,7 @@ public final class Lexer implements Iterator<String>, Closeable {
 
     /**
      * 
-     * @return 
+     * @return
      */
     public boolean hasTrailingWhitespace() {
         return !trailingWhitespace().isEmpty();
@@ -169,26 +169,26 @@ public final class Lexer implements Iterator<String>, Closeable {
      *
      * @return 次のトークン
      * @throws NoSuchElementException トークンがこれ以上ない場合
-     * @throws UncheckedIOException 入出力エラーが発生した場合
+     * @throws UncheckedIOException   入出力エラーが発生した場合
      */
     @Override
     public String next() {
         switch (nextToken()) {
-            case TT_EOF:
-                throw new NoSuchElementException();
+        case TT_EOF:
+            throw new NoSuchElementException();
 
-            case TT_NUMBER:
-                throw new AssertionError();
+        case TT_NUMBER:
+            throw new AssertionError();
 
-            case TT_WORD:
-                ws = wsBuffer.toString();
-                wsBuffer.setLength(0);
-                return st.sval;
+        case TT_WORD:
+            ws = wsBuffer.toString();
+            wsBuffer.setLength(0);
+            return st.sval;
 
-            default:
-                ws = wsBuffer.toString();
-                wsBuffer.setLength(0);
-                return String.valueOf((char) st.ttype);
+        default:
+            ws = wsBuffer.toString();
+            wsBuffer.setLength(0);
+            return String.valueOf((char) st.ttype);
         }
     }
 
@@ -198,23 +198,23 @@ public final class Lexer implements Iterator<String>, Closeable {
      * @return 次のワードトークン
      * @throws NoSuchElementException トークンがこれ以上ない場合
      * @throws InputMismatchException 次のトークンがワードトークンではない場合
-     * @throws UncheckedIOException 入出力エラーが発生した場合
+     * @throws UncheckedIOException   入出力エラーが発生した場合
      */
     public String nextWord() {
         switch (nextToken()) {
-            case TT_EOF:
-                throw new NoSuchElementException();
+        case TT_EOF:
+            throw new NoSuchElementException();
 
-            case TT_NUMBER:
-                throw new AssertionError();
+        case TT_NUMBER:
+            throw new AssertionError();
 
-            case TT_WORD:
-                ws = wsBuffer.toString();
-                wsBuffer.setLength(0);
-                return st.sval;
+        case TT_WORD:
+            ws = wsBuffer.toString();
+            wsBuffer.setLength(0);
+            return st.sval;
 
-            default:
-                throw new InputMismatchException();
+        default:
+            throw new InputMismatchException();
         }
     }
 
@@ -224,23 +224,23 @@ public final class Lexer implements Iterator<String>, Closeable {
      * @return 次の文字トークン
      * @throws NoSuchElementException トークンがこれ以上ない場合
      * @throws InputMismatchException 次のトークンが文字トークンではない場合
-     * @throws UncheckedIOException 入出力エラーが発生した場合
+     * @throws UncheckedIOException   入出力エラーが発生した場合
      */
     public char nextChar() {
         switch (nextToken()) {
-            case TT_EOF:
-                throw new NoSuchElementException();
+        case TT_EOF:
+            throw new NoSuchElementException();
 
-            case TT_NUMBER:
-                throw new AssertionError();
+        case TT_NUMBER:
+            throw new AssertionError();
 
-            case TT_WORD:
-                throw new InputMismatchException();
+        case TT_WORD:
+            throw new InputMismatchException();
 
-            default:
-                ws = wsBuffer.toString();
-                wsBuffer.setLength(0);
-                return (char) st.ttype;
+        default:
+            ws = wsBuffer.toString();
+            wsBuffer.setLength(0);
+            return (char) st.ttype;
         }
     }
 
@@ -249,21 +249,21 @@ public final class Lexer implements Iterator<String>, Closeable {
      *
      * @return 次のトークン
      * @throws NoSuchElementException トークンがこれ以上ない場合
-     * @throws UncheckedIOException 入出力エラーが発生した場合
+     * @throws UncheckedIOException   入出力エラーが発生した場合
      */
     public String peek() {
         switch (peekToken()) {
-            case TT_EOF:
-                throw new NoSuchElementException();
+        case TT_EOF:
+            throw new NoSuchElementException();
 
-            case TT_NUMBER:
-                throw new AssertionError();
+        case TT_NUMBER:
+            throw new AssertionError();
 
-            case TT_WORD:
-                return st.sval;
+        case TT_WORD:
+            return st.sval;
 
-            default:
-                return String.valueOf((char) st.ttype);
+        default:
+            return String.valueOf((char) st.ttype);
         }
     }
 
@@ -273,21 +273,21 @@ public final class Lexer implements Iterator<String>, Closeable {
      * @return 次のワードトークン
      * @throws NoSuchElementException トークンがこれ以上ない場合
      * @throws InputMismatchException 次のトークンがワードトークンではない場合
-     * @throws UncheckedIOException 入出力エラーが発生した場合
+     * @throws UncheckedIOException   入出力エラーが発生した場合
      */
     public String peekWord() {
         switch (peekToken()) {
-            case TT_EOF:
-                throw new NoSuchElementException();
+        case TT_EOF:
+            throw new NoSuchElementException();
 
-            case TT_NUMBER:
-                throw new AssertionError();
+        case TT_NUMBER:
+            throw new AssertionError();
 
-            case TT_WORD:
-                return st.sval;
+        case TT_WORD:
+            return st.sval;
 
-            default:
-                throw new InputMismatchException();
+        default:
+            throw new InputMismatchException();
         }
     }
 
@@ -297,21 +297,21 @@ public final class Lexer implements Iterator<String>, Closeable {
      * @return 次の文字トークン
      * @throws NoSuchElementException トークンがこれ以上ない場合
      * @throws InputMismatchException 次のトークンが文字トークンではない場合
-     * @throws UncheckedIOException 入出力エラーが発生した場合
+     * @throws UncheckedIOException   入出力エラーが発生した場合
      */
     public char peekChar() {
         switch (peekToken()) {
-            case TT_EOF:
-                throw new NoSuchElementException();
+        case TT_EOF:
+            throw new NoSuchElementException();
 
-            case TT_NUMBER:
-                throw new AssertionError();
+        case TT_NUMBER:
+            throw new AssertionError();
 
-            case TT_WORD:
-                throw new InputMismatchException();
+        case TT_WORD:
+            throw new InputMismatchException();
 
-            default:
-                return (char) st.ttype;
+        default:
+            return (char) st.ttype;
         }
     }
 
@@ -365,21 +365,21 @@ public final class Lexer implements Iterator<String>, Closeable {
     /**
      * 
      * @param ch
-     * @return 
+     * @return
      */
     public Lexer setWordChars(char... ch) {
         reset(ch);
         for (char c : ch) {
             st.wordChars(c, c);
         }
-        return this;        
+        return this;
     }
 
     /**
      * 
      * @param low
      * @param hi
-     * @return 
+     * @return
      */
     public Lexer setWordCharRange(char low, char hi) {
         IntStream.rangeClosed(low, hi).forEach(ch -> setWordChars((char) ch));
@@ -403,7 +403,7 @@ public final class Lexer implements Iterator<String>, Closeable {
     /**
      * 
      * @param ch
-     * @return 
+     * @return
      */
     public Lexer setLineTerminatorChars(char... ch) {
         reset(ch);
@@ -412,7 +412,7 @@ public final class Lexer implements Iterator<String>, Closeable {
         }
         return this;
     }
-            
+
     /**
      * 文字ストリームを閉じます。
      *
@@ -434,27 +434,27 @@ public final class Lexer implements Iterator<String>, Closeable {
      */
     @Override
     public String toString() {
-    	StringBuilder sb = new StringBuilder("Next: ");
-    	sb.append("[");
-    	sb.append(trailingWhitespace());
-    	sb.append("] ");
-    	if (hasNextInLine()) {
-    		if (hasNextChar()) {
-    	    	sb.append("CHAR'");
-    			sb.append(peekChar());
-    	    	sb.append("'");
-    		} else if (hasNextWord()) {
-    	    	sb.append("WORD\"");
-    			sb.append(peekWord());
-    	    	sb.append("\"");
-    		}
-		} else if (hasNext()) {
-	    	sb.append("EOL[");
-			sb.append(peekChar());
-	    	sb.append("]");
-		} else {
-			sb.append("EOF");
-		}
+        StringBuilder sb = new StringBuilder("Next: ");
+        sb.append("[");
+        sb.append(trailingWhitespace());
+        sb.append("] ");
+        if (hasNextInLine()) {
+            if (hasNextChar()) {
+                sb.append("CHAR'");
+                sb.append(peekChar());
+                sb.append("'");
+            } else if (hasNextWord()) {
+                sb.append("WORD\"");
+                sb.append(peekWord());
+                sb.append("\"");
+            }
+        } else if (hasNext()) {
+            sb.append("EOL[");
+            sb.append(peekChar());
+            sb.append("]");
+        } else {
+            sb.append("EOF");
+        }
         return sb.toString();
     }
 

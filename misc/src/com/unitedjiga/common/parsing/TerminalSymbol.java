@@ -28,15 +28,15 @@ package com.unitedjiga.common.parsing;
  * @author Junji Mikami
  */
 public interface TerminalSymbol extends Symbol {
-    
-	@Override
-	default Kind getKind() {
-		return Kind.TERMINAL;
-	}
 
-	default <R, P> R accept(SymbolVisitor<R, P> v, P p) {
-		return v.visitTerminal(this, p);
-	}
+    @Override
+    default Kind getKind() {
+        return Kind.TERMINAL;
+    }
 
-	String getValue();
+    default <R, P> R accept(SymbolVisitor<R, P> v, P p) {
+        return v.visitTerminal(this, p);
+    }
+
+    String getValue();
 }

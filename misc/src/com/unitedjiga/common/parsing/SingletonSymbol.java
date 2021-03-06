@@ -25,16 +25,16 @@ package com.unitedjiga.common.parsing;
 
 public interface SingletonSymbol extends NonTerminalSymbol {
 
-	Symbol get();
-	
-	@Override
-	default Kind getKind() {
-		return Kind.SINGLETON;
-	}
+    Symbol get();
 
-	@Override
-	default <R, P> R accept(SymbolVisitor<R, P> v, P p) {
-		return v.visitSingleton(this, p);
-	}
-	
+    @Override
+    default Kind getKind() {
+        return Kind.SINGLETON;
+    }
+
+    @Override
+    default <R, P> R accept(SymbolVisitor<R, P> v, P p) {
+        return v.visitSingleton(this, p);
+    }
+
 }
