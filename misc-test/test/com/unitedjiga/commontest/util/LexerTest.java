@@ -49,9 +49,9 @@ import com.unitedjiga.common.util.Lexer;
  */
 public class LexerTest {
 
-    private static final char[] DIGITS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-    private static final char[] ZERO_TO_EIGHT = {'0', '1', '2', '3', '4', '5', '6', '7', '8'};
-    private static final char[] ONE_TO_NINE = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
+    private static final char[] DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+    private static final char[] ZERO_TO_EIGHT = { '0', '1', '2', '3', '4', '5', '6', '7', '8' };
+    private static final char[] ONE_TO_NINE = { '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 
     public LexerTest() {
     }
@@ -74,20 +74,20 @@ public class LexerTest {
 
     @Test
     public void sample2() {
-    	String input = "_a__b___c____|____d___e__f_";
-    	try (Lexer lexer = new Lexer(new StringReader(input))) {
-			lexer.setWhitespaceChars('_').setLineTerminatorChars('|');
-			while (lexer.hasNext()) {
-				if (lexer.hasNextInLine()) {
-					System.out.println(lexer.trailingWhitespace());
-					System.out.println(lexer.next());
-				} else {
-					System.out.println(">" + lexer.trailingWhitespace());
-					System.out.println(">" + lexer.next());
-				}
-			}
-			System.out.println(">>" + lexer.trailingWhitespace());
-		}
+        String input = "_a__b___c____|____d___e__f_";
+        try (Lexer lexer = new Lexer(new StringReader(input))) {
+            lexer.setWhitespaceChars('_').setLineTerminatorChars('|');
+            while (lexer.hasNext()) {
+                if (lexer.hasNextInLine()) {
+                    System.out.println(lexer.trailingWhitespace());
+                    System.out.println(lexer.next());
+                } else {
+                    System.out.println(">" + lexer.trailingWhitespace());
+                    System.out.println(">" + lexer.next());
+                }
+            }
+            System.out.println(">>" + lexer.trailingWhitespace());
+        }
     }
 
     /**
@@ -1325,7 +1325,6 @@ public class LexerTest {
 //        fail();
 //    }
 
-
     @Test(expected = UncheckedIOException.class)
     public void test29_1() {
         Lexer lexer = new Lexer(new StringReader(""));
@@ -1406,12 +1405,10 @@ public class LexerTest {
         fail();
     }
 
-
     @Test
     public void testXXX1() {
         System.out.println("com.unitedjiga.common.util.LexerTest.testXXX1()");
-        String input = IntStream.rangeClosed(0x0000, 0x01ff)
-                .mapToObj(i -> String.valueOf((char) i))
+        String input = IntStream.rangeClosed(0x0000, 0x01ff).mapToObj(i -> String.valueOf((char) i))
                 .collect(Collectors.joining());
         Lexer lexer = new Lexer(new StringReader(input));
         while (lexer.hasNext()) {
@@ -1427,9 +1424,10 @@ public class LexerTest {
     @Test
     public void testXXX2() {
         System.out.println("com.unitedjiga.common.util.LexerTest.testXXX2()");
-        try (Lexer lexer = new Lexer(new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("Lexer.html"))))) {
-            IntStream.rangeClosed(0x00, 0x20).forEach(i -> lexer.setWhitespaceChars((char)i));
-            IntStream.rangeClosed(0x21, 0xff).forEach(i -> lexer.setWordChars((char)i));
+        try (Lexer lexer = new Lexer(
+                new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("Lexer.html"))))) {
+            IntStream.rangeClosed(0x00, 0x20).forEach(i -> lexer.setWhitespaceChars((char) i));
+            IntStream.rangeClosed(0x21, 0xff).forEach(i -> lexer.setWordChars((char) i));
             while (lexer.hasNext()) {
                 String token = lexer.next();
                 System.out.print(lexer.skippedWhitespace());
