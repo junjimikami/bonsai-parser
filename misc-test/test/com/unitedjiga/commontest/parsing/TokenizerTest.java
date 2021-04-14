@@ -67,6 +67,14 @@ class TokenizerTest {
         assertThrows(NullPointerException.class, () -> Tokenizer.wrap((Iterator<CharSequence>) null))
                 .printStackTrace();
     }
+    
+    @Test
+    void testEmpty() {
+        var tzer = Tokenizer.wrap();
+        assertFalse(tzer.hasNext());
+        var buf = tzer.buffer();
+        assertFalse(buf.hasRemaining());
+    }
 
     @Test
     void testBuffer() {
@@ -115,6 +123,7 @@ class TokenizerTest {
         assertTrue(buf.hasRemaining());
         assertTrue(buf.isEmpty());
     }
+
     @Test
     void testBuffer02() {
         var words = input.split(" ");
