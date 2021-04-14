@@ -48,6 +48,20 @@ class TokenizerTest {
 
     @Test
     void test03() {
+        var words = input.split(" ");
+        var tzer = Tokenizer.wrap("Last", "night", "I", "said", "these", "words", "to", "my", "girl.");
+        for (var s : words) {
+            assertTrue(tzer.hasNext());
+            assertEquals(s, tzer.next().getValue());
+        }
+        assertFalse(tzer.hasNext());
+        assertThrows(NoSuchElementException.class, tzer::next).printStackTrace();
+        assertThrows(UnsupportedOperationException.class, tzer::remove).printStackTrace();
+        tzer.close();
+    }
+
+    @Test
+    void testNull() {
         assertThrows(NullPointerException.class, () -> Tokenizer.wrap((String[]) null))
                 .printStackTrace();
         assertThrows(NullPointerException.class, () -> Tokenizer.wrap((Iterator<CharSequence>) null))
@@ -55,7 +69,7 @@ class TokenizerTest {
     }
 
     @Test
-    void test04() {
+    void testBuffer() {
         var words = input.split(" ");
         var tzer = Tokenizer.wrap(words);
         var buf = tzer.buffer();
@@ -102,7 +116,7 @@ class TokenizerTest {
         assertTrue(buf.isEmpty());
     }
     @Test
-    void test05() {
+    void testBuffer02() {
         var words = input.split(" ");
         {
             var tzer = Tokenizer.wrap(words);

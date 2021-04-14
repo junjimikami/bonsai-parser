@@ -64,7 +64,7 @@ public interface Tokenizer extends Iterator<Token>, Closeable {
      * @param str
      * @return
      */
-    static Tokenizer wrap(String[] str) {
+    static Tokenizer wrap(String... str) {
         return wrap(Arrays.asList(str).iterator());
     }
 
