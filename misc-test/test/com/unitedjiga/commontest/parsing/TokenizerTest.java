@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.unitedjiga.common.parsing.Tokenizer;
@@ -17,6 +18,11 @@ import com.unitedjiga.common.parsing.Tokenizer;
 class TokenizerTest {
 
     final String input = "Last night I said these words to my girl.";
+
+    @BeforeEach
+    void beforeEach() {
+        System.out.println("---------------------------");
+    }
 
     @Test
     void test01() {
@@ -82,38 +88,54 @@ class TokenizerTest {
         var tzer = Tokenizer.wrap(words);
         var buf = tzer.buffer();
 
+        System.out.println(buf.toString());
         assertTrue(buf.hasRemaining());
         assertTrue(buf.isEmpty());
         assertEquals(words[0], buf.get().getValue());
+        System.out.println(buf.toString());
         assertTrue(buf.hasRemaining());
         assertFalse(buf.isEmpty());
         assertEquals(words[1], buf.get().getValue());
+        System.out.println(buf.toString());
         assertTrue(buf.hasRemaining());
         assertFalse(buf.isEmpty());
         assertEquals(words[2], buf.get().getValue());
+        System.out.println(buf.toString());
         buf.reset();
+        System.out.println(buf.toString());
         assertTrue(buf.isEmpty());
         assertEquals(words[0], buf.get().getValue());
+        System.out.println(buf.toString());
         assertFalse(buf.isEmpty());
         assertEquals(words[1], buf.get().getValue());
+        System.out.println(buf.toString());
         buf.pushBack();
+        System.out.println(buf.toString());
         assertEquals(words[1], buf.get().getValue());
         buf.pushBack();
+        System.out.println(buf.toString());
         buf.pushBack();
+        System.out.println(buf.toString());
         assertEquals(words[0], buf.get().getValue());
         assertEquals(words[1], buf.get().getValue());
         assertEquals(words[2], buf.get().getValue());
+        System.out.println(buf.toString());
 
         assertEquals(words[0], buf.remove().getValue());
+        System.out.println(buf.toString());
         buf.reset();
+        System.out.println(buf.toString());
         assertEquals(words[1], buf.get().getValue());
+        System.out.println(buf.toString());
         assertFalse(buf.isEmpty());
         assertEquals(words[1], buf.remove().getValue());
+        System.out.println(buf.toString());
         assertTrue(buf.isEmpty());
 
         var it = Arrays.asList(words).listIterator(2);
         while (buf.hasRemaining()) {
             assertEquals(it.next(), buf.get().getValue());
+            System.out.println(buf.toString());
         }
         assertFalse(buf.hasRemaining());
         assertFalse(buf.isEmpty());
@@ -122,6 +144,7 @@ class TokenizerTest {
         buf.reset();
         assertTrue(buf.hasRemaining());
         assertTrue(buf.isEmpty());
+        System.out.println(buf.toString());
     }
 
     @Test

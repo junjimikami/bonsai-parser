@@ -28,6 +28,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.unitedjiga.common.parsing.Token;
@@ -114,5 +116,13 @@ public abstract class AbstractTokenizer implements Tokenizer {
             return buffer.subList(0, current).stream();
         }
         
+        @Override
+        public String toString() {
+            return IntStream.range(0, buffer.size())
+                    .mapToObj(i -> (i == current ? "-> " : "") + buffer.get(i).getValue())
+                    .collect(Collectors.joining(", ", "[", "]"))
+                    .concat(current == buffer.size() ? " ->" : "")
+                    .concat(tzer.hasNext() ? " Tokenizer" : " EOF");
+        }
     }
 }
