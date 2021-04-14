@@ -24,7 +24,13 @@
 package com.unitedjiga.common.parsing;
 
 import java.io.Closeable;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.stream.Stream;
+
+import com.unitedjiga.common.parsing.impl.AbstractTokenizer;
 
 /**
  *
@@ -32,17 +38,90 @@ import java.util.Iterator;
  */
 public interface Tokenizer extends Iterator<Token>, Closeable {
 
+    /**
+     * 
+     * @param it
+     * @return
+     */
+    static Tokenizer wrap(Iterator<? extends CharSequence> it) {
+        return new AbstractTokenizer(it) {
+            
+            @Override
+            public void close() {
+                try {
+                    if (it instanceof Closeable) {
+                        ((Closeable) it).close();
+                    }
+                } catch (IOException ex) {
+                    throw new UncheckedIOException(ex);
+                }
+            }
+        };
+    }
+
+    /**
+     * 
+     * @param str
+     * @return
+     */
+    static Tokenizer wrap(String[] str) {
+        return wrap(Arrays.asList(str).iterator());
+    }
+
     @Override
     boolean hasNext();
 
     @Override
     Token next();
 
-    Token peek();
-
     @Override
     void close();
 
     @Override
     String toString();
+
+    /**
+     * 
+     * @return
+     */
+    Buffer buffer();
+
+    /**
+     * 
+     * @author Junji Mikami
+     *
+     */
+    interface Buffer {
+        
+        /**
+         * 
+         * @return
+         */
+        boolean hasRemaining();
+        
+        /**
+         * 
+         * @return
+         * @throws java.util.NoSuchElementException 元となるトークナイザーにこれ以上トークンがない場合
+         */
+        Token get();
+        
+        void pushBack();
+        void reset();
+        
+        /**
+         * 
+         * @return
+         */
+        boolean isEmpty();
+        
+        /**
+         * 
+         * @return
+         * @throws java.util.NoSuchElementException バッファが空の場合
+         */
+        Token remove();
+        
+        Stream<Token> tokens();
+    }
 }

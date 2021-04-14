@@ -29,6 +29,35 @@ package com.unitedjiga.common.parsing;
  */
 public interface Token extends TerminalSymbol {
 
+    /**
+     * 
+     * @param value
+     * @return
+     */
+    static Token of(String value) {
+        return new Token() {
+            private String s = String.valueOf(value);
+            @Override
+            public String getValue() {
+                return s;
+            }
+            @Override
+            public String toString() {
+                return s;
+            }
+        };
+    }
+
+    /**
+     * 
+     * @param t1
+     * @param t2
+     * @return
+     */
+    static Token concat(Token t1, Token t2) {
+        return of(t1.getValue() + t2.getValue());
+    }
+
     @Override
     String toString();
 }
