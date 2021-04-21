@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2020 Junji Mikami.
+ * Copyright 2021 Junji Mikami.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,37 +23,40 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import com.unitedjiga.common.parsing.AlternativeProduction;
-import com.unitedjiga.common.parsing.SequentialProduction;
+import java.util.Set;
+import java.util.function.Supplier;
+
+import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Symbol;
+import com.unitedjiga.common.parsing.Tokenizer.Buffer;
 
 /**
- * 
  * @author Junji Mikami
  *
  */
-public final class Productions {
-//    private static final Productions instance = new Productions();
+class DelayProduction extends AbstractProduction {
+    private final Supplier<? extends Production> p;
 
-    private Productions() {
+    public DelayProduction(Supplier<? extends Production> p) {
+        this.p = p;
     }
 
-//    public static Productions getInstance() {
-//        return instance;
-//    }
-//
-//    public Production of(CharSequence... regex) {
-//        return new AndProduction(regex);
-//    }
-//
-//    public Production oneOf(CharSequence... regex) {
-//        return new OrProduction(regex);
-//    }
-
-    public static SequentialProduction.Builder sequencialBuilder() {
-        return new SeqProduction.Builder();
+    @Override
+    Set<TermProduction> getFirstSet(Set<TermProduction> followSet) {
+        return get().getFirstSet(followSet);
     }
-    
-    public static AlternativeProduction.Builder alternativeBuilder() {
-        return new AltProduction.Builder();
+
+    @Override
+    Symbol interpret(Buffer buffer, Set<TermProduction> followSet) {
+        return get().interpret(buffer, followSet);
+    }
+
+    @Override
+    boolean isOption() {
+        return get().isOption();
+    }
+
+    private AbstractProduction get() {
+        return (AbstractProduction) p.get();
     }
 }

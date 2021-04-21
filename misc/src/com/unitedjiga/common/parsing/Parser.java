@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2020 Junji Mikami.
+ * Copyright 2021 Junji Mikami.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,39 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.parsing.impl;
+package com.unitedjiga.common.parsing;
 
-import com.unitedjiga.common.parsing.AlternativeProduction;
-import com.unitedjiga.common.parsing.SequentialProduction;
+public interface Parser {
 
-/**
- * 
- * @author Junji Mikami
- *
- */
-public final class Productions {
-//    private static final Productions instance = new Productions();
-
-    private Productions() {
-    }
-
-//    public static Productions getInstance() {
-//        return instance;
-//    }
-//
-//    public Production of(CharSequence... regex) {
-//        return new AndProduction(regex);
-//    }
-//
-//    public Production oneOf(CharSequence... regex) {
-//        return new OrProduction(regex);
-//    }
-
-    public static SequentialProduction.Builder sequencialBuilder() {
-        return new SeqProduction.Builder();
-    }
-    
-    public static AlternativeProduction.Builder alternativeBuilder() {
-        return new AltProduction.Builder();
-    }
+    Symbol parse();
 }

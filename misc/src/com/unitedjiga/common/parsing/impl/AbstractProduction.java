@@ -31,10 +31,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.unitedjiga.common.parsing.NonTerminalSymbol;
+import com.unitedjiga.common.parsing.Parser;
 import com.unitedjiga.common.parsing.ParsingException;
 import com.unitedjiga.common.parsing.Production;
 import com.unitedjiga.common.parsing.SingletonSymbol;
 import com.unitedjiga.common.parsing.Symbol;
+import com.unitedjiga.common.parsing.Token;
 import com.unitedjiga.common.parsing.Tokenizer;
 
 /**
@@ -47,17 +49,19 @@ abstract class AbstractProduction implements Production {
     };
 
     @Override
-    public Symbol parseRemaining(Tokenizer tokenizer) {
-        Symbol symbol = parse(tokenizer);
-        if (tokenizer.hasNext()) {
-            throw new ParsingException(Messages.TOO_MANY_TOKEN.format(tokenizer.peek()));
-        }
-        return symbol;
-    }
-
-    @Override
-    public Symbol parse(Tokenizer tokenizer) {
-        return interpret(tokenizer, Collections.singleton(EOF));
+    public Parser parser(Tokenizer tokenizer) {
+        return new Parser() {
+            
+            @Override
+            public Symbol parse() {
+                Tokenizer.Buffer buf = tokenizer.buffer();
+                Symbol s = interpret(buf, Collections.singleton(EOF));
+                if (buf.hasRemaining()) {
+                    throw newException(Messages.TOO_MANY_TOKEN, buf);
+                }
+                return s;
+            }
+        };
     }
 
     @Override
@@ -69,27 +73,28 @@ abstract class AbstractProduction implements Production {
     public Production repeat() {
         return new RepeatProduction(this);
     }
-
-    @Override
-    public String toString() {
-        return asPattern().pattern();
-    }
-
-    abstract Set<TermProduction> getFirstSet(Set<TermProduction> followSet);
-
+    
+    
+    
+    
     Set<TermProduction> getFirstSet() {
         return getFirstSet(Collections.emptySet());
     }
 
-    abstract Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet);
+    abstract Set<TermProduction> getFirstSet(Set<TermProduction> followSet);
+
+    abstract Symbol interpret(Tokenizer.Buffer buffer, Set<TermProduction> followSet);
 
     abstract boolean isOption();
 
-    static boolean anyMatch(Set<TermProduction> set, Tokenizer tokenizer) {
-        if (!tokenizer.hasNext()) {
+
+    static boolean anyMatch(Set<TermProduction> set, Tokenizer.Buffer buffer) {
+        if (!buffer.hasRemaining()) {
             return set.contains(EOF);
         }
-        return set.stream().anyMatch(p -> p.matches(tokenizer));
+        Token t = buffer.get();
+        buffer.reset();
+        return set.stream().anyMatch(p -> p.matches(t));
     }
 
     static NonTerminalSymbol newNonTerminal(Production origin, List<Symbol> list) {
@@ -147,7 +152,19 @@ abstract class AbstractProduction implements Production {
         };
     }
 
-    static Object tryNext(Tokenizer tokenizer) {
-        return tokenizer.hasNext() ? tokenizer.peek() : "EOF";
+    static Object tryNext(Tokenizer.Buffer buffer) {
+        Token eof = Token.of("EOF");
+        return buffer.hasRemaining() ? buffer.get() : eof;
+//        return tokenizer.hasNext() ? tokenizer.peek() : "EOF";
+    }
+
+    private static ParsingException newException(Messages m, Object... args) {
+        return new ParsingException(m.format(args));
+    }
+    static ParsingException newException(Messages m, Tokenizer.Buffer buf) {
+        return newException(m, buf.hasRemaining() ? buf.get().getValue() : "EOF");
+    }
+    static ParsingException newException(Messages m, Set<?> set, Tokenizer.Buffer buf) {
+        return newException(m, set, buf.hasRemaining() ? buf.get().getValue() : "EOF");
     }
 }

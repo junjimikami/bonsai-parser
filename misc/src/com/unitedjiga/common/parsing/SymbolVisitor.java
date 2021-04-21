@@ -23,6 +23,13 @@
  */
 package com.unitedjiga.common.parsing;
 
+/**
+ * 
+ * @author Junji Mikami
+ *
+ * @param <R>
+ * @param <P>
+ */
 public interface SymbolVisitor<R, P> {
 
     default R visit(Symbol s) {

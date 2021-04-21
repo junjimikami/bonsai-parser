@@ -29,46 +29,47 @@ package com.unitedjiga.common.parsing;
  */
 public interface Symbol {
 
+    /**
+     * 
+     * @author Junji Mikami
+     *
+     */
     enum Kind {
-        TERMINAL {
-            @Override
-            boolean isTerminal() {
-                return true;
-            }
-        },
-        NON_TERMINAL, SINGLETON {
-            @Override
-            boolean isSingleton() {
-                return true;
-            }
-        };
+        TERMINAL,
+        NON_TERMINAL,
+        SINGLETON;
 
         boolean isTerminal() {
-            return false;
+            return this == TERMINAL;
         }
 
         boolean isSingleton() {
-            return false;
+            return this == SINGLETON;
         }
     }
 
+    /**
+     * 
+     * @return
+     */
     Kind getKind();
 
+    /**
+     * 
+     * @return
+     */
     default Token asToken() {
-        return new Token() {
-
-            @Override
-            public String getValue() {
-                return Symbol.this.toString();
-            }
-
-            @Override
-            public String toString() {
-                return getValue();
-            }
-        };
+        return Token.of(toString());
     }
 
+    /**
+     * 
+     * @param <R>
+     * @param <P>
+     * @param v
+     * @param p
+     * @return
+     */
     <R, P> R accept(SymbolVisitor<R, P> v, P p);
 
     @Override

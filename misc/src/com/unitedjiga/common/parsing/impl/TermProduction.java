@@ -44,11 +44,11 @@ class TermProduction extends AbstractProduction {
     }
 
     @Override
-    Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
-        if (matches(tokenizer)) {
-            return tokenizer.next();
+    Symbol interpret(Tokenizer.Buffer buffer, Set<TermProduction> followSet) {
+        if (buffer.hasRemaining() && matches(buffer.get())) {
+            return buffer.remove();
         }
-        Object[] args = { getFirstSet(followSet), tryNext(tokenizer) };
+        Object[] args = { getFirstSet(followSet), tryNext(buffer) };
         throw new ParsingException(Messages.RULE_MISMATCH.format(args));
     }
 
@@ -63,15 +63,11 @@ class TermProduction extends AbstractProduction {
     }
 
     @Override
-    public Pattern asPattern() {
-        return pattern;
+    public String toString() {
+        return pattern.pattern();
     }
 
-    boolean matches(Tokenizer tokenizer) {
-        if (!tokenizer.hasNext()) {
-            return false;
-        }
-        Token t = tokenizer.peek();
+    boolean matches(Token t) {
         return pattern.matcher(t.getValue()).matches();
     }
 }

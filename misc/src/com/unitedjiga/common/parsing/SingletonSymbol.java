@@ -23,9 +23,12 @@
  */
 package com.unitedjiga.common.parsing;
 
+/**
+ * 
+ * @author Junji Mikami
+ *
+ */
 public interface SingletonSymbol extends NonTerminalSymbol {
-
-    Symbol get();
 
     @Override
     default Kind getKind() {
@@ -36,5 +39,7 @@ public interface SingletonSymbol extends NonTerminalSymbol {
     default <R, P> R accept(SymbolVisitor<R, P> v, P p) {
         return v.visitSingleton(this, p);
     }
+
+    Symbol get();
 
 }

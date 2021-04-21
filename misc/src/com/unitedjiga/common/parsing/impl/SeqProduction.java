@@ -27,11 +27,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import java.util.function.Supplier;
 
-import com.unitedjiga.common.parsing.ParsingException;
+import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.SequentialProduction;
 import com.unitedjiga.common.parsing.Symbol;
 import com.unitedjiga.common.parsing.Tokenizer;
 
@@ -39,29 +40,26 @@ import com.unitedjiga.common.parsing.Tokenizer;
  *
  * @author Junji Mikami
  */
-class AndProduction extends AbstractProduction {
-    private final List<AbstractProduction> elements = new ArrayList<>();
-    private final Pattern pattern;
+class SeqProduction extends AbstractProduction implements SequentialProduction {
+    private final List<AbstractProduction> elements;
 
-    AndProduction(CharSequence... production) {
-        for (CharSequence cs : production) {
-            elements.add(cs instanceof AbstractProduction ? (AbstractProduction) cs : new TermProduction(cs));
-        }
-        pattern = elements.stream().map(e -> "(" + e + ")")
-                .collect(Collectors.collectingAndThen(Collectors.joining(), Pattern::compile));
+    SeqProduction(List<AbstractProduction> elements) {
+        this.elements = Objects.requireNonNull(elements);
     }
 
     @Override
-    Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
-        if (anyMatch(getFirstSet(followSet), tokenizer)) {
+    Symbol interpret(Tokenizer.Buffer buffer, Set<TermProduction> followSet) {
+        Set<TermProduction> firstSet = getFirstSet(followSet);
+        if (anyMatch(firstSet, buffer)) {
             List<Symbol> list = new ArrayList<>();
             for (int i = 0; i < elements.size(); i++) {
-                list.add(elements.get(i).interpret(tokenizer, getFollowSet(i, followSet)));
+                list.add(elements.get(i).interpret(buffer, getFollowSet(i, followSet)));
             }
             return newNonTerminal(this, list);
         }
-        Object[] args = { getFirstSet(followSet), tryNext(tokenizer) };
-        throw new ParsingException(Messages.RULE_MISMATCH.format(args));
+//        Object[] args = { firstSet, tryNext(buffer) };
+//        throw new ParsingException(Messages.RULE_MISMATCH.format(args));
+        throw newException(Messages.RULE_MISMATCH, firstSet, buffer);
     }
 
     @Override
@@ -98,8 +96,47 @@ class AndProduction extends AbstractProduction {
     }
 
     @Override
-    public Pattern asPattern() {
-        return pattern;
+    public String toString() {
+        return elements.toString();
+    }
+
+    static class Builder implements SequentialProduction.Builder {
+        private final List<AbstractProduction> elements = new ArrayList<>();
+        private boolean isBuilt;
+        
+        @Override
+        public SequentialProduction build() {
+            if (isBuilt) {
+                throw new IllegalStateException();
+            }
+            isBuilt = true;
+            return new SeqProduction(elements);
+        }
+        
+        @Override
+        public Builder add(Production p) {
+            addIfBuilding((AbstractProduction) p);
+            return this;
+        }
+        
+        @Override
+        public Builder add(String s) {
+            addIfBuilding(new TermProduction(s));
+            return this;
+        }
+        
+        @Override
+        public Builder add(Supplier<? extends Production> p) {
+            addIfBuilding(new DelayProduction(p));
+            return this;
+        }
+
+        private void addIfBuilding(AbstractProduction e) {
+            if (isBuilt) {
+                throw new IllegalStateException();
+            }
+            elements.add(e);
+        }
     }
 
 }

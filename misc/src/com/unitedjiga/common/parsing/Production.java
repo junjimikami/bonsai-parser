@@ -23,49 +23,70 @@
  */
 package com.unitedjiga.common.parsing;
 
-import java.util.regex.Pattern;
-
-import com.unitedjiga.common.parsing.impl.Productions;
-
 /**
  * 正規表現ベースの生成規則です。
  * 
  * @author Junji Mikami
  */
-public interface Production extends CharSequence {
+public interface Production {
 
-    static Production of(CharSequence... regex) {
-        return Productions.getInstance().of(regex);
+    static Production of(Object... args) {
+        SequentialProduction.Builder builder = SequentialProduction.builder();
+        for (Object o : args) {
+            if (o instanceof Production) {
+                builder.add((Production) o);
+            } else if (o instanceof String) {
+                builder.add((String) o);
+            } else {
+                builder.add(o.toString());
+            }
+        }
+        return builder.build();
     }
 
-    static Production oneOf(CharSequence... regex) {
-        return Productions.getInstance().oneOf(regex);
+    static Production oneOf(Object... args) {
+//        return Productions.getInstance().oneOf(regex);
+        AlternativeProduction.Builder builder = AlternativeProduction.builder();
+        for (Object o : args) {
+            if (o instanceof Production) {
+                builder.add((Production) o);
+            } else if (o instanceof String) {
+                builder.add((String) o);
+            } else {
+                builder.add(o.toString());
+            }
+        }
+        return builder.build();
     }
 
-    Symbol parseRemaining(Tokenizer tokenizer);
+//    Symbol parseRemaining(Tokenizer tokenizer);
+//    Symbol parseRemaining(Tokenizer.Buffer buffer);
 
-    Symbol parse(Tokenizer tokenizer);
+//    Symbol parse(Tokenizer tokenizer);
+//    Symbol parse(Tokenizer.Buffer buffer);
+
+    Parser parser(Tokenizer tokenizer);
 
     Production opt();
 
     Production repeat();
 
-    Pattern asPattern();
+//    Pattern asPattern();
 
-    @Override
-    default CharSequence subSequence(int start, int end) {
-        return toString().subSequence(start, end);
-    }
-
-    @Override
-    default char charAt(int index) {
-        return toString().charAt(index);
-    }
-
-    @Override
-    default int length() {
-        return toString().length();
-    }
+//    @Override
+//    default CharSequence subSequence(int start, int end) {
+//        return toString().subSequence(start, end);
+//    }
+//
+//    @Override
+//    default char charAt(int index) {
+//        return toString().charAt(index);
+//    }
+//
+//    @Override
+//    default int length() {
+//        return toString().length();
+//    }
 
     @Override
     String toString();
