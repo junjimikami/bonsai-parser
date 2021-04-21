@@ -23,13 +23,12 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.unitedjiga.common.parsing.Token;
@@ -39,23 +38,7 @@ import com.unitedjiga.common.parsing.Tokenizer;
  * @author Junji Mikami
  *
  */
-public abstract class AbstractTokenizer implements Tokenizer {
-
-    private Iterator<? extends CharSequence> it;
-
-    public AbstractTokenizer(Iterator<? extends CharSequence> it) {
-        this.it = Objects.requireNonNull(it);
-    }
-
-    @Override
-    public boolean hasNext() {
-        return it.hasNext();
-    }
-
-    @Override
-    public Token next() {
-        return Token.of(it.next().toString());
-    }
+abstract class AbstractTokenizer implements Tokenizer {
 
     @Override
     public Buffer buffer() {
@@ -104,11 +87,10 @@ public abstract class AbstractTokenizer implements Tokenizer {
 
         @Override
         public Token remove() {
-            try {
-                return buffer.subList(0, current--).remove(0);
-            } catch (IndexOutOfBoundsException ex) {
-                throw new NoSuchElementException(ex);
+            if (current <= 0) {
+                throw new NoSuchElementException();
             }
+            return buffer.subList(0, current--).remove(0);
         }
 
         @Override
@@ -118,11 +100,20 @@ public abstract class AbstractTokenizer implements Tokenizer {
         
         @Override
         public String toString() {
-            return IntStream.range(0, buffer.size())
-                    .mapToObj(i -> (i == current ? "-> " : "") + buffer.get(i).getValue())
-                    .collect(Collectors.joining(", ", "[", "]"))
-                    .concat(current == buffer.size() ? " ->" : "")
-                    .concat(tzer.hasNext() ? " Tokenizer" : " EOF");
+            // Buffered tokens:[a, b, c] << Remaining:[d, e, f, ...]
+            StringBuilder sb = new StringBuilder();
+            sb.append(buffer.subList(0, current).stream()
+                    .map(Token::getValue)
+                    .collect(Collectors.joining(", ", "Buffered tokens:[", "]")));
+            sb.append(" << ");
+
+            StringJoiner remaining = new StringJoiner(", ", "Remaining:[", "]");
+            buffer.subList(current, buffer.size()).stream()
+                    .map(Token::getValue)
+                    .forEach(remaining::add);
+            remaining.add(tzer.hasNext() ? "..." : "EOF");
+            sb.append(remaining.toString());
+            return sb.toString();
         }
     }
 }

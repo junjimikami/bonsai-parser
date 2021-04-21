@@ -35,7 +35,6 @@ class TokenizerTest {
         assertFalse(tzer.hasNext());
         assertThrows(NoSuchElementException.class, tzer::next).printStackTrace();
         assertThrows(UnsupportedOperationException.class, tzer::remove).printStackTrace();
-        tzer.close();
     }
 
     @Test
@@ -49,7 +48,6 @@ class TokenizerTest {
         assertFalse(tzer.hasNext());
         assertThrows(NoSuchElementException.class, tzer::next).printStackTrace();
         assertThrows(UnsupportedOperationException.class, tzer::remove).printStackTrace();
-        tzer.close();
     }
 
     @Test
@@ -63,7 +61,6 @@ class TokenizerTest {
         assertFalse(tzer.hasNext());
         assertThrows(NoSuchElementException.class, tzer::next).printStackTrace();
         assertThrows(UnsupportedOperationException.class, tzer::remove).printStackTrace();
-        tzer.close();
     }
 
     @Test

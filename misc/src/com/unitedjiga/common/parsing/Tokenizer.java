@@ -23,20 +23,17 @@
  */
 package com.unitedjiga.common.parsing;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.stream.Stream;
 
-import com.unitedjiga.common.parsing.impl.AbstractTokenizer;
+import com.unitedjiga.common.parsing.impl.Tokenizers;
 
 /**
  *
  * @author Junji Mikami
  */
-public interface Tokenizer extends Iterator<Token>, Closeable {
+public interface Tokenizer extends Iterator<Token> {
 
     /**
      * 
@@ -44,19 +41,7 @@ public interface Tokenizer extends Iterator<Token>, Closeable {
      * @return
      */
     static Tokenizer wrap(Iterator<? extends CharSequence> it) {
-        return new AbstractTokenizer(it) {
-            
-            @Override
-            public void close() {
-                try {
-                    if (it instanceof Closeable) {
-                        ((Closeable) it).close();
-                    }
-                } catch (IOException ex) {
-                    throw new UncheckedIOException(ex);
-                }
-            }
-        };
+        return Tokenizers.create(it);
     }
 
     /**
@@ -73,9 +58,6 @@ public interface Tokenizer extends Iterator<Token>, Closeable {
 
     @Override
     Token next();
-
-    @Override
-    void close();
 
     @Override
     String toString();
