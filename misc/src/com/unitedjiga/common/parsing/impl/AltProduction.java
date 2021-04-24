@@ -26,12 +26,14 @@ package com.unitedjiga.common.parsing.impl;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import java.util.function.Supplier;
 
+import com.unitedjiga.common.parsing.AlternativeProduction;
 import com.unitedjiga.common.parsing.ParsingException;
+import com.unitedjiga.common.parsing.Production;
 import com.unitedjiga.common.parsing.Symbol;
 import com.unitedjiga.common.parsing.Tokenizer;
 
@@ -40,31 +42,26 @@ import com.unitedjiga.common.parsing.Tokenizer;
  * @author Junji Mikami
  *
  */
-class OrProduction extends AbstractProduction {
-    private final List<AbstractProduction> elements = new ArrayList<>();
-    private final Pattern pattern;
+class AltProduction extends AbstractProduction implements AlternativeProduction {
+    private final List<AbstractProduction> elements;
 
-    OrProduction(CharSequence... production) {
-        for (CharSequence cs : production) {
-            elements.add(cs instanceof AbstractProduction ? (AbstractProduction) cs : new TermProduction(cs));
-        }
-        pattern = elements.stream().map(e -> "(" + e + ")")
-                .collect(Collectors.collectingAndThen(Collectors.joining("|"), Pattern::compile));
+    AltProduction(List<AbstractProduction> elements) {
+        this.elements = Objects.requireNonNull(elements);
     }
 
     @Override
-    Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
+    Symbol interpret(Tokenizer.Buffer buffer, Set<TermProduction> followSet) {
         for (int i = 0; i < elements.size(); i++) {
-            if (!anyMatch(getFirstSet(i, followSet), tokenizer)) {
+            if (!anyMatch(getFirstSet(i, followSet), buffer)) {
                 continue;
             }
-            Symbol symbol = elements.get(i).interpret(tokenizer, followSet);
+            Symbol symbol = elements.get(i).interpret(buffer, followSet);
             return newSingleton(this, Optional.of(symbol));
         }
-        if (anyMatch(getFirstSet(followSet), tokenizer)) {
+        if (anyMatch(getFirstSet(followSet), buffer)) {
             return newSingleton(this, Optional.empty());
         }
-        Object[] args = { getFirstSet(followSet), tryNext(tokenizer) };
+        Object[] args = { getFirstSet(followSet), tryNext(buffer) };
         throw new ParsingException(Messages.RULE_MISMATCH.format(args));
     }
 
@@ -90,8 +87,43 @@ class OrProduction extends AbstractProduction {
         return elements.stream().anyMatch(p -> p.isOption());
     }
 
-    @Override
-    public Pattern asPattern() {
-        return pattern;
+    static class Builder implements AlternativeProduction.Builder {
+        private final List<AbstractProduction> elements = new ArrayList<>();
+        private boolean isBuilt;
+        
+        @Override
+        public AlternativeProduction build() {
+            if (isBuilt) {
+                throw new IllegalStateException();
+            }
+            isBuilt = true;
+            return new AltProduction(elements);
+        }
+        
+        @Override
+        public Builder add(Production p) {
+            addIfBuilding((AbstractProduction) p);
+            return this;
+        }
+        
+        @Override
+        public Builder add(String s) {
+            addIfBuilding(new TermProduction(s));
+            return this;
+        }
+
+        @Override
+        public Builder add(Supplier<? extends Production> p) {
+            addIfBuilding(new DelayProduction(p));
+            return this;
+        }
+
+        private void addIfBuilding(AbstractProduction e) {
+            if (isBuilt) {
+                throw new IllegalStateException();
+            }
+            elements.add(e);
+        }
     }
+
 }
