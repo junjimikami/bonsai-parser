@@ -30,7 +30,7 @@ package com.unitedjiga.common.parsing;
  */
 public interface Production {
 
-    static Production of(Object... args) {
+    static SequentialProduction of(Object... args) {
         SequentialProduction.Builder builder = SequentialProduction.builder();
         for (Object o : args) {
             if (o instanceof Production) {
@@ -44,8 +44,7 @@ public interface Production {
         return builder.build();
     }
 
-    static Production oneOf(Object... args) {
-//        return Productions.getInstance().oneOf(regex);
+    static AlternativeProduction oneOf(Object... args) {
         AlternativeProduction.Builder builder = AlternativeProduction.builder();
         for (Object o : args) {
             if (o instanceof Production) {
@@ -59,34 +58,11 @@ public interface Production {
         return builder.build();
     }
 
-//    Symbol parseRemaining(Tokenizer tokenizer);
-//    Symbol parseRemaining(Tokenizer.Buffer buffer);
-
-//    Symbol parse(Tokenizer tokenizer);
-//    Symbol parse(Tokenizer.Buffer buffer);
-
     Parser parser(Tokenizer tokenizer);
 
     Production opt();
 
     Production repeat();
-
-//    Pattern asPattern();
-
-//    @Override
-//    default CharSequence subSequence(int start, int end) {
-//        return toString().subSequence(start, end);
-//    }
-//
-//    @Override
-//    default char charAt(int index) {
-//        return toString().charAt(index);
-//    }
-//
-//    @Override
-//    default int length() {
-//        return toString().length();
-//    }
 
     @Override
     String toString();

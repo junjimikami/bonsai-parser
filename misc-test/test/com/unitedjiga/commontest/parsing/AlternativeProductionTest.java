@@ -25,6 +25,7 @@ package com.unitedjiga.commontest.parsing;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Collections;
 import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,7 @@ import com.unitedjiga.common.parsing.AlternativeProduction;
 import com.unitedjiga.common.parsing.NonTerminalSymbol;
 import com.unitedjiga.common.parsing.ParsingException;
 import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.SequentialProduction;
 import com.unitedjiga.common.parsing.Symbol;
 import com.unitedjiga.common.parsing.SymbolVisitor;
 import com.unitedjiga.common.parsing.TerminalSymbol;
@@ -183,5 +185,141 @@ public class AlternativeProductionTest {
 
         testThrowing(prd);
         testThrowing(prd, "0", "1", "2");
+    }
+
+    @Test
+    void test05() throws Exception {
+        var prd0 = AlternativeProduction.builder()
+                .add("1")
+                .add("2")
+                .build();
+        var prd = SequentialProduction.builder()
+                .add("0")
+                .add(prd0)
+                .build();
+        {
+            var pser = prd.parser(Tokenizer.wrap("0", "1"));
+            var smbl = pser.parse();
+            assertEquals(Symbol.Kind.NON_TERMINAL, smbl.getKind());
+            assertEquals("01", smbl.asToken().getValue());
+            smbl.accept(visitor, "+-");
+        }
+        {
+            var pser = prd.parser(Tokenizer.wrap("0", "2"));
+            var smbl = pser.parse();
+            assertEquals(Symbol.Kind.NON_TERMINAL, smbl.getKind());
+            assertEquals("02", smbl.asToken().getValue());
+            smbl.accept(visitor, "+-");
+        }
+
+        testThrowing(prd);
+        testThrowing(prd, "0");
+        testThrowing(prd, "0", "3");
+        testThrowing(prd, "0", "1", "2");
+    }
+    @Test
+    void testOption01() throws Exception {
+        var prd0 = AlternativeProduction.builder()
+                .build();
+        var prd = AlternativeProduction.builder()
+                .add("0")
+                .add(prd0)
+                .build();
+        {
+            var pser = prd.parser(Tokenizer.wrap("0"));
+            var smbl = pser.parse();
+            assertEquals(Symbol.Kind.SINGLETON, smbl.getKind());
+            assertEquals("0", smbl.asToken().getValue());
+            smbl.accept(visitor, "+-");
+        }
+        {
+            var pser = prd.parser(Tokenizer.wrap());
+            var smbl = pser.parse();
+            assertEquals(Symbol.Kind.SINGLETON, smbl.getKind());
+            assertEquals("", smbl.asToken().getValue());
+            smbl.accept(visitor, "+-");
+        }
+
+        testThrowing(prd, "0", "");
+    }
+    @Test
+    void testOption02() throws Exception {
+        var prd0 = AlternativeProduction.builder()
+                .build();
+        var prd1 = AlternativeProduction.builder()
+                .add("1")
+                .add(prd0)
+                .build();
+        var prd = SequentialProduction.builder()
+                .add("0")
+                .add(prd1)
+                .add("2")
+                .build();
+        {
+            var pser = prd.parser(Tokenizer.wrap("0", "1", "2"));
+            var smbl = pser.parse();
+            assertEquals(Symbol.Kind.NON_TERMINAL, smbl.getKind());
+            assertEquals("012", smbl.asToken().getValue());
+            smbl.accept(visitor, "+-");
+        }
+        {
+            var pser = prd.parser(Tokenizer.wrap("0", "2"));
+            var smbl = pser.parse();
+            assertEquals(Symbol.Kind.NON_TERMINAL, smbl.getKind());
+            assertEquals("02", smbl.asToken().getValue());
+            smbl.accept(visitor, "+-");
+        }
+
+    }
+    
+    Production empty() {
+//        return AlternativeProduction.builder().build();
+        return SequentialProduction.builder().build();
+    }
+    /** A=empty|B */
+    Production prdA() {
+        return AlternativeProduction.builder()
+                .add(empty())
+                .add(prdB())
+                .build();
+    }
+    /** B=0A */
+    Production prdB() {
+        return SequentialProduction.builder()
+                .add("0")
+                .add(this::prdA)
+                .build();
+    }
+    @Test
+    void testRepetition() throws Exception {
+        {
+            var pser = prdA().parser(Tokenizer.wrap());
+            var smbl = pser.parse();
+            assertEquals(Symbol.Kind.SINGLETON, smbl.getKind());
+            assertEquals("", smbl.asToken().getValue());
+            smbl.accept(visitor, "+-");
+        }
+        {
+            var pser = prdA().parser(Tokenizer.wrap("0"));
+            var smbl = pser.parse();
+            assertEquals(Symbol.Kind.SINGLETON, smbl.getKind());
+            assertEquals("0", smbl.asToken().getValue());
+            smbl.accept(visitor, "+-");
+        }
+        {
+            var pser = prdA().parser(Tokenizer.wrap("0", "0"));
+            var smbl = pser.parse();
+            assertEquals(Symbol.Kind.SINGLETON, smbl.getKind());
+            assertEquals("00", smbl.asToken().getValue());
+            smbl.accept(visitor, "+-");
+        }
+        {
+            var pser = prdA().parser(Tokenizer.wrap(Collections.nCopies(8, "0").iterator()));
+            var smbl = pser.parse();
+            assertEquals(Symbol.Kind.SINGLETON, smbl.getKind());
+            assertEquals("00000000", smbl.asToken().getValue());
+            smbl.accept(visitor, "+-");
+        }
+
     }
 }

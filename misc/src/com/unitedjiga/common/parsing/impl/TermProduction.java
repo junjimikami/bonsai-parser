@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import com.unitedjiga.common.parsing.ParsingException;
 import com.unitedjiga.common.parsing.Symbol;
 import com.unitedjiga.common.parsing.Token;
 import com.unitedjiga.common.parsing.Tokenizer;
@@ -48,8 +47,9 @@ class TermProduction extends AbstractProduction {
         if (buffer.hasRemaining() && matches(buffer.get())) {
             return buffer.remove();
         }
-        Object[] args = { getFirstSet(followSet), tryNext(buffer) };
-        throw new ParsingException(Messages.RULE_MISMATCH.format(args));
+//        Object[] args = { getFirstSet(followSet), tryNext(buffer) };
+//        throw new ParsingException(Messages.RULE_MISMATCH.format(args));
+        throw newException(Message.RULE_MISMATCH, getFirstSet(followSet), buffer);
     }
 
     @Override

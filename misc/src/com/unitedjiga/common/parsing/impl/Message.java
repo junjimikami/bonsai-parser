@@ -29,14 +29,14 @@ import java.text.MessageFormat;
  * @author Junji Mikami
  *
  */
-enum Messages {
+enum Message {
 
     TOO_MANY_TOKEN("Expected EOF, but {0}."),
     RULE_MISMATCH("Expected {0}, but {1}.");
 
     private MessageFormat msg;
 
-    Messages(String message) {
+    private Message(String message) {
         this.msg = new MessageFormat(message);
     }
 

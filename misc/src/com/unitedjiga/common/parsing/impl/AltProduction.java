@@ -32,7 +32,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import com.unitedjiga.common.parsing.AlternativeProduction;
-import com.unitedjiga.common.parsing.ParsingException;
 import com.unitedjiga.common.parsing.Production;
 import com.unitedjiga.common.parsing.Symbol;
 import com.unitedjiga.common.parsing.Tokenizer;
@@ -58,11 +57,12 @@ class AltProduction extends AbstractProduction implements AlternativeProduction 
             Symbol symbol = elements.get(i).interpret(buffer, followSet);
             return newSingleton(this, Optional.of(symbol));
         }
-        if (anyMatch(getFirstSet(followSet), buffer)) {
+        if (elements.isEmpty() && anyMatch(followSet, buffer)) {
             return newSingleton(this, Optional.empty());
         }
-        Object[] args = { getFirstSet(followSet), tryNext(buffer) };
-        throw new ParsingException(Messages.RULE_MISMATCH.format(args));
+//        Object[] args = { getFirstSet(followSet), tryNext(buffer) };
+//        throw new ParsingException(Messages.RULE_MISMATCH.format(args));
+        throw newException(Message.RULE_MISMATCH, getFirstSet(followSet), buffer);
     }
 
     @Override
@@ -84,7 +84,15 @@ class AltProduction extends AbstractProduction implements AlternativeProduction 
 
     @Override
     boolean isOption() {
+        if (elements.isEmpty()) {
+            return true;
+        }
         return elements.stream().anyMatch(p -> p.isOption());
+    }
+
+    @Override
+    public String toString() {
+        return elements.toString();
     }
 
     static class Builder implements AlternativeProduction.Builder {

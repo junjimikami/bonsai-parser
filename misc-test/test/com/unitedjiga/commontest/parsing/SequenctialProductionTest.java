@@ -82,9 +82,6 @@ public class SequenctialProductionTest {
         var prd = SequentialProduction.builder()
                 .add("[0-9]")
                 .build();
-        testThrowing(prd);
-        testThrowing(prd, "A");
-        testThrowing(prd, "");
         {
             var pser = prd.parser(Tokenizer.wrap("0"));
             var smbl = pser.parse();
@@ -94,6 +91,9 @@ public class SequenctialProductionTest {
             assertThrows(ParsingException.class, ()->pser.parse())
                     .printStackTrace(System.out);
         }
+        testThrowing(prd);
+        testThrowing(prd, "A");
+        testThrowing(prd, "");
         testThrowing(prd, "0", "1");
     }
 
@@ -103,10 +103,6 @@ public class SequenctialProductionTest {
                 .add("[0-9]")
                 .add("[A-Z]")
                 .build();
-        testThrowing(prd);
-        testThrowing(prd, "0");
-        testThrowing(prd, "A");
-        testThrowing(prd, "");
         {
             var pser = prd.parser(Tokenizer.wrap("0", "A"));
             var smbl = pser.parse();
@@ -116,6 +112,10 @@ public class SequenctialProductionTest {
             assertThrows(ParsingException.class, ()->pser.parse())
                     .printStackTrace(System.out);
         }
+        testThrowing(prd);
+        testThrowing(prd, "0");
+        testThrowing(prd, "A");
+        testThrowing(prd, "");
         testThrowing(prd, "0", "A", "");
     }
 
@@ -128,10 +128,6 @@ public class SequenctialProductionTest {
         var prd = SequentialProduction.builder()
                 .add(prd0)
                 .build();
-        testThrowing(prd);
-        testThrowing(prd, "0");
-        testThrowing(prd, "A");
-        testThrowing(prd, "");
         {
             var pser = prd.parser(Tokenizer.wrap("0", "A"));
             var smbl = pser.parse();
@@ -141,6 +137,10 @@ public class SequenctialProductionTest {
             assertThrows(ParsingException.class, ()->pser.parse())
                     .printStackTrace(System.out);
         }
+        testThrowing(prd);
+        testThrowing(prd, "0");
+        testThrowing(prd, "A");
+        testThrowing(prd, "");
         testThrowing(prd, "0", "A", "");
     }
 
@@ -153,10 +153,6 @@ public class SequenctialProductionTest {
         var prd = SequentialProduction.builder()
                 .add(prd0)
                 .build();
-        testThrowing(prd);
-        testThrowing(prd, "0");
-        testThrowing(prd, "A");
-        testThrowing(prd, "");
         {
             var pser = prd.parser(Tokenizer.wrap("0", "A"));
             var smbl = pser.parse();
@@ -166,6 +162,31 @@ public class SequenctialProductionTest {
             assertThrows(ParsingException.class, ()->pser.parse())
                     .printStackTrace(System.out);
         }
+        testThrowing(prd);
+        testThrowing(prd, "0");
+        testThrowing(prd, "A");
+        testThrowing(prd, "");
         testThrowing(prd, "0", "A", "");
+    }
+    @Test
+    void test05() throws Exception {
+        var prd0 = SequentialProduction.builder()
+                .build();
+        var prd = SequentialProduction.builder()
+                .add(prd0)
+                .add("A")
+                .build();
+        {
+            var pser = prd.parser(Tokenizer.wrap("A"));
+            var smbl = pser.parse();
+            assertEquals(Symbol.Kind.NON_TERMINAL, smbl.getKind());
+            assertEquals("A", smbl.asToken().getValue());
+            smbl.accept(visitor, "+-");
+            assertThrows(ParsingException.class, ()->pser.parse())
+                    .printStackTrace(System.out);
+        }
+        testThrowing(prd);
+        testThrowing(prd, "");
+        testThrowing(prd, "A", "");
     }
 }

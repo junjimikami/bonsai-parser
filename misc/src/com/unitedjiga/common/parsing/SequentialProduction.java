@@ -41,6 +41,6 @@ public interface SequentialProduction extends Production {
     }
 
     static Builder builder() {
-        return Productions.sequencialBuilder();
+        return Productions.sequentialBuilder();
     }
 }

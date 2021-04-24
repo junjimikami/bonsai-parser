@@ -59,7 +59,7 @@ class SeqProduction extends AbstractProduction implements SequentialProduction {
         }
 //        Object[] args = { firstSet, tryNext(buffer) };
 //        throw new ParsingException(Messages.RULE_MISMATCH.format(args));
-        throw newException(Messages.RULE_MISMATCH, firstSet, buffer);
+        throw newException(Message.RULE_MISMATCH, firstSet, buffer);
     }
 
     @Override

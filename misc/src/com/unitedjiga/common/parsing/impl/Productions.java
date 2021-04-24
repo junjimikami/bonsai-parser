@@ -24,6 +24,7 @@
 package com.unitedjiga.common.parsing.impl;
 
 import com.unitedjiga.common.parsing.AlternativeProduction;
+import com.unitedjiga.common.parsing.Production;
 import com.unitedjiga.common.parsing.SequentialProduction;
 
 /**
@@ -32,28 +33,19 @@ import com.unitedjiga.common.parsing.SequentialProduction;
  *
  */
 public final class Productions {
-//    private static final Productions instance = new Productions();
 
     private Productions() {
     }
 
-//    public static Productions getInstance() {
-//        return instance;
-//    }
-//
-//    public Production of(CharSequence... regex) {
-//        return new AndProduction(regex);
-//    }
-//
-//    public Production oneOf(CharSequence... regex) {
-//        return new OrProduction(regex);
-//    }
-
-    public static SequentialProduction.Builder sequencialBuilder() {
+    public static SequentialProduction.Builder sequentialBuilder() {
         return new SeqProduction.Builder();
     }
     
     public static AlternativeProduction.Builder alternativeBuilder() {
         return new AltProduction.Builder();
+    }
+
+    public static Production empty() {
+        return sequentialBuilder().build();
     }
 }

@@ -23,6 +23,7 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
@@ -57,7 +58,7 @@ abstract class AbstractProduction implements Production {
                 Tokenizer.Buffer buf = tokenizer.buffer();
                 Symbol s = interpret(buf, Collections.singleton(EOF));
                 if (buf.hasRemaining()) {
-                    throw newException(Messages.TOO_MANY_TOKEN, buf);
+                    throw newException(Message.TOO_MANY_TOKEN, buf);
                 }
                 return s;
             }
@@ -152,19 +153,14 @@ abstract class AbstractProduction implements Production {
         };
     }
 
-    static Object tryNext(Tokenizer.Buffer buffer) {
-        Token eof = Token.of("EOF");
-        return buffer.hasRemaining() ? buffer.get() : eof;
-//        return tokenizer.hasNext() ? tokenizer.peek() : "EOF";
-    }
-
-    private static ParsingException newException(Messages m, Object... args) {
-        return new ParsingException(m.format(args));
-    }
-    static ParsingException newException(Messages m, Tokenizer.Buffer buf) {
-        return newException(m, buf.hasRemaining() ? buf.get().getValue() : "EOF");
-    }
-    static ParsingException newException(Messages m, Set<?> set, Tokenizer.Buffer buf) {
-        return newException(m, set, buf.hasRemaining() ? buf.get().getValue() : "EOF");
+    static ParsingException newException(Message m, Object... args) {
+        Object[] str = Arrays.stream(args).map(e -> {
+            if (e instanceof Tokenizer.Buffer) {
+                Tokenizer.Buffer buf = (Tokenizer.Buffer) e;
+                return buf.hasRemaining() ? buf.get().getValue() : "EOF";
+            }
+            return e.toString();
+        }).toArray();
+        return new ParsingException(m.format(str));
     }
 }
