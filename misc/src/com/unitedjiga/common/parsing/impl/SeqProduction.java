@@ -57,8 +57,6 @@ class SeqProduction extends AbstractProduction implements SequentialProduction {
             }
             return newNonTerminal(this, list);
         }
-//        Object[] args = { firstSet, tryNext(buffer) };
-//        throw new ParsingException(Messages.RULE_MISMATCH.format(args));
         throw newException(Message.RULE_MISMATCH, firstSet, buffer);
     }
 

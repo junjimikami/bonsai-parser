@@ -60,8 +60,6 @@ class AltProduction extends AbstractProduction implements AlternativeProduction 
         if (elements.isEmpty() && anyMatch(followSet, buffer)) {
             return newSingleton(this, Optional.empty());
         }
-//        Object[] args = { getFirstSet(followSet), tryNext(buffer) };
-//        throw new ParsingException(Messages.RULE_MISMATCH.format(args));
         throw newException(Message.RULE_MISMATCH, getFirstSet(followSet), buffer);
     }
 

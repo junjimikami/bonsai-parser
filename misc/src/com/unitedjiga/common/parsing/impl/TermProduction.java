@@ -47,8 +47,6 @@ class TermProduction extends AbstractProduction {
         if (buffer.hasRemaining() && matches(buffer.get())) {
             return buffer.remove();
         }
-//        Object[] args = { getFirstSet(followSet), tryNext(buffer) };
-//        throw new ParsingException(Messages.RULE_MISMATCH.format(args));
         throw newException(Message.RULE_MISMATCH, getFirstSet(followSet), buffer);
     }
 
