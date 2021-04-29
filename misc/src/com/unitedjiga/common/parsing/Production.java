@@ -60,9 +60,9 @@ public interface Production {
 
     Parser parser(Tokenizer tokenizer);
 
-    Production opt();
+    AlternativeProduction opt();
 
-    Production repeat();
+    SequentialProduction repeat();
 
     @Override
     String toString();

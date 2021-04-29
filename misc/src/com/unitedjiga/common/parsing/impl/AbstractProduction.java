@@ -31,10 +31,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.unitedjiga.common.parsing.AlternativeProduction;
 import com.unitedjiga.common.parsing.NonTerminalSymbol;
 import com.unitedjiga.common.parsing.Parser;
 import com.unitedjiga.common.parsing.ParsingException;
 import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.SequentialProduction;
 import com.unitedjiga.common.parsing.SingletonSymbol;
 import com.unitedjiga.common.parsing.Symbol;
 import com.unitedjiga.common.parsing.Token;
@@ -66,12 +68,12 @@ abstract class AbstractProduction implements Production {
     }
 
     @Override
-    public Production opt() {
+    public AlternativeProduction opt() {
         return new OptProduction(this);
     }
 
     @Override
-    public Production repeat() {
+    public SequentialProduction repeat() {
         return new RepeatProduction(this);
     }
     

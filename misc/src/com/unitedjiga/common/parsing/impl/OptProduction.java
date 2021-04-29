@@ -23,10 +23,11 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Pattern;
 
+import com.unitedjiga.common.parsing.AlternativeProduction;
 import com.unitedjiga.common.parsing.Symbol;
 import com.unitedjiga.common.parsing.Tokenizer;
 
@@ -34,19 +35,17 @@ import com.unitedjiga.common.parsing.Tokenizer;
  *
  * @author Junji Mikami
  */
-class OptProduction extends AbstractProduction {
+class OptProduction extends AbstractProduction implements AlternativeProduction {
     private final AbstractProduction element;
-    private final Pattern pattern;
 
     OptProduction(AbstractProduction p) {
-        element = p;
-        pattern = Pattern.compile("(" + element + ")?");
+        element = Objects.requireNonNull(p);
     }
 
     @Override
-    Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
-        if (anyMatch(getFirstSet(), tokenizer)) {
-            Symbol symbol = element.interpret(tokenizer, followSet);
+    Symbol interpret(Tokenizer.Buffer buffer, Set<TermProduction> followSet) {
+        if (anyMatch(getFirstSet(), buffer)) {
+            Symbol symbol = element.interpret(buffer, followSet);
             return newSingleton(this, Optional.of(symbol));
         }
         return newSingleton(this, Optional.empty());
@@ -63,7 +62,7 @@ class OptProduction extends AbstractProduction {
     }
 
     @Override
-    public Pattern asPattern() {
-        return pattern;
+    public String toString() {
+        return element.toString();
     }
 }

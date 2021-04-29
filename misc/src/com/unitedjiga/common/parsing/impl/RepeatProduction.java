@@ -27,9 +27,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
-import java.util.regex.Pattern;
 
+import com.unitedjiga.common.parsing.SequentialProduction;
 import com.unitedjiga.common.parsing.Symbol;
 import com.unitedjiga.common.parsing.Tokenizer;
 
@@ -38,20 +39,18 @@ import com.unitedjiga.common.parsing.Tokenizer;
  * @author Junji Mikami
  *
  */
-class RepeatProduction extends AbstractProduction {
+class RepeatProduction extends AbstractProduction implements SequentialProduction {
     private final AbstractProduction element;
-    private final Pattern pattern;
 
     RepeatProduction(AbstractProduction p) {
-        element = p;
-        pattern = Pattern.compile("(" + element + ")*");
+        element = Objects.requireNonNull(p);
     }
 
     @Override
-    Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
+    Symbol interpret(Tokenizer.Buffer buffer, Set<TermProduction> followSet) {
         List<Symbol> list = new ArrayList<>();
-        while (anyMatch(getFirstSet(), tokenizer)) {
-            list.add(element.interpret(tokenizer, getFollowSet(followSet)));
+        while (anyMatch(getFirstSet(), buffer)) {
+            list.add(element.interpret(buffer, getFollowSet(followSet)));
         }
         if (!list.isEmpty()) {
             return newNonTerminal(this, list);
@@ -77,7 +76,7 @@ class RepeatProduction extends AbstractProduction {
     }
 
     @Override
-    public Pattern asPattern() {
-        return pattern;
+    public String toString() {
+        return element.toString();
     }
 }

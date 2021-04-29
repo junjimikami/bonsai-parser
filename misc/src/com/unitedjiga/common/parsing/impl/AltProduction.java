@@ -77,7 +77,12 @@ class AltProduction extends AbstractProduction implements AlternativeProduction 
 
     private Set<TermProduction> getFirstSet(int i, Set<TermProduction> followSet) {
         assert 0 <= i && i < elements.size();
-        return elements.get(i).getFirstSet(followSet);
+        Set<TermProduction> set = new HashSet<>();
+        set.addAll(elements.get(i).getFirstSet());
+        if (elements.get(i).isOption()) {
+            set.addAll(followSet);
+        }
+        return set;
     }
 
     @Override

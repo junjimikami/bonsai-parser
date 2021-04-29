@@ -39,6 +39,7 @@ import com.unitedjiga.common.parsing.Symbol;
 import com.unitedjiga.common.parsing.SymbolVisitor;
 import com.unitedjiga.common.parsing.TerminalSymbol;
 import com.unitedjiga.common.parsing.Tokenizer;
+import static com.unitedjiga.common.parsing.AlternativeProduction.builder;
 
 public class AlternativeProductionTest {
 
@@ -321,5 +322,143 @@ public class AlternativeProductionTest {
             smbl.accept(visitor, "+-");
         }
 
+    }
+
+    @Test
+    void testOpt01() throws Exception {
+        var prd = builder()
+                .add("0")
+                .add("1")
+                .build()
+                .opt();
+        {
+            var pser = prd.parser(Tokenizer.wrap("0"));
+            var smbl = pser.parse();
+            assertEquals(Symbol.Kind.SINGLETON, smbl.getKind());
+            assertEquals("0", smbl.asToken().getValue());
+            smbl.accept(visitor, "+-");
+        }
+        {
+            var pser = prd.parser(Tokenizer.wrap("1"));
+            var smbl = pser.parse();
+            assertEquals(Symbol.Kind.SINGLETON, smbl.getKind());
+            assertEquals("1", smbl.asToken().getValue());
+            smbl.accept(visitor, "+-");
+        }
+        {
+            var pser = prd.parser(Tokenizer.wrap());
+            var smbl = pser.parse();
+            assertEquals(Symbol.Kind.SINGLETON, smbl.getKind());
+            assertEquals("", smbl.asToken().getValue());
+            smbl.accept(visitor, "+-");
+        }
+        testThrowing(prd, "0", "1");
+    }
+    @Test
+    void testOpt02() throws Exception {
+        var prd = builder()
+                .add("0")
+                .add(builder()
+                        .add("1")
+                        .build()
+                        .opt())
+                .build();
+        {
+            var pser = prd.parser(Tokenizer.wrap("0"));
+            var smbl = pser.parse();
+            assertEquals(Symbol.Kind.SINGLETON, smbl.getKind());
+            assertEquals("0", smbl.asToken().getValue());
+            smbl.accept(visitor, "+-");
+        }
+        {
+            var pser = prd.parser(Tokenizer.wrap("1"));
+            var smbl = pser.parse();
+            assertEquals(Symbol.Kind.SINGLETON, smbl.getKind());
+            assertEquals("1", smbl.asToken().getValue());
+            smbl.accept(visitor, "+-");
+        }
+        {
+            var pser = prd.parser(Tokenizer.wrap());
+            var smbl = pser.parse();
+            assertEquals(Symbol.Kind.SINGLETON, smbl.getKind());
+            assertEquals("", smbl.asToken().getValue());
+            smbl.accept(visitor, "+-");
+        }
+        testThrowing(prd, "0", "1");
+    }
+    @Test
+    void testRepeat01() throws Exception {
+        var prd = builder()
+                .add("0")
+                .add("1")
+                .build()
+                .repeat();
+        {
+            var pser = prd.parser(Tokenizer.wrap("0"));
+            var smbl = pser.parse();
+            assertEquals(Symbol.Kind.NON_TERMINAL, smbl.getKind());
+            assertEquals("0", smbl.asToken().getValue());
+            smbl.accept(visitor, "+-");
+        }
+        {
+            var pser = prd.parser(Tokenizer.wrap("1"));
+            var smbl = pser.parse();
+            assertEquals(Symbol.Kind.NON_TERMINAL, smbl.getKind());
+            assertEquals("1", smbl.asToken().getValue());
+            smbl.accept(visitor, "+-");
+        }
+        {
+            var pser = prd.parser(Tokenizer.wrap());
+            var smbl = pser.parse();
+            assertEquals(Symbol.Kind.NON_TERMINAL, smbl.getKind());
+            assertEquals("", smbl.asToken().getValue());
+            smbl.accept(visitor, "+-");
+        }
+        {
+            var pser = prd.parser(Tokenizer.wrap("01101010".split("\\B")));
+            var smbl = pser.parse();
+            assertEquals(Symbol.Kind.NON_TERMINAL, smbl.getKind());
+            assertEquals("01101010", smbl.asToken().getValue());
+            smbl.accept(visitor, "+-");
+        }
+    }
+    @Test
+    void testRepeat02() throws Exception {
+        var prd = builder()
+                .add("0")
+                .add(builder()
+                        .add("1")
+                        .build()
+                        .repeat())
+                .build();
+        {
+            var pser = prd.parser(Tokenizer.wrap("0"));
+            var smbl = pser.parse();
+            assertEquals(Symbol.Kind.SINGLETON, smbl.getKind());
+            assertEquals("0", smbl.asToken().getValue());
+            smbl.accept(visitor, "+-");
+        }
+        {
+            var pser = prd.parser(Tokenizer.wrap("1"));
+            var smbl = pser.parse();
+            assertEquals(Symbol.Kind.SINGLETON, smbl.getKind());
+            assertEquals("1", smbl.asToken().getValue());
+            smbl.accept(visitor, "+-");
+        }
+        {
+            var pser = prd.parser(Tokenizer.wrap());
+            var smbl = pser.parse();
+            assertEquals(Symbol.Kind.SINGLETON, smbl.getKind());
+            assertEquals("", smbl.asToken().getValue());
+            smbl.accept(visitor, "+-");
+        }
+        {
+            var pser = prd.parser(Tokenizer.wrap("11111".split("\\B")));
+            var smbl = pser.parse();
+            assertEquals(Symbol.Kind.SINGLETON, smbl.getKind());
+            assertEquals("11111", smbl.asToken().getValue());
+            smbl.accept(visitor, "+-");
+        }
+        testThrowing(prd, "0101".split("\\B"));
     }
 }

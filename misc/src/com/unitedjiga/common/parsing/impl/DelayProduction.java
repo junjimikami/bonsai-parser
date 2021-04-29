@@ -23,6 +23,7 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -38,7 +39,7 @@ class DelayProduction extends AbstractProduction {
     private final Supplier<? extends Production> p;
 
     public DelayProduction(Supplier<? extends Production> p) {
-        this.p = p;
+        this.p = Objects.requireNonNull(p);
     }
 
     @Override
