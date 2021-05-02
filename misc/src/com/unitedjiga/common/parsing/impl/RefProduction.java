@@ -35,10 +35,10 @@ import com.unitedjiga.common.parsing.Tokenizer.Buffer;
  * @author Junji Mikami
  *
  */
-class DelayProduction extends AbstractProduction {
+class RefProduction extends AbstractProduction {
     private final Supplier<? extends Production> p;
 
-    public DelayProduction(Supplier<? extends Production> p) {
+    public RefProduction(Supplier<? extends Production> p) {
         this.p = Objects.requireNonNull(p);
     }
 

@@ -1,17 +1,13 @@
 package com.unitedjiga.commontest.parsing;
 
+import static com.unitedjiga.common.parsing.Production.empty;
+import static com.unitedjiga.common.parsing.Production.of;
+import static com.unitedjiga.common.parsing.Production.oneOf;
+import static com.unitedjiga.common.parsing.Production.ref;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.ListIterator;
-import java.util.Optional;
-import java.util.function.Consumer;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,17 +15,10 @@ import org.junit.jupiter.api.Test;
 import com.unitedjiga.common.parsing.NonTerminalSymbol;
 import com.unitedjiga.common.parsing.ParsingException;
 import com.unitedjiga.common.parsing.Production;
-import com.unitedjiga.common.parsing.SingletonSymbol;
 import com.unitedjiga.common.parsing.Symbol;
 import com.unitedjiga.common.parsing.SymbolVisitor;
 import com.unitedjiga.common.parsing.TerminalSymbol;
-import com.unitedjiga.common.parsing.Token;
 import com.unitedjiga.common.parsing.Tokenizer;
-import com.unitedjiga.common.parsing.TokenizerFactory;
-import com.unitedjiga.common.util.Lexer;
-
-import static com.unitedjiga.common.parsing.Production.of;
-import static com.unitedjiga.common.parsing.Production.oneOf;
 
 class ProductionTest {
 
@@ -38,57 +27,65 @@ class ProductionTest {
         @Override
         public Void visitTerminal(TerminalSymbol s, String p) {
             System.out.print(p);
-            System.out.println(s + ":" + s.getKind());
+            System.out.println(s.getKind() + "=[" + s + "]");
             return null;
         }
-
-//		@Override
-//		public Void visitSingleton(SingletonSymbol s, String p) {
-//			System.out.print(p);
-//			System.out.println(s.getOrigin()  + ":" + s.getKind() + "=\"" + s + "\"");
-//			s.forEach(e -> e.accept(this, "  " + p));
-//			return null;
-//		}
 
         @Override
         public Void visitNonTerminal(NonTerminalSymbol s, String p) {
             System.out.print(p);
-            System.out.println(s.getOrigin() + ":" + s.getKind() + "=\"" + s + "\"");
+            System.out.println(s.getKind() + "=[" + s + "]");
             s.forEach(e -> e.accept(this, "  " + p));
             return null;
+        }
+        
+        public Void visit(Symbol s) {
+            return visit(s, "+-");
         }
     };
 
     static void testSuccess(Production p, String in) {
-        assertTrue(p.asPattern().matcher(in).matches());
+        var arr = in.chars().mapToObj(Character::toString).iterator();
+        var pser = p.parser(Tokenizer.wrap(arr));
+        var smbl = pser.parse();
+        assertEquals(in, smbl.asToken().getValue());
+        printer.visit(smbl);
+//        assertTrue(p.asPattern().matcher(in).matches());
 
-        TokenizerFactory tf = TokenizerFactory.newInstance();
-        try (Tokenizer tzer = tf.createTokenizer(new StringReader(in))) {
-            Symbol s = p.parseRemaining(tzer);
-            s.accept(printer, "+-");
-        }
+//        TokenizerFactory tf = TokenizerFactory.newInstance();
+//        try (Tokenizer tzer = tf.createTokenizer(new StringReader(in));
+//                Parser pser = p.parser(tzer)) {
+////            Symbol s = p.parseRemaining(tzer.buffer());
+//            Symbol s = pser.next();
+//            s.accept(printer, "+-");
+//        }
     }
 
     static void testFailure(Production p, String in) {
-        assertFalse(p.asPattern().matcher(in).matches());
+        var arr = in.chars().mapToObj(Character::toString).iterator();
+        var pser = p.parser(Tokenizer.wrap(arr));
+        assertThrows(ParsingException.class, pser::parse).printStackTrace(System.out);
+//        assertFalse(p.asPattern().matcher(in).matches());
 
-        TokenizerFactory tf = TokenizerFactory.newInstance();
-        try (Tokenizer tzer = tf.createTokenizer(new StringReader(in))) {
-            assertThrows(ParsingException.class, () -> {
-                try {
-                    p.parseRemaining(tzer);
-                } catch (ParsingException e) {
-                    System.out.println(e);
-                    throw e;
-                }
-            });
-        }
+//        TokenizerFactory tf = TokenizerFactory.newInstance();
+//        try (Tokenizer tzer = tf.createTokenizer(new StringReader(in));
+//                Parser pser = p.parser(tzer)) {
+//            assertThrows(ParsingException.class, () -> {
+//                try {
+////                    p.parseRemaining(tzer.buffer());
+//                    pser.next();
+//                } catch (ParsingException e) {
+//                    System.out.println(e);
+//                    throw e;
+//                }
+//            });
+//        }
     }
 
-    static void testInit(Production p) {
-        System.out.println(p);
-        assertEquals(p.toString(), p.asPattern().pattern());
-    }
+//    static void testInit(Production p) {
+//        System.out.println(p);
+////        assertEquals(p.toString(), p.asPattern().pattern());
+//    }
 
     @BeforeEach
     void beforeTest() {
@@ -98,7 +95,6 @@ class ProductionTest {
     @Test
     void test1_1() throws IOException {
         Production A = Production.of();
-        testInit(A);
 
         testSuccess(A, "");
         testFailure(A, "1");
@@ -108,7 +104,6 @@ class ProductionTest {
     @Test
     void test1_2() throws IOException {
         Production A = Production.of("1");
-        testInit(A);
 
         testFailure(A, "");
         testSuccess(A, "1");
@@ -119,7 +114,6 @@ class ProductionTest {
     @Test
     void test1_3() throws IOException {
         Production A = Production.of("1", "0");
-        testInit(A);
 
         testFailure(A, "");
         testSuccess(A, "10");
@@ -132,7 +126,6 @@ class ProductionTest {
     @Test
     void test1_4() throws IOException {
         Production A = Production.of("1|0");
-        testInit(A);
 
         testFailure(A, "");
         testSuccess(A, "1");
@@ -144,7 +137,6 @@ class ProductionTest {
     @Test
     void test2_1() throws IOException {
         Production A = Production.oneOf();
-        testInit(A);
 
         testSuccess(A, "");
         testFailure(A, "1");
@@ -153,7 +145,6 @@ class ProductionTest {
     @Test
     void test2_2() throws IOException {
         Production A = Production.oneOf("1");
-        testInit(A);
 
         testFailure(A, "");
         testSuccess(A, "1");
@@ -163,7 +154,6 @@ class ProductionTest {
     @Test
     void test2_3() throws IOException {
         Production A = Production.oneOf("1", "0");
-        testInit(A);
 
         testFailure(A, "");
         testSuccess(A, "1");
@@ -176,7 +166,6 @@ class ProductionTest {
     @Test
     void test3_1() throws IOException {
         Production A = Production.of().opt();
-        testInit(A);
 
         testSuccess(A, "");
         testFailure(A, "1");
@@ -185,7 +174,6 @@ class ProductionTest {
     @Test
     void test3_2() throws IOException {
         Production A = Production.of("1").opt();
-        testInit(A);
 
         testSuccess(A, "");
         testSuccess(A, "1");
@@ -196,7 +184,6 @@ class ProductionTest {
     @Test
     void test3_3() throws IOException {
         Production A = Production.of("1", "0").opt();
-        testInit(A);
 
         testSuccess(A, "");
         testSuccess(A, "10");
@@ -207,7 +194,6 @@ class ProductionTest {
     @Test
     void test4_1() throws IOException {
         Production A = Production.of().repeat();
-        testInit(A);
 
         testSuccess(A, "");
         testFailure(A, "1");
@@ -216,7 +202,6 @@ class ProductionTest {
     @Test
     void test4_2() throws IOException {
         Production A = Production.oneOf().repeat();
-        testInit(A);
 
         testSuccess(A, "");
         testFailure(A, "1");
@@ -225,7 +210,6 @@ class ProductionTest {
     @Test
     void test4_3() throws IOException {
         Production A = Production.of("1").repeat();
-        testInit(A);
 
         testSuccess(A, "");
         testSuccess(A, "1");
@@ -238,7 +222,6 @@ class ProductionTest {
     @Test
     void test4_4() throws IOException {
         Production A = Production.of("1", "0").repeat();
-        testInit(A);
 
         testSuccess(A, "");
         testSuccess(A, "10");
@@ -253,7 +236,6 @@ class ProductionTest {
     @Test
     void test4_5() throws IOException {
         Production A = Production.oneOf("1").repeat();
-        testInit(A);
 
         testSuccess(A, "");
         testSuccess(A, "1");
@@ -266,7 +248,6 @@ class ProductionTest {
     @Test
     void test4_6() throws IOException {
         Production A = Production.oneOf("1", "0").repeat();
-        testInit(A);
 
         testSuccess(A, "");
         testSuccess(A, "1");
@@ -283,7 +264,6 @@ class ProductionTest {
     void test1_001() throws IOException {
         Production B = Production.of();
         Production A = Production.of(B);
-        testInit(A);
 
         testSuccess(A, "");
         testFailure(A, "1");
@@ -294,7 +274,6 @@ class ProductionTest {
     void test1_002() throws IOException {
         Production B = Production.of("1");
         Production A = Production.of(B);
-        testInit(A);
 
         testFailure(A, "");
         testSuccess(A, "1");
@@ -306,7 +285,6 @@ class ProductionTest {
     void test1_003() throws IOException {
         Production B = Production.of("1", "0");
         Production A = Production.of(B);
-        testInit(A);
 
         testFailure(A, "");
         testSuccess(A, "10");
@@ -320,7 +298,6 @@ class ProductionTest {
         Production C = Production.of();
         Production B = Production.of(C);
         Production A = Production.of(B);
-        testInit(A);
 
         testSuccess(A, "");
         testFailure(A, "1");
@@ -332,7 +309,6 @@ class ProductionTest {
         Production C = Production.of("1");
         Production B = Production.of(C.opt());
         Production A = Production.of(B, "0");
-        testInit(A);
 
         testFailure(A, "");
         testSuccess(A, "10");
@@ -345,7 +321,6 @@ class ProductionTest {
         Production C = Production.of("0");
         Production B = Production.of("1", C.opt());
         Production A = Production.of("0", B.repeat());
-        testInit(A);
 
         testFailure(A, "");
         testSuccess(A, "0");
@@ -361,7 +336,6 @@ class ProductionTest {
         Production C = Production.of("0");
         Production B = Production.of("1");
         Production A = Production.of(B.opt(), C.opt());
-        testInit(A);
 
         testSuccess(A, "");
         testSuccess(A, "1");
@@ -370,45 +344,82 @@ class ProductionTest {
         testFailure(A, "11");
     }
 
+    class CsvParsingTest {
+        /*
+         * COMMA = %x2C
+         * CR = %x0D ;as per section 6.1 of RFC 2234 [2]
+         * DQUOTE = %x22 ;as per section 6.1 of RFC 2234 [2]
+         * LF = %x0A ;as per section 6.1 of RFC 2234 [2]
+         * CRLF = CR LF ;as per section 6.1 of RFC 2234 [2]
+         * TEXTDATA = %x20-21 / %x23-2B / %x2D-7E
+         */
+        Production COMMA = of("\\x2C");
+        Production CR = of("\\x0D");
+        Production DQUOTE = of("\\x22");
+        Production LF = of("\\x0A");
+        Production CRLF = of(CR, LF);
+        Production TEXTDATA = oneOf("[\\x20-\\x21]", "[\\x23-\\x2B]", "[\\x2D-\\x7E]");
+
+        /*
+         * file = [header CRLF] record *(CRLF record) [CRLF]
+         * header = name *(COMMA name)
+         * record = field *(COMMA field)
+         * name = field
+         * field = (escaped / non-escaped)
+         * escaped = DQUOTE *(TEXTDATA / COMMA / CR / LF / 2DQUOTE) DQUOTE
+         * non-escaped = *TEXTDATA
+         */
+        Production file() {
+            return of(of(header(), CRLF).opt(),
+                    record(),
+                    file_recoreds());
+        }
+        Production file_recoreds() {
+            return of(CRLF, oneOf(empty(),
+                    of(record(), ref(this::file_recoreds)))
+                    ).opt();
+        }
+        Production header() {
+            return of(name(), of(COMMA, name()).repeat());
+        }
+        Production record() {
+            return of(field(), of(COMMA, field()).repeat());
+        }
+        Production name() {
+            return field();
+        }
+        Production field() {
+            return oneOf(escaped(), non_escaped());
+        }
+        Production escaped() {
+            return of(DQUOTE, escaped_contents());
+        }
+        Production escaped_contents() {
+            return oneOf(of(DQUOTE, oneOf(empty(),
+                            of(DQUOTE, ref(this::escaped_contents)))),
+                    of(TEXTDATA, ref(this::escaped_contents)),
+                    of(COMMA, ref(this::escaped_contents)),
+                    of(CR, ref(this::escaped_contents)),
+                    of(LF, ref(this::escaped_contents))
+                    );
+        }
+        Production non_escaped() {
+            return TEXTDATA.repeat();
+        }
+
+    }
+
     @Test
     void test1_XXX1() throws IOException {
-        /*
-         * file = [header CRLF] record *(CRLF record) [CRLF] header = name *(COMMA name)
-         * record = field *(COMMA field) name = field field = (escaped / non-escaped)
-         * escaped = DQUOTE *(TEXTDATA / COMMA / CR / LF / 2DQUOTE) DQUOTE non-escaped =
-         * *TEXTDATA COMMA = %x2C CR = %x0D ;as per section 6.1 of RFC 2234 [2] DQUOTE =
-         * %x22 ;as per section 6.1 of RFC 2234 [2] LF = %x0A ;as per section 6.1 of RFC
-         * 2234 [2] CRLF = CR LF ;as per section 6.1 of RFC 2234 [2] TEXTDATA = %x20-21
-         * / %x23-2B / %x2D-7E
-         */
-        Production TEXTDATA = Production.oneOf("[\\x20-\\x21]", "[\\x23-\\x2B]", "[\\x2D-\\x7E]");
-        Production LF = Production.of("\\x0A");
-        Production DQUOTE = Production.of("\\x22");
-        Production CR = Production.of("\\x0D");
-        Production CRLF = Production.of(CR, LF);
-        Production COMMA = Production.of("\\x2C");
-        Production non_escaped = Production.of(TEXTDATA.repeat());
-        Production escaped = Production.of(DQUOTE,
-                Production.oneOf(TEXTDATA, COMMA, CR, LF, Production.of(DQUOTE, DQUOTE)).repeat(), DQUOTE);
-        Production field = Production.oneOf(escaped, non_escaped);
-        Production name = field;
-        Production record = Production.of(field, Production.of(COMMA, field).repeat());
-        Production header = Production.of(name, Production.of(COMMA, name).repeat());
-//		Production file = Production.of(
-//				Production.of(header, CRLF).opt(),
-//				record,
-//				Production.of(CRLF, record).repeat(),
-//				CRLF.opt());
-        Production file = Production.of(Production.of(header, CRLF).opt(), Production.of(record, CRLF.opt()).repeat());
-
         StringBuilder sb = new StringBuilder();
-        sb.append("TITLE,RELEASED").append("\r\n");
-        sb.append("Please Please Me,22 March 1963").append("\r\n");
-        sb.append("With the Beatles,22 November 1963").append("\r\n");
-        sb.append("Introducing... The Beatles,10 January 1964").append("\r\n");
-        sb.append("Meet the Beatles!,20 January 1964").append("\r\n");
-//		sb.append("Meet the Beatles!,20 January 1964");
-        testSuccess(file, sb.toString());
+        sb.append("A,\"B\",C\r\n");
+        sb.append("A1,\"B1\",C1\r\n");
+        sb.append("A2,\"\"\"B2\"\",\r\n\",C2\r\n");
+        sb.append("A3,B3,C3\r\n");
+        sb.append("A4,B4,C4");
+
+        var prd = new CsvParsingTest().file();
+        testSuccess(prd, sb.toString());
     }
 
     @Test
@@ -433,90 +444,97 @@ class ProductionTest {
         testSuccess(input, sb.toString());
     }
 
-    @Test
-    void test1_XXX3() {
-        class TestTokenizerFactory implements TokenizerFactory {
-            // Phase1
-            // LINE_TERMINATORS
-            Production LINE_TERMINATOR = oneOf(of("\\n"), of(of("\\r"), of("\\n").opt()));
-            // WHITE_SPACES
-            Production WHITE_SPACE = oneOf("\\x20", "\\t", "\\f", LINE_TERMINATOR);
-            // COMMENTS
-            Production COMMENT = oneOf(of("/", oneOf("/", "\\*")), of("\\*", of("/").opt()));
-            // OPERATORS
-            Production OPERATOR = oneOf(of("=", of("=").opt()), of(">", of("=").opt()), of("<", of("=").opt()));
-            // IDENTIFIERS
-            Production IDENTIFIER = of("\\p{Alpha}", of("\\p{Alnum}").repeat());
-            // INPUT
-            Production INPUT = oneOf(WHITE_SPACE, COMMENT, OPERATOR, IDENTIFIER);// .repeat();
-
-            // Phase2
-            Production END_OF_LINE_COMMENT = of("//", of(".+").repeat());
-            Production TRADITIONAL_COMMNET = of("/\\*", of("(?!\\*/)(?s:.+)").repeat(), "\\*/");
-            Production INPUT2 = oneOf(END_OF_LINE_COMMENT, TRADITIONAL_COMMNET, "(?s:.+)");// .repeat();
-
-            class TestTokenizer implements Tokenizer {
-                private Tokenizer tzer;
-                private Production p;
-                private Token t;
-
-                public TestTokenizer(Tokenizer tzer, Production p) {
-                    this.tzer = tzer;
-                    this.p = p;
-                }
-
-                @Override
-                public boolean hasNext() {
-                    if (t != null) {
-                        return true;
-                    }
-                    return tzer.hasNext();
-                }
-
-                @Override
-                public Token next() {
-                    try {
-                        return peek();
-                    } finally {
-                        t = null;
-                    }
-                }
-
-                @Override
-                public Token peek() {
-                    if (t == null) {
-                        Symbol s = p.parse(tzer);
-                        t = s.asToken();
-                    }
-                    return t;
-                }
-
-                @Override
-                public void close() {
-                    tzer.close();
-                }
-
-                @Override
-                public String toString() {
-                    return tzer.toString();
-                }
-            }
-
-            @Override
-            public Tokenizer createTokenizer(Reader r) {
-                TokenizerFactory tf = TokenizerFactory.newInstance();
-                Tokenizer tzer = tf.createTokenizer(r);
-                tzer = new TestTokenizer(tzer, INPUT);
-                tzer = new TestTokenizer(tzer, INPUT2);
-                return tzer;
-            }
-
-        }
-
-        String in = "abc=D12\r\n" + "= == < <= > >=\r" + "//Comment line\n" + "/*\n" + " *Comment block\n" + " */";
-        TokenizerFactory tf = new TestTokenizerFactory();
-        try (Tokenizer tzer = tf.createTokenizer(new StringReader(in))) {
-            tzer.forEachRemaining(t -> System.out.println("|" + t.getValue()));
-        }
-    }
+//    @Test
+//    void test1_XXX3() {
+//        class TestTokenizerFactory implements TokenizerFactory {
+//            // Phase1
+//            // LINE_TERMINATORS
+//            Production LINE_TERMINATOR = oneOf(of("\\n"), of(of("\\r"), of("\\n").opt()));
+//            // WHITE_SPACES
+//            Production WHITE_SPACE = oneOf("\\x20", "\\t", "\\f", LINE_TERMINATOR);
+//            // COMMENTS
+//            Production COMMENT = oneOf(of("/", oneOf("/", "\\*")), of("\\*", of("/").opt()));
+//            // OPERATORS
+//            Production OPERATOR = oneOf(of("=", of("=").opt()), of(">", of("=").opt()), of("<", of("=").opt()));
+//            // IDENTIFIERS
+//            Production IDENTIFIER = of("\\p{Alpha}", of("\\p{Alnum}").repeat());
+//            // INPUT
+//            Production INPUT = oneOf(WHITE_SPACE, COMMENT, OPERATOR, IDENTIFIER);// .repeat();
+//
+//            // Phase2
+//            Production END_OF_LINE_COMMENT = of("//", of(".+").repeat());
+//            Production TRADITIONAL_COMMNET = of("/\\*", of("(?!\\*/)(?s:.+)").repeat(), "\\*/");
+//            Production INPUT2 = oneOf(END_OF_LINE_COMMENT, TRADITIONAL_COMMNET, "(?s:.+)");// .repeat();
+//
+//            class TestTokenizer implements Tokenizer {
+//                private Tokenizer tzer;
+//                private Production p;
+//                private Token t;
+//
+//                public TestTokenizer(Tokenizer tzer, Production p) {
+//                    this.tzer = tzer;
+//                    this.p = p;
+//                }
+//
+//                @Override
+//                public boolean hasNext() {
+//                    if (t != null) {
+//                        return true;
+//                    }
+//                    return tzer.hasNext();
+//                }
+//
+//                @Override
+//                public Token next() {
+//                    try {
+//                        return peek();
+//                    } finally {
+//                        t = null;
+//                    }
+//                }
+//
+////                @Override
+//                public Token peek() {
+//                    if (t == null) {
+//                        Symbol s = p.parse(tzer.buffer());
+//                        t = s.asToken();
+//                    }
+//                    return t;
+//                }
+//
+//                @Override
+//                public void close() {
+//                    tzer.close();
+//                }
+//
+//                @Override
+//                public String toString() {
+//                    return tzer.toString();
+//                }
+//
+//                @Override
+//                public Buffer buffer() {
+//                    // TODO Auto-generated method stub
+//                    return null;
+//                }
+//            }
+//
+//            @Override
+//            public Tokenizer createTokenizer(Reader r) {
+//                TokenizerFactory tf = TokenizerFactory.newInstance();
+//                Tokenizer tzer = tf.createTokenizer(r);
+//                tzer = new TestTokenizer(tzer, INPUT);
+//                tzer = new TestTokenizer(tzer, INPUT2);
+//                return tzer;
+//            }
+//
+//        }
+//
+//        String in = "abc=D12\r\n" + "= == < <= > >=\r" + "//Comment line\n" + "/*\n" + " *Comment block\n" + " */";
+//        TokenizerFactory tf = new TestTokenizerFactory();
+//        try (Tokenizer tzer = tf.createTokenizer(new StringReader(in))) {
+//            tzer.forEachRemaining(t -> System.out.println("|" + t.getValue()));
+//        }
+//    }
 }
+

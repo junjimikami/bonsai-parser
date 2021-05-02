@@ -90,7 +90,12 @@ class AltProduction extends AbstractProduction implements AlternativeProduction 
         if (elements.isEmpty()) {
             return true;
         }
-        return elements.stream().anyMatch(p -> p.isOption());
+        for (AbstractProduction e : elements) {
+            if (e.isOption()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -125,7 +130,7 @@ class AltProduction extends AbstractProduction implements AlternativeProduction 
 
         @Override
         public Builder add(Supplier<? extends Production> p) {
-            addIfBuilding(new DelayProduction(p));
+            addIfBuilding(new RefProduction(p));
             return this;
         }
 

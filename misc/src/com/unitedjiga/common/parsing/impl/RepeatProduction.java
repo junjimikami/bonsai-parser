@@ -24,7 +24,6 @@
 package com.unitedjiga.common.parsing.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -52,10 +51,7 @@ class RepeatProduction extends AbstractProduction implements SequentialProductio
         while (anyMatch(getFirstSet(), buffer)) {
             list.add(element.interpret(buffer, getFollowSet(followSet)));
         }
-        if (!list.isEmpty()) {
-            return newNonTerminal(this, list);
-        }
-        return newNonTerminal(this, Collections.emptyList());
+        return newNonTerminal(this, list);
     }
 
     @Override

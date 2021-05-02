@@ -24,7 +24,6 @@
 package com.unitedjiga.common.parsing.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -65,24 +64,25 @@ class SeqProduction extends AbstractProduction implements SequentialProduction {
         if (elements.isEmpty()) {
             return followSet;
         }
+        return getFirstSet(0, followSet);
+    }
+
+    private Set<TermProduction> getFirstSet(int i, Set<TermProduction> followSet) {
+        assert 0 <= i && i < elements.size();
         Set<TermProduction> set = new HashSet<>();
-        set.addAll(elements.get(0).getFirstSet());
-        set.addAll(getFollowSet(0, followSet));
+        set.addAll(elements.get(i).getFirstSet());
+        if (elements.get(i).isOption()) {
+            set.addAll(getFollowSet(i, followSet));
+        }
         return set;
     }
 
     private Set<TermProduction> getFollowSet(int i, Set<TermProduction> followSet) {
         assert 0 <= i && i < elements.size();
-        if (!elements.get(i).isOption()) {
-            return Collections.emptySet();
-        }
         if (elements.size() - 1 == i) {
             return followSet;
         }
-        Set<TermProduction> set = new HashSet<>();
-        set.addAll(elements.get(i + 1).getFirstSet());
-        set.addAll(getFollowSet(i + 1, followSet));
-        return set;
+        return getFirstSet(i + 1, followSet);
     }
 
     @Override
@@ -125,7 +125,7 @@ class SeqProduction extends AbstractProduction implements SequentialProduction {
         
         @Override
         public Builder add(Supplier<? extends Production> p) {
-            addIfBuilding(new DelayProduction(p));
+            addIfBuilding(new RefProduction(p));
             return this;
         }
 

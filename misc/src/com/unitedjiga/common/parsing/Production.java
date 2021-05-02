@@ -23,6 +23,10 @@
  */
 package com.unitedjiga.common.parsing;
 
+import java.util.function.Supplier;
+
+import com.unitedjiga.common.parsing.impl.Productions;
+
 /**
  * 正規表現ベースの生成規則です。
  * 
@@ -31,31 +35,19 @@ package com.unitedjiga.common.parsing;
 public interface Production {
 
     static SequentialProduction of(Object... args) {
-        SequentialProduction.Builder builder = SequentialProduction.builder();
-        for (Object o : args) {
-            if (o instanceof Production) {
-                builder.add((Production) o);
-            } else if (o instanceof String) {
-                builder.add((String) o);
-            } else {
-                builder.add(o.toString());
-            }
-        }
-        return builder.build();
+        return Productions.of(args);
     }
 
     static AlternativeProduction oneOf(Object... args) {
-        AlternativeProduction.Builder builder = AlternativeProduction.builder();
-        for (Object o : args) {
-            if (o instanceof Production) {
-                builder.add((Production) o);
-            } else if (o instanceof String) {
-                builder.add((String) o);
-            } else {
-                builder.add(o.toString());
-            }
-        }
-        return builder.build();
+        return Productions.oneOf(args);
+    }
+
+    static Production empty() {
+        return Productions.empty();
+    }
+
+    static Supplier<? extends Production> ref(Supplier<? extends Production> p) {
+        return p;
     }
 
     Parser parser(Tokenizer tokenizer);

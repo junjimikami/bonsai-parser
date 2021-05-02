@@ -23,6 +23,8 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
+import java.util.function.Supplier;
+
 import com.unitedjiga.common.parsing.AlternativeProduction;
 import com.unitedjiga.common.parsing.Production;
 import com.unitedjiga.common.parsing.SequentialProduction;
@@ -43,6 +45,40 @@ public final class Productions {
     
     public static AlternativeProduction.Builder alternativeBuilder() {
         return new AltProduction.Builder();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static SequentialProduction of(Object... args) {
+        SequentialProduction.Builder builder = sequentialBuilder();
+        for (Object o : args) {
+            if (o instanceof Production) {
+                builder.add((Production) o);
+            } else if (o instanceof String) {
+                builder.add((String) o);
+            } else if (o instanceof Supplier) {
+                builder.add((Supplier<? extends Production>) o);
+            } else {
+                builder.add(o.toString());
+            }
+        }
+        return builder.build();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static AlternativeProduction oneOf(Object... args) {
+        AlternativeProduction.Builder builder = alternativeBuilder();
+        for (Object o : args) {
+            if (o instanceof Production) {
+                builder.add((Production) o);
+            } else if (o instanceof String) {
+                builder.add((String) o);
+            } else if (o instanceof Supplier) {
+                builder.add((Supplier<? extends Production>) o);
+            } else {
+                builder.add(o.toString());
+            }
+        }
+        return builder.build();
     }
 
     public static Production empty() {
