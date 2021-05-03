@@ -23,7 +23,11 @@
  */
 package com.unitedjiga.common.parsing;
 
+import java.util.stream.Stream;
+
 public interface Parser {
 
     Symbol parse();
+    
+    Stream<Symbol> iterativeParse();
 }

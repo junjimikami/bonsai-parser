@@ -25,19 +25,15 @@ package com.unitedjiga.common.parsing.impl;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.unitedjiga.common.parsing.AlternativeProduction;
-import com.unitedjiga.common.parsing.NonTerminalSymbol;
 import com.unitedjiga.common.parsing.Parser;
 import com.unitedjiga.common.parsing.ParsingException;
 import com.unitedjiga.common.parsing.Production;
 import com.unitedjiga.common.parsing.SequentialProduction;
-import com.unitedjiga.common.parsing.SingletonSymbol;
 import com.unitedjiga.common.parsing.Symbol;
 import com.unitedjiga.common.parsing.Token;
 import com.unitedjiga.common.parsing.Tokenizer;
@@ -48,21 +44,41 @@ import com.unitedjiga.common.parsing.Tokenizer;
  */
 abstract class AbstractProduction implements Production {
 
-    private static final TermProduction EOF = new TermProduction("EOF") {
+    private static final TermProduction EOF = new TermProduction("") {
+        @Override
+        boolean matches(Token t) {
+            return false;
+        }
+        @Override
+        public String toString() {
+            return "(EOF)";
+        }
     };
 
     @Override
     public Parser parser(Tokenizer tokenizer) {
+        Objects.requireNonNull(tokenizer);
         return new Parser() {
             
             @Override
             public Symbol parse() {
                 Tokenizer.Buffer buf = tokenizer.buffer();
-                Symbol s = interpret(buf, Collections.singleton(EOF));
+                Symbol s = interpret(buf);
                 if (buf.hasRemaining()) {
                     throw newException(Message.TOO_MANY_TOKEN, buf);
                 }
                 return s;
+            }
+
+            @Override
+            public Stream<Symbol> iterativeParse() {
+                Tokenizer.Buffer buf = tokenizer.buffer();
+                return Stream.iterate(interpret(buf), Objects::nonNull,
+                        s -> buf.hasRemaining() ? interpret(buf) : null);
+            }
+
+            private Symbol interpret(Tokenizer.Buffer buf) {
+                return AbstractProduction.this.interpret(buf, Collections.singleton(EOF));
             }
         };
     }
@@ -76,9 +92,6 @@ abstract class AbstractProduction implements Production {
     public SequentialProduction repeat() {
         return new RepeatProduction(this);
     }
-    
-    
-    
     
     Set<TermProduction> getFirstSet() {
         return getFirstSet(Collections.emptySet());
@@ -96,70 +109,15 @@ abstract class AbstractProduction implements Production {
             return set.contains(EOF);
         }
         Token t = buffer.get();
-        buffer.reset();
+        buffer.pushBack();
         return set.stream().anyMatch(p -> p.matches(t));
-    }
-
-    static NonTerminalSymbol newNonTerminal(Production origin, List<Symbol> list) {
-        return new AbstractNonTerminalSymbol() {
-
-            @Override
-            public Production getOrigin() {
-                return origin;
-            }
-
-            @Override
-            public String toString() {
-                return list.stream().map(Symbol::toString).collect(Collectors.joining());
-            }
-
-            @Override
-            public ListIterator<Symbol> listIterator(int index) {
-                return list.listIterator(index);
-            }
-
-            @Override
-            public int size() {
-                return list.size();
-            }
-        };
-    }
-
-    static SingletonSymbol newSingleton(Production origin, Optional<Symbol> symbol) {
-        return new AbstractSingletonSymbol() {
-
-            @Override
-            public Production getOrigin() {
-                return origin;
-            }
-
-            @Override
-            public Symbol get() {
-                return symbol.get();
-            }
-
-            @Override
-            public String toString() {
-                return symbol.stream().map(Symbol::toString).collect(Collectors.joining());
-            }
-
-            @Override
-            public ListIterator<Symbol> listIterator(int index) {
-                return symbol.stream().collect(Collectors.toUnmodifiableList()).listIterator(index);
-            }
-
-            @Override
-            public int size() {
-                return (int) symbol.stream().count();
-            }
-        };
     }
 
     static ParsingException newException(Message m, Object... args) {
         Object[] str = Arrays.stream(args).map(e -> {
             if (e instanceof Tokenizer.Buffer) {
                 Tokenizer.Buffer buf = (Tokenizer.Buffer) e;
-                return buf.hasRemaining() ? buf.get().getValue() : "EOF";
+                return "\"" + (buf.hasRemaining() ? buf.get().getValue() : "EOF") + "\"";
             }
             return e.toString();
         }).toArray();

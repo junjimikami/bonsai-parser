@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -410,7 +411,7 @@ class ProductionTest {
     }
 
     @Test
-    void test1_XXX1() throws IOException {
+    void testCsvParsing01() throws IOException {
         StringBuilder sb = new StringBuilder();
         sb.append("A,\"B\",C\r\n");
         sb.append("A1,\"B1\",C1\r\n");
@@ -423,25 +424,15 @@ class ProductionTest {
     }
 
     @Test
-    void test1_XXX2() throws IOException {
-        Production CR = of("\\r");
-        Production LF = of("\\n");
-        Production lineTerminator = oneOf(LF, of(CR, LF.opt()));
-        Production commentHead = of("/", oneOf("/", "\\*"));
-        Production commentTail = of("\\*", of("/").opt());
-        Production comment = oneOf(commentHead, commentTail);
-        Production input = oneOf(lineTerminator, comment, ".").repeat();
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("//");
-        sb.append("\n");
-        sb.append("/*");
-        sb.append("\r");
-        sb.append("*");
-        sb.append("\r");
-        sb.append("\n");
-        sb.append("*/");
-        testSuccess(input, sb.toString());
+    void test5() throws IOException {
+        var prd = of("0|1");
+        var in = "00110101".chars().mapToObj(Character::toString).iterator();
+        var pser = prd.parser(Tokenizer.wrap(in));
+        var out = pser.iterativeParse()
+                .map(s -> s.asToken().getValue())
+                .peek(System.out::println)
+                .collect(Collectors.joining(","));
+        assertEquals("0,0,1,1,0,1,0,1", out);
     }
 
 //    @Test

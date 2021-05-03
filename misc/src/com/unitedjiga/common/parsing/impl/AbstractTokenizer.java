@@ -111,7 +111,7 @@ abstract class AbstractTokenizer implements Tokenizer {
             buffer.subList(current, buffer.size()).stream()
                     .map(Token::getValue)
                     .forEach(remaining::add);
-            remaining.add(tzer.hasNext() ? "..." : "EOF");
+            remaining.add(tzer.hasNext() ? "..." : "no tokens");
             sb.append(remaining.toString());
             return sb.toString();
         }

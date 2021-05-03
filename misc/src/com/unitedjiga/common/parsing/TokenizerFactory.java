@@ -35,11 +35,11 @@ import com.unitedjiga.common.parsing.impl.Tokenizers;
 public interface TokenizerFactory {
 
     static TokenizerFactory newInstance() {
-        return newDefaultInstance();
+        return Tokenizers.createFactory();
     }
 
-    static TokenizerFactory newDefaultInstance() {
-        return Tokenizers.createFactory();
+    static TokenizerFactory newInstance(Production p) {
+        return Tokenizers.createFactory(p);
     }
 
     Tokenizer createTokenizer(Reader r);

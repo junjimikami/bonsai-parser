@@ -23,6 +23,8 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
+import static com.unitedjiga.common.parsing.impl.Symbols.newSingleton;
+
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;

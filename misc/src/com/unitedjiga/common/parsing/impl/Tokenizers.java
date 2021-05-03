@@ -23,23 +23,110 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
+import java.io.IOException;
+import java.io.PushbackReader;
 import java.io.Reader;
+import java.io.UncheckedIOException;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 
+import com.unitedjiga.common.parsing.Parser;
+import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Token;
+import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.TokenizerFactory;
 
-public class Tokenizers {
+public final class Tokenizers {
 
     private Tokenizers() {
     }
 
-    public static IteratorTokenizer create(Iterator<? extends CharSequence> it) {
-        return new IteratorTokenizer(it);
+    public static Tokenizer create(Iterator<? extends CharSequence> it) {
+        Objects.requireNonNull(it);
+        return new AbstractTokenizer() {
+            @Override
+            public boolean hasNext() {
+                return it.hasNext();
+            }
+
+            @Override
+            public Token next() {
+                return Token.of(it.next().toString());
+            }
+        };
     }
-    public static CharacterTokenizer create(Reader r) {
-        return new CharacterTokenizer(r);
+
+    public static Tokenizer create(Reader r) {
+        PushbackReader pr = new PushbackReader(Objects.requireNonNull(r));
+        return new AbstractTokenizer() {
+            @Override
+            public boolean hasNext() {
+                return peek() != -1;
+            }
+
+            @Override
+            public Token next() {
+                int ch = read();
+                if (ch == -1) {
+                    throw new NoSuchElementException();
+                }
+                return Token.of(Character.toString(ch));
+            }
+
+            private int read() {
+                try {
+                    return pr.read();
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
+
+            private void unread(int ch) {
+                assert ch != -1;
+                try {
+                    pr.unread(ch);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
+
+            private int peek() {
+                int ch = read();
+                if (ch != -1) {
+                    unread(ch);
+                }
+                return ch;
+            }
+
+            @Override
+            public String toString() {
+                return "Next: " + peek();
+            }
+        };
     }
+
     public static TokenizerFactory createFactory() {
-        return new DefaultTokenizerFactory();
+        return new TokenizerFactory() {
+            
+            @Override
+            public Tokenizer createTokenizer(Reader r) {
+                return Tokenizers.create(r);
+            }
+        };
+    }
+
+    public static TokenizerFactory createFactory(Production p) {
+        Objects.requireNonNull(p);
+        return new TokenizerFactory() {
+            
+            @Override
+            public Tokenizer createTokenizer(Reader r) {
+                Parser pser = p.parser(create(r));
+                return create(pser.iterativeParse()
+                        .map(s -> s.asToken().getValue())
+                        .iterator());
+            }
+        };
     }
 }

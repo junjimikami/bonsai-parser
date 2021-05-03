@@ -23,6 +23,8 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
+import static com.unitedjiga.common.parsing.impl.Symbols.newNonTerminal;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
