@@ -29,7 +29,6 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.unitedjiga.common.parsing.Token;
 import com.unitedjiga.common.parsing.Tokenizer;
@@ -45,12 +44,12 @@ abstract class AbstractTokenizer implements Tokenizer {
         return new SimpleBuffer(this);
     }
 
-    public static class SimpleBuffer implements Tokenizer.Buffer {
+    static class SimpleBuffer implements Tokenizer.Buffer {
         private Tokenizer tzer;
         private List<Token> buffer = new LinkedList<>();
         private int current = 0;
 
-        public SimpleBuffer(Tokenizer tzer) {
+        private SimpleBuffer(Tokenizer tzer) {
             this.tzer = Objects.requireNonNull(tzer);
         }
 
@@ -70,7 +69,7 @@ abstract class AbstractTokenizer implements Tokenizer {
         @Override
         public void pushBack() {
             if (current <= 0) {
-                throw new NoSuchElementException();
+                throw new NoSuchElementException(Message.CANNOT_PUSHBACK.format());
             }
             current--;
         }
@@ -88,15 +87,15 @@ abstract class AbstractTokenizer implements Tokenizer {
         @Override
         public Token remove() {
             if (current <= 0) {
-                throw new NoSuchElementException();
+                throw new NoSuchElementException(Message.CANNOT_REMOVE.format());
             }
             return buffer.subList(0, current--).remove(0);
         }
 
-        @Override
-        public Stream<Token> tokens() {
-            return buffer.subList(0, current).stream();
-        }
+//        @Override
+//        public Stream<Token> tokens() {
+//            return buffer.subList(0, current).stream();
+//        }
         
         @Override
         public String toString() {

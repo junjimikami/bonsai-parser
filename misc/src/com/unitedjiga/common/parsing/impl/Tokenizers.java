@@ -30,6 +30,8 @@ import java.io.UncheckedIOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.ServiceLoader;
+import java.util.ServiceLoader.Provider;
 
 import com.unitedjiga.common.parsing.Parser;
 import com.unitedjiga.common.parsing.Production;
@@ -42,8 +44,22 @@ public final class Tokenizers {
     private Tokenizers() {
     }
 
-    public static Tokenizer create(Iterator<? extends CharSequence> it) {
-        Objects.requireNonNull(it);
+    public static Token createToken(String s) {
+        String value = String.valueOf(s);
+        return new Token() {
+            @Override
+            public String getValue() {
+                return value;
+            }
+            @Override
+            public String toString() {
+                return value;
+            }
+        };
+    }
+
+    public static Tokenizer createTokenizer(Iterator<? extends CharSequence> it) {
+        Objects.requireNonNull(it, Message.REQUIRE_NON_NULL.format());
         return new AbstractTokenizer() {
             @Override
             public boolean hasNext() {
@@ -52,13 +68,14 @@ public final class Tokenizers {
 
             @Override
             public Token next() {
-                return Token.of(it.next().toString());
+                return createToken(it.next().toString());
             }
         };
     }
 
-    public static Tokenizer create(Reader r) {
-        PushbackReader pr = new PushbackReader(Objects.requireNonNull(r));
+    static Tokenizer createTokenizer(Reader r) {
+        Objects.requireNonNull(r, Message.REQUIRE_NON_NULL.format());
+        PushbackReader pr = new PushbackReader(r);
         return new AbstractTokenizer() {
             @Override
             public boolean hasNext() {
@@ -69,9 +86,9 @@ public final class Tokenizers {
             public Token next() {
                 int ch = read();
                 if (ch == -1) {
-                    throw new NoSuchElementException();
+                    throw new NoSuchElementException(Message.NO_SUCH_ELEMENT.format());
                 }
-                return Token.of(Character.toString(ch));
+                return createToken(Character.toString(ch));
             }
 
             private int read() {
@@ -106,27 +123,29 @@ public final class Tokenizers {
         };
     }
 
-    public static TokenizerFactory createFactory() {
+    public static TokenizerFactory createFactory(Production... productionLayers) {
+        Objects.requireNonNull(productionLayers, Message.REQUIRE_NON_NULL.format());
         return new TokenizerFactory() {
             
             @Override
             public Tokenizer createTokenizer(Reader r) {
-                return Tokenizers.create(r);
+                Tokenizer tzer = Tokenizers.createTokenizer(r);
+                for (Production p : productionLayers) {
+                    Parser pser = p.parser(tzer);
+                    tzer = Tokenizers.createTokenizer(pser.iterativeParse()
+                            .map(s -> s.asToken().getValue())
+                            .iterator());
+                }
+                return tzer;
             }
         };
     }
-
-    public static TokenizerFactory createFactory(Production p) {
-        Objects.requireNonNull(p);
-        return new TokenizerFactory() {
-            
-            @Override
-            public Tokenizer createTokenizer(Reader r) {
-                Parser pser = p.parser(create(r));
-                return create(pser.iterativeParse()
-                        .map(s -> s.asToken().getValue())
-                        .iterator());
-            }
-        };
+    
+    public static TokenizerFactory loadFactory(String factoryName, ClassLoader cl) {
+        return ServiceLoader.load(TokenizerFactory.class, cl).stream()
+                .filter(p -> p.type().getCanonicalName().equals(factoryName))
+                .map(Provider::get)
+                .findFirst()
+                .get();
     }
 }

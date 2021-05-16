@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2020 Junji Mikami.
+ * Copyright 2021 Junji Mikami.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,35 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.parsing;
+package com.unitedjiga.commontest.parsing.sp;
 
-import com.unitedjiga.common.parsing.impl.Tokenizers;
+import java.io.Reader;
+
+import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Tokenizer;
+import com.unitedjiga.common.parsing.TokenizerFactory;
 
 /**
- *
  * @author Junji Mikami
+ *
  */
-public interface Token extends TerminalSymbol {
-
-    /**
-     * 
-     * @param value
-     * @return
-     */
-    static Token of(String value) {
-        return Tokenizers.createToken(value);
-    }
-
-    /**
-     * 
-     * @param t1
-     * @param t2
-     * @return
-     */
-    static Token concat(Token t1, Token t2) {
-        return of(t1.getValue().concat(t2.getValue()));
-    }
+public class TestTokenizerFactory implements TokenizerFactory {
 
     @Override
-    String toString();
+    public Tokenizer createTokenizer(Reader r) {
+        var prd = Production.oneOf(
+                Production.of("0").repeat(),
+                Production.of("1").repeat());
+        return TokenizerFactory.newFactory(prd).createTokenizer(r);
+    }
+
 }

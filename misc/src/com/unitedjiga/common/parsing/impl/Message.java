@@ -32,7 +32,13 @@ import java.text.MessageFormat;
 enum Message {
 
     TOO_MANY_TOKEN("Expected EOF, but {0}."),
-    RULE_MISMATCH("Expected {0}, but {1}.");
+    RULE_MISMATCH("Expected {0}, but {1}."),
+    REQUIRE_NON_NULL("Non-null required."),
+    CANNOT_PUSHBACK(""),
+    CANNOT_REMOVE(""),
+    ALREADY_BUILT(""),
+    NO_SUCH_ELEMENT("")
+    ;
 
     private MessageFormat msg;
 

@@ -41,7 +41,7 @@ public class TokenizerFactoryTest {
 
     @Test
     void test01() throws Exception {
-        var tf = TokenizerFactory.newInstance();
+        var tf = TokenizerFactory.newFactory();
         var tzer = tf.createTokenizer(new StringReader("abc"));
         
         assertTrue(tzer.hasNext());
@@ -56,7 +56,7 @@ public class TokenizerFactoryTest {
                 of("[0-9]").repeat(),
                 of("[a-z]").repeat()
                 );
-        var tf = TokenizerFactory.newInstance(prd);
+        var tf = TokenizerFactory.newFactory(prd);
         var tzer = tf.createTokenizer(new StringReader("abc123def456"));
         
         assertTrue(tzer.hasNext());
@@ -66,7 +66,7 @@ public class TokenizerFactoryTest {
         assertEquals("456", tzer.next().getValue());
         assertFalse(tzer.hasNext());
     }
-    class JavaCommentParsing {
+    class JavaCommentParsing01 {
         Production InputElement() {
             return Production.oneOf(
                     WhiteSpace(),
@@ -106,9 +106,9 @@ public class TokenizerFactoryTest {
         }
     }
     @Test
-    void testJavaCommentParsing() throws Exception {
-        var prd = new JavaCommentParsing().InputElement();
-        var tf = TokenizerFactory.newInstance(prd);
+    void testJavaCommentParsing01() throws Exception {
+        var prd = new JavaCommentParsing01().InputElement();
+        var tf = TokenizerFactory.newFactory(prd);
         var tzer = tf.createTokenizer(new StringReader(""
                 + " "
                 + "// Single line comment\n"
@@ -118,5 +118,52 @@ public class TokenizerFactoryTest {
                 + ""));
         
         tzer.forEachRemaining(t -> System.out.println("[" + t + "]"));
+    }
+    class JavaCommentParsing02 extends JavaCommentParsing01 {
+        Production CommentStart() {
+            return oneOf(of("/", oneOf("/", "\\*").opt()), "(?s:.)");
+        }
+
+        @Override
+        Production Comment() {
+            return oneOf(TraditionalComment(), EndOfLineComment());
+        }
+        @Override
+        Production TraditionalComment() {
+            return of("/\\*", CommentTail());
+        }
+        @Override
+        Production EndOfLineComment() {
+            return of("//", of(".").repeat());
+        }
+    }
+    @Test
+    void testJavaCommentParsing02() throws Exception {
+        var prd0 = new JavaCommentParsing02().CommentStart();
+        var prd = new JavaCommentParsing02().InputElement();
+        var tf = TokenizerFactory.newFactory(prd0, prd);
+        var tzer = tf.createTokenizer(new StringReader(""
+                + " "
+                + "// Single line comment\n"
+                + "/*\n"
+                + " * Multi line comment\n"
+                + " */\n"
+                + ""));
+        
+        tzer.forEachRemaining(t -> System.out.println("[" + t + "]"));
+    }
+
+    @Test
+    void testService() throws Exception {
+        var tf = TokenizerFactory.loadFactory("com.unitedjiga.commontest.parsing.sp.TestTokenizerFactory", null);
+        var tzer = tf.createTokenizer(new StringReader("0110001111"));
+        
+        assertTrue(tzer.hasNext());
+        assertEquals("0", tzer.next().getValue());
+        assertEquals("11", tzer.next().getValue());
+        assertEquals("000", tzer.next().getValue());
+        assertEquals("1111", tzer.next().getValue());
+        assertFalse(tzer.hasNext());
+
     }
 }

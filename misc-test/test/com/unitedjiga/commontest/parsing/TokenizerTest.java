@@ -136,8 +136,8 @@ class TokenizerTest {
         }
         assertFalse(buf.hasRemaining());
         assertFalse(buf.isEmpty());
-        var it2 = Arrays.asList(words).listIterator(2);
-        buf.tokens().forEach(t->assertEquals(it2.next(), t.getValue()));
+//        var it2 = Arrays.asList(words).listIterator(2);
+//        buf.tokens().forEach(t->assertEquals(it2.next(), t.getValue()));
         buf.reset();
         assertTrue(buf.hasRemaining());
         assertTrue(buf.isEmpty());

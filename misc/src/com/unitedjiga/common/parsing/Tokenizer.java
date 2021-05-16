@@ -25,7 +25,6 @@ package com.unitedjiga.common.parsing;
 
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.stream.Stream;
 
 import com.unitedjiga.common.parsing.impl.Tokenizers;
 
@@ -41,7 +40,7 @@ public interface Tokenizer extends Iterator<Token> {
      * @return
      */
     static Tokenizer wrap(Iterator<? extends CharSequence> it) {
-        return Tokenizers.create(it);
+        return Tokenizers.createTokenizer(it);
     }
 
     /**
@@ -104,6 +103,6 @@ public interface Tokenizer extends Iterator<Token> {
          */
         Token remove();
         
-        Stream<Token> tokens();
+//        Stream<Token> tokens();
     }
 }
