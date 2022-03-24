@@ -46,7 +46,7 @@ import com.unitedjiga.common.parsing.Tokenizer;
 class AltProduction extends AbstractProduction implements AlternativeProduction {
     private final List<AbstractProduction> elements;
 
-    AltProduction(List<AbstractProduction> elements) {
+    private AltProduction(List<AbstractProduction> elements) {
         this.elements = Objects.requireNonNull(elements);
     }
 
@@ -112,7 +112,7 @@ class AltProduction extends AbstractProduction implements AlternativeProduction 
         @Override
         public AlternativeProduction build() {
             if (isBuilt) {
-                throw new IllegalStateException();
+                throw new IllegalStateException(Message.ALREADY_BUILT.format());
             }
             isBuilt = true;
             return new AltProduction(elements);
@@ -138,7 +138,7 @@ class AltProduction extends AbstractProduction implements AlternativeProduction 
 
         private void addIfBuilding(AbstractProduction e) {
             if (isBuilt) {
-                throw new IllegalStateException();
+                throw new IllegalStateException(Message.ALREADY_BUILT.format());
             }
             elements.add(e);
         }
