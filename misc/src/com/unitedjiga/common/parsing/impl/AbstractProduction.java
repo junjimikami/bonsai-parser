@@ -57,7 +57,7 @@ abstract class AbstractProduction implements Production {
 
     @Override
     public Parser parser(Tokenizer tokenizer) {
-        Objects.requireNonNull(tokenizer);
+        Objects.requireNonNull(tokenizer, Message.REQUIRE_NON_NULL.format());
         return new Parser() {
             
             @Override
@@ -73,8 +73,8 @@ abstract class AbstractProduction implements Production {
             @Override
             public Stream<Symbol> iterativeParse() {
                 Tokenizer.Buffer buf = tokenizer.buffer();
-                return Stream.iterate(interpret(buf), Objects::nonNull,
-                        s -> buf.hasRemaining() ? interpret(buf) : null);
+                return Stream.generate(() -> buf.hasRemaining() ? interpret(buf) : null)
+                        .takeWhile(Objects::nonNull);
             }
 
             private Symbol interpret(Tokenizer.Buffer buf) {
@@ -117,7 +117,7 @@ abstract class AbstractProduction implements Production {
         Object[] str = Arrays.stream(args).map(e -> {
             if (e instanceof Tokenizer.Buffer) {
                 Tokenizer.Buffer buf = (Tokenizer.Buffer) e;
-                return "\"" + (buf.hasRemaining() ? buf.get().getValue() : "EOF") + "\"";
+                return buf.hasRemaining() ? "\"" + buf.get().getValue() + "\"" : "EOF";
             }
             return e.toString();
         }).toArray();
