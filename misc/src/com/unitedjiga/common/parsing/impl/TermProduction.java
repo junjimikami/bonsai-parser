@@ -24,6 +24,7 @@
 package com.unitedjiga.common.parsing.impl;
 
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -39,6 +40,7 @@ class TermProduction extends AbstractProduction {
     private final Pattern pattern;
 
     TermProduction(CharSequence regex) {
+        Objects.requireNonNull(regex, Message.REQUIRE_NON_NULL.format());
         pattern = Pattern.compile(regex.toString());
     }
 
