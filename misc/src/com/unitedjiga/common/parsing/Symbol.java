@@ -39,11 +39,15 @@ public interface Symbol {
         NON_TERMINAL,
         SINGLETON;
 
-        boolean isTerminal() {
+        public boolean isTerminal() {
             return this == TERMINAL;
         }
 
-        boolean isSingleton() {
+        public boolean isNonTerminal() {
+            return this == NON_TERMINAL || this == SINGLETON;
+        }
+
+        public boolean isSingleton() {
             return this == SINGLETON;
         }
     }
