@@ -29,7 +29,7 @@ import java.util.function.Supplier;
 
 import com.unitedjiga.common.parsing.Production;
 import com.unitedjiga.common.parsing.Symbol;
-import com.unitedjiga.common.parsing.Tokenizer.Buffer;
+import com.unitedjiga.common.parsing.Tokenizer;
 
 /**
  * @author Junji Mikami
@@ -48,8 +48,8 @@ class RefProduction extends AbstractProduction {
     }
 
     @Override
-    Symbol interpret(Buffer buffer, Set<TermProduction> followSet) {
-        return get().interpret(buffer, followSet);
+    Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
+        return get().interpret(tokenizer, followSet);
     }
 
     @Override

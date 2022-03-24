@@ -23,6 +23,7 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -37,82 +38,76 @@ import com.unitedjiga.common.parsing.Tokenizer;
  * @author Junji Mikami
  *
  */
-abstract class AbstractTokenizer implements Tokenizer {
+class AbstractTokenizer implements Tokenizer {
+    private Iterator<? extends CharSequence> tzer;
+    private List<Token> buffer = new LinkedList<>();
+    private int current = 0;
+
+    public AbstractTokenizer(Iterator<? extends CharSequence> tzer) {
+        this.tzer = Objects.requireNonNull(tzer);
+    }
 
     @Override
-    public Buffer buffer() {
-        return new SimpleBuffer(this);
+    public boolean hasRemaining() {
+        return current < buffer.size() || tzer.hasNext();
     }
 
-    static class SimpleBuffer implements Tokenizer.Buffer {
-        private Tokenizer tzer;
-        private List<Token> buffer = new LinkedList<>();
-        private int current = 0;
-
-        private SimpleBuffer(Tokenizer tzer) {
-            this.tzer = Objects.requireNonNull(tzer);
+    @Override
+    public Token get() {
+        if (buffer.size() <= current) {
+            var t = Tokenizers.createToken(tzer.next().toString());
+            buffer.add(t);
         }
-
-        @Override
-        public boolean hasRemaining() {
-            return current < buffer.size() || tzer.hasNext();
-        }
-
-        @Override
-        public Token get() {
-            if (buffer.size() <= current) {
-                buffer.add(tzer.next());
-            }
-            return buffer.get(current++);
-        }
-
-        @Override
-        public void pushBack() {
-            if (current <= 0) {
-                throw new NoSuchElementException(Message.CANNOT_PUSHBACK.format());
-            }
-            current--;
-        }
-
-        @Override
-        public void reset() {
-            current = 0;
-        }
-
-        @Override
-        public boolean isEmpty() {
-            return buffer.subList(0, current).isEmpty();
-        }
-
-        @Override
-        public Token remove() {
-            if (current <= 0) {
-                throw new NoSuchElementException(Message.CANNOT_REMOVE.format());
-            }
-            return buffer.subList(0, current--).remove(0);
-        }
-
-//        @Override
-//        public Stream<Token> tokens() {
-//            return buffer.subList(0, current).stream();
-//        }
-        
-        @Override
-        public String toString() {
-            // Buffered tokens:[a, b, c] << Remaining:[d, e, f, ...]
-            StringBuilder sb = new StringBuilder();
-            sb.append(buffer.subList(0, current).stream()
-                    .map(Token::getValue)
-                    .collect(Collectors.joining(", ", "Buffered tokens:[", "]")));
-            sb.append(" << ");
-
-            StringJoiner remaining = new StringJoiner(", ", "Remaining:[", "]");
-            buffer.subList(current, buffer.size()).stream()
-                    .map(Token::getValue)
-                    .forEach(remaining::add);
-            remaining.add(tzer.hasNext() ? "..." : "no tokens");
-            sb.append(remaining.toString());
-            return sb.toString();
-        }
+        return buffer.get(current++);
     }
+
+    @Override
+    public void pushBack() {
+        if (current <= 0) {
+            throw new NoSuchElementException(Message.CANNOT_PUSHBACK.format());
+        }
+        current--;
+    }
+
+    @Override
+    public void reset() {
+        current = 0;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return buffer.subList(0, current).isEmpty();
+    }
+
+    @Override
+    public Token remove() {
+        if (current <= 0) {
+            throw new NoSuchElementException(Message.CANNOT_REMOVE.format());
+        }
+        return buffer.subList(0, current--).remove(0);
+    }
+
+//    @Override
+//    public Stream<Token> tokens() {
+//        return buffer.subList(0, current).stream();
+//    }
+    
+    @Override
+    public String toString() {
+        // Buffered tokens:[a, b, c] << Remaining:[d, e, f, ...]
+        StringBuilder sb = new StringBuilder();
+        sb.append(buffer.subList(0, current).stream()
+                .map(Token::getValue)
+                .collect(Collectors.joining(", ", "Buffered tokens:[", "]")));
+        sb.append(" << ");
+
+        StringJoiner remaining = new StringJoiner(", ", "Remaining:[", "]");
+        buffer.subList(current, buffer.size()).stream()
+                .map(Token::getValue)
+                .forEach(remaining::add);
+        remaining.add(tzer.hasNext() ? "..." : "no tokens");
+        sb.append(remaining.toString());
+        return sb.toString();
+    }
+
 }

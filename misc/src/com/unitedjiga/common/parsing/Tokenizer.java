@@ -32,7 +32,7 @@ import com.unitedjiga.common.parsing.impl.Tokenizers;
  *
  * @author Junji Mikami
  */
-public interface Tokenizer extends Iterator<Token> {
+public interface Tokenizer {
 
     /**
      * 
@@ -52,57 +52,33 @@ public interface Tokenizer extends Iterator<Token> {
         return wrap(Arrays.asList(str).iterator());
     }
 
-    @Override
-    boolean hasNext();
-
-    @Override
-    Token next();
-
-    @Override
-    String toString();
-
     /**
      * 
      * @return
      */
-    Buffer buffer();
-
+    boolean hasRemaining();
+    
     /**
      * 
-     * @author Junji Mikami
-     *
+     * @return
+     * @throws java.util.NoSuchElementException 
      */
-    interface Buffer {
-        
-        /**
-         * 
-         * @return
-         */
-        boolean hasRemaining();
-        
-        /**
-         * 
-         * @return
-         * @throws java.util.NoSuchElementException 元となるトークナイザーにこれ以上トークンがない場合
-         */
-        Token get();
-        
-        void pushBack();
-        void reset();
-        
-        /**
-         * 
-         * @return
-         */
-        boolean isEmpty();
-        
-        /**
-         * 
-         * @return
-         * @throws java.util.NoSuchElementException バッファが空の場合
-         */
-        Token remove();
-        
-//        Stream<Token> tokens();
-    }
+    Token get();
+    
+    void pushBack();
+    void reset();
+    
+    /**
+     * 
+     * @return
+     */
+    boolean isEmpty();
+    
+    /**
+     * 
+     * @return
+     * @throws java.util.NoSuchElementException 
+     */
+    Token remove();
+
 }

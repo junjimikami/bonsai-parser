@@ -49,16 +49,16 @@ class SeqProduction extends AbstractProduction implements SequentialProduction {
     }
 
     @Override
-    Symbol interpret(Tokenizer.Buffer buffer, Set<TermProduction> followSet) {
+    Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
         Set<TermProduction> firstSet = getFirstSet(followSet);
-        if (anyMatch(firstSet, buffer)) {
+        if (anyMatch(firstSet, tokenizer)) {
             List<Symbol> list = new ArrayList<>();
             for (int i = 0; i < elements.size(); i++) {
-                list.add(elements.get(i).interpret(buffer, getFollowSet(i, followSet)));
+                list.add(elements.get(i).interpret(tokenizer, getFollowSet(i, followSet)));
             }
             return newNonTerminal(this, list);
         }
-        throw newException(Message.RULE_MISMATCH, firstSet, buffer);
+        throw newException(Message.RULE_MISMATCH, firstSet, tokenizer);
     }
 
     @Override

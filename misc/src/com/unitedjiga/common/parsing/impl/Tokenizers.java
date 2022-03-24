@@ -60,35 +60,25 @@ public final class Tokenizers {
 
     public static Tokenizer createTokenizer(Iterator<? extends CharSequence> it) {
         Objects.requireNonNull(it, Message.REQUIRE_NON_NULL.format());
-        return new AbstractTokenizer() {
-            @Override
-            public boolean hasNext() {
-                return it.hasNext();
-            }
-
-            @Override
-            public Token next() {
-                return createToken(it.next().toString());
-            }
-        };
+        return new AbstractTokenizer(it);
     }
 
     static Tokenizer createTokenizer(Reader r) {
         Objects.requireNonNull(r, Message.REQUIRE_NON_NULL.format());
         PushbackReader pr = new PushbackReader(r);
-        return new AbstractTokenizer() {
+        return new AbstractTokenizer(new Iterator<String>() {
             @Override
             public boolean hasNext() {
                 return peek() != -1;
             }
 
             @Override
-            public Token next() {
+            public String next() {
                 int ch = read();
                 if (ch == -1) {
                     throw new NoSuchElementException(Message.NO_SUCH_ELEMENT.format());
                 }
-                return createToken(Character.toString(ch));
+                return Character.toString(ch);
             }
 
             private int read() {
@@ -120,7 +110,8 @@ public final class Tokenizers {
             public String toString() {
                 return "Next: " + peek();
             }
-        };
+
+        });
     }
 
     public static TokenizerFactory createFactory(Production... productionLayers) {

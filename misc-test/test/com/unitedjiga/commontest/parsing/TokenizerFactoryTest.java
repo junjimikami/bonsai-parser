@@ -39,33 +39,48 @@ import com.unitedjiga.common.parsing.TokenizerFactory;
  */
 public class TokenizerFactoryTest {
 
-    @Test
-    void test01() throws Exception {
-        var tf = TokenizerFactory.newFactory();
-        var tzer = tf.createTokenizer(new StringReader("abc"));
-        
-        assertTrue(tzer.hasNext());
-        assertEquals("a", tzer.next().getValue());
-        assertEquals("b", tzer.next().getValue());
-        assertEquals("c", tzer.next().getValue());
-        assertFalse(tzer.hasNext());
-    }
-    @Test
-    void test02() throws Exception {
-        var prd = Production.oneOf(
-                of("[0-9]").repeat(),
-                of("[a-z]").repeat()
-                );
-        var tf = TokenizerFactory.newFactory(prd);
-        var tzer = tf.createTokenizer(new StringReader("abc123def456"));
-        
-        assertTrue(tzer.hasNext());
-        assertEquals("abc", tzer.next().getValue());
-        assertEquals("123", tzer.next().getValue());
-        assertEquals("def", tzer.next().getValue());
-        assertEquals("456", tzer.next().getValue());
-        assertFalse(tzer.hasNext());
-    }
+//    @Test
+//    void test01() throws Exception {
+//        var tf = TokenizerFactory.newFactory();
+//        var tzer = tf.createTokenizer(new StringReader("abc"));
+//        
+//        assertTrue(tzer.hasNext());
+//        assertEquals("a", tzer.next().getValue());
+//        assertEquals("b", tzer.next().getValue());
+//        assertEquals("c", tzer.next().getValue());
+//        assertFalse(tzer.hasNext());
+//    }
+//    @Test
+//    void test02() throws Exception {
+//        var prd = Production.oneOf(
+//                of("[0-9]").repeat(),
+//                of("[a-z]").repeat()
+//                );
+//        var tf = TokenizerFactory.newFactory(prd);
+//        var tzer = tf.createTokenizer(new StringReader("abc123def456"));
+//        
+//        assertTrue(tzer.hasNext());
+//        assertEquals("abc", tzer.next().getValue());
+//        assertEquals("123", tzer.next().getValue());
+//        assertEquals("def", tzer.next().getValue());
+//        assertEquals("456", tzer.next().getValue());
+//        assertFalse(tzer.hasNext());
+//    }
+//    @Test
+//    void test03() throws Exception {
+//        var prd0 = Production.oneOf(
+//                of("[0-9]").repeat(),
+//                of("[a-z]").repeat()
+//                );
+//        var prd1 = Production.of("[a-z]+", "[0-9]+");
+//        var tf = TokenizerFactory.newFactory(prd0, prd1);
+//        var tzer = tf.createTokenizer(new StringReader("abc123def456"));
+//        
+//        assertTrue(tzer.hasNext());
+//        assertEquals("abc123", tzer.next().getValue());
+//        assertEquals("def456", tzer.next().getValue());
+//        assertFalse(tzer.hasNext());
+//    }
     class JavaCommentParsing01 {
         Production InputElement() {
             return Production.oneOf(
@@ -105,20 +120,20 @@ public class TokenizerFactoryTest {
             return of("/", of(".").repeat());
         }
     }
-    @Test
-    void testJavaCommentParsing01() throws Exception {
-        var prd = new JavaCommentParsing01().InputElement();
-        var tf = TokenizerFactory.newFactory(prd);
-        var tzer = tf.createTokenizer(new StringReader(""
-                + " "
-                + "// Single line comment\n"
-                + "/*\n"
-                + " * Multi line comment\n"
-                + " */\n"
-                + ""));
-        
-        tzer.forEachRemaining(t -> System.out.println("[" + t + "]"));
-    }
+//    @Test
+//    void testJavaCommentParsing01() throws Exception {
+//        var prd = new JavaCommentParsing01().InputElement();
+//        var tf = TokenizerFactory.newFactory(prd);
+//        var tzer = tf.createTokenizer(new StringReader(""
+//                + " "
+//                + "// Single line comment\n"
+//                + "/*\n"
+//                + " * Multi line comment\n"
+//                + " */\n"
+//                + ""));
+//        
+//        tzer.forEachRemaining(t -> System.out.println("[" + t + "]"));
+//    }
     class JavaCommentParsing02 extends JavaCommentParsing01 {
         Production CommentStart() {
             return oneOf(of("/", oneOf("/", "\\*").opt()), "(?s:.)");
@@ -137,33 +152,59 @@ public class TokenizerFactoryTest {
             return of("//", of(".").repeat());
         }
     }
-    @Test
-    void testJavaCommentParsing02() throws Exception {
-        var prd0 = new JavaCommentParsing02().CommentStart();
-        var prd = new JavaCommentParsing02().InputElement();
-        var tf = TokenizerFactory.newFactory(prd0, prd);
-        var tzer = tf.createTokenizer(new StringReader(""
-                + " "
-                + "// Single line comment\n"
-                + "/*\n"
-                + " * Multi line comment\n"
-                + " */\n"
-                + ""));
-        
-        tzer.forEachRemaining(t -> System.out.println("[" + t + "]"));
-    }
+//    @Test
+//    void testJavaCommentParsing02() throws Exception {
+//        var prd0 = new JavaCommentParsing02().CommentStart();
+//        var prd = new JavaCommentParsing02().InputElement();
+//        var tf = TokenizerFactory.newFactory(prd0, prd);
+//        var tzer = tf.createTokenizer(new StringReader(""
+//                + " "
+//                + "// Single line comment\n"
+//                + "/*\n"
+//                + " * Multi line comment\n"
+//                + " */\n"
+//                + ""));
+//        
+//        tzer.forEachRemaining(t -> System.out.println("[" + t + "]"));
+//    }
 
-    @Test
-    void testService() throws Exception {
-        var tf = TokenizerFactory.loadFactory("com.unitedjiga.commontest.parsing.sp.TestTokenizerFactory", null);
-        var tzer = tf.createTokenizer(new StringReader("0110001111"));
-        
-        assertTrue(tzer.hasNext());
-        assertEquals("0", tzer.next().getValue());
-        assertEquals("11", tzer.next().getValue());
-        assertEquals("000", tzer.next().getValue());
-        assertEquals("1111", tzer.next().getValue());
-        assertFalse(tzer.hasNext());
+//    @Test
+//    void testService() throws Exception {
+//        var tf = TokenizerFactory.loadFactory("com.unitedjiga.commontest.parsing.sp.TestTokenizerFactory", null);
+//        var tzer = tf.createTokenizer(new StringReader("0110001111"));
+//        
+//        assertTrue(tzer.hasNext());
+//        assertEquals("0", tzer.next().getValue());
+//        assertEquals("11", tzer.next().getValue());
+//        assertEquals("000", tzer.next().getValue());
+//        assertEquals("1111", tzer.next().getValue());
+//        assertFalse(tzer.hasNext());
+//
+//    }
 
-    }
+//    @Test
+//    void testService2() throws Exception {
+//        var tf = TokenizerFactory.loadFactory("com.unitedjiga.commontest.parsing.sp.JavaTokenizerFactory", null);
+//        {
+//            var tzer = tf.createTokenizer(new StringReader(""
+//                    + " \n"
+//                    + "\r\n"
+//                    + "// 123\n"
+//                    + "/* abc */\n"
+//                    + "/*\n"
+//                    + " * a\n"
+//                    + " * b\n"
+//                    + " * c\n"
+//                    + " */// def\n"
+//                    + "+++"));
+//
+//            tzer.forEachRemaining(t -> System.out.print("[" + t + "]"));
+////            assertTrue(tzer.hasNext());
+////            assertEquals(" ", tzer.next().getValue());
+////            assertEquals("\n", tzer.next().getValue());
+////            assertEquals("\r\n", tzer.next().getValue());
+////            assertFalse(tzer.hasNext());
+//        }
+//
+//    }
 }

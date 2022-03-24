@@ -45,11 +45,11 @@ class TermProduction extends AbstractProduction {
     }
 
     @Override
-    Symbol interpret(Tokenizer.Buffer buffer, Set<TermProduction> followSet) {
-        if (buffer.hasRemaining() && matches(buffer.get())) {
-            return buffer.remove();
+    Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
+        if (tokenizer.hasRemaining() && matches(tokenizer.get())) {
+            return tokenizer.remove();
         }
-        throw newException(Message.RULE_MISMATCH, getFirstSet(followSet), buffer);
+        throw newException(Message.RULE_MISMATCH, getFirstSet(followSet), tokenizer);
     }
 
     @Override

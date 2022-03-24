@@ -48,10 +48,10 @@ class RepeatProduction extends AbstractProduction implements SequentialProductio
     }
 
     @Override
-    Symbol interpret(Tokenizer.Buffer buffer, Set<TermProduction> followSet) {
+    Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
         List<Symbol> list = new ArrayList<>();
-        while (anyMatch(getFirstSet(), buffer)) {
-            list.add(element.interpret(buffer, getFollowSet(followSet)));
+        while (anyMatch(getFirstSet(), tokenizer)) {
+            list.add(element.interpret(tokenizer, getFollowSet(followSet)));
         }
         return newNonTerminal(this, list);
     }

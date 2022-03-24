@@ -51,18 +51,18 @@ class AltProduction extends AbstractProduction implements AlternativeProduction 
     }
 
     @Override
-    Symbol interpret(Tokenizer.Buffer buffer, Set<TermProduction> followSet) {
+    Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
         for (int i = 0; i < elements.size(); i++) {
-            if (!anyMatch(getFirstSet(i, followSet), buffer)) {
+            if (!anyMatch(getFirstSet(i, followSet), tokenizer)) {
                 continue;
             }
-            Symbol symbol = elements.get(i).interpret(buffer, followSet);
+            Symbol symbol = elements.get(i).interpret(tokenizer, followSet);
             return newSingleton(this, Optional.of(symbol));
         }
-        if (elements.isEmpty() && anyMatch(followSet, buffer)) {
+        if (elements.isEmpty() && anyMatch(followSet, tokenizer)) {
             return newSingleton(this, Optional.empty());
         }
-        throw newException(Message.RULE_MISMATCH, getFirstSet(followSet), buffer);
+        throw newException(Message.RULE_MISMATCH, getFirstSet(followSet), tokenizer);
     }
 
     @Override

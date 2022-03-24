@@ -45,9 +45,9 @@ class OptProduction extends AbstractProduction implements AlternativeProduction 
     }
 
     @Override
-    Symbol interpret(Tokenizer.Buffer buffer, Set<TermProduction> followSet) {
-        if (anyMatch(getFirstSet(), buffer)) {
-            Symbol symbol = element.interpret(buffer, followSet);
+    Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
+        if (anyMatch(getFirstSet(), tokenizer)) {
+            Symbol symbol = element.interpret(tokenizer, followSet);
             return newSingleton(this, Optional.of(symbol));
         }
         return newSingleton(this, Optional.empty());

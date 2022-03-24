@@ -62,23 +62,21 @@ abstract class AbstractProduction implements Production {
             
             @Override
             public Symbol parse() {
-                Tokenizer.Buffer buf = tokenizer.buffer();
-                Symbol s = interpret(buf);
-                if (buf.hasRemaining()) {
-                    throw newException(Message.TOO_MANY_TOKEN, buf);
+                Symbol s = interpret(tokenizer);
+                if (tokenizer.hasRemaining()) {
+                    throw newException(Message.TOO_MANY_TOKEN, tokenizer);
                 }
                 return s;
             }
 
             @Override
             public Stream<Symbol> iterativeParse() {
-                Tokenizer.Buffer buf = tokenizer.buffer();
-                return Stream.generate(() -> buf.hasRemaining() ? interpret(buf) : null)
+                return Stream.generate(() -> tokenizer.hasRemaining() ? interpret(tokenizer) : null)
                         .takeWhile(Objects::nonNull);
             }
 
-            private Symbol interpret(Tokenizer.Buffer buf) {
-                return AbstractProduction.this.interpret(buf, Collections.singleton(EOF));
+            private Symbol interpret(Tokenizer tokenizer) {
+                return AbstractProduction.this.interpret(tokenizer, Collections.singleton(EOF));
             }
         };
     }
@@ -99,25 +97,25 @@ abstract class AbstractProduction implements Production {
 
     abstract Set<TermProduction> getFirstSet(Set<TermProduction> followSet);
 
-    abstract Symbol interpret(Tokenizer.Buffer buffer, Set<TermProduction> followSet);
+    abstract Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet);
 
     abstract boolean isOption();
 
 
-    static boolean anyMatch(Set<TermProduction> set, Tokenizer.Buffer buffer) {
-        if (!buffer.hasRemaining()) {
+    static boolean anyMatch(Set<TermProduction> set, Tokenizer tokenizer) {
+        if (!tokenizer.hasRemaining()) {
             return set.contains(EOF);
         }
-        Token t = buffer.get();
-        buffer.pushBack();
+        Token t = tokenizer.get();
+        tokenizer.pushBack();
         return set.stream().anyMatch(p -> p.matches(t));
     }
 
     static ParsingException newException(Message m, Object... args) {
         Object[] str = Arrays.stream(args).map(e -> {
-            if (e instanceof Tokenizer.Buffer) {
-                Tokenizer.Buffer buf = (Tokenizer.Buffer) e;
-                return buf.hasRemaining() ? "\"" + buf.get().getValue() + "\"" : "EOF";
+            if (e instanceof Tokenizer) {
+                Tokenizer tokenizer = (Tokenizer) e;
+                return tokenizer.hasRemaining() ? "\"" + tokenizer.get().getValue() + "\"" : "EOF";
             }
             return e.toString();
         }).toArray();
