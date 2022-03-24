@@ -44,7 +44,7 @@ import com.unitedjiga.common.parsing.Tokenizer;
 class SeqProduction extends AbstractProduction implements SequentialProduction {
     private final List<AbstractProduction> elements;
 
-    SeqProduction(List<AbstractProduction> elements) {
+    private SeqProduction(List<AbstractProduction> elements) {
         this.elements = Objects.requireNonNull(elements);
     }
 
@@ -107,7 +107,7 @@ class SeqProduction extends AbstractProduction implements SequentialProduction {
         @Override
         public SequentialProduction build() {
             if (isBuilt) {
-                throw new IllegalStateException();
+                throw new IllegalStateException(Message.ALREADY_BUILT.format());
             }
             isBuilt = true;
             return new SeqProduction(elements);
@@ -133,7 +133,7 @@ class SeqProduction extends AbstractProduction implements SequentialProduction {
 
         private void addIfBuilding(AbstractProduction e) {
             if (isBuilt) {
-                throw new IllegalStateException();
+                throw new IllegalStateException(Message.ALREADY_BUILT.format());
             }
             elements.add(e);
         }
