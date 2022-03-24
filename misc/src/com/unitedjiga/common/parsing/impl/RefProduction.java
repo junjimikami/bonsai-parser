@@ -38,8 +38,8 @@ import com.unitedjiga.common.parsing.Tokenizer.Buffer;
 class RefProduction extends AbstractProduction {
     private final Supplier<? extends Production> p;
 
-    public RefProduction(Supplier<? extends Production> p) {
-        this.p = Objects.requireNonNull(p);
+    RefProduction(Supplier<? extends Production> p) {
+        this.p = Objects.requireNonNull(p, Message.REQUIRE_NON_NULL.format());
     }
 
     @Override
