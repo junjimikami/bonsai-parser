@@ -25,6 +25,7 @@ package com.unitedjiga.common.parsing.impl;
 
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -39,6 +40,8 @@ import com.unitedjiga.common.parsing.Symbol;
  */
 final class Symbols {
     static NonTerminalSymbol newNonTerminal(Production origin, List<Symbol> list) {
+        Objects.requireNonNull(origin);
+        Objects.requireNonNull(list);
         return new AbstractNonTerminalSymbol() {
 
             @Override
@@ -64,6 +67,8 @@ final class Symbols {
     }
 
     static SingletonSymbol newSingleton(Production origin, Optional<Symbol> symbol) {
+        Objects.requireNonNull(origin);
+        Objects.requireNonNull(symbol);
         return new AbstractSingletonSymbol() {
 
             @Override
