@@ -39,7 +39,7 @@ public interface Tokenizer {
      * @param it
      * @return
      */
-    static Tokenizer wrap(Iterator<? extends CharSequence> it) {
+    public static Tokenizer wrap(Iterator<? extends CharSequence> it) {
         return Tokenizers.createTokenizer(it);
     }
 
@@ -48,9 +48,17 @@ public interface Tokenizer {
      * @param str
      * @return
      */
-    static Tokenizer wrap(String... str) {
+    public static Tokenizer wrap(String... str) {
         return wrap(Arrays.asList(str).iterator());
     }
+
+    public Token read();
+
+    public boolean hasNext();
+    public Token next();
+
+    public boolean hasPrevious();
+    public Token previous();
 
     /**
      * 
@@ -64,15 +72,6 @@ public interface Tokenizer {
      * @throws java.util.NoSuchElementException 
      */
     Token get();
-    
-    void pushBack();
-    void reset();
-    
-    /**
-     * 
-     * @return
-     */
-    boolean isEmpty();
     
     /**
      * 

@@ -79,99 +79,99 @@ class TokenizerTest {
 //        assertFalse(buf.hasRemaining());
 //    }
 
-    @Test
-    void testBuffer() {
-        var words = input.split(" ");
-        var tzer = Tokenizer.wrap(words);
-//        var buf = tzer.buffer();
-        var buf = tzer;
+//    @Test
+//    void testBuffer() {
+//        var words = input.split(" ");
+//        var tzer = Tokenizer.wrap(words);
+////        var buf = tzer.buffer();
+//        var buf = tzer;
+//
+//        System.out.println(buf.toString());
+//        assertTrue(buf.hasRemaining());
+//        assertTrue(buf.isEmpty());
+//        assertEquals(words[0], buf.get().getValue());
+//        System.out.println(buf.toString());
+//        assertTrue(buf.hasRemaining());
+//        assertFalse(buf.isEmpty());
+//        assertEquals(words[1], buf.get().getValue());
+//        System.out.println(buf.toString());
+//        assertTrue(buf.hasRemaining());
+//        assertFalse(buf.isEmpty());
+//        assertEquals(words[2], buf.get().getValue());
+//        System.out.println(buf.toString());
+//        buf.reset();
+//        System.out.println(buf.toString());
+//        assertTrue(buf.isEmpty());
+//        assertEquals(words[0], buf.get().getValue());
+//        System.out.println(buf.toString());
+//        assertFalse(buf.isEmpty());
+//        assertEquals(words[1], buf.get().getValue());
+//        System.out.println(buf.toString());
+//        buf.pushBack();
+//        System.out.println(buf.toString());
+//        assertEquals(words[1], buf.get().getValue());
+//        buf.pushBack();
+//        System.out.println(buf.toString());
+//        buf.pushBack();
+//        System.out.println(buf.toString());
+//        assertEquals(words[0], buf.get().getValue());
+//        assertEquals(words[1], buf.get().getValue());
+//        assertEquals(words[2], buf.get().getValue());
+//        System.out.println(buf.toString());
+//
+//        assertEquals(words[0], buf.remove().getValue());
+//        System.out.println(buf.toString());
+//        buf.reset();
+//        System.out.println(buf.toString());
+//        assertEquals(words[1], buf.get().getValue());
+//        System.out.println(buf.toString());
+//        assertFalse(buf.isEmpty());
+//        assertEquals(words[1], buf.remove().getValue());
+//        System.out.println(buf.toString());
+//        assertTrue(buf.isEmpty());
+//
+//        var it = Arrays.asList(words).listIterator(2);
+//        while (buf.hasRemaining()) {
+//            assertEquals(it.next(), buf.get().getValue());
+//            System.out.println(buf.toString());
+//        }
+//        assertFalse(buf.hasRemaining());
+//        assertFalse(buf.isEmpty());
+////        var it2 = Arrays.asList(words).listIterator(2);
+////        buf.tokens().forEach(t->assertEquals(it2.next(), t.getValue()));
+//        buf.reset();
+//        assertTrue(buf.hasRemaining());
+//        assertTrue(buf.isEmpty());
+//        System.out.println(buf.toString());
+//    }
 
-        System.out.println(buf.toString());
-        assertTrue(buf.hasRemaining());
-        assertTrue(buf.isEmpty());
-        assertEquals(words[0], buf.get().getValue());
-        System.out.println(buf.toString());
-        assertTrue(buf.hasRemaining());
-        assertFalse(buf.isEmpty());
-        assertEquals(words[1], buf.get().getValue());
-        System.out.println(buf.toString());
-        assertTrue(buf.hasRemaining());
-        assertFalse(buf.isEmpty());
-        assertEquals(words[2], buf.get().getValue());
-        System.out.println(buf.toString());
-        buf.reset();
-        System.out.println(buf.toString());
-        assertTrue(buf.isEmpty());
-        assertEquals(words[0], buf.get().getValue());
-        System.out.println(buf.toString());
-        assertFalse(buf.isEmpty());
-        assertEquals(words[1], buf.get().getValue());
-        System.out.println(buf.toString());
-        buf.pushBack();
-        System.out.println(buf.toString());
-        assertEquals(words[1], buf.get().getValue());
-        buf.pushBack();
-        System.out.println(buf.toString());
-        buf.pushBack();
-        System.out.println(buf.toString());
-        assertEquals(words[0], buf.get().getValue());
-        assertEquals(words[1], buf.get().getValue());
-        assertEquals(words[2], buf.get().getValue());
-        System.out.println(buf.toString());
-
-        assertEquals(words[0], buf.remove().getValue());
-        System.out.println(buf.toString());
-        buf.reset();
-        System.out.println(buf.toString());
-        assertEquals(words[1], buf.get().getValue());
-        System.out.println(buf.toString());
-        assertFalse(buf.isEmpty());
-        assertEquals(words[1], buf.remove().getValue());
-        System.out.println(buf.toString());
-        assertTrue(buf.isEmpty());
-
-        var it = Arrays.asList(words).listIterator(2);
-        while (buf.hasRemaining()) {
-            assertEquals(it.next(), buf.get().getValue());
-            System.out.println(buf.toString());
-        }
-        assertFalse(buf.hasRemaining());
-        assertFalse(buf.isEmpty());
-//        var it2 = Arrays.asList(words).listIterator(2);
-//        buf.tokens().forEach(t->assertEquals(it2.next(), t.getValue()));
-        buf.reset();
-        assertTrue(buf.hasRemaining());
-        assertTrue(buf.isEmpty());
-        System.out.println(buf.toString());
-    }
-
-    @Test
-    void testBuffer02() {
-        var words = input.split(" ");
-        {
-            var tzer = Tokenizer.wrap(words);
-//            var buf = tzer.buffer();
-            var buf = tzer;
-            assertThrows(NoSuchElementException.class, buf::remove)
-                    .printStackTrace();
-        }
-        {
-            var tzer = Tokenizer.wrap(words);
-//            var buf = tzer.buffer();
-            var buf = tzer;
-            assertThrows(NoSuchElementException.class, buf::pushBack)
-                    .printStackTrace();
-        }
-        {
-            var tzer = Tokenizer.wrap(words);
-//            var buf = tzer.buffer();
-            var buf = tzer;
-            while (buf.hasRemaining()) {
-                buf.get();
-            }
-            assertThrows(NoSuchElementException.class, buf::get)
-                    .printStackTrace();
-        }
-    }
+//    @Test
+//    void testBuffer02() {
+//        var words = input.split(" ");
+//        {
+//            var tzer = Tokenizer.wrap(words);
+////            var buf = tzer.buffer();
+//            var buf = tzer;
+//            assertThrows(NoSuchElementException.class, buf::remove)
+//                    .printStackTrace();
+//        }
+//        {
+//            var tzer = Tokenizer.wrap(words);
+////            var buf = tzer.buffer();
+//            var buf = tzer;
+//            assertThrows(NoSuchElementException.class, buf::pushBack)
+//                    .printStackTrace();
+//        }
+//        {
+//            var tzer = Tokenizer.wrap(words);
+////            var buf = tzer.buffer();
+//            var buf = tzer;
+//            while (buf.hasRemaining()) {
+//                buf.get();
+//            }
+//            assertThrows(NoSuchElementException.class, buf::get)
+//                    .printStackTrace();
+//        }
+//    }
 
 }

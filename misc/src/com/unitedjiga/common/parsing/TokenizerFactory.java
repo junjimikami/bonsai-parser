@@ -34,10 +34,6 @@ import com.unitedjiga.common.parsing.impl.Tokenizers;
  */
 public interface TokenizerFactory {
 
-//    static TokenizerFactory newDefaultInstance() {
-//        return Tokenizers.createFactory();
-//    }
-
     static TokenizerFactory newFactory(Production... productionLayers) {
         return Tokenizers.createFactory(productionLayers);
     }
