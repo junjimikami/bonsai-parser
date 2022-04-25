@@ -34,7 +34,7 @@ public interface Symbol {
      * @author Junji Mikami
      *
      */
-    enum Kind {
+    public static enum Kind {
         TERMINAL,
         NON_TERMINAL,
         SINGLETON;
@@ -56,13 +56,13 @@ public interface Symbol {
      * 
      * @return
      */
-    Kind getKind();
+    public Kind getKind();
 
     /**
      * 
      * @return
      */
-    default Token asToken() {
+    public default Token asToken() {
         return Token.of(toString());
     }
 
@@ -74,7 +74,7 @@ public interface Symbol {
      * @param p
      * @return
      */
-    <R, P> R accept(SymbolVisitor<R, P> v, P p);
+    public <R, P> R accept(SymbolVisitor<R, P> v, P p);
 
     @Override
     String toString();

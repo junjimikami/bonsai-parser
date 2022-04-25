@@ -32,14 +32,14 @@ import java.util.List;
 public interface NonTerminalSymbol extends Symbol, List<Symbol> {
 
     @Override
-    default Kind getKind() {
+    public default Kind getKind() {
         return Kind.NON_TERMINAL;
     }
 
     @Override
-    default <R, P> R accept(SymbolVisitor<R, P> v, P p) {
+    public default <R, P> R accept(SymbolVisitor<R, P> v, P p) {
         return v.visitNonTerminal(this, p);
     }
 
-    Production getOrigin();
+    public String getName();
 }

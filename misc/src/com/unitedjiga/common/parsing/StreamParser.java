@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2021 Junji Mikami.
+ * Copyright 2022 Junji Mikami.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,26 +23,19 @@
  */
 package com.unitedjiga.common.parsing;
 
-import com.unitedjiga.common.parsing.impl.ParserImpls;
-
 /**
  * @author Junji Mikami
  *
  */
-public interface ParserFactory {
-
-	public static ParserFactory newFactory(Production p) {
-		return null;
+public interface StreamParser {
+	public static enum Event {
+		START_NON_TERMINAL,
+		END_NON_TERMINAL,
+		TERMINAL;
 	}
 
-	public static ParserFactory loadFactory(String factoryName, ClassLoader cl) {
-        return ParserImpls.loadFactory(factoryName, cl);
-    }
-
-	public static ParserFactory loadFactory(String factoryName) {
-        return ParserImpls.loadFactory(factoryName, null);
-    }
-
-	public Parser createParser(Tokenizer tokenizer);
-	public StreamParser createStreamParser(Tokenizer tokenizer);
+	public boolean hasNext();
+	public Event next();
+	public String getName();
+	public String getValue();
 }

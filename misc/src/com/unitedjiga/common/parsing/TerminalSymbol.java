@@ -30,13 +30,13 @@ package com.unitedjiga.common.parsing;
 public interface TerminalSymbol extends Symbol {
 
     @Override
-    default Kind getKind() {
+    public default Kind getKind() {
         return Kind.TERMINAL;
     }
 
-    default <R, P> R accept(SymbolVisitor<R, P> v, P p) {
+    public default <R, P> R accept(SymbolVisitor<R, P> v, P p) {
         return v.visitTerminal(this, p);
     }
 
-    String getValue();
+    public String getValue();
 }
