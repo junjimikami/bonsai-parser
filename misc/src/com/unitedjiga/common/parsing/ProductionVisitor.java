@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2020 Junji Mikami.
+ * Copyright 2022 Mikami Junji.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,60 +23,18 @@
  */
 package com.unitedjiga.common.parsing;
 
+import java.util.regex.Pattern;
+
 /**
+ * @author Mikami Junji
  *
- * @author Junji Mikami
  */
-public interface Symbol {
+public interface ProductionVisitor<R, P> {
 
-    /**
-     * 
-     * @author Junji Mikami
-     *
-     */
-    public static enum Kind {
-        TERMINAL,
-        NON_TERMINAL,
-        SINGLETON;
-
-        public boolean isTerminal() {
-            return this == TERMINAL;
-        }
-
-        public boolean isNonTerminal() {
-            return this == NON_TERMINAL || this == SINGLETON;
-        }
-
-        public boolean isSingleton() {
-            return this == SINGLETON;
-        }
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public Kind getKind();
-    public String getName();
-
-//    /**
-//     * 
-//     * @return
-//     */
-//    public default Token asToken() {
-//        return Token.of(toString());
-//    }
-
-    /**
-     * 
-     * @param <R>
-     * @param <P>
-     * @param v
-     * @param p
-     * @return
-     */
-    public <R, P> R accept(SymbolVisitor<R, P> v, P p);
-
-    @Override
-    String toString();
+	public R visit(Production prd);
+	public R visit(Production prd, P p);
+	public R visitAlternative(AlternativeProduction prd, P p);
+	public R visitSequential(SequentialProduction prd, P p);
+	public R visitPattern(PatternProduction prd, P p);
+	public R visitReference(Reference<?> prd, P p);
 }

@@ -43,30 +43,30 @@ import com.unitedjiga.common.parsing.Tokenizer;
  */
 class ParserTest {
 
-    @Test
-    void test() {
-        var pf = ParserFactory.loadFactory("com.unitedjiga.commontest.parsing.sp.TestParserFactory");
-        var pser = pf.createParser(Tokenizer.wrap("12345".split("\\B")));
-        var smbl = pser.parse();
-
-        assertTrue(smbl.getKind().isNonTerminal());
-        var it = smbl.accept(new SymbolVisitor<Iterator<Token>, Void>() {
-            @Override
-            public Iterator<Token> visitTerminal(TerminalSymbol s, Void p) {
-                return null;
-            }
-            @Override
-            public Iterator<Token> visitNonTerminal(NonTerminalSymbol s, Void p) {
-                return s.stream().map(Symbol::asToken).iterator();
-            }
-        }, null);
-        assertTrue(it.hasNext());
-        assertEquals("1", it.next().getValue());
-        assertEquals("2", it.next().getValue());
-        assertEquals("3", it.next().getValue());
-        assertEquals("4", it.next().getValue());
-        assertEquals("5", it.next().getValue());
-        assertFalse(it.hasNext());
-    }
+//    @Test
+//    void test() {
+//        var pf = ParserFactory.loadFactory("com.unitedjiga.commontest.parsing.sp.TestParserFactory");
+//        var pser = pf.createParser(Tokenizer.wrap("12345".split("\\B")));
+//        var smbl = pser.parse();
+//
+//        assertTrue(smbl.getKind().isNonTerminal());
+//        var it = smbl.accept(new SymbolVisitor<Iterator<Token>, Void>() {
+//            @Override
+//            public Iterator<Token> visitTerminal(TerminalSymbol s, Void p) {
+//                return null;
+//            }
+//            @Override
+//            public Iterator<Token> visitNonTerminal(NonTerminalSymbol s, Void p) {
+//                return s.stream().map(Symbol::asToken).iterator();
+//            }
+//        }, null);
+//        assertTrue(it.hasNext());
+//        assertEquals("1", it.next().getValue());
+//        assertEquals("2", it.next().getValue());
+//        assertEquals("3", it.next().getValue());
+//        assertEquals("4", it.next().getValue());
+//        assertEquals("5", it.next().getValue());
+//        assertFalse(it.hasNext());
+//    }
 
 }

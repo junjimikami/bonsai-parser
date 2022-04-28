@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2020 Junji Mikami.
+ * Copyright 2021 Junji Mikami.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,60 +23,34 @@
  */
 package com.unitedjiga.common.parsing;
 
+import java.util.function.Supplier;
+import java.util.regex.Pattern;
+
+import com.unitedjiga.common.parsing.impl.Productions;
+
 /**
- *
  * @author Junji Mikami
+ *
  */
-public interface Symbol {
+public interface PatternProduction extends Production {
 
-    /**
-     * 
-     * @author Junji Mikami
-     *
-     */
-    public static enum Kind {
-        TERMINAL,
-        NON_TERMINAL,
-        SINGLETON;
-
-        public boolean isTerminal() {
-            return this == TERMINAL;
-        }
-
-        public boolean isNonTerminal() {
-            return this == NON_TERMINAL || this == SINGLETON;
-        }
-
-        public boolean isSingleton() {
-            return this == SINGLETON;
-        }
+    public static interface Builder extends Production.Builder {
+        Builder set(String s);
+        Builder setFlag(int flags);
+        PatternProduction build();
     }
 
-    /**
-     * 
-     * @return
-     */
-    public Kind getKind();
-    public String getName();
-
-//    /**
-//     * 
-//     * @return
-//     */
-//    public default Token asToken() {
-//        return Token.of(toString());
-//    }
-
-    /**
-     * 
-     * @param <R>
-     * @param <P>
-     * @param v
-     * @param p
-     * @return
-     */
-    public <R, P> R accept(SymbolVisitor<R, P> v, P p);
+    public static Builder builder() {
+        return null;
+    }
+    public static Builder builder(String name) {
+        return null;
+    }
 
     @Override
-    String toString();
+    public default Kind getKind() {
+    	return Kind.PATTERN;
+    }
+
+    public PatternProduction as(String name);
 }

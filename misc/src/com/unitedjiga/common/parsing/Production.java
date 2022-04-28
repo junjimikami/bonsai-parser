@@ -34,7 +34,18 @@ import com.unitedjiga.common.parsing.impl.Productions;
  */
 public interface Production {
 
-    static SequentialProduction of(Object... args) {
+	public static enum Kind {
+		PATTERN,
+		SEQUENTIAL,
+		ALTERNATIVE,
+		REFERENCE;
+	}
+
+	public static interface Builder {
+		public Production build();
+	}
+
+	static SequentialProduction of(Object... args) {
         return Productions.of(args);
     }
 
@@ -50,11 +61,17 @@ public interface Production {
         return p;
     }
 
-    Parser parser(Tokenizer tokenizer);
+//    Parser parser(Tokenizer tokenizer);
 
-    AlternativeProduction opt();
+    public <R, P> R accept(ProductionVisitor<R, P> visitor, P p);
+    public String getName();
+    public Kind getKind();
+    
+    public Production as(String name);
 
-    SequentialProduction repeat();
+    public AlternativeProduction opt();
+
+    public SequentialProduction repeat();
 
     @Override
     String toString();
