@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2021 Junji Mikami.
+ * Copyright 2022 Mikami Junji.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,26 +23,38 @@
  */
 package com.unitedjiga.common.parsing;
 
-import java.util.regex.Pattern;
+import java.util.OptionalInt;
+import java.util.stream.Stream;
 
 /**
- * @author Junji Mikami
+ * @author Mikami Junji
  *
  */
-public interface PatternProduction extends TerminalProduction {
+public interface QuantifiedProduction extends Production {
+
+    public static interface Builder extends Production.Builder {
+        public QuantifiedProduction build();
+    }
 
     @Override
     public default Kind getKind() {
-    	return Kind.PATTERN;
+        return Kind.QUANTIFIED;
     }
 
     @Override
     public default <R, P> R accept(ProductionVisitor<R, P> visitor, P p) {
-    	return visitor.visitPattern(this, p);
+        return visitor.visitQuantified(this, p);
     }
 
     @Override
-    public PatternProduction as(String name);
+    public QuantifiedProduction as(String name);
 
-    public Pattern getPattern();
+    public Production get();
+    public int getLowerLimit();
+    public OptionalInt getUpperLimit();
+    public default Stream<Production> stream() {
+        var s = Stream.generate(this::get);
+        getUpperLimit().ifPresent(l -> s.limit(l));
+        return s;
+    }
 }

@@ -23,33 +23,24 @@
  */
 package com.unitedjiga.common.parsing;
 
-import java.util.function.Supplier;
-import java.util.regex.Pattern;
-
-import com.unitedjiga.common.parsing.impl.Productions;
-
 /**
  * @author Junji Mikami
  *
  */
 public interface Reference<T extends Production> extends Production {
 
-    public static interface Builder<T extends Production> extends Production.Builder {
-        Builder<T> set(Supplier<T> s);
-        Reference<T> build();
-    }
-
-    public static <T extends Production> Builder<T> builder() {
-        return null;
-    }
-    public static <T extends Production> Builder<T> builder(String name) {
-        return null;
-    }
-
     @Override
     public default Kind getKind() {
     	return Kind.REFERENCE;
     }
 
+    @Override
+    public default <R, P> R accept(ProductionVisitor<R, P> visitor, P p) {
+        return visitor.visitReference(this, p);
+    }
+    
+    @Override
     public Reference<T> as(String name);
+
+    public T get();
 }

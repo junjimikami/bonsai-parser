@@ -23,31 +23,19 @@
  */
 package com.unitedjiga.common.parsing;
 
-import java.util.function.Supplier;
-import java.util.regex.Pattern;
-
-import com.unitedjiga.common.parsing.impl.Productions;
+import java.util.List;
 
 /**
  * @author Junji Mikami
  *
  */
-public interface AlternativeProduction extends Production, Iterable<Production> {
+public interface AlternativeProduction extends Production {
 
     public static interface Builder extends Production.Builder {
-        Builder add(String s);
-        Builder add(Pattern p);
-        Builder add(Production p);
-        Builder add(Supplier<? extends Production> p);
-        Builder add(Production.Builder b);
-        AlternativeProduction build();
-    }
-
-    public static Builder builder() {
-        return Productions.alternativeBuilder();
-    }
-    public static Builder builder(String name) {
-        return null;
+        public Builder add(Production p);
+        public Builder add(Production.Builder b);
+        public Builder addEmpty();
+        public AlternativeProduction build();
     }
 
     @Override
@@ -56,5 +44,12 @@ public interface AlternativeProduction extends Production, Iterable<Production> 
     }
 
     @Override
+    public default <R, P> R accept(ProductionVisitor<R, P> visitor, P p) {
+        return visitor.visitAlternative(this, p);
+    }
+
+    @Override
     public AlternativeProduction as(String name);
+
+    public List<Production> getProductions();
 }

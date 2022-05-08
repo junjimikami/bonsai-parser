@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2021 Junji Mikami.
+ * Copyright 2022 Mikami Junji.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,26 +23,11 @@
  */
 package com.unitedjiga.common.parsing;
 
-import java.util.regex.Pattern;
-
 /**
- * @author Junji Mikami
+ * @author Mikami Junji
  *
  */
-public interface PatternProduction extends TerminalProduction {
+public interface TerminalProduction extends Production {
 
-    @Override
-    public default Kind getKind() {
-    	return Kind.PATTERN;
-    }
-
-    @Override
-    public default <R, P> R accept(ProductionVisitor<R, P> visitor, P p) {
-    	return visitor.visitPattern(this, p);
-    }
-
-    @Override
-    public PatternProduction as(String name);
-
-    public Pattern getPattern();
+    public boolean matches(Token t);
 }

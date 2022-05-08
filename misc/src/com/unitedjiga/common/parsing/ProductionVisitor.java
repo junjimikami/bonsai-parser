@@ -23,18 +23,22 @@
  */
 package com.unitedjiga.common.parsing;
 
-import java.util.regex.Pattern;
-
 /**
  * @author Mikami Junji
  *
  */
 public interface ProductionVisitor<R, P> {
 
-	public R visit(Production prd);
-	public R visit(Production prd, P p);
+	public default R visit(Production prd) {
+	    return visit(prd, null);
+	}
+	public default R visit(Production prd, P p) {
+	    return prd.accept(this, p);
+	}
 	public R visitAlternative(AlternativeProduction prd, P p);
 	public R visitSequential(SequentialProduction prd, P p);
 	public R visitPattern(PatternProduction prd, P p);
 	public R visitReference(Reference<?> prd, P p);
+    public R visitQuantified(QuantifiedProduction prd, P p);
+    public R visitEmpty(TerminalProduction prd, P p);
 }

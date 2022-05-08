@@ -38,23 +38,32 @@ public interface Production {
 		PATTERN,
 		SEQUENTIAL,
 		ALTERNATIVE,
-		REFERENCE;
+		REFERENCE,
+		QUANTIFIED,
+		EMPTY;
 	}
 
 	public static interface Builder {
-		public Production build();
+        public Production build();
+        public QuantifiedProduction.Builder opt();
+        public QuantifiedProduction.Builder repeat();
+    }
+
+    public static final TerminalProduction EMPTY = Productions.empty();
+
+	public static PatternProduction ofPattern(String regex) {
+		return Productions.ofPattern(regex);
+	}
+	public static PatternProduction ofPattern(String regex, int flags) {
+		return Productions.ofPattern(regex, flags);
 	}
 
-	static SequentialProduction of(Object... args) {
+	public static SequentialProduction of(Object... args) {
         return Productions.of(args);
     }
 
-    static AlternativeProduction oneOf(Object... args) {
+    public static AlternativeProduction oneOf(Object... args) {
         return Productions.oneOf(args);
-    }
-
-    static Production empty() {
-        return Productions.empty();
     }
 
     static Supplier<? extends Production> ref(Supplier<? extends Production> p) {
@@ -69,9 +78,9 @@ public interface Production {
     
     public Production as(String name);
 
-    public AlternativeProduction opt();
+    public QuantifiedProduction opt();
 
-    public SequentialProduction repeat();
+    public QuantifiedProduction repeat();
 
     @Override
     String toString();

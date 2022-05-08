@@ -23,31 +23,18 @@
  */
 package com.unitedjiga.common.parsing;
 
-import java.util.function.Supplier;
-import java.util.regex.Pattern;
-
-import com.unitedjiga.common.parsing.impl.Productions;
+import java.util.List;
 
 /**
  * @author Junji Mikami
  *
  */
-public interface SequentialProduction extends Production, Iterable<Production> {
+public interface SequentialProduction extends Production {
 
     public static interface Builder extends Production.Builder {
-        Builder add(String s);
-        Builder add(Pattern p);
         Builder add(Production p);
-        Builder add(Supplier<? extends Production> p);
         Builder add(Production.Builder b);
         SequentialProduction build();
-    }
-
-    public static Builder builder() {
-        return Productions.sequentialBuilder();
-    }
-    public static Builder builder(String name) {
-        return null;
     }
 
     @Override
@@ -55,5 +42,13 @@ public interface SequentialProduction extends Production, Iterable<Production> {
     	return Kind.SEQUENTIAL;
     }
 
+    @Override
+    public default <R, P> R accept(ProductionVisitor<R, P> visitor, P p) {
+        return visitor.visitSequential(this, p);
+    }
+
+    @Override
     public SequentialProduction as(String name);
+
+    public List<Production> getProductions();
 }
