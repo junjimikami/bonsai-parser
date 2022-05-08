@@ -23,43 +23,34 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import java.util.Collections;
 import java.util.Objects;
-import java.util.Set;
 import java.util.regex.Pattern;
 
-import com.unitedjiga.common.parsing.Symbol;
+import com.unitedjiga.common.parsing.PatternProduction;
 import com.unitedjiga.common.parsing.Token;
-import com.unitedjiga.common.parsing.Tokenizer;
 
 /**
  *
  * @author Junji Mikami
  */
-class TermProduction extends AbstractProduction {
+class TermProduction extends AbstractProduction implements PatternProduction {
     private final Pattern pattern;
 
-    TermProduction(CharSequence regex) {
+    TermProduction(String regex) {
+    	this(regex, 0);
+    }
+    TermProduction(String regex, int flags) {
+    	super();
         Objects.requireNonNull(regex, Message.REQUIRE_NON_NULL.format());
-        pattern = Pattern.compile(regex.toString());
+        this.pattern = Pattern.compile(regex, flags);
     }
-
-    @Override
-    Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
-        if (tokenizer.hasRemaining() && matches(tokenizer.get())) {
-            return tokenizer.remove();
-        }
-        throw newException(Message.RULE_MISMATCH, getFirstSet(followSet), tokenizer);
+    TermProduction(String name, String regex) {
+    	this(name, regex, 0);
     }
-
-    @Override
-    Set<TermProduction> getFirstSet(Set<TermProduction> followSet) {
-        return Collections.singleton(this);
-    }
-
-    @Override
-    boolean isOption() {
-        return false;
+    TermProduction(String name, String regex, int flags) {
+    	super(name);
+        Objects.requireNonNull(regex, Message.REQUIRE_NON_NULL.format());
+        this.pattern = Pattern.compile(regex, flags);
     }
 
     @Override
@@ -67,7 +58,17 @@ class TermProduction extends AbstractProduction {
         return pattern.pattern();
     }
 
-    boolean matches(Token t) {
+    public boolean matches(Token t) {
         return pattern.matcher(t.getValue()).matches();
+    }
+
+    @Override
+    public PatternProduction as(String name) {
+        return (PatternProduction) super.as(name);
+    }
+
+    @Override
+    public Pattern getPattern() {
+        return pattern;
     }
 }

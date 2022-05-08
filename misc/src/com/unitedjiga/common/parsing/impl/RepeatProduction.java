@@ -23,58 +23,47 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import static com.unitedjiga.common.parsing.impl.Symbols.newNonTerminal;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
-import com.unitedjiga.common.parsing.SequentialProduction;
-import com.unitedjiga.common.parsing.Symbol;
-import com.unitedjiga.common.parsing.Tokenizer;
+import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.QuantifiedProduction;
 
 /**
  * 
  * @author Junji Mikami
  *
  */
-class RepeatProduction extends AbstractProduction implements SequentialProduction {
-    private final AbstractProduction element;
-
-    RepeatProduction(AbstractProduction p) {
-        element = Objects.requireNonNull(p);
-    }
-
-    @Override
-    Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
-        List<Symbol> list = new ArrayList<>();
-        while (anyMatch(getFirstSet(), tokenizer)) {
-            list.add(element.interpret(tokenizer, getFollowSet(followSet)));
+class RepeatProduction extends AbstractQuantifiedProduction {
+    static class Builder extends AbstractQuantifiedProduction.Builder {
+        Builder(Production.Builder builder) {
+            super(builder);
         }
-        return newNonTerminal(this, list);
+        Builder(String name, Production.Builder builder) {
+            super(name, builder);
+        }
+
+        @Override
+        public QuantifiedProduction build() {
+            checkForBuild();
+            return new RepeatProduction(builder.build());
+        }
     }
 
-    @Override
-    Set<TermProduction> getFirstSet(Set<TermProduction> followSet) {
-        return element.getFirstSet(followSet);
-    }
+    private final Production element;
 
-    private Set<TermProduction> getFollowSet(Set<TermProduction> followSet) {
-        Set<TermProduction> set = new HashSet<>();
-        set.addAll(element.getFirstSet());
-        set.addAll(followSet);
-        return set;
-    }
-
-    @Override
-    boolean isOption() {
-        return true;
+    RepeatProduction(Production p) {
+    	super(0);
+        element = Objects.requireNonNull(p);
     }
 
     @Override
     public String toString() {
         return element.toString();
     }
+
+    @Override
+    public Production get() {
+        return element;
+    }
+
 }

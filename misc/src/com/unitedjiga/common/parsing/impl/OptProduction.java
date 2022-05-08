@@ -23,48 +23,46 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import static com.unitedjiga.common.parsing.impl.Symbols.newSingleton;
-
 import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
 
-import com.unitedjiga.common.parsing.AlternativeProduction;
-import com.unitedjiga.common.parsing.Symbol;
-import com.unitedjiga.common.parsing.Tokenizer;
+import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.QuantifiedProduction;
 
 /**
  *
  * @author Junji Mikami
  */
-class OptProduction extends AbstractProduction implements AlternativeProduction {
-    private final AbstractProduction element;
-
-    OptProduction(AbstractProduction p) {
-        element = Objects.requireNonNull(p);
-    }
-
-    @Override
-    Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
-        if (anyMatch(getFirstSet(), tokenizer)) {
-            Symbol symbol = element.interpret(tokenizer, followSet);
-            return newSingleton(this, Optional.of(symbol));
+class OptProduction extends AbstractQuantifiedProduction {
+    static class Builder extends AbstractQuantifiedProduction.Builder {
+        Builder(Production.Builder builder) {
+            super(builder);
         }
-        return newSingleton(this, Optional.empty());
+        Builder(String name, Production.Builder builder) {
+            super(name, builder);
+        }
+
+        @Override
+        public QuantifiedProduction build() {
+            checkForBuild();
+            return new OptProduction(builder.build());
+        }
     }
 
-    @Override
-    Set<TermProduction> getFirstSet(Set<TermProduction> followSet) {
-        return element.getFirstSet(followSet);
-    }
+    private final Production element;
 
-    @Override
-    boolean isOption() {
-        return true;
+    OptProduction(Production p) {
+        super(0, 1);
+        Objects.requireNonNull(p);
+        element = p;
     }
 
     @Override
     public String toString() {
         return element.toString();
+    }
+
+    @Override
+    public Production get() {
+        return element;
     }
 }

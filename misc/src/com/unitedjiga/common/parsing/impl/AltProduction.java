@@ -23,125 +23,71 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import static com.unitedjiga.common.parsing.impl.Symbols.newSingleton;
-
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import com.unitedjiga.common.parsing.AlternativeProduction;
 import com.unitedjiga.common.parsing.Production;
-import com.unitedjiga.common.parsing.Symbol;
-import com.unitedjiga.common.parsing.Tokenizer;
 
 /**
  * 
  * @author Junji Mikami
  *
  */
-class AltProduction extends AbstractProduction implements AlternativeProduction {
-    private final List<AbstractProduction> elements;
+// package private
+class AltProduction extends AbstractProductionStructure implements AlternativeProduction {
+    static class Builder extends AbstractProduction.Builder implements AlternativeProduction.Builder {
+        private final List<Supplier<Production>> elements = new ArrayList<>();
 
-    private AltProduction(List<AbstractProduction> elements) {
-        this.elements = Objects.requireNonNull(elements);
-    }
+        // PP
+        Builder() {
+            super();
+        }
+        Builder(String name) {
+            super(name);
+        }
 
-    @Override
-    Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
-        for (int i = 0; i < elements.size(); i++) {
-            if (!anyMatch(getFirstSet(i, followSet), tokenizer)) {
-                continue;
-            }
-            Symbol symbol = elements.get(i).interpret(tokenizer, followSet);
-            return newSingleton(this, Optional.of(symbol));
-        }
-        if (elements.isEmpty() && anyMatch(followSet, tokenizer)) {
-            return newSingleton(this, Optional.empty());
-        }
-        throw newException(Message.RULE_MISMATCH, getFirstSet(followSet), tokenizer);
-    }
-
-    @Override
-    Set<TermProduction> getFirstSet(Set<TermProduction> followSet) {
-        if (elements.isEmpty()) {
-            return followSet;
-        }
-        Set<TermProduction> set = new HashSet<>();
-        for (int i = 0; i < elements.size(); i++) {
-            set.addAll(getFirstSet(i, followSet));
-        }
-        return set;
-    }
-
-    private Set<TermProduction> getFirstSet(int i, Set<TermProduction> followSet) {
-        assert 0 <= i && i < elements.size();
-        Set<TermProduction> set = new HashSet<>();
-        set.addAll(elements.get(i).getFirstSet());
-        if (elements.get(i).isOption()) {
-            set.addAll(followSet);
-        }
-        return set;
-    }
-
-    @Override
-    boolean isOption() {
-        if (elements.isEmpty()) {
-            return true;
-        }
-        for (AbstractProduction e : elements) {
-            if (e.isOption()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        return elements.toString();
-    }
-
-    static class Builder implements AlternativeProduction.Builder {
-        private final List<AbstractProduction> elements = new ArrayList<>();
-        private boolean isBuilt;
-        
         @Override
         public AlternativeProduction build() {
-            if (isBuilt) {
-                throw new IllegalStateException(Message.ALREADY_BUILT.format());
-            }
-            isBuilt = true;
-            return new AltProduction(elements);
+            checkForBuild();
+            var el = elements.stream()
+                    .map(Supplier::get)
+                    .toList();
+            return name == null ? new AltProduction(el) : new AltProduction(name, el);
         }
-        
+
         @Override
         public Builder add(Production p) {
-            addIfBuilding((AbstractProduction) p);
-            return this;
-        }
-        
-        @Override
-        public Builder add(String s) {
-            addIfBuilding(new TermProduction(s));
+            check();
+            elements.add(() -> p);
             return this;
         }
 
         @Override
-        public Builder add(Supplier<? extends Production> p) {
-            addIfBuilding(new RefProduction(p));
+        public Builder add(Production.Builder b) {
+            check();
+            elements.add(b::build);
             return this;
         }
 
-        private void addIfBuilding(AbstractProduction e) {
-            if (isBuilt) {
-                throw new IllegalStateException(Message.ALREADY_BUILT.format());
-            }
-            elements.add(e);
+        @Override
+        public Builder addEmpty() {
+            check();
+            elements.add(Productions::empty);
+            return this;
         }
     }
 
+    private AltProduction(List<Production> elements) {
+        super(elements);
+    }
+    private AltProduction(String name, List<Production> elements) {
+        super(name, elements);
+    }
+
+    @Override
+    public AlternativeProduction as(String name) {
+        return (AlternativeProduction) super.as(name);
+    }
 }

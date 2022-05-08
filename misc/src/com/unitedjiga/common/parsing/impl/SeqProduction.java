@@ -23,120 +23,63 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import static com.unitedjiga.common.parsing.impl.Symbols.newNonTerminal;
-
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import com.unitedjiga.common.parsing.Production;
 import com.unitedjiga.common.parsing.SequentialProduction;
-import com.unitedjiga.common.parsing.Symbol;
-import com.unitedjiga.common.parsing.Tokenizer;
 
 /**
  *
  * @author Junji Mikami
  */
-class SeqProduction extends AbstractProduction implements SequentialProduction {
-    private final List<AbstractProduction> elements;
+class SeqProduction extends AbstractProductionStructure implements SequentialProduction {
+    static class Builder extends AbstractProduction.Builder implements SequentialProduction.Builder {
+        private final List<Supplier<Production>> elements = new ArrayList<>();
 
-    private SeqProduction(List<AbstractProduction> elements) {
-        this.elements = Objects.requireNonNull(elements);
-    }
-
-    @Override
-    Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
-        Set<TermProduction> firstSet = getFirstSet(followSet);
-        if (anyMatch(firstSet, tokenizer)) {
-            List<Symbol> list = new ArrayList<>();
-            for (int i = 0; i < elements.size(); i++) {
-                list.add(elements.get(i).interpret(tokenizer, getFollowSet(i, followSet)));
-            }
-            return newNonTerminal(this, list);
+        Builder() {
+            super();
         }
-        throw newException(Message.RULE_MISMATCH, firstSet, tokenizer);
-    }
-
-    @Override
-    Set<TermProduction> getFirstSet(Set<TermProduction> followSet) {
-        if (elements.isEmpty()) {
-            return followSet;
+        Builder(String name) {
+            super(name);
         }
-        return getFirstSet(0, followSet);
-    }
 
-    private Set<TermProduction> getFirstSet(int i, Set<TermProduction> followSet) {
-        assert 0 <= i && i < elements.size();
-        Set<TermProduction> set = new HashSet<>();
-        set.addAll(elements.get(i).getFirstSet());
-        if (elements.get(i).isOption()) {
-            set.addAll(getFollowSet(i, followSet));
-        }
-        return set;
-    }
-
-    private Set<TermProduction> getFollowSet(int i, Set<TermProduction> followSet) {
-        assert 0 <= i && i < elements.size();
-        if (elements.size() - 1 == i) {
-            return followSet;
-        }
-        return getFirstSet(i + 1, followSet);
-    }
-
-    @Override
-    boolean isOption() {
-        if (elements.isEmpty()) {
-            return true;
-        }
-        return elements.stream().allMatch(p -> p.isOption());
-    }
-
-    @Override
-    public String toString() {
-        return elements.toString();
-    }
-
-    static class Builder implements SequentialProduction.Builder {
-        private final List<AbstractProduction> elements = new ArrayList<>();
-        private boolean isBuilt;
-        
         @Override
         public SequentialProduction build() {
-            if (isBuilt) {
-                throw new IllegalStateException(Message.ALREADY_BUILT.format());
-            }
-            isBuilt = true;
-            return new SeqProduction(elements);
+            checkForBuild();
+            var el = elements.stream()
+                    .map(e -> e.get())
+                    .toList();
+            return name == null ?
+                    new SeqProduction(el) : new SeqProduction(name, el);
         }
-        
+
         @Override
         public Builder add(Production p) {
-            addIfBuilding((AbstractProduction) p);
-            return this;
-        }
-        
-        @Override
-        public Builder add(String s) {
-            addIfBuilding(new TermProduction(s));
-            return this;
-        }
-        
-        @Override
-        public Builder add(Supplier<? extends Production> p) {
-            addIfBuilding(new RefProduction(p));
+            check();
+            elements.add(() -> p);
             return this;
         }
 
-        private void addIfBuilding(AbstractProduction e) {
-            if (isBuilt) {
-                throw new IllegalStateException(Message.ALREADY_BUILT.format());
-            }
-            elements.add(e);
+        @Override
+        public Builder add(Production.Builder b) {
+            check();
+            elements.add(b::build);
+            return this;
         }
     }
 
+
+    private SeqProduction(List<Production> elements) {
+        super(elements);
+    }
+    private SeqProduction(String name, List<Production> elements) {
+        super(name, elements);
+    }
+
+    @Override
+    public SequentialProduction as(String name) {
+        return (SequentialProduction) super.as(name);
+    }
 }

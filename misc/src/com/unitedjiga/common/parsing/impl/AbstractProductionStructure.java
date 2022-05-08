@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2021 Junji Mikami.
+ * Copyright 2022 Mikami Junji.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,38 +23,32 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
+import java.util.List;
 import java.util.Objects;
-import java.util.function.Supplier;
 
 import com.unitedjiga.common.parsing.Production;
-import com.unitedjiga.common.parsing.Reference;
 
 /**
- * @author Junji Mikami
+ * @author Mikami Junji
  *
  */
-class RefProduction<T extends Production> extends AbstractProduction implements Reference<T> {
-    private final Supplier<T> p;
+abstract class AbstractProductionStructure extends AbstractProduction {
+    private final List<Production> elements;
 
-    RefProduction(Supplier<T> p) {
-    	super();
-        Objects.requireNonNull(p, Message.REQUIRE_NON_NULL.format());
-        this.p = p;
+    AbstractProductionStructure(List<Production> elements) {
+        super();
+        Objects.requireNonNull(elements);
+        this.elements = elements;
     }
-    RefProduction(String name, Supplier<T> p) {
+
+    AbstractProductionStructure(String name, List<Production> elements) {
         super(name);
-        Objects.requireNonNull(p, Message.REQUIRE_NON_NULL.format());
-        this.p = p;
+        Objects.requireNonNull(elements);
+        this.elements = elements;
     }
 
-    @Override
-    public T get() {
-        return p.get();
+    public List<Production> getProductions() {
+        return elements;
     }
 
-	@SuppressWarnings("unchecked")
-    @Override
-	public Reference<T> as(String name) {
-		return (Reference<T>) super.as(name);
-	}
 }
