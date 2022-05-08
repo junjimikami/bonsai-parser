@@ -23,11 +23,15 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import java.util.function.Supplier;
-
 import com.unitedjiga.common.parsing.AlternativeProduction;
+import com.unitedjiga.common.parsing.PatternProduction;
 import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.ProductionFactory;
+import com.unitedjiga.common.parsing.ProductionVisitor;
+import com.unitedjiga.common.parsing.QuantifiedProduction;
 import com.unitedjiga.common.parsing.SequentialProduction;
+import com.unitedjiga.common.parsing.TerminalProduction;
+import com.unitedjiga.common.parsing.Token;
 
 /**
  * 
@@ -36,52 +40,107 @@ import com.unitedjiga.common.parsing.SequentialProduction;
  */
 public final class Productions {
 
+    private static final TerminalProduction EMPTY =  new TerminalProduction() {
+
+        @Override
+        public <R, P> R accept(ProductionVisitor<R, P> visitor, P p) {
+            return visitor.visitEmpty(this, p);
+        }
+
+        @Override
+        public String getName() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Kind getKind() {
+            return Kind.EMPTY;
+        }
+
+        @Override
+        public Production as(String name) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public QuantifiedProduction opt() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public QuantifiedProduction repeat() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean matches(Token t) {
+            return false;
+        }
+        
+    };
+
     private Productions() {
+    }
+
+    public static ProductionFactory newFactory() {
+    	return new DefaultProductionFactory();
+    }
+
+    public static PatternProduction ofPattern(String regex) {
+    	return new TermProduction(regex);
+    }
+    public static PatternProduction ofPattern(String regex, int flags) {
+    	return new TermProduction(regex, flags);
     }
 
     public static SequentialProduction.Builder sequentialBuilder() {
         return new SeqProduction.Builder();
     }
+    public static SequentialProduction.Builder sequentialBuilder(String name) {
+        return new SeqProduction.Builder(name);
+    }
     
     public static AlternativeProduction.Builder alternativeBuilder() {
         return new AltProduction.Builder();
     }
+    public static AlternativeProduction.Builder alternativeBuilder(String name) {
+        return new AltProduction.Builder(name);
+    }
 
-    @SuppressWarnings("unchecked")
+    public static TerminalProduction empty() {
+        return EMPTY;
+    }
+
     public static SequentialProduction of(Object... args) {
         SequentialProduction.Builder builder = sequentialBuilder();
         for (Object o : args) {
             if (o instanceof Production) {
                 builder.add((Production) o);
-            } else if (o instanceof String) {
-                builder.add((String) o);
-            } else if (o instanceof Supplier) {
-                builder.add((Supplier<? extends Production>) o);
-            } else {
-                builder.add(o.toString());
+//            } else if (o instanceof String) {
+//                builder.add((String) o);
+//            } else if (o instanceof Supplier) {
+//                builder.add((Supplier<? extends Production>) o);
+//            } else {
+//                builder.add(o.toString());
             }
         }
         return builder.build();
     }
 
-    @SuppressWarnings("unchecked")
     public static AlternativeProduction oneOf(Object... args) {
         AlternativeProduction.Builder builder = alternativeBuilder();
         for (Object o : args) {
             if (o instanceof Production) {
                 builder.add((Production) o);
-            } else if (o instanceof String) {
-                builder.add((String) o);
-            } else if (o instanceof Supplier) {
-                builder.add((Supplier<? extends Production>) o);
-            } else {
-                builder.add(o.toString());
+//            } else if (o instanceof String) {
+//                builder.add((String) o);
+//            } else if (o instanceof Supplier) {
+//                builder.add((Supplier<? extends Production>) o);
+//            } else {
+//                builder.add(o.toString());
             }
         }
         return builder.build();
     }
 
-    public static Production empty() {
-        return sequentialBuilder().build();
-    }
 }

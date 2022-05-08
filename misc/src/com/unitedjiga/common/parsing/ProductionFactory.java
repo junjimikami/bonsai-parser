@@ -23,8 +23,7 @@
  */
 package com.unitedjiga.common.parsing;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import com.unitedjiga.common.parsing.impl.Productions;
@@ -53,20 +52,8 @@ public interface ProductionFactory {
     public <T extends Production> Reference<T> createReference(Supplier<T> supplier);
     public <T extends Production> Reference<T> createReference(String name, Supplier<T> supplier);
 
-    public default Reference<Production> createReference(String src) {
-        Objects.requireNonNull(src);
-        var p = getProductions().stream()
-                .filter(e -> src.contentEquals(e.getName()))
-                .findFirst();
-        return createReference(p::get);
-    }
-    public default Reference<Production> createReference(String name, String src) {
-        Objects.requireNonNull(src);
-        var p = getProductions().stream()
-                .filter(e -> src.contentEquals(e.getName()))
-                .findFirst();
-        return createReference(name, p::get);
-    }
+    public Reference<Production> createReference(String src);
+    public Reference<Production> createReference(String name, String src);
 
-    public List<Production> getProductions();
+    public Map<String, Production> getProductions();
 }
