@@ -25,11 +25,13 @@ package com.unitedjiga.common.parsing.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import com.unitedjiga.common.parsing.AlternativeProduction;
 import com.unitedjiga.common.parsing.PatternProduction;
 import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Production.Builder;
 import com.unitedjiga.common.parsing.ProductionFactory;
 import com.unitedjiga.common.parsing.ProductionVisitor;
 import com.unitedjiga.common.parsing.QuantifiedProduction;
@@ -42,8 +44,8 @@ import com.unitedjiga.common.parsing.TerminalProduction;
  *
  */
 class DefaultProductionFactory implements ProductionFactory {
-    private Map<String, Production> productions = new HashMap<>();
-    private ProductionVisitor<Void, Void> scanner = new ProductionVisitor<>() {
+    private final Map<String, Production> productions = new HashMap<>();
+    private final ProductionVisitor<Void, Void> scanner = new ProductionVisitor<>() {
 
         @Override
         public Void visitAlternative(AlternativeProduction prd, Void p) {
@@ -93,6 +95,27 @@ class DefaultProductionFactory implements ProductionFactory {
             return null;
         }
     };
+    private final ProductionFactory.Register register = new ProductionFactory.Register() {
+
+        @Override
+        public Register add(String name, Production p) {
+            Objects.requireNonNull(name);
+            Objects.requireNonNull(p);
+            scanner.visit(p.as(name));
+            return this;
+        }
+
+        @Override
+        public Register add(String name, Builder b) {
+            return add(name, b.build());
+        }
+
+        @Override
+        public Production get(String name) {
+            return productions.get(name);
+        }
+        
+    };
 
     @Override
     public PatternProduction createPattern(String regex) {
@@ -105,69 +128,13 @@ class DefaultProductionFactory implements ProductionFactory {
     }
 
     @Override
-    public PatternProduction createPattern(String name, String regex) {
-        var p = new TermProduction(name, regex);
-        productions.put(name, p);
-        return p;
-    }
-
-    @Override
-    public PatternProduction createPattern(String name, String regex, int flags) {
-        var p = new TermProduction(name, regex, flags);
-        productions.put(name, p);
-        return p;
-    }
-
-    @Override
     public AlternativeProduction.Builder createAlternativeBuilder() {
-        var p = new AltProduction.Builder() {
-            @Override
-            public AlternativeProduction build() {
-                var p = super.build();
-                scanner.visit(p);
-                return p;
-            }
-        };
-        return p;
-    }
-
-    @Override
-    public AlternativeProduction.Builder createAlternativeBuilder(String name) {
-        var p = new AltProduction.Builder(name) {
-            @Override
-            public AlternativeProduction build() {
-                var p = super.build();
-                scanner.visit(p);
-                return p;
-            }
-        };
-        return p;
+        return new AltProduction.Builder();
     }
 
     @Override
     public SequentialProduction.Builder createSequentialBuilder() {
-        var p = new SeqProduction.Builder() {
-            @Override
-            public SequentialProduction build() {
-                var p = super.build();
-                scanner.visit(p);
-                return p;
-            }
-        };
-        return p;
-    }
-
-    @Override
-    public SequentialProduction.Builder createSequentialBuilder(String name) {
-        var p = new SeqProduction.Builder(name) {
-            @Override
-            public SequentialProduction build() {
-                var p = super.build();
-                scanner.visit(p);
-                return p;
-            }
-        };
-        return p;
+        return new SeqProduction.Builder();
     }
 
     @Override
@@ -176,27 +143,13 @@ class DefaultProductionFactory implements ProductionFactory {
     }
 
     @Override
-    public <T extends Production> Reference<T> createReference(String name, Supplier<T> supplier) {
-        var p = new RefProduction<>(name, supplier);
-        productions.put(name, p);
-        return p;
-    }
-
-    @Override
     public Reference<Production> createReference(String src) {
         return new RefProduction<>(() -> productions.get(src));
     }
 
     @Override
-    public Reference<Production> createReference(String name, String src) {
-        var p = new RefProduction<>(name, () -> productions.get(src));
-        productions.put(name, p);
-        return p;
-    }
-
-    @Override
-    public Map<String, Production> getProductions() {
-        return productions;
+    public ProductionFactory.Register register() {
+        return register;
     }
 
 }

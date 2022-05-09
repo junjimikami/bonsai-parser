@@ -23,7 +23,6 @@
  */
 package com.unitedjiga.common.parsing;
 
-import java.util.Map;
 import java.util.function.Supplier;
 
 import com.unitedjiga.common.parsing.impl.Productions;
@@ -33,6 +32,11 @@ import com.unitedjiga.common.parsing.impl.Productions;
  *
  */
 public interface ProductionFactory {
+    public static interface Register {
+        public Register add(String name, Production p);
+        public Register add(String name, Production.Builder b);
+        public Production get(String name);
+    }
 
     public static ProductionFactory newFactory() {
         return Productions.newFactory();
@@ -40,20 +44,14 @@ public interface ProductionFactory {
 
     public PatternProduction createPattern(String regex);
     public PatternProduction createPattern(String regex, int flags);
-    public PatternProduction createPattern(String name, String regex);
-    public PatternProduction createPattern(String name, String regex, int flags);
 
     public AlternativeProduction.Builder createAlternativeBuilder();
-    public AlternativeProduction.Builder createAlternativeBuilder(String name);
 
     public SequentialProduction.Builder createSequentialBuilder();
-    public SequentialProduction.Builder createSequentialBuilder(String name);
 
     public <T extends Production> Reference<T> createReference(Supplier<T> supplier);
-    public <T extends Production> Reference<T> createReference(String name, Supplier<T> supplier);
 
     public Reference<Production> createReference(String src);
-    public Reference<Production> createReference(String name, String src);
 
-    public Map<String, Production> getProductions();
+    public Register register();
 }

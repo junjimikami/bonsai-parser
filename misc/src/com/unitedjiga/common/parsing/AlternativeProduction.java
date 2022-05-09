@@ -34,6 +34,8 @@ public interface AlternativeProduction extends Production {
     public static interface Builder extends Production.Builder {
         public Builder add(Production p);
         public Builder add(Production.Builder b);
+        public Builder add(String name, Production p);
+        public Builder add(String name, Production.Builder b);
         public Builder addEmpty();
         public AlternativeProduction build();
     }

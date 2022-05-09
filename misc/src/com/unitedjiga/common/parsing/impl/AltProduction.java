@@ -77,6 +77,18 @@ class AltProduction extends AbstractProductionStructure implements AlternativePr
             elements.add(Productions::empty);
             return this;
         }
+        @Override
+        public Builder add(String name, Production p) {
+            check();
+            elements.add(() -> p.as(name));
+            return this;
+        }
+        @Override
+        public Builder add(String name, Production.Builder b) {
+            check();
+            elements.add(() -> b.build().as(name));
+            return this;
+        }
     }
 
     private AltProduction(List<Production> elements) {

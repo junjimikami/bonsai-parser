@@ -32,9 +32,11 @@ import java.util.List;
 public interface SequentialProduction extends Production {
 
     public static interface Builder extends Production.Builder {
-        Builder add(Production p);
-        Builder add(Production.Builder b);
-        SequentialProduction build();
+        public Builder add(Production p);
+        public Builder add(Production.Builder b);
+        public Builder add(String name, Production p);
+        public Builder add(String name, Production.Builder b);
+        public SequentialProduction build();
     }
 
     @Override

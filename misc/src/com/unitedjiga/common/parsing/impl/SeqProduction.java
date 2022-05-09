@@ -68,6 +68,18 @@ class SeqProduction extends AbstractProductionStructure implements SequentialPro
             elements.add(b::build);
             return this;
         }
+        @Override
+        public Builder add(String name, Production p) {
+            check();
+            elements.add(() -> p.as(name));
+            return this;
+        }
+        @Override
+        public Builder add(String name, Production.Builder b) {
+            check();
+            elements.add(() -> b.build().as(name));
+            return this;
+        }
     }
 
 
