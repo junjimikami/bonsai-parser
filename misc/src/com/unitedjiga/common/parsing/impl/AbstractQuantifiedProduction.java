@@ -24,6 +24,7 @@
 package com.unitedjiga.common.parsing.impl;
 
 import java.util.OptionalInt;
+import java.util.stream.Stream;
 
 import com.unitedjiga.common.parsing.Production;
 import com.unitedjiga.common.parsing.QuantifiedProduction;
@@ -81,5 +82,11 @@ abstract class AbstractQuantifiedProduction extends AbstractProduction implement
     @Override
     public OptionalInt getUpperLimit() {
         return upperLimit;
+    }
+    @Override
+    public Stream<Production> stream() {
+        var s = Stream.generate(this::get);
+        upperLimit.ifPresent(l -> s.limit(l));
+        return s;
     }
 }

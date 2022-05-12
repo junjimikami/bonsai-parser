@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2021 Junji Mikami.
+ * Copyright 2022 Mikami Junji.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,30 +23,48 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import java.util.ServiceLoader;
-import java.util.ServiceLoader.Provider;
+import java.util.Objects;
 
+import com.unitedjiga.common.parsing.Parser;
 import com.unitedjiga.common.parsing.ParserFactory;
+import com.unitedjiga.common.parsing.ParsingException;
 import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.StreamParser;
+import com.unitedjiga.common.parsing.Symbol;
+import com.unitedjiga.common.parsing.Tokenizer;
 
 /**
- * @author Junji Mikami
+ * @author Mikami Junji
  *
  */
-public final class ParserImpls {
+class DefaultParserFactory implements ParserFactory {
+    private final Production production;
 
-    private ParserImpls() {
+    DefaultParserFactory(Production p) {
+        Objects.requireNonNull(p);
+        this.production = p;
     }
 
-    public static ParserFactory newFactory(Production p) {
-        return new DefaultParserFactory(p);
+    @Override
+    public Parser createParser(Tokenizer tokenizer) {
+        Objects.requireNonNull(tokenizer);
+        return new Parser() {
+            private Interpreter interpreter = new Interpreter();
+            @Override
+            public Symbol parse() {
+                var s = interpreter.interpret(production, tokenizer);
+                if (tokenizer.hasNext()) {
+                    throw new ParsingException();
+                }
+                return s;
+            }
+        };
     }
 
-    public static ParserFactory loadFactory(String factoryName, ClassLoader cl) {
-        return ServiceLoader.load(ParserFactory.class, cl).stream()
-                .filter(p -> p.type().getCanonicalName().equals(factoryName))
-                .map(Provider::get)
-                .findFirst()
-                .get();
+    @Override
+    public StreamParser createStreamParser(Tokenizer tokenizer) {
+        // TODO Auto-generated method stub
+        return null;
     }
+
 }

@@ -52,9 +52,5 @@ public interface QuantifiedProduction extends Production {
     public Production get();
     public int getLowerLimit();
     public OptionalInt getUpperLimit();
-    public default Stream<Production> stream() {
-        var s = Stream.generate(this::get);
-        getUpperLimit().ifPresent(l -> s.limit(l));
-        return s;
-    }
+    public Stream<Production> stream();
 }

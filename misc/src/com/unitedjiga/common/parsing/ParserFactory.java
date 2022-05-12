@@ -32,7 +32,7 @@ import com.unitedjiga.common.parsing.impl.ParserImpls;
 public interface ParserFactory {
 
 	public static ParserFactory newFactory(Production p) {
-		return null;
+		return ParserImpls.newFactory(p);
 	}
 
 	public static ParserFactory loadFactory(String factoryName, ClassLoader cl) {
