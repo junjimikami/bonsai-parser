@@ -66,7 +66,7 @@ class Interpreter implements ProductionVisitor<Symbol, Object[]> {
         for (var p : alt.getProductions()) {
             if (firstSet.anyMatch(p, tokenizer, followSet)) {
                 var s = interpret(p, tokenizer, followSet);
-                return new AbstractNonTerminalSymbol(alt.getName(), s);
+                return new DefaultNonTerminalSymbol(alt.getName(), s);
             }
         }
         throw new ParsingException();
@@ -85,7 +85,7 @@ class Interpreter implements ProductionVisitor<Symbol, Object[]> {
                 var f = firstSet.visitSequential(pList, followSet);
                 list.add(interpret(p, tokenizer, f));
             }
-            return new AbstractNonTerminalSymbol(seq.getName(), list);
+            return new DefaultNonTerminalSymbol(seq.getName(), list);
         }
         throw new ParsingException();
     }
@@ -108,7 +108,7 @@ class Interpreter implements ProductionVisitor<Symbol, Object[]> {
         var tokenizer = (Tokenizer) args[0];
         var followSet = (Set<TerminalProduction>) args[1];
         var s = interpret(ref.get(), tokenizer, followSet);
-        return new AbstractNonTerminalSymbol(ref.getName(), s);
+        return new DefaultNonTerminalSymbol(ref.getName(), s);
     }
 
     @SuppressWarnings("unchecked")
@@ -126,7 +126,7 @@ class Interpreter implements ProductionVisitor<Symbol, Object[]> {
             list.add(interpret(p, tokenizer, followSet));
         }
         if (qt.getLowerLimit() <= list.size()) {
-            return new AbstractNonTerminalSymbol(qt.getName(), list);
+            return new DefaultNonTerminalSymbol(qt.getName(), list);
         }
         throw new ParsingException();
     }

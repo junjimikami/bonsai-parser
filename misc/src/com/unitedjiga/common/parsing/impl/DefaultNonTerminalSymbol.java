@@ -35,19 +35,19 @@ import com.unitedjiga.common.parsing.Symbol;
  * @author Junji Mikami
  *
  */
-class AbstractNonTerminalSymbol extends AbstractSymbol implements NonTerminalSymbol {
+class DefaultNonTerminalSymbol extends AbstractSymbol implements NonTerminalSymbol {
     private final List<Symbol> list;
 
-    AbstractNonTerminalSymbol(String name, List<Symbol> list) {
+    DefaultNonTerminalSymbol(String name, List<Symbol> list) {
         super(name);
         Objects.requireNonNull(list);
         this.list = list;
     }
-    AbstractNonTerminalSymbol(String name, Symbol s) {
+    DefaultNonTerminalSymbol(String name, Symbol s) {
         super(name);
         this.list = List.of(s);
     }
-    AbstractNonTerminalSymbol(String name) {
+    DefaultNonTerminalSymbol(String name) {
         super(name);
         this.list = List.of();
     }
