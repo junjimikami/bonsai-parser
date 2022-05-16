@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2020 Junji Mikami.
+ * Copyright 2022 Mikami Junji.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,25 +21,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.parsing;
+package com.unitedjiga.common.parsing.impl;
+
+import java.util.Objects;
+
+import com.unitedjiga.common.parsing.TerminalSymbol;
 
 /**
- * 
- * @author Junji Mikami
+ * @author Mikami Junji
  *
  */
-public interface SingletonSymbol extends NonTerminalSymbol {
+class DefaultTerminalSymbol extends AbstractSymbol implements TerminalSymbol {
+    private final String value;
 
-    @Override
-    default Kind getKind() {
-        return Kind.SINGLETON;
+    DefaultTerminalSymbol(String name) {
+        super(name);
+        this.value = null;
+    }
+    DefaultTerminalSymbol(String name, String value) {
+        super(name);
+        Objects.requireNonNull(value);
+        this.value = value;
     }
 
     @Override
-    default <R, P> R accept(SymbolVisitor<R, P> v, P p) {
-        return v.visitSingleton(this, p);
+    public String getValue() {
+        return value;
     }
-
-    Symbol get();
-
 }

@@ -23,79 +23,80 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import com.unitedjiga.common.parsing.NonTerminalSymbol;
-import com.unitedjiga.common.parsing.Production;
-import com.unitedjiga.common.parsing.SingletonSymbol;
-import com.unitedjiga.common.parsing.Symbol;
-
 /**
  * @author Junji Mikami
  *
  */
 final class Symbols {
-    static NonTerminalSymbol newNonTerminal(Production origin, List<Symbol> list) {
-        Objects.requireNonNull(origin);
-        Objects.requireNonNull(list);
-        return new AbstractNonTerminalSymbol() {
+//    static NonTerminalSymbol newNonTerminal(Production origin, List<Symbol> list) {
+//        Objects.requireNonNull(origin);
+//        Objects.requireNonNull(list);
+//        return new AbstractNonTerminalSymbol() {
+//
+////            @Override
+////            public Production getOrigin() {
+////                return origin;
+////            }
+//
+//            @Override
+//            public String toString() {
+//                return list.stream().map(Symbol::toString).collect(Collectors.joining());
+//            }
+//
+//            @Override
+//            public ListIterator<Symbol> listIterator(int index) {
+//                return list.listIterator(index);
+//            }
+//
+//            @Override
+//            public int size() {
+//                return list.size();
+//            }
+//
+//			@Override
+//			public String getName() {
+//				// TODO Auto-generated method stub
+//				return null;
+//			}
+//        };
+//    }
 
-            @Override
-            public Production getOrigin() {
-                return origin;
-            }
-
-            @Override
-            public String toString() {
-                return list.stream().map(Symbol::toString).collect(Collectors.joining());
-            }
-
-            @Override
-            public ListIterator<Symbol> listIterator(int index) {
-                return list.listIterator(index);
-            }
-
-            @Override
-            public int size() {
-                return list.size();
-            }
-        };
-    }
-
-    static SingletonSymbol newSingleton(Production origin, Optional<Symbol> symbol) {
-        Objects.requireNonNull(origin);
-        Objects.requireNonNull(symbol);
-        return new AbstractSingletonSymbol() {
-
-            @Override
-            public Production getOrigin() {
-                return origin;
-            }
-
-            @Override
-            public Symbol get() {
-                return symbol.get();
-            }
-
-            @Override
-            public String toString() {
-                return symbol.stream().map(Symbol::toString).collect(Collectors.joining());
-            }
-
-            @Override
-            public ListIterator<Symbol> listIterator(int index) {
-                return symbol.stream().collect(Collectors.toUnmodifiableList()).listIterator(index);
-            }
-
-            @Override
-            public int size() {
-                return (int) symbol.stream().count();
-            }
-        };
-    }
+//    static SingletonSymbol newSingleton(Production origin, Optional<Symbol> symbol) {
+//        Objects.requireNonNull(origin);
+//        Objects.requireNonNull(symbol);
+//        return new AbstractSingletonSymbol() {
+//
+////            @Override
+////            public Production getOrigin() {
+////                return origin;
+////            }
+//
+//            @Override
+//            public Symbol get() {
+//                return symbol.get();
+//            }
+//
+//            @Override
+//            public String toString() {
+//                return symbol.stream().map(Symbol::toString).collect(Collectors.joining());
+//            }
+//
+//            @Override
+//            public ListIterator<Symbol> listIterator(int index) {
+//                return symbol.stream().collect(Collectors.toUnmodifiableList()).listIterator(index);
+//            }
+//
+//            @Override
+//            public int size() {
+//                return (int) symbol.stream().count();
+//            }
+//
+//			@Override
+//			public String getName() {
+//				// TODO Auto-generated method stub
+//				return null;
+//			}
+//        };
+//    }
 
 }

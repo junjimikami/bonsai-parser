@@ -26,4 +26,6 @@ package com.unitedjiga.common.parsing;
 public interface Parser {
 
     public Symbol parse();
+    public NonTerminalSymbol parseNonTerminal();
+    public TerminalSymbol parseTerminal();
 }

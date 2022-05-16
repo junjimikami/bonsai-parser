@@ -29,7 +29,7 @@ import java.util.List;
  *
  * @author Junji Mikami
  */
-public interface NonTerminalSymbol extends Symbol, List<Symbol> {
+public interface NonTerminalSymbol extends Symbol {
 
     @Override
     public default Kind getKind() {
@@ -41,5 +41,5 @@ public interface NonTerminalSymbol extends Symbol, List<Symbol> {
         return v.visitNonTerminal(this, p);
     }
 
-    public String getName();
+    public List<Symbol> getSymbols();
 }

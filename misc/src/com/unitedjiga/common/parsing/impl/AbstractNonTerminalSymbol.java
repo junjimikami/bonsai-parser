@@ -23,7 +23,9 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import java.util.AbstractSequentialList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 import com.unitedjiga.common.parsing.NonTerminalSymbol;
 import com.unitedjiga.common.parsing.Symbol;
@@ -33,6 +35,25 @@ import com.unitedjiga.common.parsing.Symbol;
  * @author Junji Mikami
  *
  */
-abstract class AbstractNonTerminalSymbol extends AbstractSequentialList<Symbol> implements NonTerminalSymbol {
+class AbstractNonTerminalSymbol extends AbstractSymbol implements NonTerminalSymbol {
+    private final List<Symbol> list;
 
+    AbstractNonTerminalSymbol(String name, List<Symbol> list) {
+        super(name);
+        Objects.requireNonNull(list);
+        this.list = list;
+    }
+    AbstractNonTerminalSymbol(String name, Symbol s) {
+        super(name);
+        this.list = List.of(s);
+    }
+    AbstractNonTerminalSymbol(String name) {
+        super(name);
+        this.list = List.of();
+    }
+
+    @Override
+    public List<Symbol> getSymbols() {
+        return Collections.unmodifiableList(list);
+    }
 }

@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2020 Junji Mikami.
+ * Copyright 2022 Mikami Junji.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,13 +23,22 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import com.unitedjiga.common.parsing.SingletonSymbol;
+import com.unitedjiga.common.parsing.Symbol;
 
 /**
- * 
- * @author Junji Mikami
+ * @author Mikami Junji
  *
  */
-abstract class AbstractSingletonSymbol extends AbstractNonTerminalSymbol implements SingletonSymbol {
+abstract class AbstractSymbol implements Symbol {
+    private final String name;
+
+    AbstractSymbol(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
 
 }

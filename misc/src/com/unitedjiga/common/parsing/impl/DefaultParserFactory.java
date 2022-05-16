@@ -25,12 +25,14 @@ package com.unitedjiga.common.parsing.impl;
 
 import java.util.Objects;
 
+import com.unitedjiga.common.parsing.NonTerminalSymbol;
 import com.unitedjiga.common.parsing.Parser;
 import com.unitedjiga.common.parsing.ParserFactory;
 import com.unitedjiga.common.parsing.ParsingException;
 import com.unitedjiga.common.parsing.Production;
 import com.unitedjiga.common.parsing.StreamParser;
 import com.unitedjiga.common.parsing.Symbol;
+import com.unitedjiga.common.parsing.TerminalSymbol;
 import com.unitedjiga.common.parsing.Tokenizer;
 
 /**
@@ -57,6 +59,14 @@ class DefaultParserFactory implements ParserFactory {
                     throw new ParsingException();
                 }
                 return s;
+            }
+            @Override
+            public NonTerminalSymbol parseNonTerminal() {
+                return (NonTerminalSymbol) parse();
+            }
+            @Override
+            public TerminalSymbol parseTerminal() {
+                return (TerminalSymbol) parse();
             }
         };
     }

@@ -23,6 +23,9 @@
  */
 package com.unitedjiga.common.parsing;
 
+import java.text.MessageFormat;
+import java.util.stream.Collectors;
+
 /**
  *
  * @author Junji Mikami
@@ -36,19 +39,14 @@ public interface Symbol {
      */
     public static enum Kind {
         TERMINAL,
-        NON_TERMINAL,
-        SINGLETON;
+        NON_TERMINAL;
 
         public boolean isTerminal() {
             return this == TERMINAL;
         }
 
         public boolean isNonTerminal() {
-            return this == NON_TERMINAL || this == SINGLETON;
-        }
-
-        public boolean isSingleton() {
-            return this == SINGLETON;
+            return this == NON_TERMINAL;
         }
     }
 
@@ -59,14 +57,6 @@ public interface Symbol {
     public Kind getKind();
     public String getName();
 
-//    /**
-//     * 
-//     * @return
-//     */
-//    public default Token asToken() {
-//        return Token.of(toString());
-//    }
-
     /**
      * 
      * @param <R>
@@ -76,7 +66,4 @@ public interface Symbol {
      * @return
      */
     public <R, P> R accept(SymbolVisitor<R, P> v, P p);
-
-    @Override
-    String toString();
 }
