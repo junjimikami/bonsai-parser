@@ -45,6 +45,7 @@ public interface Production {
 
 	public static interface Builder {
         public Production build();
+        public Production.Builder setName(String name);
         public QuantifiedProduction.Builder opt();
         public QuantifiedProduction.Builder repeat();
     }

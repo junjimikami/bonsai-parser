@@ -32,16 +32,12 @@ import com.unitedjiga.common.parsing.impl.Productions;
  *
  */
 public interface ProductionFactory {
-    public static interface Register {
-        public Register add(String name, Production p);
-        public Register add(String name, Production.Builder b);
-        public Production get(String name);
-    }
 
     public static ProductionFactory newFactory() {
         return Productions.newFactory();
     }
 
+    public PatternProduction.Builder createPatternBuilder();
     public PatternProduction createPattern(String regex);
     public PatternProduction createPattern(String regex, int flags);
 
@@ -49,9 +45,6 @@ public interface ProductionFactory {
 
     public SequentialProduction.Builder createSequentialBuilder();
 
-    public <T extends Production> Reference<T> createReference(Supplier<T> supplier);
-
-    public Reference<Production> createReference(String src);
-
-    public Register register();
+    public Reference.Builder createReferenceBuilder();
+    public Reference createReference(Supplier<? extends Production> supplier);
 }

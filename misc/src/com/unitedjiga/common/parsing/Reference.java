@@ -23,11 +23,19 @@
  */
 package com.unitedjiga.common.parsing;
 
+import java.util.function.Supplier;
+
 /**
  * @author Junji Mikami
  *
  */
-public interface Reference<T extends Production> extends Production {
+public interface Reference extends Production {
+
+    public static interface Builder extends Production.Builder {
+        public Builder setName(String name);
+        public Builder setSource(Supplier<? extends Production> supplier);
+        public Reference build();
+    }
 
     @Override
     public default Kind getKind() {
@@ -40,7 +48,7 @@ public interface Reference<T extends Production> extends Production {
     }
     
     @Override
-    public Reference<T> as(String name);
+    public Reference as(String name);
 
-    public T get();
+    public Production get();
 }

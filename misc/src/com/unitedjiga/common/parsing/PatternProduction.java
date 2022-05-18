@@ -31,6 +31,13 @@ import java.util.regex.Pattern;
  */
 public interface PatternProduction extends TerminalProduction {
 
+    public static interface Builder extends Production.Builder {
+        public Builder setName(String name);
+        public Builder setPattern(String p);
+        public Builder setFlags(int flags);
+        public PatternProduction build();
+    }
+
     @Override
     public default Kind getKind() {
     	return Kind.PATTERN;

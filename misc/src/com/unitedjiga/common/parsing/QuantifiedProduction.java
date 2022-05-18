@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 public interface QuantifiedProduction extends Production {
 
     public static interface Builder extends Production.Builder {
+        public Builder setName(String name);
         public QuantifiedProduction build();
     }
 

@@ -38,7 +38,7 @@ public interface ProductionVisitor<R, P> {
 	public R visitAlternative(AlternativeProduction prd, P p);
 	public R visitSequential(SequentialProduction prd, P p);
 	public R visitPattern(PatternProduction prd, P p);
-	public R visitReference(Reference<?> prd, P p);
+	public R visitReference(Reference prd, P p);
     public R visitQuantified(QuantifiedProduction prd, P p);
     public R visitEmpty(TerminalProduction prd, P p);
 }
