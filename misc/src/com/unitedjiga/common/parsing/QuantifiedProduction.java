@@ -34,6 +34,7 @@ import java.util.stream.Stream;
 public interface QuantifiedProduction extends EntityProduction {
 
     public static interface Builder extends EntityProduction.Builder {
+        public Builder setName(String name);
         public Builder set(Production p);
         public Builder set(Production.Builder b);
         public default Builder exactly(long times) {

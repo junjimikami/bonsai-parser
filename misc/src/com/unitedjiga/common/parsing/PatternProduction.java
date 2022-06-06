@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 public interface PatternProduction extends EntityProduction {
 
     public static interface Builder extends EntityProduction.Builder {
+        public Builder setName(String name);
         public Builder setPattern(String p);
         public Builder setFlags(int flags);
         public PatternProduction build();

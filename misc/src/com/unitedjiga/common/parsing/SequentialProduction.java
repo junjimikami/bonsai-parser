@@ -32,6 +32,7 @@ import java.util.List;
 public interface SequentialProduction extends EntityProduction {
 
     public static interface Builder extends EntityProduction.Builder {
+        public Builder setName(String name);
         public Builder add(Production p);
         public Builder add(Production.Builder b);
         public Builder addEmpty();
