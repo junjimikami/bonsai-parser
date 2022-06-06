@@ -40,5 +40,5 @@ public interface ProductionVisitor<R, P> {
 	public R visitPattern(PatternProduction prd, P p);
 	public R visitReference(Reference prd, P p);
     public R visitQuantified(QuantifiedProduction prd, P p);
-    public R visitEmpty(TerminalProduction prd, P p);
+    public R visitEmpty(Production prd, P p);
 }

@@ -45,12 +45,9 @@ public interface Production {
 
 	public static interface Builder {
         public Production build();
-        public Production.Builder setName(String name);
-        public QuantifiedProduction.Builder opt();
-        public QuantifiedProduction.Builder repeat();
     }
 
-    public static final TerminalProduction EMPTY = Productions.empty();
+    public static final Production EMPTY = Productions.empty();
 
 	public static PatternProduction ofPattern(String regex) {
 		return Productions.ofPattern(regex);
@@ -74,14 +71,15 @@ public interface Production {
 //    Parser parser(Tokenizer tokenizer);
 
     public <R, P> R accept(ProductionVisitor<R, P> visitor, P p);
-    public String getName();
     public Kind getKind();
     
-    public Production as(String name);
+    public default QuantifiedProduction opt() {
+        throw new UnsupportedOperationException();
+    }
 
-    public QuantifiedProduction opt();
-
-    public QuantifiedProduction repeat();
+    public default QuantifiedProduction repeat() {
+        throw new UnsupportedOperationException();
+    }
 
     @Override
     String toString();

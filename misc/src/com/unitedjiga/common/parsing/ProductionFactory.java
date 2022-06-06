@@ -38,13 +38,40 @@ public interface ProductionFactory {
     }
 
     public PatternProduction.Builder createPatternBuilder();
-    public PatternProduction createPattern(String regex);
-    public PatternProduction createPattern(String regex, int flags);
+    public default PatternProduction createPattern(String regex) {
+        return createPatternBuilder()
+                .setPattern(regex)
+                .build();
+    }
+    public default PatternProduction createPattern(String regex, int flags) {
+        return createPatternBuilder()
+                .setPattern(regex)
+                .setFlags(flags)
+                .build();
+    }
 
     public AlternativeProduction.Builder createAlternativeBuilder();
 
     public SequentialProduction.Builder createSequentialBuilder();
 
     public Reference.Builder createReferenceBuilder();
-    public Reference createReference(Supplier<? extends Production> supplier);
+    public default Reference createReference(Supplier<? extends Production> supplier) {
+        return createReferenceBuilder()
+                .set(supplier)
+                .build();
+    }
+
+    public QuantifiedProduction.Builder createQuantifiedBuilder();
+    public default QuantifiedProduction createOptional(Production p) {
+        return createQuantifiedBuilder()
+                .set(p)
+                .range(0, 1)
+                .build();
+    }
+    public default QuantifiedProduction createZeroOrMore(Production p) {
+        return createQuantifiedBuilder()
+                .set(p)
+                .atLeast(0)
+                .build();
+    }
 }

@@ -29,12 +29,12 @@ import java.util.List;
  * @author Junji Mikami
  *
  */
-public interface SequentialProduction extends Production {
+public interface SequentialProduction extends EntityProduction {
 
-    public static interface Builder extends Production.Builder {
-        public Builder setName(String name);
+    public static interface Builder extends EntityProduction.Builder {
         public Builder add(Production p);
         public Builder add(Production.Builder b);
+        public Builder addEmpty();
         public SequentialProduction build();
     }
 
@@ -47,9 +47,6 @@ public interface SequentialProduction extends Production {
     public default <R, P> R accept(ProductionVisitor<R, P> visitor, P p) {
         return visitor.visitSequential(this, p);
     }
-
-    @Override
-    public SequentialProduction as(String name);
 
     public List<Production> getProductions();
 }

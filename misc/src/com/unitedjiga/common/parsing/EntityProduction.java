@@ -23,29 +23,16 @@
  */
 package com.unitedjiga.common.parsing;
 
-import java.util.regex.Pattern;
-
 /**
  * @author Junji Mikami
  *
  */
-public interface PatternProduction extends EntityProduction {
+public interface EntityProduction extends Production {
 
-    public static interface Builder extends EntityProduction.Builder {
-        public Builder setPattern(String p);
-        public Builder setFlags(int flags);
-        public PatternProduction build();
+    public static interface Builder extends Production.Builder {
+        public Builder setName(String name);
+        public EntityProduction build();
     }
 
-    @Override
-    public default Kind getKind() {
-    	return Kind.PATTERN;
-    }
-
-    @Override
-    public default <R, P> R accept(ProductionVisitor<R, P> visitor, P p) {
-    	return visitor.visitPattern(this, p);
-    }
-
-    public Pattern getPattern();
+    public String getName();
 }

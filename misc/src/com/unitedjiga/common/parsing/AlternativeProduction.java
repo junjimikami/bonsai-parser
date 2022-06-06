@@ -29,10 +29,9 @@ import java.util.List;
  * @author Junji Mikami
  *
  */
-public interface AlternativeProduction extends Production {
+public interface AlternativeProduction extends EntityProduction {
 
-    public static interface Builder extends Production.Builder {
-        public Builder setName(String name);
+    public static interface Builder extends EntityProduction.Builder {
         public Builder add(Production p);
         public Builder add(Production.Builder b);
         public Builder addEmpty();
@@ -48,9 +47,6 @@ public interface AlternativeProduction extends Production {
     public default <R, P> R accept(ProductionVisitor<R, P> visitor, P p) {
         return visitor.visitAlternative(this, p);
     }
-
-    @Override
-    public AlternativeProduction as(String name);
 
     public List<Production> getProductions();
 }

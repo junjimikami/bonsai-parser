@@ -32,8 +32,7 @@ import java.util.function.Supplier;
 public interface Reference extends Production {
 
     public static interface Builder extends Production.Builder {
-        public Builder setName(String name);
-        public Builder setSource(Supplier<? extends Production> supplier);
+        public Builder set(Supplier<? extends Production> supplier);
         public Reference build();
     }
 
@@ -47,8 +46,5 @@ public interface Reference extends Production {
         return visitor.visitReference(this, p);
     }
     
-    @Override
-    public Reference as(String name);
-
     public Production get();
 }
