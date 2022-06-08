@@ -58,7 +58,7 @@ class DefaultProductionFactory implements ProductionFactory {
 
     @Override
     public QuantifiedProduction.Builder createQuantifiedBuilder() {
-        return new AbstractQuantifiedProduction.Builder();
+        return new QtProduction.Builder();
     }
 
 }

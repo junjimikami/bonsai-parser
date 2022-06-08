@@ -34,7 +34,7 @@ import com.unitedjiga.common.parsing.QuantifiedProduction;
  * @author Mikami Junji
  *
  */
-class AbstractQuantifiedProduction extends AbstractEntityProduction implements QuantifiedProduction {
+class QtProduction extends AbstractEntityProduction implements QuantifiedProduction {
     static class Builder extends AbstractProduction.Builder implements QuantifiedProduction.Builder {
         private String name;
         private long from;
@@ -84,9 +84,9 @@ class AbstractQuantifiedProduction extends AbstractEntityProduction implements Q
         public QuantifiedProduction build() {
             checkForBuild();
             if (limited) {
-                return new AbstractQuantifiedProduction(name, from, to, p.get());
+                return new QtProduction(name, from, to, p.get());
             }
-            return new AbstractQuantifiedProduction(name, from, p.get());
+            return new QtProduction(name, from, p.get());
         }
     }
 
@@ -94,13 +94,13 @@ class AbstractQuantifiedProduction extends AbstractEntityProduction implements Q
     private final OptionalLong upperLimit;
     private final Production p;
 
-    private AbstractQuantifiedProduction(String name, long lowerLimit, Production p) {
+    private QtProduction(String name, long lowerLimit, Production p) {
         super(name);
         this.lowerLimit = lowerLimit;
         this.upperLimit = OptionalLong.empty();
         this.p = p;
     }
-    private AbstractQuantifiedProduction(String name, long lowerLimit, long upperLimit, Production p) {
+    private QtProduction(String name, long lowerLimit, long upperLimit, Production p) {
         super(name);
         this.lowerLimit = lowerLimit;
         this.upperLimit = OptionalLong.of(upperLimit);
