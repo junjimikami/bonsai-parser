@@ -36,16 +36,16 @@ import com.unitedjiga.common.parsing.Production;
  *
  */
 // package private
-class AltProduction extends AbstractProductionStructure implements AlternativeProduction {
+class AltProduction extends AbstractEntityProduction implements AlternativeProduction {
     static class Builder extends AbstractProduction.Builder implements AlternativeProduction.Builder {
+        private String name;
         private final List<Supplier<Production>> elements = new ArrayList<>();
 
-        // PP
-        Builder() {
-            super();
-        }
-        Builder(String name) {
-            super(name);
+        @Override
+        public Builder setName(String name) {
+            check();
+            this.name = name;
+            return this;
         }
 
         @Override
@@ -54,7 +54,7 @@ class AltProduction extends AbstractProductionStructure implements AlternativePr
             var el = elements.stream()
                     .map(Supplier::get)
                     .toList();
-            return name == null ? new AltProduction(el) : new AltProduction(name, el);
+            return new AltProduction(name, el);
         }
 
         @Override
@@ -77,29 +77,18 @@ class AltProduction extends AbstractProductionStructure implements AlternativePr
             elements.add(Productions::empty);
             return this;
         }
-        @Override
-        public Builder add(String name, Production p) {
-            check();
-            elements.add(() -> p.as(name));
-            return this;
-        }
-        @Override
-        public Builder add(String name, Production.Builder b) {
-            check();
-            elements.add(() -> b.build().as(name));
-            return this;
-        }
+
     }
 
-    private AltProduction(List<Production> elements) {
-        super(elements);
-    }
+    private final List<Production> elements;
+
     private AltProduction(String name, List<Production> elements) {
-        super(name, elements);
+        super(name);
+        this.elements = elements;
     }
 
     @Override
-    public AlternativeProduction as(String name) {
-        return (AlternativeProduction) super.as(name);
+    public List<Production> getProductions() {
+        return elements;
     }
 }

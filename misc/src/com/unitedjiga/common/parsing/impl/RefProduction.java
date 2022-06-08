@@ -33,28 +33,35 @@ import com.unitedjiga.common.parsing.Reference;
  * @author Junji Mikami
  *
  */
-class RefProduction<T extends Production> extends AbstractProduction implements Reference<T> {
-    private final Supplier<T> p;
+class RefProduction extends AbstractProduction implements Reference {
+    static class Builder extends AbstractProduction.Builder implements Reference.Builder {
+        private Supplier<? extends Production> p;
 
-    RefProduction(Supplier<T> p) {
-    	super();
-        Objects.requireNonNull(p, Message.REQUIRE_NON_NULL.format());
-        this.p = p;
+        @Override
+        public Builder set(Supplier<? extends Production> supplier) {
+            check();
+            this.p = supplier;
+            return this;
+        }
+
+        @Override
+        public Reference build() {
+            checkForBuild();
+            return new RefProduction(p);
+        }
+        
     }
-    RefProduction(String name, Supplier<T> p) {
-        super(name);
+
+    private final Supplier<? extends Production> p;
+
+    private RefProduction(Supplier<? extends Production> p) {
         Objects.requireNonNull(p, Message.REQUIRE_NON_NULL.format());
         this.p = p;
     }
 
     @Override
-    public T get() {
+    public Production get() {
         return p.get();
     }
 
-	@SuppressWarnings("unchecked")
-    @Override
-	public Reference<T> as(String name) {
-		return (Reference<T>) super.as(name);
-	}
 }

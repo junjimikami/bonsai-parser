@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2022 Mikami Junji.
+ * Copyright 2020 Junji Mikami.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,32 +23,22 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import java.util.List;
-import java.util.Objects;
-
-import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.EntityProduction;
 
 /**
- * @author Mikami Junji
  *
+ * @author Junji Mikami
  */
-abstract class AbstractProductionStructure extends AbstractProduction {
-    private final List<Production> elements;
+abstract class AbstractEntityProduction extends AbstractProduction implements EntityProduction {
+    private final String name;
 
-    AbstractProductionStructure(List<Production> elements) {
-        super();
-        Objects.requireNonNull(elements);
-        this.elements = elements;
+    AbstractEntityProduction(String name) {
+        this.name = name;
     }
 
-    AbstractProductionStructure(String name, List<Production> elements) {
-        super(name);
-        Objects.requireNonNull(elements);
-        this.elements = elements;
-    }
-
-    public List<Production> getProductions() {
-        return elements;
+    @Override
+    public String getName() {
+        return name;
     }
 
 }

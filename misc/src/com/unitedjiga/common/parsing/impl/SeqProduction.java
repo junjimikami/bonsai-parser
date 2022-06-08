@@ -34,15 +34,16 @@ import com.unitedjiga.common.parsing.SequentialProduction;
  *
  * @author Junji Mikami
  */
-class SeqProduction extends AbstractProductionStructure implements SequentialProduction {
+class SeqProduction extends AbstractEntityProduction implements SequentialProduction {
     static class Builder extends AbstractProduction.Builder implements SequentialProduction.Builder {
+        private String name;
         private final List<Supplier<Production>> elements = new ArrayList<>();
 
-        Builder() {
-            super();
-        }
-        Builder(String name) {
-            super(name);
+        @Override
+        public Builder setName(String name) {
+            check();
+            this.name = name;
+            return this;
         }
 
         @Override
@@ -51,8 +52,7 @@ class SeqProduction extends AbstractProductionStructure implements SequentialPro
             var el = elements.stream()
                     .map(e -> e.get())
                     .toList();
-            return name == null ?
-                    new SeqProduction(el) : new SeqProduction(name, el);
+            return new SeqProduction(name, el);
         }
 
         @Override
@@ -68,30 +68,24 @@ class SeqProduction extends AbstractProductionStructure implements SequentialPro
             elements.add(b::build);
             return this;
         }
+
         @Override
-        public Builder add(String name, Production p) {
+        public Builder addEmpty() {
             check();
-            elements.add(() -> p.as(name));
-            return this;
-        }
-        @Override
-        public Builder add(String name, Production.Builder b) {
-            check();
-            elements.add(() -> b.build().as(name));
+            elements.add(Productions::empty);
             return this;
         }
     }
 
+    private final List<Production> elements;
 
-    private SeqProduction(List<Production> elements) {
-        super(elements);
-    }
     private SeqProduction(String name, List<Production> elements) {
-        super(name, elements);
+        super(name);
+        this.elements = elements;
     }
 
     @Override
-    public SequentialProduction as(String name) {
-        return (SequentialProduction) super.as(name);
+    public List<Production> getProductions() {
+        return elements;
     }
 }

@@ -33,38 +33,51 @@ import com.unitedjiga.common.parsing.Token;
  *
  * @author Junji Mikami
  */
-class TermProduction extends AbstractProduction implements PatternProduction {
+class TermProduction extends AbstractEntityProduction implements PatternProduction {
+    static class Builder extends AbstractProduction.Builder implements PatternProduction.Builder {
+        private String name;
+        private String pattern;
+        private int flags;
+
+        @Override
+        public Builder setName(String name) {
+            check();
+            this.name = name;
+            return this;
+        }
+
+        @Override
+        public Builder setPattern(String p) {
+            check();
+            this.pattern = p;
+            return this;
+        }
+
+        @Override
+        public Builder setFlags(int flags) {
+            check();
+            this.flags = flags;
+            return this;
+        }
+
+        @Override
+        public PatternProduction build() {
+            checkForBuild();
+            return new TermProduction(name, pattern, flags);
+        }
+        
+    }
+
     private final Pattern pattern;
 
-    TermProduction(String regex) {
-    	this(regex, 0);
-    }
-    TermProduction(String regex, int flags) {
-    	super();
-        Objects.requireNonNull(regex, Message.REQUIRE_NON_NULL.format());
-        this.pattern = Pattern.compile(regex, flags);
-    }
-    TermProduction(String name, String regex) {
-    	this(name, regex, 0);
-    }
-    TermProduction(String name, String regex, int flags) {
+    private TermProduction(String name, String regex, int flags) {
     	super(name);
         Objects.requireNonNull(regex, Message.REQUIRE_NON_NULL.format());
         this.pattern = Pattern.compile(regex, flags);
     }
 
-    @Override
-    public String toString() {
-        return pattern.pattern();
-    }
-
     public boolean matches(Token t) {
         return pattern.matcher(t.getValue()).matches();
-    }
-
-    @Override
-    public PatternProduction as(String name) {
-        return (PatternProduction) super.as(name);
     }
 
     @Override

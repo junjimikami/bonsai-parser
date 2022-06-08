@@ -28,10 +28,7 @@ import com.unitedjiga.common.parsing.PatternProduction;
 import com.unitedjiga.common.parsing.Production;
 import com.unitedjiga.common.parsing.ProductionFactory;
 import com.unitedjiga.common.parsing.ProductionVisitor;
-import com.unitedjiga.common.parsing.QuantifiedProduction;
 import com.unitedjiga.common.parsing.SequentialProduction;
-import com.unitedjiga.common.parsing.TerminalProduction;
-import com.unitedjiga.common.parsing.Token;
 
 /**
  * 
@@ -40,7 +37,7 @@ import com.unitedjiga.common.parsing.Token;
  */
 public final class Productions {
 
-    private static final TerminalProduction EMPTY =  new TerminalProduction() {
+    private static final Production EMPTY =  new Production() {
 
         @Override
         public <R, P> R accept(ProductionVisitor<R, P> visitor, P p) {
@@ -48,35 +45,22 @@ public final class Productions {
         }
 
         @Override
-        public String getName() {
+        public Kind getKind() {
+            return Kind.EMPTY;
+        }
+    };
+
+    static final Production EOF =  new Production() {
+
+        @Override
+        public <R, P> R accept(ProductionVisitor<R, P> visitor, P p) {
             throw new UnsupportedOperationException();
         }
 
         @Override
         public Kind getKind() {
-            return Kind.EMPTY;
-        }
-
-        @Override
-        public Production as(String name) {
             throw new UnsupportedOperationException();
         }
-
-        @Override
-        public QuantifiedProduction opt() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public QuantifiedProduction repeat() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public boolean matches(Token t) {
-            return false;
-        }
-        
     };
 
     private Productions() {
@@ -87,27 +71,29 @@ public final class Productions {
     }
 
     public static PatternProduction ofPattern(String regex) {
-    	return new TermProduction(regex);
+//    	return new TermProduction(regex);
+        throw new UnsupportedOperationException();
     }
     public static PatternProduction ofPattern(String regex, int flags) {
-    	return new TermProduction(regex, flags);
+//    	return new TermProduction(regex, flags);
+        throw new UnsupportedOperationException();
     }
 
     public static SequentialProduction.Builder sequentialBuilder() {
         return new SeqProduction.Builder();
     }
-    public static SequentialProduction.Builder sequentialBuilder(String name) {
-        return new SeqProduction.Builder(name);
-    }
+//    public static SequentialProduction.Builder sequentialBuilder(String name) {
+//        return new SeqProduction.Builder().setName(name);
+//    }
     
     public static AlternativeProduction.Builder alternativeBuilder() {
         return new AltProduction.Builder();
     }
-    public static AlternativeProduction.Builder alternativeBuilder(String name) {
-        return new AltProduction.Builder(name);
-    }
+//    public static AlternativeProduction.Builder alternativeBuilder(String name) {
+//        return new AltProduction.Builder().setName(name);
+//    }
 
-    public static TerminalProduction empty() {
+    public static Production empty() {
         return EMPTY;
     }
 

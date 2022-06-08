@@ -23,108 +23,22 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Supplier;
-
 import com.unitedjiga.common.parsing.AlternativeProduction;
 import com.unitedjiga.common.parsing.PatternProduction;
-import com.unitedjiga.common.parsing.Production;
-import com.unitedjiga.common.parsing.Production.Builder;
 import com.unitedjiga.common.parsing.ProductionFactory;
-import com.unitedjiga.common.parsing.ProductionVisitor;
 import com.unitedjiga.common.parsing.QuantifiedProduction;
 import com.unitedjiga.common.parsing.Reference;
 import com.unitedjiga.common.parsing.SequentialProduction;
-import com.unitedjiga.common.parsing.TerminalProduction;
 
 /**
  * @author Mikami Junji
  *
  */
 class DefaultProductionFactory implements ProductionFactory {
-    private final Map<String, Production> productions = new HashMap<>();
-    private final ProductionVisitor<Void, Void> scanner = new ProductionVisitor<>() {
-
-        @Override
-        public Void visitAlternative(AlternativeProduction prd, Void p) {
-            if (prd.getName() != null) {
-                productions.put(prd.getName(), prd);
-            }
-            prd.getProductions().forEach(this::visit);
-            return null;
-        }
-
-        @Override
-        public Void visitSequential(SequentialProduction prd, Void p) {
-            if (prd.getName() != null) {
-                productions.put(prd.getName(), prd);
-            }
-            prd.getProductions().forEach(this::visit);
-            return null;
-        }
-
-        @Override
-        public Void visitPattern(PatternProduction prd, Void p) {
-            if (prd.getName() != null) {
-                productions.put(prd.getName(), prd);
-            }
-            return null;
-        }
-
-        @Override
-        public Void visitReference(Reference<?> prd, Void p) {
-            if (prd.getName() != null) {
-                productions.put(prd.getName(), prd);
-            }
-            return null;
-        }
-
-        @Override
-        public Void visitQuantified(QuantifiedProduction prd, Void p) {
-            if (prd.getName() != null) {
-                productions.put(prd.getName(), prd);
-            }
-            visit(prd.get());
-            return null;
-        }
-
-        @Override
-        public Void visitEmpty(TerminalProduction prd, Void p) {
-            return null;
-        }
-    };
-    private final ProductionFactory.Register register = new ProductionFactory.Register() {
-
-        @Override
-        public Register add(String name, Production p) {
-            Objects.requireNonNull(name);
-            Objects.requireNonNull(p);
-            scanner.visit(p.as(name));
-            return this;
-        }
-
-        @Override
-        public Register add(String name, Builder b) {
-            return add(name, b.build());
-        }
-
-        @Override
-        public Production get(String name) {
-            return productions.get(name);
-        }
-        
-    };
 
     @Override
-    public PatternProduction createPattern(String regex) {
-        return new TermProduction(regex);
-    }
-
-    @Override
-    public PatternProduction createPattern(String regex, int flags) {
-        return new TermProduction(regex, flags);
+    public PatternProduction.Builder createPatternBuilder() {
+        return new TermProduction.Builder();
     }
 
     @Override
@@ -138,18 +52,13 @@ class DefaultProductionFactory implements ProductionFactory {
     }
 
     @Override
-    public <T extends Production> Reference<T> createReference(Supplier<T> supplier) {
-        return new RefProduction<>(supplier);
+    public Reference.Builder createReferenceBuilder() {
+        return new RefProduction.Builder();
     }
 
     @Override
-    public Reference<Production> createReference(String src) {
-        return new RefProduction<>(() -> productions.get(src));
-    }
-
-    @Override
-    public ProductionFactory.Register register() {
-        return register;
+    public QuantifiedProduction.Builder createQuantifiedBuilder() {
+        return new AbstractQuantifiedProduction.Builder();
     }
 
 }

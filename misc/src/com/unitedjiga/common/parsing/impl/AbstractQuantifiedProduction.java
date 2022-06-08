@@ -23,7 +23,8 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import java.util.OptionalInt;
+import java.util.OptionalLong;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import com.unitedjiga.common.parsing.Production;
@@ -33,60 +34,93 @@ import com.unitedjiga.common.parsing.QuantifiedProduction;
  * @author Mikami Junji
  *
  */
-abstract class AbstractQuantifiedProduction extends AbstractProduction implements QuantifiedProduction {
-    abstract static class Builder extends AbstractProduction.Builder implements QuantifiedProduction.Builder {
-        protected final Production.Builder builder;
-        Builder(Production.Builder builder) {
-            super();
-            this.builder = builder;
+class AbstractQuantifiedProduction extends AbstractEntityProduction implements QuantifiedProduction {
+    static class Builder extends AbstractProduction.Builder implements QuantifiedProduction.Builder {
+        private String name;
+        private long from;
+        private long to;
+        private boolean limited;
+        private Supplier<Production> p;
+
+        @Override
+        public Builder setName(String name) {
+            check();
+            this.name = name;
+            return this;
         }
-        Builder(String name, Production.Builder builder) {
-            super(name);
-            this.builder = builder;
+
+        @Override
+        public Builder set(Production p) {
+            check();
+            this.p = () -> p;
+            return this;
+        }
+
+        @Override
+        public Builder set(Production.Builder b) {
+            check();
+            this.p = b::build;
+            return this;
+        }
+
+        @Override
+        public Builder atLeast(long times) {
+            check();
+            this.from = times;
+            this.limited = false;
+            return this;
+        }
+
+        @Override
+        public Builder range(long from, long to) {
+            check();
+            this.from = from;
+            this.to = to;
+            this.limited = true;
+            return this;
+        }
+
+        @Override
+        public QuantifiedProduction build() {
+            checkForBuild();
+            if (limited) {
+                return new AbstractQuantifiedProduction(name, from, to, p.get());
+            }
+            return new AbstractQuantifiedProduction(name, from, p.get());
         }
     }
 
-    private final int lowerLimit;
-    private final OptionalInt upperLimit;
+    private final long lowerLimit;
+    private final OptionalLong upperLimit;
+    private final Production p;
 
-    AbstractQuantifiedProduction(int lowerLimit) {
-        super();
-        this.lowerLimit = lowerLimit;
-        this.upperLimit = OptionalInt.empty();
-    }
-    AbstractQuantifiedProduction(int lowerLimit, int upperLimit) {
-        super();
-        this.lowerLimit = lowerLimit;
-        this.upperLimit = OptionalInt.of(upperLimit);
-    }
-    AbstractQuantifiedProduction(String name, int lowerLimit) {
+    private AbstractQuantifiedProduction(String name, long lowerLimit, Production p) {
         super(name);
         this.lowerLimit = lowerLimit;
-        this.upperLimit = OptionalInt.empty();
+        this.upperLimit = OptionalLong.empty();
+        this.p = p;
     }
-    AbstractQuantifiedProduction(String name, int lowerLimit, int upperLimit) {
+    private AbstractQuantifiedProduction(String name, long lowerLimit, long upperLimit, Production p) {
         super(name);
         this.lowerLimit = lowerLimit;
-        this.upperLimit = OptionalInt.of(upperLimit);
+        this.upperLimit = OptionalLong.of(upperLimit);
+        this.p = p;
     }
 
     @Override
-    public QuantifiedProduction as(String name) {
-        return (QuantifiedProduction) super.as(name);
-    }
-
-    @Override
-    public int getLowerLimit() {
+    public long getLowerLimit() {
         return lowerLimit;
     }
     @Override
-    public OptionalInt getUpperLimit() {
+    public OptionalLong getUpperLimit() {
         return upperLimit;
     }
     @Override
     public Stream<Production> stream() {
-        var s = Stream.generate(this::get);
-        upperLimit.ifPresent(l -> s.limit(l));
+        var s = Stream.generate(() -> p);
+        if (upperLimit.isPresent()) {
+            return s.limit(upperLimit.getAsLong());
+        }
         return s;
     }
 }
