@@ -1,6 +1,5 @@
 package com.unitedjiga.commontest.parsing;
 
-import static com.unitedjiga.common.parsing.Production.empty;
 import static com.unitedjiga.common.parsing.Production.of;
 import static com.unitedjiga.common.parsing.Production.oneOf;
 import static com.unitedjiga.common.parsing.Production.ref;
