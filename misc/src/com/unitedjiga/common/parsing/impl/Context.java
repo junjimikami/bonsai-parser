@@ -23,29 +23,31 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import java.util.Objects;
+import java.util.Set;
 
-import com.unitedjiga.common.parsing.TerminalSymbol;
+import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Tokenizer;
 
 /**
  * @author Mikami Junji
  *
  */
-class DefaultTerminalSymbol extends AbstractSymbol implements TerminalSymbol {
-    private final String value;
+class Context {
 
-    DefaultTerminalSymbol(String name) {
-        super(name);
-        this.value = null;
-    }
-    DefaultTerminalSymbol(String name, String value) {
-        super(name);
-        Objects.requireNonNull(value);
-        this.value = value;
+    private final Tokenizer tokenizer;
+    private final Set<Production> followSet;
+
+    Context(Tokenizer tokenizer, Set<Production> followSet) {
+        super();
+        this.tokenizer = tokenizer;
+        this.followSet = followSet;
     }
 
-    @Override
-    public String getValue() {
-        return value;
+    Tokenizer getTokenizer() {
+        return tokenizer;
+    }
+
+    Set<Production> getFollowSet() {
+        return followSet;
     }
 }

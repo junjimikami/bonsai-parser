@@ -21,54 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.parsing.impl;
-
-import java.util.Objects;
+package com.unitedjiga.common.parsing.util;
 
 import com.unitedjiga.common.parsing.NonTerminalSymbol;
-import com.unitedjiga.common.parsing.Parser;
-import com.unitedjiga.common.parsing.ParserFactory;
-import com.unitedjiga.common.parsing.Production;
-import com.unitedjiga.common.parsing.StreamParser;
 import com.unitedjiga.common.parsing.Symbol;
+import com.unitedjiga.common.parsing.SymbolVisitor;
 import com.unitedjiga.common.parsing.TerminalSymbol;
-import com.unitedjiga.common.parsing.Tokenizer;
 
 /**
  * @author Mikami Junji
  *
  */
-class DefaultParserFactory implements ParserFactory {
-    private final Production production;
+@FunctionalInterface
+public interface SimpleSymbolVisitor<R, P> extends SymbolVisitor<R, P> {
 
-    DefaultParserFactory(Production p) {
-        Objects.requireNonNull(p);
-        this.production = p;
+    @Override
+    public default R visitTerminal(TerminalSymbol s, P p) {
+        return defaultAction(s, p);
     }
 
     @Override
-    public Parser createParser(Tokenizer tokenizer) {
-        Objects.requireNonNull(tokenizer);
-        return new Parser() {
-            private Interpreter interpreter = new Interpreter();
-            @Override
-            public Symbol parse() {
-                return interpreter.interpret(production, tokenizer);
-            }
-            @Override
-            public NonTerminalSymbol parseNonTerminal() {
-                return (NonTerminalSymbol) parse();
-            }
-            @Override
-            public TerminalSymbol parseTerminal() {
-                return (TerminalSymbol) parse();
-            }
-        };
+    public default R visitNonTerminal(NonTerminalSymbol s, P p) {
+        return defaultAction(s, p);
     }
 
-    @Override
-    public StreamParser createStreamParser(Tokenizer tokenizer) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+    public R defaultAction(Symbol s, P p);
 }

@@ -23,6 +23,8 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
+import static com.unitedjiga.common.parsing.impl.Productions.EOF;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Set;
@@ -36,53 +38,51 @@ import com.unitedjiga.common.parsing.QuantifiedProduction;
 import com.unitedjiga.common.parsing.Reference;
 import com.unitedjiga.common.parsing.SequentialProduction;
 import com.unitedjiga.common.parsing.Symbol;
-import com.unitedjiga.common.parsing.TerminalProduction;
 import com.unitedjiga.common.parsing.Tokenizer;
 
 /**
  * @author Mikami Junji
  *
  */
-class Interpreter implements ProductionVisitor<Symbol, Object[]> {
+class Interpreter implements ProductionVisitor<Symbol, Context> {
     private final FirstSet firstSet = new FirstSet();
+    private final AnyMatcher anyMatcher = new AnyMatcher();
 
     Symbol interpret(Production prd, Tokenizer t) {
-        var followSet = Set.<TerminalProduction>of();
-        return interpret(prd, t, followSet);
+        var followSet = Set.<Production>of(EOF);
+        var s = interpret(prd, t, followSet);
+        if (t.hasNext()) {
+            throw new ParsingException();
+        }
+        return s;
     }
-    Symbol interpret(Production prd, Tokenizer tokenizer, Set<TerminalProduction> followSet) {
-        var p = new Object[] {
-                tokenizer,
-                followSet
-        };
-        return ProductionVisitor.super.visit(prd, p);
+    Symbol interpret(Production prd, Tokenizer tokenizer, Set<Production> followSet) {
+        var p = new Context(tokenizer, followSet);
+        return visit(prd, p);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Symbol visitAlternative(AlternativeProduction alt, Object[] args) {
-        var tokenizer = (Tokenizer) args[0];
-        var followSet = (Set<TerminalProduction>) args[1];
+    public Symbol visitAlternative(AlternativeProduction alt, Context args) {
         for (var p : alt.getProductions()) {
-            if (firstSet.anyMatch(p, tokenizer, followSet)) {
-                var s = interpret(p, tokenizer, followSet);
+            if (anyMatcher.visit(p, args)) {
+                var s = visit(p, args);
                 return new DefaultNonTerminalSymbol(alt.getName(), s);
             }
         }
         throw new ParsingException();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Symbol visitSequential(SequentialProduction seq, Object[] args) {
-        var tokenizer = (Tokenizer) args[0];
-        var followSet = (Set<TerminalProduction>) args[1];
-        if (firstSet.anyMatch(seq, tokenizer, followSet)) {
+    public Symbol visitSequential(SequentialProduction seq, Context args) {
+        var tokenizer = args.getTokenizer();
+        var followSet = args.getFollowSet();
+        if (anyMatcher.visit(seq, args)) {
             var list = new ArrayList<Symbol>();
             var pList = new LinkedList<>(seq.getProductions());
             while (!pList.isEmpty()) {
                 var p = pList.remove();
-                var f = firstSet.visitSequential(pList, followSet);
+                var subseq = Productions.of(pList.toArray());
+                var f = firstSet.visitSequential(subseq, followSet);
                 list.add(interpret(p, tokenizer, f));
             }
             return new DefaultNonTerminalSymbol(seq.getName(), list);
@@ -90,54 +90,41 @@ class Interpreter implements ProductionVisitor<Symbol, Object[]> {
         throw new ParsingException();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Symbol visitPattern(PatternProduction p, Object[] args) {
-        var tokenizer = (Tokenizer) args[0];
-        var followSet = (Set<TerminalProduction>) args[1];
-        if (firstSet.anyMatch(p, tokenizer, followSet)) {
+    public Symbol visitPattern(PatternProduction p, Context args) {
+        var tokenizer = args.getTokenizer();
+        if (anyMatcher.visit(p, args)) {
             var t = tokenizer.remove();
-            return new DefaultTerminalSymbol(p.getName(), t.getValue());
+            return new DefaultNonTerminalSymbol(p.getName(), t);
         }
         throw new ParsingException();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Symbol visitReference(Reference<?> ref, Object[] args) {
-        var tokenizer = (Tokenizer) args[0];
-        var followSet = (Set<TerminalProduction>) args[1];
-        var s = interpret(ref.get(), tokenizer, followSet);
-        return new DefaultNonTerminalSymbol(ref.getName(), s);
+    public Symbol visitReference(Reference ref, Context args) {
+        return visit(ref.get(), args);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Symbol visitQuantified(QuantifiedProduction qt, Object[] args) {
-        var tokenizer = (Tokenizer) args[0];
-        var followSet = (Set<TerminalProduction>) args[1];
+    public Symbol visitQuantified(QuantifiedProduction qt, Context args) {
         var list = new ArrayList<Symbol>();
-        var it = qt.stream().iterator();
-        while (it.hasNext()) {
-            var p = it.next();
-            if (!firstSet.anyMatch(p, tokenizer, followSet)) {
-                break;
+        var result = qt.withinRange(p -> {
+            if (anyMatcher.visit(p, args)) {
+                list.add(visit(p, args));
+                return true;
             }
-            list.add(interpret(p, tokenizer, followSet));
-        }
-        if (qt.getLowerLimit() <= list.size()) {
+            return false;
+        });
+        if (result) {
             return new DefaultNonTerminalSymbol(qt.getName(), list);
         }
         throw new ParsingException();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Symbol visitEmpty(TerminalProduction empty, Object[] args) {
-        var tokenizer = (Tokenizer) args[0];
-        var followSet = (Set<TerminalProduction>) args[1];
-        if (firstSet.anyMatch(empty, tokenizer, followSet)) {
-            return new DefaultTerminalSymbol(empty.getName());
+    public Symbol visitEmpty(Production empty, Context args) {
+        if (anyMatcher.visit(empty, args)) {
+            return new DefaultNonTerminalSymbol(null);
         }
         throw new ParsingException();
     }

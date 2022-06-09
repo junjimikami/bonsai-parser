@@ -26,7 +26,6 @@ package com.unitedjiga.common.parsing.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import com.unitedjiga.common.parsing.AlternativeProduction;
@@ -36,23 +35,24 @@ import com.unitedjiga.common.parsing.ProductionVisitor;
 import com.unitedjiga.common.parsing.QuantifiedProduction;
 import com.unitedjiga.common.parsing.Reference;
 import com.unitedjiga.common.parsing.SequentialProduction;
-import com.unitedjiga.common.parsing.TerminalProduction;
-import com.unitedjiga.common.parsing.Tokenizer;
 
 /**
  * @author Mikami Junji
  *
  */
-class FirstSet implements ProductionVisitor<Set<TerminalProduction>, Set<TerminalProduction>> {
+class FirstSet implements ProductionVisitor<Set<Production>, Set<Production>> {
 
     @Override
-    public Set<TerminalProduction> visit(Production prd) {
+    public Set<Production> visit(Production prd) {
         return visit(prd, Set.of());
     }
 
     @Override
-    public Set<TerminalProduction> visitAlternative(AlternativeProduction alt, Set<TerminalProduction> followSet) {
-        var set = new HashSet<TerminalProduction>();
+    public Set<Production> visitAlternative(AlternativeProduction alt, Set<Production> followSet) {
+        if (alt.getProductions().isEmpty()) {
+            return followSet;
+        }
+        var set = new HashSet<Production>();
         for (var p : alt.getProductions()) {
             set.addAll(visit(p, followSet));
         }
@@ -60,11 +60,11 @@ class FirstSet implements ProductionVisitor<Set<TerminalProduction>, Set<Termina
     }
 
     @Override
-    public Set<TerminalProduction> visitSequential(SequentialProduction seq, Set<TerminalProduction> followSet) {
-        return visitSequential(seq.getProductions(), followSet);
-    }
-    Set<TerminalProduction> visitSequential(List<Production> seq, Set<TerminalProduction> followSet) {
-        var list = new ArrayList<>(seq);
+    public Set<Production> visitSequential(SequentialProduction seq, Set<Production> followSet) {
+        if (seq.getProductions().isEmpty()) {
+            return followSet;
+        }
+        var list = new ArrayList<>(seq.getProductions());
         Collections.reverse(list);
         var set = followSet;
         for (var p : list) {
@@ -74,35 +74,32 @@ class FirstSet implements ProductionVisitor<Set<TerminalProduction>, Set<Termina
     }
 
     @Override
-    public Set<TerminalProduction> visitPattern(PatternProduction p, Set<TerminalProduction> followSet) {
+    public Set<Production> visitPattern(PatternProduction p, Set<Production> followSet) {
         return Set.of(p);
     }
 
     @Override
-    public Set<TerminalProduction> visitReference(Reference<?> ref, Set<TerminalProduction> followSet) {
+    public Set<Production> visitReference(Reference ref, Set<Production> followSet) {
         return visit(ref.get(), followSet);
     }
 
     @Override
-    public Set<TerminalProduction> visitQuantified(QuantifiedProduction qt, Set<TerminalProduction> followSet) {
-        var set = new HashSet<TerminalProduction>();
-        set.addAll(visit(qt.get()));
-        set.addAll(followSet);
+    public Set<Production> visitQuantified(QuantifiedProduction qt, Set<Production> followSet) {
+        var set = new HashSet<Production>();
+        var prd = qt.stream()
+                .limit(1)
+                .findFirst();
+        if (prd.isPresent()) {
+            set.addAll(visit(prd.get()));
+        }
+        if (qt.getLowerLimit() == 0) {
+            set.addAll(followSet);
+        }
         return set;
     }
 
     @Override
-    public Set<TerminalProduction> visitEmpty(TerminalProduction empty, Set<TerminalProduction> followSet) {
+    public Set<Production> visitEmpty(Production empty, Set<Production> followSet) {
         return followSet;
-    }
-
-    boolean anyMatch(Production prd, Tokenizer tokenizer, Set<TerminalProduction> followSet) {
-        var set = visit(prd, followSet);
-        if (!tokenizer.hasNext()) {
-            return set.contains(Productions.empty());
-        }
-        var t = tokenizer.next();
-        tokenizer.previous();
-        return set.stream().anyMatch(p -> p.matches(t));
     }
 }

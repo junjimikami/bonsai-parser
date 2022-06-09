@@ -23,9 +23,6 @@
  */
 package com.unitedjiga.common.parsing;
 
-import java.text.MessageFormat;
-import java.util.stream.Collectors;
-
 /**
  *
  * @author Junji Mikami
