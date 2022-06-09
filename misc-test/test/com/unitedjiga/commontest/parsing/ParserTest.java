@@ -25,23 +25,165 @@ package com.unitedjiga.commontest.parsing;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.Iterator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 
-import com.unitedjiga.common.parsing.NonTerminalSymbol;
 import com.unitedjiga.common.parsing.ParserFactory;
-import com.unitedjiga.common.parsing.Symbol;
-import com.unitedjiga.common.parsing.SymbolVisitor;
-import com.unitedjiga.common.parsing.TerminalSymbol;
-import com.unitedjiga.common.parsing.Token;
+import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.ProductionFactory;
+import com.unitedjiga.common.parsing.Reference;
 import com.unitedjiga.common.parsing.Tokenizer;
+import com.unitedjiga.common.parsing.util.SimpleProductionVisitor;
 
 /**
  * @author Junji Mikami
  *
  */
 class ParserTest {
+    @Test
+    void test() throws Exception {
+        var prdFactory = ProductionFactory.newFactory();
+        var prd = prdFactory.createPattern("[01]");
+        
+        var psrFactory = ParserFactory.newFactory(prd);
+        var psr = psrFactory.createParser(null);
+    }
+
+    @Test
+    void testName() throws Exception {
+        var prdf = ProductionFactory.newFactory();
+        var grammar = new HashMap<String, Production>();
+        grammar.put("Type", prdf.createAlternativeBuilder()
+                .add(grammar.get("PrimitiveType"))
+                .add(grammar.get("ReferenceType"))
+                .build());
+        grammar.put("PrimitiveType", prdf.createAlternativeBuilder()
+                .add(grammar.get("NumericType"))
+                .add(prdf.createPattern("boolean"))
+                .build());
+        grammar.put("NumericType", prdf.createAlternativeBuilder()
+                .add(grammar.get("IntegralType"))
+                .add(grammar.get("FloatingPointType"))
+                .build());
+        grammar.put("IntegralType", prdf.createAlternativeBuilder()
+                .add(prdf.createPattern("byte"))
+                .add(prdf.createPattern("short"))
+                .add(prdf.createPattern("long"))
+                .add(prdf.createPattern("char"))
+                .build());
+        grammar.put("FloatingPointType", prdf.createAlternativeBuilder()
+                .add(prdf.createPattern("float"))
+                .add(prdf.createPattern("double"))
+                .build());
+        grammar.put("ReferenceType", prdf.createAlternativeBuilder()
+                .add(grammar.get("ClassOrInterfaceType"))
+                .add(grammar.get("TypeVariable"))
+                .add(grammar.get("ArrayType"))
+                .build());
+        var psf = ParserFactory.newFactory(grammar.get("Type"));
+        var tzer = (Tokenizer) null;
+        var ps = psf.createParser(tzer);
+        var s = ps.parseNonTerminal();
+        Stream.of(s)
+        .filter(e -> e.getName().equals("Type"))
+        .flatMap(e -> e.getSymbols().stream())
+        .filter(e -> e.getName().equals("PrimitiveType"))
+//        .filter(e -> e.getName().equals("Type"))
+//        .flatMap(e -> e.getSymbols().stream())
+//        .filter(e -> e.getName().equals("PrimitiveType"))
+//        .findFirst()
+//        .map(e -> e.accept(Symbol.joining(), null))
+//        .get()
+        ;
+
+        assertEquals("Type", s.getName());
+    }
+    
+    @Test
+    void testName2() throws Exception {
+        class GrammarTest {
+            ProductionFactory prdf = ProductionFactory.newFactory();
+
+            Production type() {
+                return prdf.createAlternativeBuilder()
+                        .setName("Type")
+                        .add(prdf.createReference(this::primitiveType))
+                        .add(prdf.createReference(this::referenceType))
+                        .build();
+            }
+            Production primitiveType() {
+                return prdf.createAlternativeBuilder()
+                        .setName("PrimitiveType")
+                        .add(prdf.createReference(this::numericType))
+                        .add(prdf.createPattern("boolean"))
+                        .build();
+            }
+            Production numericType() {
+                return prdf.createAlternativeBuilder()
+                        .setName("NumericType")
+                        .add(prdf.createReference(this::integralType))
+                        .add(prdf.createReference(this::floatingPointType))
+                        .build();
+            }
+            Production integralType() {
+                return prdf.createAlternativeBuilder()
+                        .setName("IntegralType")
+                        .add(prdf.createPattern("byte"))
+                        .add(prdf.createPattern("short"))
+                        .add(prdf.createPattern("long"))
+                        .add(prdf.createPattern("char"))
+                        .build();
+            }
+            Production floatingPointType() {
+                return prdf.createAlternativeBuilder()
+                        .setName("FloatingPointType")
+                        .add(prdf.createPattern("float"))
+                        .add(prdf.createPattern("double"))
+                        .build(); 
+            }
+            Production referenceType() {
+                return prdf.createAlternativeBuilder()
+                        .setName("ReferenceType")
+                        .add(prdf.createReference(this::classOrInterfaceType))
+                        .build();
+            }
+            Production classOrInterfaceType() {
+                return prdf.createAlternativeBuilder()
+                        .setName("ClassOrInterfaceType")
+                        .add(prdf.createSequentialBuilder()
+                                .add(prdf.createQuantifiedBuilder()
+                                        .set(prdf.createReference(null))
+                                        .range(0, 1))
+                                .add(prdf.createReference(null))
+                                .add(prdf.createQuantifiedBuilder()
+                                        .set(prdf.createReference(null))
+                                        .range(0, 1)))
+                        .add(prdf.createSequentialBuilder())
+                        .build();
+            }
+        }
+        var grammarTest = new GrammarTest();
+        var psf = ParserFactory.newFactory(grammarTest.type());
+//        psf.getGrammar();
+        var tzer = (Tokenizer) null;
+        var ps = psf.createParser(tzer);
+        var s = ps.parseNonTerminal();
+        Stream.of(s)
+        .filter(e -> e.getName().equals("Type"))
+        .flatMap(e -> e.getSymbols().stream())
+        .filter(e -> e.getName().equals("PrimitiveType"))
+//        .filter(e -> e.getName().equals("Type"))
+//        .flatMap(e -> e.getSymbols().stream())
+//        .filter(e -> e.getName().equals("PrimitiveType"))
+//        .findFirst()
+//        .map(e -> e.accept(Symbol.joining(), null))
+//        .get()
+        ;
+    }
+    
 
 //    @Test
 //    void test() {

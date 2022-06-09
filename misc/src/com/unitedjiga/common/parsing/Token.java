@@ -29,7 +29,7 @@ import com.unitedjiga.common.parsing.impl.Tokenizers;
  *
  * @author Junji Mikami
  */
-public interface Token {
+public interface Token extends TerminalSymbol {
 
     /**
      * 

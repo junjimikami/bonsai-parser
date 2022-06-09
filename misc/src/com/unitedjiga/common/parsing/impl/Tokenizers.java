@@ -55,6 +55,11 @@ public final class Tokenizers {
             public String toString() {
                 return value;
             }
+			@Override
+			public String getName() {
+				// TODO Auto-generated method stub
+				return null;
+			}
         };
     }
 
@@ -122,10 +127,10 @@ public final class Tokenizers {
             public Tokenizer createTokenizer(Reader r) {
                 Tokenizer tzer = Tokenizers.createTokenizer(r);
                 for (Production p : productionLayers) {
-                    Parser pser = p.parser(tzer);
-                    tzer = Tokenizers.createTokenizer(pser.iterativeParse()
-                            .map(s -> s.asToken().getValue())
-                            .iterator());
+//                    Parser pser = p.parser(tzer);
+//                    tzer = Tokenizers.createTokenizer(pser.iterativeParse()
+//                            .map(s -> s.asToken().getValue())
+//                            .iterator());
                 }
                 return tzer;
             }

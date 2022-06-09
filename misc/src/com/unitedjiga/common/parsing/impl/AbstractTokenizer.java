@@ -61,23 +61,23 @@ class AbstractTokenizer implements Tokenizer {
         return buffer.get(current++);
     }
 
-    @Override
-    public void pushBack() {
-        if (current <= 0) {
-            throw new NoSuchElementException(Message.CANNOT_PUSHBACK.format());
-        }
-        current--;
-    }
-
-    @Override
-    public void reset() {
-        current = 0;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return buffer.subList(0, current).isEmpty();
-    }
+//    @Override
+//    public void pushBack() {
+//        if (current <= 0) {
+//            throw new NoSuchElementException(Message.CANNOT_PUSHBACK.format());
+//        }
+//        current--;
+//    }
+//
+//    @Override
+//    public void reset() {
+//        current = 0;
+//    }
+//
+//    @Override
+//    public boolean isEmpty() {
+//        return buffer.subList(0, current).isEmpty();
+//    }
 
     @Override
     public Token remove() {
@@ -109,5 +109,35 @@ class AbstractTokenizer implements Tokenizer {
         sb.append(remaining.toString());
         return sb.toString();
     }
+
+	@Override
+	public Token read() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean hasNext() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public Token next() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean hasPrevious() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public Token previous() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }
