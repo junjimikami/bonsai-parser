@@ -34,17 +34,19 @@ import com.unitedjiga.common.parsing.impl.Tokenizers;
  */
 public interface TokenizerFactory {
 
-    static TokenizerFactory newFactory(Production... productionLayers) {
-        return Tokenizers.createFactory(productionLayers);
+    public static TokenizerFactory newFactory(Production... productions) {
+        return Tokenizers.createFactory(productions);
     }
     
-    static TokenizerFactory loadFactory(String factoryName, ClassLoader cl) {
+    public static TokenizerFactory loadFactory(String factoryName, ClassLoader cl) {
         return Tokenizers.loadFactory(factoryName, cl);
     }
 
-    static TokenizerFactory loadFactory(String factoryName) {
+    public static TokenizerFactory loadFactory(String factoryName) {
         return Tokenizers.loadFactory(factoryName, null);
     }
 
-    Tokenizer createTokenizer(Reader r);
+    public Tokenizer createTokenizer(Reader r);
+
+    public Tokenizer.Builder createTokenizerBuilder();
 }
