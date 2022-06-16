@@ -49,5 +49,5 @@ public interface AlternativeProduction extends EntityProduction {
         return visitor.visitAlternative(this, p);
     }
 
-    public List<Production> getProductions();
+    public List<? extends Production> getProductions();
 }
