@@ -49,7 +49,7 @@ class Interpreter implements ProductionVisitor<Symbol, Context> {
     private final AnyMatcher anyMatcher = new AnyMatcher();
 
     Symbol interpret(Production prd, Tokenizer t) {
-        var followSet = Set.<Production>of(EOF);
+        var followSet = Set.of(EOF);
         var s = interpret(prd, t, followSet);
         if (t.hasNext()) {
             throw new ParsingException();
@@ -94,7 +94,7 @@ class Interpreter implements ProductionVisitor<Symbol, Context> {
     public Symbol visitPattern(PatternProduction p, Context args) {
         var tokenizer = args.getTokenizer();
         if (anyMatcher.visit(p, args)) {
-            var t = tokenizer.remove();
+            var t = tokenizer.read();
             return new DefaultNonTerminalSymbol(p.getName(), t);
         }
         throw new ParsingException();

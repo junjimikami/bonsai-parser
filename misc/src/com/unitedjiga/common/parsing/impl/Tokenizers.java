@@ -27,7 +27,9 @@ import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.ServiceLoader;
@@ -63,7 +65,7 @@ public final class Tokenizers {
         };
     }
 
-    public static Tokenizer createTokenizer(Iterator<? extends CharSequence> it) {
+    public static Tokenizer createTokenizer(Iterator<String> it) {
         Objects.requireNonNull(it, Message.REQUIRE_NON_NULL.format());
         return new AbstractTokenizer(it);
     }
@@ -119,22 +121,26 @@ public final class Tokenizers {
         });
     }
 
-    public static TokenizerFactory createFactory(Production... productionLayers) {
-        Objects.requireNonNull(productionLayers, Message.REQUIRE_NON_NULL.format());
-        return new TokenizerFactory() {
-            
-            @Override
-            public Tokenizer createTokenizer(Reader r) {
-                Tokenizer tzer = Tokenizers.createTokenizer(r);
-                for (Production p : productionLayers) {
-//                    Parser pser = p.parser(tzer);
-//                    tzer = Tokenizers.createTokenizer(pser.iterativeParse()
-//                            .map(s -> s.asToken().getValue())
-//                            .iterator());
-                }
-                return tzer;
-            }
-        };
+    public static TokenizerFactory createFactory(Production... productions) {
+        return createFactory(Arrays.asList(productions));
+//        Objects.requireNonNull(productions, Message.REQUIRE_NON_NULL.format());
+//        return new TokenizerFactory() {
+//            
+//            @Override
+//            public Tokenizer createTokenizer(Reader r) {
+//                Tokenizer tzer = Tokenizers.createTokenizer(r);
+//                for (Production p : productions) {
+////                    Parser pser = p.parser(tzer);
+////                    tzer = Tokenizers.createTokenizer(pser.iterativeParse()
+////                            .map(s -> s.asToken().getValue())
+////                            .iterator());
+//                }
+//                return tzer;
+//            }
+//        };
+    }
+    public static TokenizerFactory createFactory(List<? extends Production> productions) {
+        return new DefaultTokenizerFactory(productions);
     }
     
     public static TokenizerFactory loadFactory(String factoryName, ClassLoader cl) {
