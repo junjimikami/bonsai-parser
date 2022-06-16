@@ -80,15 +80,15 @@ class AltProduction extends AbstractEntityProduction implements AlternativeProdu
 
     }
 
-    private final List<Production> elements;
+    private final List<? extends Production> elements;
 
-    private AltProduction(String name, List<Production> elements) {
+    AltProduction(String name, List<? extends Production> elements) {
         super(name);
         this.elements = elements;
     }
 
     @Override
-    public List<Production> getProductions() {
+    public List<? extends Production> getProductions() {
         return elements;
     }
 }
