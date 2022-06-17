@@ -53,7 +53,7 @@ class DefaultParserFactory implements ParserFactory {
             private Interpreter interpreter = new Interpreter();
             @Override
             public Symbol parse() {
-                return interpreter.interpret(production, tokenizer);
+                return interpreter.parse(production, tokenizer);
             }
             @Override
             public NonTerminalSymbol parseNonTerminal() {
@@ -66,9 +66,4 @@ class DefaultParserFactory implements ParserFactory {
         };
     }
 
-    @Override
-    public StreamParser createStreamParser(Tokenizer tokenizer) {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }

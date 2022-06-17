@@ -44,5 +44,4 @@ public interface ParserFactory {
     }
 
 	public Parser createParser(Tokenizer tokenizer);
-	public StreamParser createStreamParser(Tokenizer tokenizer);
 }
