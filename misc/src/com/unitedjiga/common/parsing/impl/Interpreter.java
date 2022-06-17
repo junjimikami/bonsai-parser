@@ -48,13 +48,16 @@ class Interpreter implements ProductionVisitor<Symbol, Context> {
     private final FirstSet firstSet = new FirstSet();
     private final AnyMatcher anyMatcher = new AnyMatcher();
 
-    Symbol interpret(Production prd, Tokenizer t) {
-        var followSet = Set.of(EOF);
-        var s = interpret(prd, t, followSet);
+    Symbol parse(Production prd, Tokenizer t) {
+        var s = interpret(prd, t);
         if (t.hasNext()) {
             throw new ParsingException();
         }
         return s;
+    }
+    Symbol interpret(Production prd, Tokenizer t) {
+        var followSet = Set.of(EOF);
+        return interpret(prd, t, followSet);
     }
     Symbol interpret(Production prd, Tokenizer tokenizer, Set<Production> followSet) {
         var p = new Context(tokenizer, followSet);

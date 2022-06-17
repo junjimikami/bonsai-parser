@@ -46,80 +46,80 @@ public final class Tokenizers {
     private Tokenizers() {
     }
 
-    public static Token createToken(String s) {
-        String value = String.valueOf(s);
-        return new Token() {
-            @Override
-            public String getValue() {
-                return value;
-            }
-            @Override
-            public String toString() {
-                return value;
-            }
-			@Override
-			public String getName() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-        };
-    }
+//    public static Token createToken(String s) {
+//        String value = String.valueOf(s);
+//        return new Token() {
+//            @Override
+//            public String getValue() {
+//                return value;
+//            }
+//            @Override
+//            public String toString() {
+//                return value;
+//            }
+//			@Override
+//			public String getName() {
+//				// TODO Auto-generated method stub
+//				return null;
+//			}
+//        };
+//    }
+//
+//    public static Tokenizer createTokenizer(Iterator<String> it) {
+//        Objects.requireNonNull(it, Message.REQUIRE_NON_NULL.format());
+//        return new DefaultTokenizer(it);
+//    }
 
-    public static Tokenizer createTokenizer(Iterator<String> it) {
-        Objects.requireNonNull(it, Message.REQUIRE_NON_NULL.format());
-        return new AbstractTokenizer(it);
-    }
-
-    static Tokenizer createTokenizer(Reader r) {
-        Objects.requireNonNull(r, Message.REQUIRE_NON_NULL.format());
-        PushbackReader pr = new PushbackReader(r);
-        return new AbstractTokenizer(new Iterator<String>() {
-            @Override
-            public boolean hasNext() {
-                return peek() != -1;
-            }
-
-            @Override
-            public String next() {
-                int ch = read();
-                if (ch == -1) {
-                    throw new NoSuchElementException(Message.NO_SUCH_ELEMENT.format());
-                }
-                return Character.toString(ch);
-            }
-
-            private int read() {
-                try {
-                    return pr.read();
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
-            }
-
-            private void unread(int ch) {
-                assert ch != -1;
-                try {
-                    pr.unread(ch);
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
-            }
-
-            private int peek() {
-                int ch = read();
-                if (ch != -1) {
-                    unread(ch);
-                }
-                return ch;
-            }
-
-            @Override
-            public String toString() {
-                return "Next: " + peek();
-            }
-
-        });
-    }
+//    static Tokenizer createTokenizer(Reader r) {
+//        Objects.requireNonNull(r, Message.REQUIRE_NON_NULL.format());
+//        PushbackReader pr = new PushbackReader(r);
+//        return new DefaultTokenizer(new Iterator<String>() {
+//            @Override
+//            public boolean hasNext() {
+//                return peek() != -1;
+//            }
+//
+//            @Override
+//            public String next() {
+//                int ch = read();
+//                if (ch == -1) {
+//                    throw new NoSuchElementException(Message.NO_SUCH_ELEMENT.format());
+//                }
+//                return Character.toString(ch);
+//            }
+//
+//            private int read() {
+//                try {
+//                    return pr.read();
+//                } catch (IOException e) {
+//                    throw new UncheckedIOException(e);
+//                }
+//            }
+//
+//            private void unread(int ch) {
+//                assert ch != -1;
+//                try {
+//                    pr.unread(ch);
+//                } catch (IOException e) {
+//                    throw new UncheckedIOException(e);
+//                }
+//            }
+//
+//            private int peek() {
+//                int ch = read();
+//                if (ch != -1) {
+//                    unread(ch);
+//                }
+//                return ch;
+//            }
+//
+//            @Override
+//            public String toString() {
+//                return "Next: " + peek();
+//            }
+//
+//        });
+//    }
 
     public static TokenizerFactory createFactory(Production... productions) {
         return createFactory(Arrays.asList(productions));

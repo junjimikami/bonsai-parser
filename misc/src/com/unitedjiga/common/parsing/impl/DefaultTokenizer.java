@@ -32,9 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.StringJoiner;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import com.unitedjiga.common.parsing.Token;
 import com.unitedjiga.common.parsing.Tokenizer;
@@ -43,18 +41,18 @@ import com.unitedjiga.common.parsing.Tokenizer;
  * @author Junji Mikami
  *
  */
-class AbstractTokenizer implements Tokenizer {
+class DefaultTokenizer implements Tokenizer {
     static abstract class BaseBuilder implements Tokenizer.Builder {
         @Override
         public Tokenizer.Builder filter(Predicate<Token> p) {
-            return new AbstractTokenizer.FilterBuilder(this, p);
+            return new DefaultTokenizer.FilterBuilder(this, p);
         }
     }
 
     static class DecoratorBuilder extends BaseBuilder {
         private final Tokenizer.Builder builder;
         DecoratorBuilder() {
-            this.builder = new AbstractTokenizer.SimpleBuilder();
+            this.builder = new DefaultTokenizer.SimpleBuilder();
         }
         DecoratorBuilder(Tokenizer.Builder builder) {
             this.builder = builder;
@@ -83,7 +81,7 @@ class AbstractTokenizer implements Tokenizer {
         @Override
         public Tokenizer build() {
             var tzer = super.build();
-            return new AbstractTokenizer(new Iterator<String>() {
+            return new DefaultTokenizer(new Iterator<Token>() {
                 @Override
                 public boolean hasNext() {
                     skip();
@@ -91,9 +89,9 @@ class AbstractTokenizer implements Tokenizer {
                 }
 
                 @Override
-                public String next() {
+                public Token next() {
                     skip();
-                    return tzer.next().getValue();
+                    return tzer.next();
                 }
                 
                 private void skip() {
@@ -108,29 +106,29 @@ class AbstractTokenizer implements Tokenizer {
         }
     }
     static class SimpleBuilder extends BaseBuilder {
-        private Iterator<String> it;
+        private Iterator<Token> it;
         SimpleBuilder() {
         }
-        SimpleBuilder(Iterator<String> it) {
+        SimpleBuilder(Iterator<Token> it) {
             this.it = it;
         }
 
         @Override
         public Tokenizer.Builder set(Reader r) {
             var pr = new PushbackReader(r);
-            this.it = new Iterator<String>() {
+            this.it = new Iterator<Token>() {
                 @Override
                 public boolean hasNext() {
                     return peek() != -1;
                 }
 
                 @Override
-                public String next() {
+                public Token next() {
                     int ch = read();
                     if (ch == -1) {
                         throw new NoSuchElementException(Message.NO_SUCH_ELEMENT.format());
                     }
-                    return Character.toString(ch);
+                    return new DefaultToken(Character.toString(ch));
                 }
 
                 private int read() {
@@ -163,92 +161,40 @@ class AbstractTokenizer implements Tokenizer {
 
         @Override
         public Tokenizer.Builder set(Iterator<String> it) {
-            this.it = it;
+            this.it = new Iterator<Token>() {
+
+                @Override
+                public boolean hasNext() {
+                    return it.hasNext();
+                }
+
+                @Override
+                public Token next() {
+                    return new DefaultToken(it.next());
+                }
+                
+            };
             return this;
         }
 
         @Override
         public Tokenizer build() {
-            return new AbstractTokenizer(it);
+            return new DefaultTokenizer(it);
         }
     }
 
-    private final Iterator<String> itr;
+    private final Iterator<Token> itr;
     private final List<Token> buffer = new LinkedList<>();
     private int current = 0;
 
-    AbstractTokenizer(Iterator<String> itr) {
+    DefaultTokenizer(Iterator<Token> itr) {
         this.itr = Objects.requireNonNull(itr);
     }
-
-//    @Override
-//    public boolean hasRemaining() {
-//        return current < buffer.size() || tzer.hasNext();
-//    }
-//
-//    @Override
-//    public Token get() {
-//        if (buffer.size() <= current) {
-//            var t = Tokenizers.createToken(tzer.next().toString());
-//            buffer.add(t);
-//        }
-//        return buffer.get(current++);
-//    }
-//
-//    @Override
-//    public void pushBack() {
-//        if (current <= 0) {
-//            throw new NoSuchElementException(Message.CANNOT_PUSHBACK.format());
-//        }
-//        current--;
-//    }
-//
-//    @Override
-//    public void reset() {
-//        current = 0;
-//    }
-//
-//    @Override
-//    public boolean isEmpty() {
-//        return buffer.subList(0, current).isEmpty();
-//    }
-//
-//    @Override
-//    public Token remove() {
-//        if (current <= 0) {
-//            throw new NoSuchElementException(Message.CANNOT_REMOVE.format());
-//        }
-//        return buffer.subList(0, current--).remove(0);
-//    }
-//
-//    @Override
-//    public Stream<Token> tokens() {
-//        return buffer.subList(0, current).stream();
-//    }
-//    
-//    @Override
-//    public String toString() {
-//        // Buffered tokens:[a, b, c] << Remaining:[d, e, f, ...]
-//        StringBuilder sb = new StringBuilder();
-//        sb.append(buffer.subList(0, current).stream()
-//                .map(Token::getValue)
-//                .collect(Collectors.joining(", ", "Buffered tokens:[", "]")));
-//        sb.append(" << ");
-//
-//        StringJoiner remaining = new StringJoiner(", ", "Remaining:[", "]");
-//        buffer.subList(current, buffer.size()).stream()
-//                .map(Token::getValue)
-//                .forEach(remaining::add);
-//        remaining.add(tzer.hasNext() ? "..." : "no tokens");
-//        sb.append(remaining.toString());
-//        return sb.toString();
-//    }
 
 	@Override
 	public Token read() {
         if (buffer.size() <= current) {
-            var t = Tokenizers.createToken(itr.next());
-            return t;
+            return itr.next();
         }
 		return buffer.remove(current);
 	}
@@ -261,7 +207,7 @@ class AbstractTokenizer implements Tokenizer {
 	@Override
 	public Token next() {
         if (buffer.size() <= current) {
-            var t = Tokenizers.createToken(itr.next());
+            var t = itr.next();
             buffer.add(t);
         }
         return buffer.get(current++);
