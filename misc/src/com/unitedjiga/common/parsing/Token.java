@@ -23,40 +23,13 @@
  */
 package com.unitedjiga.common.parsing;
 
-import com.unitedjiga.common.parsing.impl.Tokenizers;
-
 /**
  *
  * @author Junji Mikami
  */
 public interface Token extends TerminalSymbol {
 
-    /**
-     * 
-     * @param value
-     * @return
-     */
-    public static Token of(String value) {
-        return Tokenizers.createToken(value);
-    }
-    public static Token of(String name, String value) {
-        return Tokenizers.createToken(value);
-    }
-
-//    /**
-//     * 
-//     * @param t1
-//     * @param t2
-//     * @return
-//     */
-//    public static Token concat(Token t1, Token t2) {
-//        return of(t1.getValue().concat(t2.getValue()));
-//    }
-
     public String getName();
 
     public String getValue();
-
-    @Override
-    String toString();
 }
