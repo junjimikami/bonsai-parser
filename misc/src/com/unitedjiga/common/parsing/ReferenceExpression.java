@@ -40,7 +40,7 @@ public interface ReferenceExpression extends Expression {
     }
 
     @Override
-    public default <R, P> R accept(ProductionVisitor<R, P> visitor, P p) {
+    public default <R, P> R accept(ExpressionVisitor<R, P> visitor, P p) {
         return visitor.visitReference(this, p);
     }
     

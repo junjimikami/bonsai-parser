@@ -27,18 +27,25 @@ package com.unitedjiga.common.parsing;
  * @author Mikami Junji
  *
  */
-public interface ProductionVisitor<R, P> {
+public interface ExpressionVisitor<R, P> {
 
-	public default R visit(Expression prd) {
-	    return visit(prd, null);
-	}
-	public default R visit(Expression prd, P p) {
-	    return prd.accept(this, p);
-	}
-	public R visitAlternative(ChoiceExpression prd, P p);
-	public R visitSequential(SequenceExpression prd, P p);
-	public R visitPattern(PatternExpression prd, P p);
-	public R visitReference(ReferenceExpression prd, P p);
-    public R visitQuantified(QuantifierExpression prd, P p);
+    public default R visit(Expression prd) {
+        return visit(prd, null);
+    }
+
+    public default R visit(Expression prd, P p) {
+        return prd.accept(this, p);
+    }
+
+    public R visitChoice(ChoiceExpression prd, P p);
+
+    public R visitSequence(SequenceExpression prd, P p);
+
+    public R visitPattern(PatternExpression prd, P p);
+
+    public R visitReference(ReferenceExpression prd, P p);
+
+    public R visitQuantifier(QuantifierExpression prd, P p);
+
     public R visitEmpty(Expression prd, P p);
 }

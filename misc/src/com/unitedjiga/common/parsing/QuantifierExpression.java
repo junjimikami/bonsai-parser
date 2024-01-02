@@ -43,8 +43,8 @@ public interface QuantifierExpression extends Expression {
     }
 
     @Override
-    public default <R, P> R accept(ProductionVisitor<R, P> visitor, P p) {
-        return visitor.visitQuantified(this, p);
+    public default <R, P> R accept(ExpressionVisitor<R, P> visitor, P p) {
+        return visitor.visitQuantifier(this, p);
     }
 
     public int getLowerLimit();

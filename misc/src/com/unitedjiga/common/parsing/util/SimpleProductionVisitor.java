@@ -26,7 +26,7 @@ package com.unitedjiga.common.parsing.util;
 import com.unitedjiga.common.parsing.ChoiceExpression;
 import com.unitedjiga.common.parsing.PatternExpression;
 import com.unitedjiga.common.parsing.Expression;
-import com.unitedjiga.common.parsing.ProductionVisitor;
+import com.unitedjiga.common.parsing.ExpressionVisitor;
 import com.unitedjiga.common.parsing.QuantifierExpression;
 import com.unitedjiga.common.parsing.ReferenceExpression;
 import com.unitedjiga.common.parsing.SequenceExpression;
@@ -36,15 +36,15 @@ import com.unitedjiga.common.parsing.SequenceExpression;
  *
  */
 @FunctionalInterface
-public interface SimpleProductionVisitor<R, P> extends ProductionVisitor<R, P> {
+public interface SimpleProductionVisitor<R, P> extends ExpressionVisitor<R, P> {
 
     @Override
-    public default R visitAlternative(ChoiceExpression prd, P p) {
+    public default R visitChoice(ChoiceExpression prd, P p) {
         return defaultAction(prd, p);
     }
 
     @Override
-    public default R visitSequential(SequenceExpression prd, P p) {
+    public default R visitSequence(SequenceExpression prd, P p) {
         return defaultAction(prd, p);
     }
 
@@ -59,7 +59,7 @@ public interface SimpleProductionVisitor<R, P> extends ProductionVisitor<R, P> {
     }
 
     @Override
-    public default R visitQuantified(QuantifierExpression prd, P p) {
+    public default R visitQuantifier(QuantifierExpression prd, P p) {
         return defaultAction(prd, p);
     }
 

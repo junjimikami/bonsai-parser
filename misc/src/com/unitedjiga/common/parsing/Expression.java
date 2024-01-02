@@ -69,7 +69,7 @@ public interface Expression {
 
 //    Parser parser(Tokenizer tokenizer);
 
-    public <R, P> R accept(ProductionVisitor<R, P> visitor, P p);
+    public <R, P> R accept(ExpressionVisitor<R, P> visitor, P p);
 
     public Kind getKind();
 

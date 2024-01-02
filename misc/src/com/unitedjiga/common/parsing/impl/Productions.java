@@ -27,7 +27,7 @@ import com.unitedjiga.common.parsing.ChoiceExpression;
 import com.unitedjiga.common.parsing.PatternExpression;
 import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.ProductionFactory;
-import com.unitedjiga.common.parsing.ProductionVisitor;
+import com.unitedjiga.common.parsing.ExpressionVisitor;
 import com.unitedjiga.common.parsing.SequenceExpression;
 
 /**
@@ -40,7 +40,7 @@ public final class Productions {
     private static final Expression EMPTY =  new Expression() {
 
         @Override
-        public <R, P> R accept(ProductionVisitor<R, P> visitor, P p) {
+        public <R, P> R accept(ExpressionVisitor<R, P> visitor, P p) {
             return visitor.visitEmpty(this, p);
         }
 
@@ -53,7 +53,7 @@ public final class Productions {
     static final Expression EOF =  new Expression() {
 
         @Override
-        public <R, P> R accept(ProductionVisitor<R, P> visitor, P p) {
+        public <R, P> R accept(ExpressionVisitor<R, P> visitor, P p) {
             throw new UnsupportedOperationException();
         }
 

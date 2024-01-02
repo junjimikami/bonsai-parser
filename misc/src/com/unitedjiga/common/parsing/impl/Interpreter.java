@@ -33,7 +33,7 @@ import com.unitedjiga.common.parsing.ChoiceExpression;
 import com.unitedjiga.common.parsing.ParsingException;
 import com.unitedjiga.common.parsing.PatternExpression;
 import com.unitedjiga.common.parsing.Expression;
-import com.unitedjiga.common.parsing.ProductionVisitor;
+import com.unitedjiga.common.parsing.ExpressionVisitor;
 import com.unitedjiga.common.parsing.QuantifierExpression;
 import com.unitedjiga.common.parsing.ReferenceExpression;
 import com.unitedjiga.common.parsing.SequenceExpression;
@@ -44,7 +44,7 @@ import com.unitedjiga.common.parsing.Tokenizer;
  * @author Mikami Junji
  *
  */
-class Interpreter implements ProductionVisitor<Symbol, Context> {
+class Interpreter implements ExpressionVisitor<Symbol, Context> {
     private final FirstSet firstSet = new FirstSet();
     private final AnyMatcher anyMatcher = new AnyMatcher();
 
@@ -65,7 +65,7 @@ class Interpreter implements ProductionVisitor<Symbol, Context> {
     }
 
     @Override
-    public Symbol visitAlternative(ChoiceExpression alt, Context args) {
+    public Symbol visitChoice(ChoiceExpression alt, Context args) {
         for (var p : alt.getChoices()) {
             if (anyMatcher.visit(p, args)) {
                 var s = visit(p, args);
@@ -76,7 +76,7 @@ class Interpreter implements ProductionVisitor<Symbol, Context> {
     }
 
     @Override
-    public Symbol visitSequential(SequenceExpression seq, Context args) {
+    public Symbol visitSequence(SequenceExpression seq, Context args) {
         var tokenizer = args.getTokenizer();
         var followSet = args.getFollowSet();
         if (anyMatcher.visit(seq, args)) {
@@ -85,7 +85,7 @@ class Interpreter implements ProductionVisitor<Symbol, Context> {
             while (!pList.isEmpty()) {
                 var p = pList.remove();
                 var subseq = Productions.of(pList.toArray());
-                var f = firstSet.visitSequential(subseq, followSet);
+                var f = firstSet.visitSequence(subseq, followSet);
                 list.add(interpret(p, tokenizer, f));
             }
             return new DefaultNonTerminalSymbol(seq.getName(), list);
@@ -109,7 +109,7 @@ class Interpreter implements ProductionVisitor<Symbol, Context> {
     }
 
     @Override
-    public Symbol visitQuantified(QuantifierExpression qt, Context args) {
+    public Symbol visitQuantifier(QuantifierExpression qt, Context args) {
         var list = new ArrayList<Symbol>();
         var result = qt.withinRange(p -> {
             if (anyMatcher.visit(p, args)) {

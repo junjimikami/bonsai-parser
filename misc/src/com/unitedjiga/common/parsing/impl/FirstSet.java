@@ -31,7 +31,7 @@ import java.util.Set;
 import com.unitedjiga.common.parsing.ChoiceExpression;
 import com.unitedjiga.common.parsing.PatternExpression;
 import com.unitedjiga.common.parsing.Expression;
-import com.unitedjiga.common.parsing.ProductionVisitor;
+import com.unitedjiga.common.parsing.ExpressionVisitor;
 import com.unitedjiga.common.parsing.QuantifierExpression;
 import com.unitedjiga.common.parsing.ReferenceExpression;
 import com.unitedjiga.common.parsing.SequenceExpression;
@@ -40,7 +40,7 @@ import com.unitedjiga.common.parsing.SequenceExpression;
  * @author Mikami Junji
  *
  */
-class FirstSet implements ProductionVisitor<Set<Expression>, Set<Expression>> {
+class FirstSet implements ExpressionVisitor<Set<Expression>, Set<Expression>> {
 
     @Override
     public Set<Expression> visit(Expression prd) {
@@ -48,7 +48,7 @@ class FirstSet implements ProductionVisitor<Set<Expression>, Set<Expression>> {
     }
 
     @Override
-    public Set<Expression> visitAlternative(ChoiceExpression alt, Set<Expression> followSet) {
+    public Set<Expression> visitChoice(ChoiceExpression alt, Set<Expression> followSet) {
         if (alt.getChoices().isEmpty()) {
             return followSet;
         }
@@ -60,7 +60,7 @@ class FirstSet implements ProductionVisitor<Set<Expression>, Set<Expression>> {
     }
 
     @Override
-    public Set<Expression> visitSequential(SequenceExpression seq, Set<Expression> followSet) {
+    public Set<Expression> visitSequence(SequenceExpression seq, Set<Expression> followSet) {
         if (seq.getSequence().isEmpty()) {
             return followSet;
         }
@@ -84,7 +84,7 @@ class FirstSet implements ProductionVisitor<Set<Expression>, Set<Expression>> {
     }
 
     @Override
-    public Set<Expression> visitQuantified(QuantifierExpression qt, Set<Expression> followSet) {
+    public Set<Expression> visitQuantifier(QuantifierExpression qt, Set<Expression> followSet) {
         var set = new HashSet<Expression>();
         var prd = qt.stream()
                 .limit(1)
