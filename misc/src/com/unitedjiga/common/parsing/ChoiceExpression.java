@@ -31,7 +31,7 @@ import java.util.List;
  */
 public interface ChoiceExpression extends Expression {
 
-    public static interface Builder extends Expression.Builder {
+    public static interface Builder extends Expression.Builder, Quantifiable {
         public ChoiceExpression.Builder add(Expression.Builder builder);
         public ChoiceExpression.Builder add(String reference);
         public ChoiceExpression.Builder addPattern(String pattern);

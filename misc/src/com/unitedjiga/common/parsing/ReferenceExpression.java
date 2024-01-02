@@ -29,7 +29,7 @@ package com.unitedjiga.common.parsing;
  */
 public interface ReferenceExpression extends Expression {
 
-    public static interface Builder extends Expression.Builder {
+    public static interface Builder extends Expression.Builder, Quantifiable {
         public ReferenceExpression build();
         public ReferenceExpression build(ProductionSet set);
     }

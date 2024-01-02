@@ -31,11 +31,10 @@ import java.util.List;
  */
 public interface SequenceExpression extends Expression {
 
-    public static interface Builder extends Expression.Builder {
+    public static interface Builder extends Expression.Builder, Quantifiable {
         public SequenceExpression.Builder add(Expression.Builder builder);
         public SequenceExpression.Builder add(String reference);
         public SequenceExpression.Builder addPattern(String pattern);
-        public SequenceExpression.Builder addEmpty();
         public SequenceExpression build();
         public SequenceExpression build(ProductionSet set);
     }

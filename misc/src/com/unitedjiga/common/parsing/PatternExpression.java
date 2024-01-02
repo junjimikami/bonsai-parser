@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
  */
 public interface PatternExpression extends Expression {
 
-    public static interface Builder extends Expression.Builder {
+    public static interface Builder extends Expression.Builder, Quantifiable {
         public PatternExpression build();
         public PatternExpression build(ProductionSet set);
     }
