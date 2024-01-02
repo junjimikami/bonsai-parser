@@ -47,7 +47,7 @@ public interface QuantifiedProduction extends EntityProduction {
 
     @Override
     public default Kind getKind() {
-        return Kind.QUANTIFIED;
+        return Kind.QUANTIFIER;
     }
 
     @Override

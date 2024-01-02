@@ -41,7 +41,7 @@ public interface SequentialProduction extends EntityProduction {
 
     @Override
     public default Kind getKind() {
-    	return Kind.SEQUENTIAL;
+    	return Kind.SEQUENCE;
     }
 
     @Override

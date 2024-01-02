@@ -41,7 +41,7 @@ public interface AlternativeProduction extends EntityProduction {
 
     @Override
     public default Kind getKind() {
-    	return Kind.ALTERNATIVE;
+    	return Kind.CHOICE;
     }
 
     @Override

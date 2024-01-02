@@ -34,29 +34,25 @@ import com.unitedjiga.common.parsing.impl.Productions;
  */
 public interface Expression {
 
-	public static enum Kind {
-		PATTERN,
-		SEQUENTIAL,
-		ALTERNATIVE,
-		REFERENCE,
-		QUANTIFIED,
-		EMPTY;
-	}
+    public static enum Kind {
+        PATTERN, SEQUENCE, CHOICE, REFERENCE, QUANTIFIER, EMPTY;
+    }
 
-	public static interface Builder {
+    public static interface Builder {
         public Expression build();
     }
 
     public static final Expression EMPTY = Productions.empty();
 
-	public static PatternProduction ofPattern(String regex) {
-		return Productions.ofPattern(regex);
-	}
-	public static PatternProduction ofPattern(String regex, int flags) {
-		return Productions.ofPattern(regex, flags);
-	}
+    public static PatternProduction ofPattern(String regex) {
+        return Productions.ofPattern(regex);
+    }
 
-	public static SequentialProduction of(Object... args) {
+    public static PatternProduction ofPattern(String regex, int flags) {
+        return Productions.ofPattern(regex, flags);
+    }
+
+    public static SequentialProduction of(Object... args) {
         return Productions.of(args);
     }
 
@@ -71,8 +67,9 @@ public interface Expression {
 //    Parser parser(Tokenizer tokenizer);
 
     public <R, P> R accept(ProductionVisitor<R, P> visitor, P p);
+
     public Kind getKind();
-    
+
     public default QuantifiedProduction opt() {
         throw new UnsupportedOperationException();
     }
