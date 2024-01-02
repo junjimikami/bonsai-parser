@@ -1,4 +1,4 @@
-package com.unitedjiga.common.parsing;
+package com.unitedjiga.common.parsing.grammar;
 
 public interface Production {
 

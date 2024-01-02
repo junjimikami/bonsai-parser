@@ -25,8 +25,8 @@ package com.unitedjiga.common.parsing.impl;
 
 import java.util.Set;
 
-import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.Tokenizer;
+import com.unitedjiga.common.parsing.grammar.Expression;
 
 /**
  * @author Mikami Junji

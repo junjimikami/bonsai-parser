@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-import com.unitedjiga.common.parsing.ChoiceExpression;
-import com.unitedjiga.common.parsing.Expression;
+import com.unitedjiga.common.parsing.grammar.ChoiceExpression;
+import com.unitedjiga.common.parsing.grammar.Expression;
 
 /**
  * 

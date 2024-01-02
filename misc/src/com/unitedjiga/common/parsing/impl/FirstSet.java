@@ -28,13 +28,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.unitedjiga.common.parsing.ChoiceExpression;
-import com.unitedjiga.common.parsing.PatternExpression;
-import com.unitedjiga.common.parsing.Expression;
-import com.unitedjiga.common.parsing.ExpressionVisitor;
-import com.unitedjiga.common.parsing.QuantifierExpression;
-import com.unitedjiga.common.parsing.ReferenceExpression;
-import com.unitedjiga.common.parsing.SequenceExpression;
+import com.unitedjiga.common.parsing.grammar.ChoiceExpression;
+import com.unitedjiga.common.parsing.grammar.Expression;
+import com.unitedjiga.common.parsing.grammar.ExpressionVisitor;
+import com.unitedjiga.common.parsing.grammar.PatternExpression;
+import com.unitedjiga.common.parsing.grammar.QuantifierExpression;
+import com.unitedjiga.common.parsing.grammar.ReferenceExpression;
+import com.unitedjiga.common.parsing.grammar.SequenceExpression;
 
 /**
  * @author Mikami Junji

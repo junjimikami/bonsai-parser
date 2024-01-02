@@ -27,7 +27,7 @@ import java.util.ServiceLoader;
 import java.util.ServiceLoader.Provider;
 
 import com.unitedjiga.common.parsing.ParserFactory;
-import com.unitedjiga.common.parsing.Expression;
+import com.unitedjiga.common.parsing.grammar.Expression;
 
 /**
  * @author Junji Mikami

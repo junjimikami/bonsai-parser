@@ -26,8 +26,8 @@ package com.unitedjiga.common.parsing.impl;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import com.unitedjiga.common.parsing.Expression;
-import com.unitedjiga.common.parsing.ReferenceExpression;
+import com.unitedjiga.common.parsing.grammar.Expression;
+import com.unitedjiga.common.parsing.grammar.ReferenceExpression;
 
 /**
  * @author Junji Mikami

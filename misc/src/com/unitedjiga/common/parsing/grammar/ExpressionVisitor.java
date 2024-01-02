@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2021 Junji Mikami.
+ * Copyright 2022 Mikami Junji.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,34 +21,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.parsing;
-
-import java.util.List;
+package com.unitedjiga.common.parsing.grammar;
 
 /**
- * @author Junji Mikami
+ * @author Mikami Junji
  *
  */
-public interface ChoiceExpression extends Expression {
+public interface ExpressionVisitor<R, P> {
 
-    public static interface Builder extends Expression.Builder, Quantifiable {
-        public ChoiceExpression.Builder add(Expression.Builder builder);
-        public ChoiceExpression.Builder add(String reference);
-        public ChoiceExpression.Builder addPattern(String pattern);
-        public ChoiceExpression.Builder addEmpty();
-        public ChoiceExpression build();
-        public ChoiceExpression build(ProductionSet set);
+    public default R visit(Expression prd) {
+        return visit(prd, null);
     }
 
-    @Override
-    public default Kind getKind() {
-    	return Kind.CHOICE;
+    public default R visit(Expression prd, P p) {
+        return prd.accept(this, p);
     }
 
-    @Override
-    public default <R, P> R accept(ExpressionVisitor<R, P> visitor, P p) {
-        return visitor.visitChoice(this, p);
-    }
+    public R visitChoice(ChoiceExpression prd, P p);
 
-    public List<? extends Expression> getChoices();
+    public R visitSequence(SequenceExpression prd, P p);
+
+    public R visitPattern(PatternExpression prd, P p);
+
+    public R visitReference(ReferenceExpression prd, P p);
+
+    public R visitQuantifier(QuantifierExpression prd, P p);
+
+    public R visitEmpty(Expression prd, P p);
 }

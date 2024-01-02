@@ -26,8 +26,8 @@ package com.unitedjiga.common.parsing.impl;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import com.unitedjiga.common.parsing.PatternExpression;
 import com.unitedjiga.common.parsing.Token;
+import com.unitedjiga.common.parsing.grammar.PatternExpression;
 
 /**
  *

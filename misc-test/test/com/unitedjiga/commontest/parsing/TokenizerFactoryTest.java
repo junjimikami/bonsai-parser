@@ -23,15 +23,15 @@
  */
 package com.unitedjiga.commontest.parsing;
 
+import static com.unitedjiga.common.parsing.grammar.Expression.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static com.unitedjiga.common.parsing.Expression.*;
 
 import java.io.StringReader;
 
 import org.junit.jupiter.api.Test;
 
-import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.TokenizerFactory;
+import com.unitedjiga.common.parsing.grammar.Expression;
 
 /**
  * @author Junji Mikami

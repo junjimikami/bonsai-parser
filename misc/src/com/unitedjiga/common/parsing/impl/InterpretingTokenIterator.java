@@ -4,11 +4,11 @@ import java.util.Iterator;
 import java.util.stream.Collectors;
 
 import com.unitedjiga.common.parsing.NonTerminalSymbol;
-import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.SymbolVisitor;
 import com.unitedjiga.common.parsing.TerminalSymbol;
 import com.unitedjiga.common.parsing.Token;
 import com.unitedjiga.common.parsing.Tokenizer;
+import com.unitedjiga.common.parsing.grammar.Expression;
 
 class InterpretingTokenIterator implements Iterator<Token> {
     private final SymbolVisitor<Token, Void> visitor = new SymbolVisitor<>() {

@@ -1,17 +1,17 @@
 package com.unitedjiga.commontest.parsing.sp;
 
-import static com.unitedjiga.common.parsing.Expression.of;
-import static com.unitedjiga.common.parsing.Expression.oneOf;
-import static com.unitedjiga.common.parsing.Expression.ref;
+import static com.unitedjiga.common.parsing.grammar.Expression.of;
+import static com.unitedjiga.common.parsing.grammar.Expression.oneOf;
+import static com.unitedjiga.common.parsing.grammar.Expression.ref;
 
 import java.io.Reader;
 
-import com.unitedjiga.common.parsing.ChoiceExpression;
 import com.unitedjiga.common.parsing.Parser;
-import com.unitedjiga.common.parsing.Expression;
-import com.unitedjiga.common.parsing.SequenceExpression;
 import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.Tokenizer.Builder;
+import com.unitedjiga.common.parsing.grammar.ChoiceExpression;
+import com.unitedjiga.common.parsing.grammar.Expression;
+import com.unitedjiga.common.parsing.grammar.SequenceExpression;
 import com.unitedjiga.common.parsing.TokenizerFactory;
 
 public class JavaTokenizerFactory implements TokenizerFactory {

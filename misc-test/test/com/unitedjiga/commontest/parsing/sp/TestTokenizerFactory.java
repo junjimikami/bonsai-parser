@@ -25,9 +25,9 @@ package com.unitedjiga.commontest.parsing.sp;
 
 import java.io.Reader;
 
-import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.Tokenizer.Builder;
+import com.unitedjiga.common.parsing.grammar.Expression;
 import com.unitedjiga.common.parsing.TokenizerFactory;
 
 /**

@@ -23,12 +23,12 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import com.unitedjiga.common.parsing.ChoiceExpression;
-import com.unitedjiga.common.parsing.PatternExpression;
-import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.ProductionFactory;
-import com.unitedjiga.common.parsing.ExpressionVisitor;
-import com.unitedjiga.common.parsing.SequenceExpression;
+import com.unitedjiga.common.parsing.grammar.ChoiceExpression;
+import com.unitedjiga.common.parsing.grammar.Expression;
+import com.unitedjiga.common.parsing.grammar.ExpressionVisitor;
+import com.unitedjiga.common.parsing.grammar.PatternExpression;
+import com.unitedjiga.common.parsing.grammar.SequenceExpression;
 
 /**
  * 

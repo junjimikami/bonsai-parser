@@ -27,8 +27,8 @@ import java.util.OptionalLong;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import com.unitedjiga.common.parsing.Expression;
-import com.unitedjiga.common.parsing.QuantifierExpression;
+import com.unitedjiga.common.parsing.grammar.Expression;
+import com.unitedjiga.common.parsing.grammar.QuantifierExpression;
 
 /**
  * @author Mikami Junji

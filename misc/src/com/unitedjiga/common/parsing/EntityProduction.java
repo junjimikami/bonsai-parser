@@ -23,6 +23,8 @@
  */
 package com.unitedjiga.common.parsing;
 
+import com.unitedjiga.common.parsing.grammar.Expression;
+
 /**
  * @author Junji Mikami
  *

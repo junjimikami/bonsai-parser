@@ -1,8 +1,8 @@
 package com.unitedjiga.commontest.parsing;
 
-import static com.unitedjiga.common.parsing.Expression.of;
-import static com.unitedjiga.common.parsing.Expression.oneOf;
-import static com.unitedjiga.common.parsing.Expression.ref;
+import static com.unitedjiga.common.parsing.grammar.Expression.of;
+import static com.unitedjiga.common.parsing.grammar.Expression.oneOf;
+import static com.unitedjiga.common.parsing.grammar.Expression.ref;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -14,11 +14,11 @@ import org.junit.jupiter.api.Test;
 
 import com.unitedjiga.common.parsing.NonTerminalSymbol;
 import com.unitedjiga.common.parsing.ParsingException;
-import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.Symbol;
 import com.unitedjiga.common.parsing.SymbolVisitor;
 import com.unitedjiga.common.parsing.TerminalSymbol;
 import com.unitedjiga.common.parsing.Tokenizer;
+import com.unitedjiga.common.parsing.grammar.Expression;
 
 class ProductionTest {
 

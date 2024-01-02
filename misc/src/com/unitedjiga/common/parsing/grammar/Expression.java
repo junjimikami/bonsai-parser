@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2021 Junji Mikami.
+ * Copyright 2020 Junji Mikami.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,33 +21,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.parsing;
+package com.unitedjiga.common.parsing.grammar;
 
-import java.util.List;
+import com.unitedjiga.common.parsing.impl.Productions;
 
 /**
+ * 
  * @author Junji Mikami
- *
  */
-public interface SequenceExpression extends Expression {
+public interface Expression {
 
-    public static interface Builder extends Expression.Builder, Quantifiable {
-        public SequenceExpression.Builder add(Expression.Builder builder);
-        public SequenceExpression.Builder add(String reference);
-        public SequenceExpression.Builder addPattern(String pattern);
-        public SequenceExpression build();
-        public SequenceExpression build(ProductionSet set);
+    public static enum Kind {
+        PATTERN, SEQUENCE, CHOICE, REFERENCE, QUANTIFIER, EMPTY;
     }
 
-    @Override
-    public default Kind getKind() {
-    	return Kind.SEQUENCE;
+    public static interface Builder {
+        public Expression build(ProductionSet set);
+        public default Expression build() {
+            return build(null);
+        }
     }
 
-    @Override
-    public default <R, P> R accept(ExpressionVisitor<R, P> visitor, P p) {
-        return visitor.visitSequence(this, p);
-    }
+    public static final Expression EMPTY = Productions.empty();
 
-    public List<Expression> getSequence();
+    public <R, P> R accept(ExpressionVisitor<R, P> visitor, P p);
+
+    public Kind getKind();
 }

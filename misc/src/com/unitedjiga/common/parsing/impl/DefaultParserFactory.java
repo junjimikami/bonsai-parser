@@ -29,10 +29,10 @@ import java.util.Objects;
 import com.unitedjiga.common.parsing.NonTerminalSymbol;
 import com.unitedjiga.common.parsing.Parser;
 import com.unitedjiga.common.parsing.ParserFactory;
-import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.Symbol;
 import com.unitedjiga.common.parsing.TerminalSymbol;
 import com.unitedjiga.common.parsing.Tokenizer;
+import com.unitedjiga.common.parsing.grammar.Expression;
 
 /**
  * @author Mikami Junji

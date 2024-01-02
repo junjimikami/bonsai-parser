@@ -6,10 +6,10 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.Token;
 import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.TokenizerFactory;
+import com.unitedjiga.common.parsing.grammar.Expression;
 
 class DefaultTokenizerFactory implements TokenizerFactory {
     static class BaseBuilder implements Tokenizer.Builder {

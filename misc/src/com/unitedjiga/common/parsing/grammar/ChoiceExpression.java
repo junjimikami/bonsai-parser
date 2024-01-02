@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2020 Junji Mikami.
+ * Copyright 2021 Junji Mikami.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,30 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.parsing;
+package com.unitedjiga.common.parsing.grammar;
 
-import com.unitedjiga.common.parsing.impl.Productions;
+import java.util.List;
 
 /**
- * 
  * @author Junji Mikami
+ *
  */
-public interface Expression {
+public interface ChoiceExpression extends Expression {
 
-    public static enum Kind {
-        PATTERN, SEQUENCE, CHOICE, REFERENCE, QUANTIFIER, EMPTY;
+    public static interface Builder extends Expression.Builder, Quantifiable {
+        public ChoiceExpression.Builder add(Expression.Builder builder);
+        public ChoiceExpression.Builder add(String reference);
+        public ChoiceExpression.Builder addPattern(String pattern);
+        public ChoiceExpression.Builder addEmpty();
+        public ChoiceExpression build();
+        public ChoiceExpression build(ProductionSet set);
     }
 
-    public static interface Builder {
-        public Expression build(ProductionSet set);
-        public default Expression build() {
-            return build(null);
-        }
+    @Override
+    public default Kind getKind() {
+    	return Kind.CHOICE;
     }
 
-    public static final Expression EMPTY = Productions.empty();
+    @Override
+    public default <R, P> R accept(ExpressionVisitor<R, P> visitor, P p) {
+        return visitor.visitChoice(this, p);
+    }
 
-    public <R, P> R accept(ExpressionVisitor<R, P> visitor, P p);
-
-    public Kind getKind();
+    public List<? extends Expression> getChoices();
 }

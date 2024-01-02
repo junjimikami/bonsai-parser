@@ -32,10 +32,10 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 import com.unitedjiga.common.parsing.ParserFactory;
-import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.ProductionFactory;
-import com.unitedjiga.common.parsing.ReferenceExpression;
 import com.unitedjiga.common.parsing.Tokenizer;
+import com.unitedjiga.common.parsing.grammar.Expression;
+import com.unitedjiga.common.parsing.grammar.ReferenceExpression;
 import com.unitedjiga.common.parsing.util.SimpleProductionVisitor;
 
 /**

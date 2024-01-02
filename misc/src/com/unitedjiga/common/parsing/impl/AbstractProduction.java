@@ -23,7 +23,7 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import com.unitedjiga.common.parsing.Expression;
+import com.unitedjiga.common.parsing.grammar.Expression;
 
 /**
  *

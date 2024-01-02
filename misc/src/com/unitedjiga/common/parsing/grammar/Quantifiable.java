@@ -1,4 +1,6 @@
-package com.unitedjiga.common.parsing;
+package com.unitedjiga.common.parsing.grammar;
+
+import com.unitedjiga.common.parsing.grammar.QuantifierExpression.Builder;
 
 public interface Quantifiable {
 

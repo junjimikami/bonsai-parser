@@ -25,6 +25,12 @@ package com.unitedjiga.common.parsing;
 
 import java.util.function.Supplier;
 
+import com.unitedjiga.common.parsing.grammar.ChoiceExpression;
+import com.unitedjiga.common.parsing.grammar.Expression;
+import com.unitedjiga.common.parsing.grammar.PatternExpression;
+import com.unitedjiga.common.parsing.grammar.QuantifierExpression;
+import com.unitedjiga.common.parsing.grammar.ReferenceExpression;
+import com.unitedjiga.common.parsing.grammar.SequenceExpression;
 import com.unitedjiga.common.parsing.impl.Productions;
 
 /**
