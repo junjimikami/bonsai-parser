@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2020 Junji Mikami.
+ * Copyright 2021 Junji Mikami.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,52 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.parsing;
+package com.unitedjiga.commontest.parsing.sp;
 
 import java.io.Reader;
-import java.util.Iterator;
-import java.util.function.Predicate;
+
+import com.unitedjiga.common.parsing.Parser;
+import com.unitedjiga.common.parsing.ParserFactory;
+import com.unitedjiga.common.parsing.Tokenizer;
 
 /**
- *
  * @author Junji Mikami
+ *
  */
-public interface Tokenizer {
-    public static interface Builder {
-        public Tokenizer.Builder set(Reader r);
-//        public Tokenizer.Builder set(Iterator<String> it);
-        public Tokenizer.Builder filter(Predicate<Token> p);
-        public Tokenizer build();
+public class TestParserFactory implements ParserFactory {
+
+    @Override
+    public Parser createParser(Tokenizer tokenizer) {
+//        var prd = Production.oneOf(".").repeat();
+//        return prd.parser(tokenizer);
+		// TODO Auto-generated method stub
+		return null;
     }
 
-//    /**
-//     * 
-//     * @param it
-//     * @return
-//     */
-//    public static Tokenizer wrap(Iterator<? extends CharSequence> it) {
-//        return Tokenizers.createTokenizer(it);
-//    }
-//
-//    /**
-//     * 
-//     * @param str
-//     * @return
-//     */
-//    public static Tokenizer wrap(String... str) {
-//        return wrap(Arrays.asList(str).iterator());
-//    }
-
-    public Token read();
-
-    public boolean hasNext();
-    public Token next();
-
-    public boolean hasPrevious();
-    public Token previous();
-
-    public default Token peek() {
-        next();
-        return previous();
+    @Override
+    public Parser createParser(Reader reader) {
+        // TODO Auto-generated method stub
+        return null;
     }
+
 }

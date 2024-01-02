@@ -23,21 +23,21 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import java.util.Objects;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
 
-import com.unitedjiga.common.parsing.PatternProduction;
-import com.unitedjiga.common.parsing.Token;
+import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.SequentialProduction;
 
 /**
  *
  * @author Junji Mikami
  */
-class TermProduction extends AbstractEntityProduction implements PatternProduction {
-    static class Builder extends AbstractProduction.Builder implements PatternProduction.Builder {
+class SeqProduction extends AbstractEntityProduction implements SequentialProduction {
+    static class Builder extends AbstractProduction.Builder implements SequentialProduction.Builder {
         private String name;
-        private String pattern;
-        private int flags;
+        private final List<Supplier<Production>> elements = new ArrayList<>();
 
         @Override
         public Builder setName(String name) {
@@ -47,41 +47,45 @@ class TermProduction extends AbstractEntityProduction implements PatternProducti
         }
 
         @Override
-        public Builder setPattern(String p) {
-            check();
-            this.pattern = p;
-            return this;
-        }
-
-        @Override
-        public Builder setFlags(int flags) {
-            check();
-            this.flags = flags;
-            return this;
-        }
-
-        @Override
-        public PatternProduction build() {
+        public SequentialProduction build() {
             checkForBuild();
-            return new TermProduction(name, pattern, flags);
+            var el = elements.stream()
+                    .map(e -> e.get())
+                    .toList();
+            return new SeqProduction(name, el);
         }
-        
+
+        @Override
+        public Builder add(Production p) {
+            check();
+            elements.add(() -> p);
+            return this;
+        }
+
+        @Override
+        public Builder add(Production.Builder b) {
+            check();
+            elements.add(b::build);
+            return this;
+        }
+
+        @Override
+        public Builder addEmpty() {
+            check();
+            elements.add(Productions::empty);
+            return this;
+        }
     }
 
-    private final Pattern pattern;
+    private final List<Production> elements;
 
-    private TermProduction(String name, String regex, int flags) {
-    	super(name);
-        Objects.requireNonNull(regex, Message.REQUIRE_NON_NULL.format());
-        this.pattern = Pattern.compile(regex, flags);
-    }
-
-    public boolean matches(Token t) {
-        return pattern.matcher(t.getValue()).matches();
+    private SeqProduction(String name, List<Production> elements) {
+        super(name);
+        this.elements = elements;
     }
 
     @Override
-    public Pattern getPattern() {
-        return pattern;
+    public List<Production> getProductions() {
+        return elements;
     }
 }

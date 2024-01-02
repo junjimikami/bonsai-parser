@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2020 Junji Mikami.
+ * Copyright 2021 Junji Mikami.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,52 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.parsing;
+package com.unitedjiga.commontest.parsing.sp;
 
 import java.io.Reader;
-import java.util.Iterator;
-import java.util.function.Predicate;
+
+import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Tokenizer;
+import com.unitedjiga.common.parsing.Tokenizer.Builder;
+import com.unitedjiga.common.parsing.TokenizerFactory;
 
 /**
- *
  * @author Junji Mikami
+ *
  */
-public interface Tokenizer {
-    public static interface Builder {
-        public Tokenizer.Builder set(Reader r);
-//        public Tokenizer.Builder set(Iterator<String> it);
-        public Tokenizer.Builder filter(Predicate<Token> p);
-        public Tokenizer build();
+public class TestTokenizerFactory implements TokenizerFactory {
+
+    @Override
+    public Tokenizer createTokenizer(Reader r) {
+        var prd = Production.oneOf(
+                Production.of("0").repeat(),
+                Production.of("1").repeat());
+        return TokenizerFactory.newFactory(prd).createTokenizer(r);
     }
 
-//    /**
-//     * 
-//     * @param it
-//     * @return
-//     */
-//    public static Tokenizer wrap(Iterator<? extends CharSequence> it) {
-//        return Tokenizers.createTokenizer(it);
-//    }
-//
-//    /**
-//     * 
-//     * @param str
-//     * @return
-//     */
-//    public static Tokenizer wrap(String... str) {
-//        return wrap(Arrays.asList(str).iterator());
-//    }
-
-    public Token read();
-
-    public boolean hasNext();
-    public Token next();
-
-    public boolean hasPrevious();
-    public Token previous();
-
-    public default Token peek() {
-        next();
-        return previous();
+    @Override
+    public Builder createTokenizerBuilder() {
+        // TODO Auto-generated method stub
+        return null;
     }
+
 }

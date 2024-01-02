@@ -21,26 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.parsing.impl;
-
-import java.text.MessageFormat;
+package com.unitedjiga.common.parsing;
 
 /**
  * @author Junji Mikami
  *
  */
-enum Messages {
+public interface EntityProduction extends Production {
 
-    TOO_MANY_TOKEN("expected EOF, but {0}."), RULE_MISMATCH("expected {0}, but {1}.");
-
-    private String message;
-
-    Messages(String message) {
-        this.message = message;
+    public static interface Builder extends Production.Builder {
+        public Builder setName(String name);
+        public EntityProduction build();
     }
 
-    String format(Object... args) {
-        return MessageFormat.format(message, args);
-    }
-
+    public String getName();
 }

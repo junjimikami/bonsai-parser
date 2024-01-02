@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2020 Junji Mikami.
+ * Copyright 2022 Mikami Junji.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,26 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.parsing;
+package com.unitedjiga.common.parsing.impl;
+
+import java.util.Set;
+
+import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Tokenizer;
 
 /**
- * 
- * @author Junji Mikami
+ * @author Mikami Junji
  *
- * @param <R>
- * @param <P>
  */
-public interface SymbolVisitor<R, P> {
+class Context {
 
-    public default R visit(Symbol s) {
-        return visit(s, null);
+    private final Tokenizer tokenizer;
+    private final Set<Production> followSet;
+
+    Context(Tokenizer tokenizer, Set<Production> followSet) {
+        super();
+        this.tokenizer = tokenizer;
+        this.followSet = followSet;
     }
 
-    public default R visit(Symbol s, P p) {
-        return s.accept(this, p);
+    Tokenizer getTokenizer() {
+        return tokenizer;
     }
 
-    public R visitTerminal(TerminalSymbol s, P p);
-
-    public R visitNonTerminal(NonTerminalSymbol s, P p);
+    Set<Production> getFollowSet() {
+        return followSet;
+    }
 }

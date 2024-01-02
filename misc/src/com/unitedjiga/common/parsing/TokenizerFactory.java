@@ -25,7 +25,7 @@ package com.unitedjiga.common.parsing;
 
 import java.io.Reader;
 
-import com.unitedjiga.common.parsing.impl.DefaultTokenizerFactory;
+import com.unitedjiga.common.parsing.impl.Tokenizers;
 
 /**
  * 
@@ -34,13 +34,19 @@ import com.unitedjiga.common.parsing.impl.DefaultTokenizerFactory;
  */
 public interface TokenizerFactory {
 
-    static TokenizerFactory newInstance() {
-        return newDefaultInstance();
+    public static TokenizerFactory newFactory(Production... productions) {
+        return Tokenizers.createFactory(productions);
+    }
+    
+    public static TokenizerFactory loadFactory(String factoryName, ClassLoader cl) {
+        return Tokenizers.loadFactory(factoryName, cl);
     }
 
-    static TokenizerFactory newDefaultInstance() {
-        return new DefaultTokenizerFactory();
+    public static TokenizerFactory loadFactory(String factoryName) {
+        return Tokenizers.loadFactory(factoryName, null);
     }
 
-    Tokenizer createTokenizer(Reader r);
+    public Tokenizer createTokenizer(Reader r);
+
+    public Tokenizer.Builder createTokenizerBuilder();
 }

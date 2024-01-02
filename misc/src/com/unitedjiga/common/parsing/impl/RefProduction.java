@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2020 Junji Mikami.
+ * Copyright 2021 Junji Mikami.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,20 +21,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.parsing;
+package com.unitedjiga.common.parsing.impl;
 
-public interface SingletonSymbol extends NonTerminalSymbol {
+import java.util.Objects;
+import java.util.function.Supplier;
 
-    Symbol get();
+import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Reference;
 
-    @Override
-    default Kind getKind() {
-        return Kind.SINGLETON;
+/**
+ * @author Junji Mikami
+ *
+ */
+class RefProduction extends AbstractProduction implements Reference {
+    static class Builder extends AbstractProduction.Builder implements Reference.Builder {
+        private Supplier<? extends Production> p;
+
+        @Override
+        public Builder set(Supplier<? extends Production> supplier) {
+            check();
+            this.p = supplier;
+            return this;
+        }
+
+        @Override
+        public Reference build() {
+            checkForBuild();
+            return new RefProduction(p);
+        }
+        
+    }
+
+    private final Supplier<? extends Production> p;
+
+    private RefProduction(Supplier<? extends Production> p) {
+        Objects.requireNonNull(p, Message.REQUIRE_NON_NULL.format());
+        this.p = p;
     }
 
     @Override
-    default <R, P> R accept(SymbolVisitor<R, P> v, P p) {
-        return v.visitSingleton(this, p);
+    public Production get() {
+        return p.get();
     }
 
 }

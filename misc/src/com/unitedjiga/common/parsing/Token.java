@@ -29,6 +29,7 @@ package com.unitedjiga.common.parsing;
  */
 public interface Token extends TerminalSymbol {
 
-    @Override
-    String toString();
+    public String getName();
+
+    public String getValue();
 }

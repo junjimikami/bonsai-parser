@@ -23,7 +23,7 @@
  */
 package com.unitedjiga.common.parsing;
 
-import java.util.regex.Pattern;
+import java.util.function.Supplier;
 
 import com.unitedjiga.common.parsing.impl.Productions;
 
@@ -32,39 +32,53 @@ import com.unitedjiga.common.parsing.impl.Productions;
  * 
  * @author Junji Mikami
  */
-public interface Production extends CharSequence {
+public interface Production {
 
-    static Production of(CharSequence... regex) {
-        return Productions.getInstance().of(regex);
+	public static enum Kind {
+		PATTERN,
+		SEQUENTIAL,
+		ALTERNATIVE,
+		REFERENCE,
+		QUANTIFIED,
+		EMPTY;
+	}
+
+	public static interface Builder {
+        public Production build();
     }
 
-    static Production oneOf(CharSequence... regex) {
-        return Productions.getInstance().oneOf(regex);
+    public static final Production EMPTY = Productions.empty();
+
+	public static PatternProduction ofPattern(String regex) {
+		return Productions.ofPattern(regex);
+	}
+	public static PatternProduction ofPattern(String regex, int flags) {
+		return Productions.ofPattern(regex, flags);
+	}
+
+	public static SequentialProduction of(Object... args) {
+        return Productions.of(args);
     }
 
-    Symbol parseRemaining(Tokenizer tokenizer);
-
-    Symbol parse(Tokenizer tokenizer);
-
-    Production opt();
-
-    Production repeat();
-
-    Pattern asPattern();
-
-    @Override
-    default CharSequence subSequence(int start, int end) {
-        return toString().subSequence(start, end);
+    public static AlternativeProduction oneOf(Object... args) {
+        return Productions.oneOf(args);
     }
 
-    @Override
-    default char charAt(int index) {
-        return toString().charAt(index);
+    static Supplier<? extends Production> ref(Supplier<? extends Production> p) {
+        return p;
     }
 
-    @Override
-    default int length() {
-        return toString().length();
+//    Parser parser(Tokenizer tokenizer);
+
+    public <R, P> R accept(ProductionVisitor<R, P> visitor, P p);
+    public Kind getKind();
+    
+    public default QuantifiedProduction opt() {
+        throw new UnsupportedOperationException();
+    }
+
+    public default QuantifiedProduction repeat() {
+        throw new UnsupportedOperationException();
     }
 
     @Override

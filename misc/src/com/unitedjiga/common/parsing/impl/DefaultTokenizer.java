@@ -21,52 +21,60 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.parsing;
+package com.unitedjiga.common.parsing.impl;
 
-import java.io.Reader;
 import java.util.Iterator;
-import java.util.function.Predicate;
+import java.util.LinkedList;
+import java.util.List;
+
+import com.unitedjiga.common.parsing.Token;
+import com.unitedjiga.common.parsing.Tokenizer;
 
 /**
- *
  * @author Junji Mikami
+ *
  */
-public interface Tokenizer {
-    public static interface Builder {
-        public Tokenizer.Builder set(Reader r);
-//        public Tokenizer.Builder set(Iterator<String> it);
-        public Tokenizer.Builder filter(Predicate<Token> p);
-        public Tokenizer build();
+class DefaultTokenizer implements Tokenizer {
+
+    private final Iterator<Token> itr;
+    private final List<Token> buffer = new LinkedList<>();
+    private int current = 0;
+
+    DefaultTokenizer(Iterator<Token> itr) {
+        super();
+        this.itr = itr;
     }
 
-//    /**
-//     * 
-//     * @param it
-//     * @return
-//     */
-//    public static Tokenizer wrap(Iterator<? extends CharSequence> it) {
-//        return Tokenizers.createTokenizer(it);
-//    }
-//
-//    /**
-//     * 
-//     * @param str
-//     * @return
-//     */
-//    public static Tokenizer wrap(String... str) {
-//        return wrap(Arrays.asList(str).iterator());
-//    }
-
-    public Token read();
-
-    public boolean hasNext();
-    public Token next();
-
-    public boolean hasPrevious();
-    public Token previous();
-
-    public default Token peek() {
-        next();
-        return previous();
+    @Override
+    public Token read() {
+        if (buffer.size() <= current) {
+            return itr.next();
+        }
+        return buffer.remove(current);
     }
+
+    @Override
+    public boolean hasNext() {
+        return current < buffer.size() || itr.hasNext();
+    }
+
+    @Override
+    public Token next() {
+        if (buffer.size() <= current) {
+            var t = itr.next();
+            buffer.add(t);
+        }
+        return buffer.get(current++);
+    }
+
+    @Override
+    public boolean hasPrevious() {
+        return 0 < current;
+    }
+
+    @Override
+    public Token previous() {
+        return buffer.get(--current);
+    }
+
 }

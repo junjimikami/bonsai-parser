@@ -23,7 +23,12 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
+import com.unitedjiga.common.parsing.AlternativeProduction;
+import com.unitedjiga.common.parsing.PatternProduction;
 import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.ProductionFactory;
+import com.unitedjiga.common.parsing.ProductionVisitor;
+import com.unitedjiga.common.parsing.SequentialProduction;
 
 /**
  * 
@@ -31,21 +36,97 @@ import com.unitedjiga.common.parsing.Production;
  *
  */
 public final class Productions {
-    private static final Productions instance = new Productions();
+
+    private static final Production EMPTY =  new Production() {
+
+        @Override
+        public <R, P> R accept(ProductionVisitor<R, P> visitor, P p) {
+            return visitor.visitEmpty(this, p);
+        }
+
+        @Override
+        public Kind getKind() {
+            return Kind.EMPTY;
+        }
+    };
+
+    static final Production EOF =  new Production() {
+
+        @Override
+        public <R, P> R accept(ProductionVisitor<R, P> visitor, P p) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Kind getKind() {
+            throw new UnsupportedOperationException();
+        }
+    };
 
     private Productions() {
-
     }
 
-    public static Productions getInstance() {
-        return instance;
+    public static ProductionFactory newFactory() {
+    	return new DefaultProductionFactory();
     }
 
-    public Production of(CharSequence... regex) {
-        return new AndProduction(regex);
+    public static PatternProduction ofPattern(String regex) {
+//    	return new TermProduction(regex);
+        throw new UnsupportedOperationException();
+    }
+    public static PatternProduction ofPattern(String regex, int flags) {
+//    	return new TermProduction(regex, flags);
+        throw new UnsupportedOperationException();
     }
 
-    public Production oneOf(CharSequence... regex) {
-        return new OrProduction(regex);
+    public static SequentialProduction.Builder sequentialBuilder() {
+        return new SeqProduction.Builder();
     }
+//    public static SequentialProduction.Builder sequentialBuilder(String name) {
+//        return new SeqProduction.Builder().setName(name);
+//    }
+    
+    public static AlternativeProduction.Builder alternativeBuilder() {
+        return new AltProduction.Builder();
+    }
+//    public static AlternativeProduction.Builder alternativeBuilder(String name) {
+//        return new AltProduction.Builder().setName(name);
+//    }
+
+    public static Production empty() {
+        return EMPTY;
+    }
+
+    public static SequentialProduction of(Object... args) {
+        SequentialProduction.Builder builder = sequentialBuilder();
+        for (Object o : args) {
+            if (o instanceof Production) {
+                builder.add((Production) o);
+//            } else if (o instanceof String) {
+//                builder.add((String) o);
+//            } else if (o instanceof Supplier) {
+//                builder.add((Supplier<? extends Production>) o);
+//            } else {
+//                builder.add(o.toString());
+            }
+        }
+        return builder.build();
+    }
+
+    public static AlternativeProduction oneOf(Object... args) {
+        AlternativeProduction.Builder builder = alternativeBuilder();
+        for (Object o : args) {
+            if (o instanceof Production) {
+                builder.add((Production) o);
+//            } else if (o instanceof String) {
+//                builder.add((String) o);
+//            } else if (o instanceof Supplier) {
+//                builder.add((Supplier<? extends Production>) o);
+//            } else {
+//                builder.add(o.toString());
+            }
+        }
+        return builder.build();
+    }
+
 }

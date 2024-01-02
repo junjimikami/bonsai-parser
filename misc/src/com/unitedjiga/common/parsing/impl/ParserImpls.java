@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2020 Junji Mikami.
+ * Copyright 2021 Junji Mikami.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,16 +23,30 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import java.util.AbstractSequentialList;
+import java.util.ServiceLoader;
+import java.util.ServiceLoader.Provider;
 
-import com.unitedjiga.common.parsing.NonTerminalSymbol;
-import com.unitedjiga.common.parsing.Symbol;
+import com.unitedjiga.common.parsing.ParserFactory;
+import com.unitedjiga.common.parsing.Production;
 
 /**
- * 
  * @author Junji Mikami
  *
  */
-abstract class AbstractNonTerminalSymbol extends AbstractSequentialList<Symbol> implements NonTerminalSymbol {
+public final class ParserImpls {
 
+    private ParserImpls() {
+    }
+
+    public static ParserFactory newFactory(Production p) {
+        return new DefaultParserFactory(p);
+    }
+
+    public static ParserFactory loadFactory(String factoryName, ClassLoader cl) {
+        return ServiceLoader.load(ParserFactory.class, cl).stream()
+                .filter(p -> p.type().getCanonicalName().equals(factoryName))
+                .map(Provider::get)
+                .findFirst()
+                .get();
+    }
 }

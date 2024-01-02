@@ -23,61 +23,37 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.regex.Pattern;
+import java.util.Objects;
 
+import com.unitedjiga.common.parsing.NonTerminalSymbol;
 import com.unitedjiga.common.parsing.Symbol;
-import com.unitedjiga.common.parsing.Tokenizer;
 
 /**
  * 
  * @author Junji Mikami
  *
  */
-class RepeatProduction extends AbstractProduction {
-    private final AbstractProduction element;
-    private final Pattern pattern;
+class DefaultNonTerminalSymbol extends AbstractSymbol implements NonTerminalSymbol {
+    private final List<Symbol> list;
 
-    RepeatProduction(AbstractProduction p) {
-        element = p;
-        pattern = Pattern.compile("(" + element + ")*");
+    DefaultNonTerminalSymbol(String name, List<Symbol> list) {
+        super(name);
+        Objects.requireNonNull(list);
+        this.list = list;
+    }
+    DefaultNonTerminalSymbol(String name, Symbol s) {
+        super(name);
+        this.list = List.of(s);
+    }
+    DefaultNonTerminalSymbol(String name) {
+        super(name);
+        this.list = List.of();
     }
 
     @Override
-    Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
-        List<Symbol> list = new ArrayList<>();
-        while (anyMatch(getFirstSet(), tokenizer)) {
-            list.add(element.interpret(tokenizer, getFollowSet(followSet)));
-        }
-        if (!list.isEmpty()) {
-            return newNonTerminal(this, list);
-        }
-        return newNonTerminal(this, Collections.emptyList());
-    }
-
-    @Override
-    Set<TermProduction> getFirstSet(Set<TermProduction> followSet) {
-        return element.getFirstSet(followSet);
-    }
-
-    private Set<TermProduction> getFollowSet(Set<TermProduction> followSet) {
-        Set<TermProduction> set = new HashSet<>();
-        set.addAll(element.getFirstSet());
-        set.addAll(followSet);
-        return set;
-    }
-
-    @Override
-    boolean isOption() {
-        return true;
-    }
-
-    @Override
-    public Pattern asPattern() {
-        return pattern;
+    public List<Symbol> getSymbols() {
+        return Collections.unmodifiableList(list);
     }
 }

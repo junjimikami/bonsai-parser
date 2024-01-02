@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2020 Junji Mikami.
+ * Copyright 2022 Mikami Junji.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,25 +21,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.parsing;
+package com.unitedjiga.common.parsing.impl;
 
-import java.util.List;
+import com.unitedjiga.common.parsing.AlternativeProduction;
+import com.unitedjiga.common.parsing.PatternProduction;
+import com.unitedjiga.common.parsing.ProductionFactory;
+import com.unitedjiga.common.parsing.QuantifiedProduction;
+import com.unitedjiga.common.parsing.Reference;
+import com.unitedjiga.common.parsing.SequentialProduction;
 
 /**
+ * @author Mikami Junji
  *
- * @author Junji Mikami
  */
-public interface NonTerminalSymbol extends Symbol {
+class DefaultProductionFactory implements ProductionFactory {
 
     @Override
-    public default Kind getKind() {
-        return Kind.NON_TERMINAL;
+    public PatternProduction.Builder createPatternBuilder() {
+        return new TermProduction.Builder();
     }
 
     @Override
-    public default <R, P> R accept(SymbolVisitor<R, P> v, P p) {
-        return v.visitNonTerminal(this, p);
+    public AlternativeProduction.Builder createAlternativeBuilder() {
+        return new AltProduction.Builder();
     }
 
-    public List<Symbol> getSymbols();
+    @Override
+    public SequentialProduction.Builder createSequentialBuilder() {
+        return new SeqProduction.Builder();
+    }
+
+    @Override
+    public Reference.Builder createReferenceBuilder() {
+        return new RefProduction.Builder();
+    }
+
+    @Override
+    public QuantifiedProduction.Builder createQuantifiedBuilder() {
+        return new QtProduction.Builder();
+    }
+
 }

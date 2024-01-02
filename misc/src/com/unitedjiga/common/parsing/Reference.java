@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2020 Junji Mikami.
+ * Copyright 2021 Junji Mikami.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,24 +23,28 @@
  */
 package com.unitedjiga.common.parsing;
 
+import java.util.function.Supplier;
+
 /**
- * 
  * @author Junji Mikami
  *
- * @param <R>
- * @param <P>
  */
-public interface SymbolVisitor<R, P> {
+public interface Reference extends Production {
 
-    public default R visit(Symbol s) {
-        return visit(s, null);
+    public static interface Builder extends Production.Builder {
+        public Builder set(Supplier<? extends Production> supplier);
+        public Reference build();
     }
 
-    public default R visit(Symbol s, P p) {
-        return s.accept(this, p);
+    @Override
+    public default Kind getKind() {
+    	return Kind.REFERENCE;
     }
 
-    public R visitTerminal(TerminalSymbol s, P p);
-
-    public R visitNonTerminal(NonTerminalSymbol s, P p);
+    @Override
+    public default <R, P> R accept(ProductionVisitor<R, P> visitor, P p) {
+        return visitor.visitReference(this, p);
+    }
+    
+    public Production get();
 }

@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2020 Junji Mikami.
+ * Copyright 2021 Junji Mikami.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,26 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.parsing;
+package com.unitedjiga.common.parsing.impl;
+
+import java.text.MessageFormat;
 
 /**
- * 
  * @author Junji Mikami
  *
- * @param <R>
- * @param <P>
  */
-public interface SymbolVisitor<R, P> {
+enum Message {
 
-    public default R visit(Symbol s) {
-        return visit(s, null);
+    TOO_MANY_TOKEN("Expected EOF, but {0}."),
+    RULE_MISMATCH("Expected {0}, but {1}."),
+    REQUIRE_NON_NULL("Non-null required."),
+    CANNOT_PUSHBACK(""),
+    CANNOT_REMOVE(""),
+    ALREADY_BUILT(""),
+    NO_SUCH_ELEMENT("")
+    ;
+
+    private MessageFormat msg;
+
+    private Message(String message) {
+        this.msg = new MessageFormat(message);
     }
 
-    public default R visit(Symbol s, P p) {
-        return s.accept(this, p);
+    String format(Object... args) {
+        return msg.format(args);
     }
 
-    public R visitTerminal(TerminalSymbol s, P p);
-
-    public R visitNonTerminal(NonTerminalSymbol s, P p);
 }

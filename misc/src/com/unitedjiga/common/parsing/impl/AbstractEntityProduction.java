@@ -23,47 +23,22 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import java.util.Optional;
-import java.util.Set;
-import java.util.regex.Pattern;
-
-import com.unitedjiga.common.parsing.Symbol;
-import com.unitedjiga.common.parsing.Tokenizer;
+import com.unitedjiga.common.parsing.EntityProduction;
 
 /**
  *
  * @author Junji Mikami
  */
-class OptProduction extends AbstractProduction {
-    private final AbstractProduction element;
-    private final Pattern pattern;
+abstract class AbstractEntityProduction extends AbstractProduction implements EntityProduction {
+    private final String name;
 
-    OptProduction(AbstractProduction p) {
-        element = p;
-        pattern = Pattern.compile("(" + element + ")?");
+    AbstractEntityProduction(String name) {
+        this.name = name;
     }
 
     @Override
-    Symbol interpret(Tokenizer tokenizer, Set<TermProduction> followSet) {
-        if (anyMatch(getFirstSet(), tokenizer)) {
-            Symbol symbol = element.interpret(tokenizer, followSet);
-            return newSingleton(this, Optional.of(symbol));
-        }
-        return newSingleton(this, Optional.empty());
+    public String getName() {
+        return name;
     }
 
-    @Override
-    Set<TermProduction> getFirstSet(Set<TermProduction> followSet) {
-        return element.getFirstSet(followSet);
-    }
-
-    @Override
-    boolean isOption() {
-        return true;
-    }
-
-    @Override
-    public Pattern asPattern() {
-        return pattern;
-    }
 }

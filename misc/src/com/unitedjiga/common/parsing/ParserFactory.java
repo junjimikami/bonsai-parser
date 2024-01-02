@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2020 Junji Mikami.
+ * Copyright 2021 Junji Mikami.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,49 +24,27 @@
 package com.unitedjiga.common.parsing;
 
 import java.io.Reader;
-import java.util.Iterator;
-import java.util.function.Predicate;
+
+import com.unitedjiga.common.parsing.impl.ParserImpls;
 
 /**
- *
  * @author Junji Mikami
+ *
  */
-public interface Tokenizer {
-    public static interface Builder {
-        public Tokenizer.Builder set(Reader r);
-//        public Tokenizer.Builder set(Iterator<String> it);
-        public Tokenizer.Builder filter(Predicate<Token> p);
-        public Tokenizer build();
+public interface ParserFactory {
+
+	public static ParserFactory newFactory(Production p) {
+		return ParserImpls.newFactory(p);
+	}
+
+	public static ParserFactory loadFactory(String factoryName, ClassLoader cl) {
+        return ParserImpls.loadFactory(factoryName, cl);
     }
 
-//    /**
-//     * 
-//     * @param it
-//     * @return
-//     */
-//    public static Tokenizer wrap(Iterator<? extends CharSequence> it) {
-//        return Tokenizers.createTokenizer(it);
-//    }
-//
-//    /**
-//     * 
-//     * @param str
-//     * @return
-//     */
-//    public static Tokenizer wrap(String... str) {
-//        return wrap(Arrays.asList(str).iterator());
-//    }
-
-    public Token read();
-
-    public boolean hasNext();
-    public Token next();
-
-    public boolean hasPrevious();
-    public Token previous();
-
-    public default Token peek() {
-        next();
-        return previous();
+	public static ParserFactory loadFactory(String factoryName) {
+        return ParserImpls.loadFactory(factoryName, null);
     }
+
+	public Parser createParser(Tokenizer tokenizer);
+    public Parser createParser(Reader reader);
 }

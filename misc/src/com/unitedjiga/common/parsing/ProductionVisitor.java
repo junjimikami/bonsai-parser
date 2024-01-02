@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2020 Junji Mikami.
+ * Copyright 2022 Mikami Junji.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,15 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.parsing.impl;
-
-import com.unitedjiga.common.parsing.SingletonSymbol;
+package com.unitedjiga.common.parsing;
 
 /**
- * 
- * @author Junji Mikami
+ * @author Mikami Junji
  *
  */
-abstract class AbstractSingletonSymbol extends AbstractNonTerminalSymbol implements SingletonSymbol {
+public interface ProductionVisitor<R, P> {
 
+	public default R visit(Production prd) {
+	    return visit(prd, null);
+	}
+	public default R visit(Production prd, P p) {
+	    return prd.accept(this, p);
+	}
+	public R visitAlternative(AlternativeProduction prd, P p);
+	public R visitSequential(SequentialProduction prd, P p);
+	public R visitPattern(PatternProduction prd, P p);
+	public R visitReference(Reference prd, P p);
+    public R visitQuantified(QuantifiedProduction prd, P p);
+    public R visitEmpty(Production prd, P p);
 }
