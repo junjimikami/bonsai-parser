@@ -23,6 +23,8 @@
  */
 package com.unitedjiga.common.parsing;
 
+import java.io.Reader;
+
 import com.unitedjiga.common.parsing.impl.ParserImpls;
 
 /**
@@ -44,4 +46,5 @@ public interface ParserFactory {
     }
 
 	public Parser createParser(Tokenizer tokenizer);
+    public Parser createParser(Reader reader);
 }

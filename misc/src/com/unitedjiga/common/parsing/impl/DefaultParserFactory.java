@@ -23,13 +23,13 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
+import java.io.Reader;
 import java.util.Objects;
 
 import com.unitedjiga.common.parsing.NonTerminalSymbol;
 import com.unitedjiga.common.parsing.Parser;
 import com.unitedjiga.common.parsing.ParserFactory;
 import com.unitedjiga.common.parsing.Production;
-import com.unitedjiga.common.parsing.StreamParser;
 import com.unitedjiga.common.parsing.Symbol;
 import com.unitedjiga.common.parsing.TerminalSymbol;
 import com.unitedjiga.common.parsing.Tokenizer;
@@ -64,6 +64,13 @@ class DefaultParserFactory implements ParserFactory {
                 return (TerminalSymbol) parse();
             }
         };
+    }
+
+    @Override
+    public Parser createParser(Reader reader) {
+        var it = new TokenIterator(reader);
+        var tzer = new DefaultTokenizer(it);
+        return createParser(tzer);
     }
 
 }

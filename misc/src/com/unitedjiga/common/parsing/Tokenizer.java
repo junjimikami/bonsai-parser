@@ -34,7 +34,7 @@ import java.util.function.Predicate;
 public interface Tokenizer {
     public static interface Builder {
         public Tokenizer.Builder set(Reader r);
-        public Tokenizer.Builder set(Iterator<String> it);
+//        public Tokenizer.Builder set(Iterator<String> it);
         public Tokenizer.Builder filter(Predicate<Token> p);
         public Tokenizer build();
     }

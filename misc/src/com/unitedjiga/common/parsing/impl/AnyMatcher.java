@@ -48,8 +48,10 @@ class AnyMatcher implements SimpleProductionVisitor<Boolean, Context> {
     @Override
     public Boolean visitPattern(PatternProduction prd, Context args) {
         var tokenizer = args.getTokenizer();
-        var t = tokenizer.next();
-        tokenizer.previous();
+        if (!tokenizer.hasNext()) {
+            return false;
+        }
+        var t = tokenizer.peek();
         return prd.getPattern().matcher(t.getValue()).matches();
     }
 
