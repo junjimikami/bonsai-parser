@@ -24,7 +24,7 @@
 package com.unitedjiga.common.parsing.impl;
 
 import com.unitedjiga.common.parsing.ChoiceExpression;
-import com.unitedjiga.common.parsing.PatternProduction;
+import com.unitedjiga.common.parsing.PatternExpression;
 import com.unitedjiga.common.parsing.ProductionFactory;
 import com.unitedjiga.common.parsing.QuantifiedProduction;
 import com.unitedjiga.common.parsing.Reference;
@@ -37,7 +37,7 @@ import com.unitedjiga.common.parsing.SequenceExpression;
 class DefaultProductionFactory implements ProductionFactory {
 
     @Override
-    public PatternProduction.Builder createPatternBuilder() {
+    public PatternExpression.Builder createPatternBuilder() {
         return new TermProduction.Builder();
     }
 

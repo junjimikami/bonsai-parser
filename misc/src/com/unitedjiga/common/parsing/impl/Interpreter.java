@@ -31,7 +31,7 @@ import java.util.Set;
 
 import com.unitedjiga.common.parsing.ChoiceExpression;
 import com.unitedjiga.common.parsing.ParsingException;
-import com.unitedjiga.common.parsing.PatternProduction;
+import com.unitedjiga.common.parsing.PatternExpression;
 import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.ProductionVisitor;
 import com.unitedjiga.common.parsing.QuantifiedProduction;
@@ -94,7 +94,7 @@ class Interpreter implements ProductionVisitor<Symbol, Context> {
     }
 
     @Override
-    public Symbol visitPattern(PatternProduction p, Context args) {
+    public Symbol visitPattern(PatternExpression p, Context args) {
         var tokenizer = args.getTokenizer();
         if (anyMatcher.visit(p, args)) {
             var t = tokenizer.read();

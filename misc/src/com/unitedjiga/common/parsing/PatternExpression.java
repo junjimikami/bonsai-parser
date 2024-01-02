@@ -29,13 +29,11 @@ import java.util.regex.Pattern;
  * @author Junji Mikami
  *
  */
-public interface PatternProduction extends EntityProduction {
+public interface PatternExpression extends Expression {
 
-    public static interface Builder extends EntityProduction.Builder {
-        public Builder setName(String name);
-        public Builder setPattern(String p);
-        public Builder setFlags(int flags);
-        public PatternProduction build();
+    public static interface Builder extends Expression.Builder {
+        public PatternExpression build();
+        public PatternExpression build(ProductionSet set);
     }
 
     @Override

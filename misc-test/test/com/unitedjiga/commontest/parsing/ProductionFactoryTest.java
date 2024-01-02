@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 
 import com.unitedjiga.common.parsing.ChoiceExpression;
-import com.unitedjiga.common.parsing.PatternProduction;
+import com.unitedjiga.common.parsing.PatternExpression;
 import com.unitedjiga.common.parsing.ProductionFactory;
 import com.unitedjiga.common.parsing.QuantifiedProduction;
 import com.unitedjiga.common.parsing.Reference;
@@ -47,12 +47,12 @@ class ProductionFactoryTest {
         var pf = ProductionFactory.newFactory();
 
         var ptn1 = pf.createPattern("[0-9]");
-        assertInstanceOf(PatternProduction.class, ptn1);
+        assertInstanceOf(PatternExpression.class, ptn1);
         assertEquals("[0-9]", ptn1.getPattern().pattern());
         assertEquals(0, ptn1.getPattern().flags());
 
         var ptn2 = pf.createPattern("[0-9]", Pattern.LITERAL);
-        assertInstanceOf(PatternProduction.class, ptn2);
+        assertInstanceOf(PatternExpression.class, ptn2);
         assertEquals("[0-9]", ptn2.getPattern().pattern());
         assertEquals(Pattern.LITERAL, ptn2.getPattern().flags() & Pattern.LITERAL);
 
@@ -60,7 +60,7 @@ class ProductionFactoryTest {
                 .setPattern("[0-9]")
                 .setFlags(Pattern.LITERAL)
                 .build();
-        assertInstanceOf(PatternProduction.class, ptn3);
+        assertInstanceOf(PatternExpression.class, ptn3);
         assertEquals("[0-9]", ptn3.getPattern().pattern());
         assertEquals(Pattern.LITERAL, ptn3.getPattern().flags() & Pattern.LITERAL);
 

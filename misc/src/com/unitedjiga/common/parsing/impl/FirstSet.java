@@ -29,7 +29,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.unitedjiga.common.parsing.ChoiceExpression;
-import com.unitedjiga.common.parsing.PatternProduction;
+import com.unitedjiga.common.parsing.PatternExpression;
 import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.ProductionVisitor;
 import com.unitedjiga.common.parsing.QuantifiedProduction;
@@ -74,7 +74,7 @@ class FirstSet implements ProductionVisitor<Set<Expression>, Set<Expression>> {
     }
 
     @Override
-    public Set<Expression> visitPattern(PatternProduction p, Set<Expression> followSet) {
+    public Set<Expression> visitPattern(PatternExpression p, Set<Expression> followSet) {
         return Set.of(p);
     }
 

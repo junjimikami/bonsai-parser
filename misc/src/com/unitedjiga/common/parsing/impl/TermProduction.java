@@ -26,15 +26,15 @@ package com.unitedjiga.common.parsing.impl;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import com.unitedjiga.common.parsing.PatternProduction;
+import com.unitedjiga.common.parsing.PatternExpression;
 import com.unitedjiga.common.parsing.Token;
 
 /**
  *
  * @author Junji Mikami
  */
-class TermProduction extends AbstractEntityProduction implements PatternProduction {
-    static class Builder extends AbstractProduction.Builder implements PatternProduction.Builder {
+class TermProduction extends AbstractEntityProduction implements PatternExpression {
+    static class Builder extends AbstractProduction.Builder implements PatternExpression.Builder {
         private String name;
         private String pattern;
         private int flags;
@@ -61,7 +61,7 @@ class TermProduction extends AbstractEntityProduction implements PatternProducti
         }
 
         @Override
-        public PatternProduction build() {
+        public PatternExpression build() {
             checkForBuild();
             return new TermProduction(name, pattern, flags);
         }

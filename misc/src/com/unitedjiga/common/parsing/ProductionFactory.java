@@ -37,13 +37,13 @@ public interface ProductionFactory {
         return Productions.newFactory();
     }
 
-    public PatternProduction.Builder createPatternBuilder();
-    public default PatternProduction createPattern(String regex) {
+    public PatternExpression.Builder createPatternBuilder();
+    public default PatternExpression createPattern(String regex) {
         return createPatternBuilder()
                 .setPattern(regex)
                 .build();
     }
-    public default PatternProduction createPattern(String regex, int flags) {
+    public default PatternExpression createPattern(String regex, int flags) {
         return createPatternBuilder()
                 .setPattern(regex)
                 .setFlags(flags)

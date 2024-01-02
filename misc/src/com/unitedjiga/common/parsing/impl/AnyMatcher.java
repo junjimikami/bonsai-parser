@@ -25,7 +25,7 @@ package com.unitedjiga.common.parsing.impl;
 
 import static com.unitedjiga.common.parsing.impl.Productions.EOF;
 
-import com.unitedjiga.common.parsing.PatternProduction;
+import com.unitedjiga.common.parsing.PatternExpression;
 import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.util.SimpleProductionVisitor;
 
@@ -46,7 +46,7 @@ class AnyMatcher implements SimpleProductionVisitor<Boolean, Context> {
     }
 
     @Override
-    public Boolean visitPattern(PatternProduction prd, Context args) {
+    public Boolean visitPattern(PatternExpression prd, Context args) {
         var tokenizer = args.getTokenizer();
         if (!tokenizer.hasNext()) {
             return false;

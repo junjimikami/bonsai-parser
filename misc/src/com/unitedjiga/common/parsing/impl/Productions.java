@@ -24,7 +24,7 @@
 package com.unitedjiga.common.parsing.impl;
 
 import com.unitedjiga.common.parsing.ChoiceExpression;
-import com.unitedjiga.common.parsing.PatternProduction;
+import com.unitedjiga.common.parsing.PatternExpression;
 import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.ProductionFactory;
 import com.unitedjiga.common.parsing.ProductionVisitor;
@@ -70,11 +70,11 @@ public final class Productions {
     	return new DefaultProductionFactory();
     }
 
-    public static PatternProduction ofPattern(String regex) {
+    public static PatternExpression ofPattern(String regex) {
 //    	return new TermProduction(regex);
         throw new UnsupportedOperationException();
     }
-    public static PatternProduction ofPattern(String regex, int flags) {
+    public static PatternExpression ofPattern(String regex, int flags) {
 //    	return new TermProduction(regex, flags);
         throw new UnsupportedOperationException();
     }

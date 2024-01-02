@@ -24,7 +24,7 @@
 package com.unitedjiga.common.parsing.util;
 
 import com.unitedjiga.common.parsing.ChoiceExpression;
-import com.unitedjiga.common.parsing.PatternProduction;
+import com.unitedjiga.common.parsing.PatternExpression;
 import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.ProductionVisitor;
 import com.unitedjiga.common.parsing.QuantifiedProduction;
@@ -49,7 +49,7 @@ public interface SimpleProductionVisitor<R, P> extends ProductionVisitor<R, P> {
     }
 
     @Override
-    public default R visitPattern(PatternProduction prd, P p) {
+    public default R visitPattern(PatternExpression prd, P p) {
         return defaultAction(prd, p);
     }
 

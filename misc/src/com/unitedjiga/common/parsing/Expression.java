@@ -47,11 +47,11 @@ public interface Expression {
 
     public static final Expression EMPTY = Productions.empty();
 
-    public static PatternProduction ofPattern(String regex) {
+    public static PatternExpression ofPattern(String regex) {
         return Productions.ofPattern(regex);
     }
 
-    public static PatternProduction ofPattern(String regex, int flags) {
+    public static PatternExpression ofPattern(String regex, int flags) {
         return Productions.ofPattern(regex, flags);
     }
 
