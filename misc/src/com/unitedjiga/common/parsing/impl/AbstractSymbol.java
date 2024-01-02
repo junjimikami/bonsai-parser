@@ -23,13 +23,13 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import com.unitedjiga.common.parsing.Symbol;
+import com.unitedjiga.common.parsing.Tree;
 
 /**
  * @author Mikami Junji
  *
  */
-abstract class AbstractSymbol implements Symbol {
+abstract class AbstractSymbol implements Tree {
     private final String name;
 
     AbstractSymbol(String name) {

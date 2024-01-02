@@ -26,11 +26,11 @@ package com.unitedjiga.common.parsing.impl;
 import java.io.Reader;
 import java.util.Objects;
 
-import com.unitedjiga.common.parsing.NonTerminalSymbol;
+import com.unitedjiga.common.parsing.NonTerminal;
 import com.unitedjiga.common.parsing.Parser;
 import com.unitedjiga.common.parsing.ParserFactory;
-import com.unitedjiga.common.parsing.Symbol;
-import com.unitedjiga.common.parsing.TerminalSymbol;
+import com.unitedjiga.common.parsing.Tree;
+import com.unitedjiga.common.parsing.Terminal;
 import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.grammar.Expression;
 
@@ -52,16 +52,16 @@ class DefaultParserFactory implements ParserFactory {
         return new Parser() {
             private Interpreter interpreter = new Interpreter();
             @Override
-            public Symbol parse() {
+            public Tree parse() {
                 return interpreter.parse(production, tokenizer);
             }
             @Override
-            public NonTerminalSymbol parseNonTerminal() {
-                return (NonTerminalSymbol) parse();
+            public NonTerminal parseNonTerminal() {
+                return (NonTerminal) parse();
             }
             @Override
-            public TerminalSymbol parseTerminal() {
-                return (TerminalSymbol) parse();
+            public Terminal parseTerminal() {
+                return (Terminal) parse();
             }
         };
     }

@@ -23,27 +23,27 @@
  */
 package com.unitedjiga.common.parsing.util;
 
-import com.unitedjiga.common.parsing.NonTerminalSymbol;
-import com.unitedjiga.common.parsing.Symbol;
-import com.unitedjiga.common.parsing.SymbolVisitor;
-import com.unitedjiga.common.parsing.TerminalSymbol;
+import com.unitedjiga.common.parsing.NonTerminal;
+import com.unitedjiga.common.parsing.Tree;
+import com.unitedjiga.common.parsing.TreeVisitor;
+import com.unitedjiga.common.parsing.Terminal;
 
 /**
  * @author Mikami Junji
  *
  */
 @FunctionalInterface
-public interface SimpleSymbolVisitor<R, P> extends SymbolVisitor<R, P> {
+public interface SimpleSymbolVisitor<R, P> extends TreeVisitor<R, P> {
 
     @Override
-    public default R visitTerminal(TerminalSymbol s, P p) {
+    public default R visitTerminal(Terminal s, P p) {
         return defaultAction(s, p);
     }
 
     @Override
-    public default R visitNonTerminal(NonTerminalSymbol s, P p) {
+    public default R visitNonTerminal(NonTerminal s, P p) {
         return defaultAction(s, p);
     }
 
-    public R defaultAction(Symbol s, P p);
+    public R defaultAction(Tree s, P p);
 }

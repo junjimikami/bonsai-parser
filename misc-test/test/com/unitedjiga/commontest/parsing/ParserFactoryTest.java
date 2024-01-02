@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import com.unitedjiga.common.parsing.ParserFactory;
 import com.unitedjiga.common.parsing.ProductionFactory;
-import com.unitedjiga.common.parsing.Symbol;
+import com.unitedjiga.common.parsing.Tree;
 
 class ParserFactoryTest {
 
@@ -22,7 +22,7 @@ class ParserFactoryTest {
         assertNotNull(pser);
         var s = pser.parse();
         assertNotNull(s);
-        assertInstanceOf(Symbol.class, s);
+        assertInstanceOf(Tree.class, s);
     }
 
     @Test
@@ -36,7 +36,7 @@ class ParserFactoryTest {
         var pser = pserFactory.createParser(new StringReader("0"));
         var s = pser.parse();
         assertNotNull(s);
-        assertInstanceOf(Symbol.class, s);
+        assertInstanceOf(Tree.class, s);
     }
 
     @Test
@@ -50,7 +50,7 @@ class ParserFactoryTest {
         var pser = pserFactory.createParser(new StringReader("01"));
         var s = pser.parse();
         assertNotNull(s);
-        assertInstanceOf(Symbol.class, s);
+        assertInstanceOf(Tree.class, s);
     }
 
 }

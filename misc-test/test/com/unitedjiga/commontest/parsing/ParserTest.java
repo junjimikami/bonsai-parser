@@ -80,7 +80,7 @@ class ParserTest {
         var s = ps.parseNonTerminal();
         Stream.of(s)
         .filter(e -> e.getName().equals("Type"))
-        .flatMap(e -> e.getSymbols().stream())
+        .flatMap(e -> e.getSubTrees().stream())
         .filter(e -> e.getName().equals("PrimitiveType"))
 //        .filter(e -> e.getName().equals("Type"))
 //        .flatMap(e -> e.getSymbols().stream())
@@ -164,7 +164,7 @@ class ParserTest {
         var s = ps.parseNonTerminal();
         Stream.of(s)
         .filter(e -> e.getName().equals("Type"))
-        .flatMap(e -> e.getSymbols().stream())
+        .flatMap(e -> e.getSubTrees().stream())
         .filter(e -> e.getName().equals("PrimitiveType"))
 //        .filter(e -> e.getName().equals("Type"))
 //        .flatMap(e -> e.getSymbols().stream())

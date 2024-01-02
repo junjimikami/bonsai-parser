@@ -27,23 +27,23 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import com.unitedjiga.common.parsing.NonTerminalSymbol;
-import com.unitedjiga.common.parsing.Symbol;
+import com.unitedjiga.common.parsing.NonTerminal;
+import com.unitedjiga.common.parsing.Tree;
 
 /**
  * 
  * @author Junji Mikami
  *
  */
-class DefaultNonTerminalSymbol extends AbstractSymbol implements NonTerminalSymbol {
-    private final List<Symbol> list;
+class DefaultNonTerminalSymbol extends AbstractSymbol implements NonTerminal {
+    private final List<Tree> list;
 
-    DefaultNonTerminalSymbol(String name, List<Symbol> list) {
+    DefaultNonTerminalSymbol(String name, List<Tree> list) {
         super(name);
         Objects.requireNonNull(list);
         this.list = list;
     }
-    DefaultNonTerminalSymbol(String name, Symbol s) {
+    DefaultNonTerminalSymbol(String name, Tree s) {
         super(name);
         this.list = List.of(s);
     }
@@ -53,7 +53,7 @@ class DefaultNonTerminalSymbol extends AbstractSymbol implements NonTerminalSymb
     }
 
     @Override
-    public List<Symbol> getSymbols() {
+    public List<Tree> getSubTrees() {
         return Collections.unmodifiableList(list);
     }
 }

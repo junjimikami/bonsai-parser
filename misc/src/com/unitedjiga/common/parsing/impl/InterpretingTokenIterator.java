@@ -3,24 +3,24 @@ package com.unitedjiga.common.parsing.impl;
 import java.util.Iterator;
 import java.util.stream.Collectors;
 
-import com.unitedjiga.common.parsing.NonTerminalSymbol;
-import com.unitedjiga.common.parsing.SymbolVisitor;
-import com.unitedjiga.common.parsing.TerminalSymbol;
+import com.unitedjiga.common.parsing.NonTerminal;
+import com.unitedjiga.common.parsing.TreeVisitor;
+import com.unitedjiga.common.parsing.Terminal;
 import com.unitedjiga.common.parsing.Token;
 import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.grammar.Expression;
 
 class InterpretingTokenIterator implements Iterator<Token> {
-    private final SymbolVisitor<Token, Void> visitor = new SymbolVisitor<>() {
+    private final TreeVisitor<Token, Void> visitor = new TreeVisitor<>() {
         
         @Override
-        public Token visitTerminal(TerminalSymbol s, Void p) {
+        public Token visitTerminal(Terminal s, Void p) {
             return new DefaultToken(s.getName(), s.getValue());
         }
         
         @Override
-        public Token visitNonTerminal(NonTerminalSymbol s, Void p) {
-            var value = s.getSymbols().stream()
+        public Token visitNonTerminal(NonTerminal s, Void p) {
+            var value = s.getSubTrees().stream()
                     .map(this::visit)
                     .map(Token::getValue)
                     .collect(Collectors.joining());

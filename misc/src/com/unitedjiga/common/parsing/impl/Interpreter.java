@@ -30,7 +30,7 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import com.unitedjiga.common.parsing.ParsingException;
-import com.unitedjiga.common.parsing.Symbol;
+import com.unitedjiga.common.parsing.Tree;
 import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.grammar.ChoiceExpression;
 import com.unitedjiga.common.parsing.grammar.Expression;
@@ -44,28 +44,28 @@ import com.unitedjiga.common.parsing.grammar.SequenceExpression;
  * @author Mikami Junji
  *
  */
-class Interpreter implements ExpressionVisitor<Symbol, Context> {
+class Interpreter implements ExpressionVisitor<Tree, Context> {
     private final FirstSet firstSet = new FirstSet();
     private final AnyMatcher anyMatcher = new AnyMatcher();
 
-    Symbol parse(Expression prd, Tokenizer t) {
+    Tree parse(Expression prd, Tokenizer t) {
         var s = interpret(prd, t);
         if (t.hasNext()) {
             throw new ParsingException();
         }
         return s;
     }
-    Symbol interpret(Expression prd, Tokenizer t) {
+    Tree interpret(Expression prd, Tokenizer t) {
         var followSet = Set.of(EOF);
         return interpret(prd, t, followSet);
     }
-    Symbol interpret(Expression prd, Tokenizer tokenizer, Set<Expression> followSet) {
+    Tree interpret(Expression prd, Tokenizer tokenizer, Set<Expression> followSet) {
         var p = new Context(tokenizer, followSet);
         return visit(prd, p);
     }
 
     @Override
-    public Symbol visitChoice(ChoiceExpression alt, Context args) {
+    public Tree visitChoice(ChoiceExpression alt, Context args) {
         for (var p : alt.getChoices()) {
             if (anyMatcher.visit(p, args)) {
                 var s = visit(p, args);
@@ -76,11 +76,11 @@ class Interpreter implements ExpressionVisitor<Symbol, Context> {
     }
 
     @Override
-    public Symbol visitSequence(SequenceExpression seq, Context args) {
+    public Tree visitSequence(SequenceExpression seq, Context args) {
         var tokenizer = args.getTokenizer();
         var followSet = args.getFollowSet();
         if (anyMatcher.visit(seq, args)) {
-            var list = new ArrayList<Symbol>();
+            var list = new ArrayList<Tree>();
             var pList = new LinkedList<>(seq.getSequence());
             while (!pList.isEmpty()) {
                 var p = pList.remove();
@@ -94,7 +94,7 @@ class Interpreter implements ExpressionVisitor<Symbol, Context> {
     }
 
     @Override
-    public Symbol visitPattern(PatternExpression p, Context args) {
+    public Tree visitPattern(PatternExpression p, Context args) {
         var tokenizer = args.getTokenizer();
         if (anyMatcher.visit(p, args)) {
             var t = tokenizer.read();
@@ -104,13 +104,13 @@ class Interpreter implements ExpressionVisitor<Symbol, Context> {
     }
 
     @Override
-    public Symbol visitReference(ReferenceExpression ref, Context args) {
+    public Tree visitReference(ReferenceExpression ref, Context args) {
         return visit(ref.get(), args);
     }
 
     @Override
-    public Symbol visitQuantifier(QuantifierExpression qt, Context args) {
-        var list = new ArrayList<Symbol>();
+    public Tree visitQuantifier(QuantifierExpression qt, Context args) {
+        var list = new ArrayList<Tree>();
         var result = qt.withinRange(p -> {
             if (anyMatcher.visit(p, args)) {
                 list.add(visit(p, args));
@@ -125,7 +125,7 @@ class Interpreter implements ExpressionVisitor<Symbol, Context> {
     }
 
     @Override
-    public Symbol visitEmpty(Expression empty, Context args) {
+    public Tree visitEmpty(Expression empty, Context args) {
         if (anyMatcher.visit(empty, args)) {
             return new DefaultNonTerminalSymbol(null);
         }

@@ -27,16 +27,39 @@ package com.unitedjiga.common.parsing;
  *
  * @author Junji Mikami
  */
-public interface TerminalSymbol extends Symbol {
+public interface Tree {
 
-    @Override
-    public default Kind getKind() {
-        return Kind.TERMINAL;
+    /**
+     * 
+     * @author Junji Mikami
+     *
+     */
+    public static enum Kind {
+        TERMINAL,
+        NON_TERMINAL;
+
+        public boolean isTerminal() {
+            return this == TERMINAL;
+        }
+
+        public boolean isNonTerminal() {
+            return this == NON_TERMINAL;
+        }
     }
 
-    public default <R, P> R accept(SymbolVisitor<R, P> v, P p) {
-        return v.visitTerminal(this, p);
-    }
+    /**
+     * 
+     * @return
+     */
+    public Kind getKind();
 
-    public String getValue();
+    /**
+     * 
+     * @param <R>
+     * @param <P>
+     * @param v
+     * @param p
+     * @return
+     */
+    public <R, P> R accept(TreeVisitor<R, P> v, P p);
 }

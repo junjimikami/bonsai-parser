@@ -12,11 +12,11 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.unitedjiga.common.parsing.NonTerminalSymbol;
+import com.unitedjiga.common.parsing.NonTerminal;
 import com.unitedjiga.common.parsing.ParsingException;
-import com.unitedjiga.common.parsing.Symbol;
-import com.unitedjiga.common.parsing.SymbolVisitor;
-import com.unitedjiga.common.parsing.TerminalSymbol;
+import com.unitedjiga.common.parsing.Tree;
+import com.unitedjiga.common.parsing.TreeVisitor;
+import com.unitedjiga.common.parsing.Terminal;
 import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.grammar.Expression;
 

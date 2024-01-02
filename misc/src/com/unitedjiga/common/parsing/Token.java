@@ -27,7 +27,7 @@ package com.unitedjiga.common.parsing;
  *
  * @author Junji Mikami
  */
-public interface Token extends TerminalSymbol {
+public interface Token extends Terminal {
 
     public String getName();
 

@@ -30,17 +30,17 @@ package com.unitedjiga.common.parsing;
  * @param <R>
  * @param <P>
  */
-public interface SymbolVisitor<R, P> {
+public interface TreeVisitor<R, P> {
 
-    public default R visit(Symbol s) {
+    public default R visit(Tree s) {
         return visit(s, null);
     }
 
-    public default R visit(Symbol s, P p) {
+    public default R visit(Tree s, P p) {
         return s.accept(this, p);
     }
 
-    public R visitTerminal(TerminalSymbol s, P p);
+    public R visitTerminal(Terminal s, P p);
 
-    public R visitNonTerminal(NonTerminalSymbol s, P p);
+    public R visitNonTerminal(NonTerminal s, P p);
 }
