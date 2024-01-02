@@ -6,7 +6,7 @@ import static com.unitedjiga.common.parsing.Expression.ref;
 
 import java.io.Reader;
 
-import com.unitedjiga.common.parsing.AlternativeProduction;
+import com.unitedjiga.common.parsing.ChoiceExpression;
 import com.unitedjiga.common.parsing.Parser;
 import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.SequenceExpression;

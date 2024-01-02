@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.Test;
 
-import com.unitedjiga.common.parsing.AlternativeProduction;
+import com.unitedjiga.common.parsing.ChoiceExpression;
 import com.unitedjiga.common.parsing.PatternProduction;
 import com.unitedjiga.common.parsing.ProductionFactory;
 import com.unitedjiga.common.parsing.QuantifiedProduction;
@@ -65,8 +65,8 @@ class ProductionFactoryTest {
         assertEquals(Pattern.LITERAL, ptn3.getPattern().flags() & Pattern.LITERAL);
 
         var alt1 = pf.createAlternativeBuilder().build();
-        assertInstanceOf(AlternativeProduction.class, alt1);
-        assertTrue(alt1.getProductions().isEmpty());
+        assertInstanceOf(ChoiceExpression.class, alt1);
+        assertTrue(alt1.getChoices().isEmpty());
 
         var seq1 = pf.createSequentialBuilder().build();
         assertInstanceOf(SequenceExpression.class, seq1);

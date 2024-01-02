@@ -59,7 +59,7 @@ public interface Expression {
         return Productions.of(args);
     }
 
-    public static AlternativeProduction oneOf(Object... args) {
+    public static ChoiceExpression oneOf(Object... args) {
         return Productions.oneOf(args);
     }
 

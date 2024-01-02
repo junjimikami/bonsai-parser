@@ -35,7 +35,7 @@ public interface ProductionVisitor<R, P> {
 	public default R visit(Expression prd, P p) {
 	    return prd.accept(this, p);
 	}
-	public R visitAlternative(AlternativeProduction prd, P p);
+	public R visitAlternative(ChoiceExpression prd, P p);
 	public R visitSequential(SequenceExpression prd, P p);
 	public R visitPattern(PatternProduction prd, P p);
 	public R visitReference(Reference prd, P p);

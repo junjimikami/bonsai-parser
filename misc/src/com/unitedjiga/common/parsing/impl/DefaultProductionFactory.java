@@ -23,7 +23,7 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import com.unitedjiga.common.parsing.AlternativeProduction;
+import com.unitedjiga.common.parsing.ChoiceExpression;
 import com.unitedjiga.common.parsing.PatternProduction;
 import com.unitedjiga.common.parsing.ProductionFactory;
 import com.unitedjiga.common.parsing.QuantifiedProduction;
@@ -42,7 +42,7 @@ class DefaultProductionFactory implements ProductionFactory {
     }
 
     @Override
-    public AlternativeProduction.Builder createAlternativeBuilder() {
+    public ChoiceExpression.Builder createAlternativeBuilder() {
         return new AltProduction.Builder();
     }
 

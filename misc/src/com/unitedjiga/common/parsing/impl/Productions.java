@@ -23,7 +23,7 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import com.unitedjiga.common.parsing.AlternativeProduction;
+import com.unitedjiga.common.parsing.ChoiceExpression;
 import com.unitedjiga.common.parsing.PatternProduction;
 import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.ProductionFactory;
@@ -86,7 +86,7 @@ public final class Productions {
 //        return new SeqProduction.Builder().setName(name);
 //    }
     
-    public static AlternativeProduction.Builder alternativeBuilder() {
+    public static ChoiceExpression.Builder alternativeBuilder() {
         return new AltProduction.Builder();
     }
 //    public static AlternativeProduction.Builder alternativeBuilder(String name) {
@@ -113,8 +113,8 @@ public final class Productions {
         return builder.build();
     }
 
-    public static AlternativeProduction oneOf(Object... args) {
-        AlternativeProduction.Builder builder = alternativeBuilder();
+    public static ChoiceExpression oneOf(Object... args) {
+        ChoiceExpression.Builder builder = alternativeBuilder();
         for (Object o : args) {
             if (o instanceof Expression) {
                 builder.add((Expression) o);

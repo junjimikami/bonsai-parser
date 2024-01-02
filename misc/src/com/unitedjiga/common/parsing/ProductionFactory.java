@@ -50,7 +50,7 @@ public interface ProductionFactory {
                 .build();
     }
 
-    public AlternativeProduction.Builder createAlternativeBuilder();
+    public ChoiceExpression.Builder createAlternativeBuilder();
 
     public SequenceExpression.Builder createSequentialBuilder();
 

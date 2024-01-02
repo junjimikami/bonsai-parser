@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-import com.unitedjiga.common.parsing.AlternativeProduction;
+import com.unitedjiga.common.parsing.ChoiceExpression;
 import com.unitedjiga.common.parsing.Expression;
 
 /**
@@ -36,8 +36,8 @@ import com.unitedjiga.common.parsing.Expression;
  *
  */
 // package private
-class AltProduction extends AbstractEntityProduction implements AlternativeProduction {
-    static class Builder extends AbstractProduction.Builder implements AlternativeProduction.Builder {
+class AltProduction extends AbstractEntityProduction implements ChoiceExpression {
+    static class Builder extends AbstractProduction.Builder implements ChoiceExpression.Builder {
         private String name;
         private final List<Supplier<Expression>> elements = new ArrayList<>();
 
@@ -49,7 +49,7 @@ class AltProduction extends AbstractEntityProduction implements AlternativeProdu
         }
 
         @Override
-        public AlternativeProduction build() {
+        public ChoiceExpression build() {
             checkForBuild();
             var el = elements.stream()
                     .map(Supplier::get)
@@ -88,7 +88,7 @@ class AltProduction extends AbstractEntityProduction implements AlternativeProdu
     }
 
     @Override
-    public List<? extends Expression> getProductions() {
+    public List<? extends Expression> getChoices() {
         return elements;
     }
 }

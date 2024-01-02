@@ -28,7 +28,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.unitedjiga.common.parsing.AlternativeProduction;
+import com.unitedjiga.common.parsing.ChoiceExpression;
 import com.unitedjiga.common.parsing.PatternProduction;
 import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.ProductionVisitor;
@@ -48,12 +48,12 @@ class FirstSet implements ProductionVisitor<Set<Expression>, Set<Expression>> {
     }
 
     @Override
-    public Set<Expression> visitAlternative(AlternativeProduction alt, Set<Expression> followSet) {
-        if (alt.getProductions().isEmpty()) {
+    public Set<Expression> visitAlternative(ChoiceExpression alt, Set<Expression> followSet) {
+        if (alt.getChoices().isEmpty()) {
             return followSet;
         }
         var set = new HashSet<Expression>();
-        for (var p : alt.getProductions()) {
+        for (var p : alt.getChoices()) {
             set.addAll(visit(p, followSet));
         }
         return set;

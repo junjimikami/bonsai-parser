@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Set;
 
-import com.unitedjiga.common.parsing.AlternativeProduction;
+import com.unitedjiga.common.parsing.ChoiceExpression;
 import com.unitedjiga.common.parsing.ParsingException;
 import com.unitedjiga.common.parsing.PatternProduction;
 import com.unitedjiga.common.parsing.Expression;
@@ -65,8 +65,8 @@ class Interpreter implements ProductionVisitor<Symbol, Context> {
     }
 
     @Override
-    public Symbol visitAlternative(AlternativeProduction alt, Context args) {
-        for (var p : alt.getProductions()) {
+    public Symbol visitAlternative(ChoiceExpression alt, Context args) {
+        for (var p : alt.getChoices()) {
             if (anyMatcher.visit(p, args)) {
                 var s = visit(p, args);
                 return new DefaultNonTerminalSymbol(alt.getName(), s);

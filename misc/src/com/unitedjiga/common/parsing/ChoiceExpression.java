@@ -29,14 +29,15 @@ import java.util.List;
  * @author Junji Mikami
  *
  */
-public interface AlternativeProduction extends EntityProduction {
+public interface ChoiceExpression extends Expression {
 
-    public static interface Builder extends EntityProduction.Builder {
-        public Builder setName(String name);
-        public Builder add(Expression p);
-        public Builder add(Expression.Builder b);
-        public Builder addEmpty();
-        public AlternativeProduction build();
+    public static interface Builder extends Expression.Builder {
+        public ChoiceExpression.Builder add(Expression.Builder builder);
+        public ChoiceExpression.Builder add(String reference);
+        public ChoiceExpression.Builder addPattern(String pattern);
+        public ChoiceExpression.Builder addEmpty();
+        public ChoiceExpression build();
+        public ChoiceExpression build(ProductionSet set);
     }
 
     @Override
@@ -49,5 +50,5 @@ public interface AlternativeProduction extends EntityProduction {
         return visitor.visitAlternative(this, p);
     }
 
-    public List<? extends Expression> getProductions();
+    public List<? extends Expression> getChoices();
 }
