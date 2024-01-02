@@ -23,17 +23,15 @@
  */
 package com.unitedjiga.common.parsing;
 
-import java.util.function.Supplier;
-
 /**
  * @author Junji Mikami
  *
  */
-public interface Reference extends Expression {
+public interface ReferenceExpression extends Expression {
 
     public static interface Builder extends Expression.Builder {
-        public Builder set(Supplier<? extends Expression> supplier);
-        public Reference build();
+        public ReferenceExpression build();
+        public ReferenceExpression build(ProductionSet set);
     }
 
     @Override
@@ -46,5 +44,5 @@ public interface Reference extends Expression {
         return visitor.visitReference(this, p);
     }
     
-    public Expression get();
+    public Production get();
 }

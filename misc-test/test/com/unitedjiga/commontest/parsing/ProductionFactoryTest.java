@@ -33,7 +33,7 @@ import com.unitedjiga.common.parsing.ChoiceExpression;
 import com.unitedjiga.common.parsing.PatternExpression;
 import com.unitedjiga.common.parsing.ProductionFactory;
 import com.unitedjiga.common.parsing.QuantifiedProduction;
-import com.unitedjiga.common.parsing.Reference;
+import com.unitedjiga.common.parsing.ReferenceExpression;
 import com.unitedjiga.common.parsing.SequenceExpression;
 
 /**
@@ -73,7 +73,7 @@ class ProductionFactoryTest {
         assertTrue(seq1.getSequence().isEmpty());
 
         var ref1 = pf.createReference(() -> ptn1);
-        assertInstanceOf(Reference.class, ref1);
+        assertInstanceOf(ReferenceExpression.class, ref1);
         assertEquals(ptn1, ref1.get());
 
         var opt1 = pf.createOptional(ptn1);

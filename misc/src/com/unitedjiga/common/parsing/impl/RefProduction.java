@@ -27,14 +27,14 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 import com.unitedjiga.common.parsing.Expression;
-import com.unitedjiga.common.parsing.Reference;
+import com.unitedjiga.common.parsing.ReferenceExpression;
 
 /**
  * @author Junji Mikami
  *
  */
-class RefProduction extends AbstractProduction implements Reference {
-    static class Builder extends AbstractProduction.Builder implements Reference.Builder {
+class RefProduction extends AbstractProduction implements ReferenceExpression {
+    static class Builder extends AbstractProduction.Builder implements ReferenceExpression.Builder {
         private Supplier<? extends Expression> p;
 
         @Override
@@ -45,7 +45,7 @@ class RefProduction extends AbstractProduction implements Reference {
         }
 
         @Override
-        public Reference build() {
+        public ReferenceExpression build() {
             checkForBuild();
             return new RefProduction(p);
         }

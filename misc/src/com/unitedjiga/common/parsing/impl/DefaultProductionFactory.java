@@ -27,7 +27,7 @@ import com.unitedjiga.common.parsing.ChoiceExpression;
 import com.unitedjiga.common.parsing.PatternExpression;
 import com.unitedjiga.common.parsing.ProductionFactory;
 import com.unitedjiga.common.parsing.QuantifiedProduction;
-import com.unitedjiga.common.parsing.Reference;
+import com.unitedjiga.common.parsing.ReferenceExpression;
 import com.unitedjiga.common.parsing.SequenceExpression;
 
 /**
@@ -52,7 +52,7 @@ class DefaultProductionFactory implements ProductionFactory {
     }
 
     @Override
-    public Reference.Builder createReferenceBuilder() {
+    public ReferenceExpression.Builder createReferenceBuilder() {
         return new RefProduction.Builder();
     }
 

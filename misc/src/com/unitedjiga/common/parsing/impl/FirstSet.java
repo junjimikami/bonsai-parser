@@ -33,7 +33,7 @@ import com.unitedjiga.common.parsing.PatternExpression;
 import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.ProductionVisitor;
 import com.unitedjiga.common.parsing.QuantifiedProduction;
-import com.unitedjiga.common.parsing.Reference;
+import com.unitedjiga.common.parsing.ReferenceExpression;
 import com.unitedjiga.common.parsing.SequenceExpression;
 
 /**
@@ -79,7 +79,7 @@ class FirstSet implements ProductionVisitor<Set<Expression>, Set<Expression>> {
     }
 
     @Override
-    public Set<Expression> visitReference(Reference ref, Set<Expression> followSet) {
+    public Set<Expression> visitReference(ReferenceExpression ref, Set<Expression> followSet) {
         return visit(ref.get(), followSet);
     }
 

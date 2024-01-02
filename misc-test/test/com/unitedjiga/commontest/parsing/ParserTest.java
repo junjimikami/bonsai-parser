@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 import com.unitedjiga.common.parsing.ParserFactory;
 import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.ProductionFactory;
-import com.unitedjiga.common.parsing.Reference;
+import com.unitedjiga.common.parsing.ReferenceExpression;
 import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.util.SimpleProductionVisitor;
 

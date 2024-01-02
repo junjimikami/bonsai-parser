@@ -35,7 +35,7 @@ import com.unitedjiga.common.parsing.PatternExpression;
 import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.ProductionVisitor;
 import com.unitedjiga.common.parsing.QuantifiedProduction;
-import com.unitedjiga.common.parsing.Reference;
+import com.unitedjiga.common.parsing.ReferenceExpression;
 import com.unitedjiga.common.parsing.SequenceExpression;
 import com.unitedjiga.common.parsing.Symbol;
 import com.unitedjiga.common.parsing.Tokenizer;
@@ -104,7 +104,7 @@ class Interpreter implements ProductionVisitor<Symbol, Context> {
     }
 
     @Override
-    public Symbol visitReference(Reference ref, Context args) {
+    public Symbol visitReference(ReferenceExpression ref, Context args) {
         return visit(ref.get(), args);
     }
 

@@ -54,8 +54,8 @@ public interface ProductionFactory {
 
     public SequenceExpression.Builder createSequentialBuilder();
 
-    public Reference.Builder createReferenceBuilder();
-    public default Reference createReference(Supplier<? extends Expression> supplier) {
+    public ReferenceExpression.Builder createReferenceBuilder();
+    public default ReferenceExpression createReference(Supplier<? extends Expression> supplier) {
         return createReferenceBuilder()
                 .set(supplier)
                 .build();

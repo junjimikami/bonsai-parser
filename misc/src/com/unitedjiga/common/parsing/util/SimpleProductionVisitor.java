@@ -28,7 +28,7 @@ import com.unitedjiga.common.parsing.PatternExpression;
 import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.ProductionVisitor;
 import com.unitedjiga.common.parsing.QuantifiedProduction;
-import com.unitedjiga.common.parsing.Reference;
+import com.unitedjiga.common.parsing.ReferenceExpression;
 import com.unitedjiga.common.parsing.SequenceExpression;
 
 /**
@@ -54,7 +54,7 @@ public interface SimpleProductionVisitor<R, P> extends ProductionVisitor<R, P> {
     }
 
     @Override
-    public default R visitReference(Reference prd, P p) {
+    public default R visitReference(ReferenceExpression prd, P p) {
         return defaultAction(prd, p);
     }
 
