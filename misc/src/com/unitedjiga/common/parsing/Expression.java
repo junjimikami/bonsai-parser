@@ -23,12 +23,9 @@
  */
 package com.unitedjiga.common.parsing;
 
-import java.util.function.Supplier;
-
 import com.unitedjiga.common.parsing.impl.Productions;
 
 /**
- * 正規表現ベースの生成規則です。
  * 
  * @author Junji Mikami
  */
@@ -47,40 +44,7 @@ public interface Expression {
 
     public static final Expression EMPTY = Productions.empty();
 
-    public static PatternExpression ofPattern(String regex) {
-        return Productions.ofPattern(regex);
-    }
-
-    public static PatternExpression ofPattern(String regex, int flags) {
-        return Productions.ofPattern(regex, flags);
-    }
-
-    public static SequenceExpression of(Object... args) {
-        return Productions.of(args);
-    }
-
-    public static ChoiceExpression oneOf(Object... args) {
-        return Productions.oneOf(args);
-    }
-
-    static Supplier<? extends Expression> ref(Supplier<? extends Expression> p) {
-        return p;
-    }
-
-//    Parser parser(Tokenizer tokenizer);
-
     public <R, P> R accept(ExpressionVisitor<R, P> visitor, P p);
 
     public Kind getKind();
-
-    public default QuantifierExpression opt() {
-        throw new UnsupportedOperationException();
-    }
-
-    public default QuantifierExpression repeat() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    String toString();
 }
