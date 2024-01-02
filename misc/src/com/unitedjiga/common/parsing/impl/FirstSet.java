@@ -32,7 +32,7 @@ import com.unitedjiga.common.parsing.ChoiceExpression;
 import com.unitedjiga.common.parsing.PatternExpression;
 import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.ProductionVisitor;
-import com.unitedjiga.common.parsing.QuantifiedProduction;
+import com.unitedjiga.common.parsing.QuantifierExpression;
 import com.unitedjiga.common.parsing.ReferenceExpression;
 import com.unitedjiga.common.parsing.SequenceExpression;
 
@@ -84,7 +84,7 @@ class FirstSet implements ProductionVisitor<Set<Expression>, Set<Expression>> {
     }
 
     @Override
-    public Set<Expression> visitQuantified(QuantifiedProduction qt, Set<Expression> followSet) {
+    public Set<Expression> visitQuantified(QuantifierExpression qt, Set<Expression> followSet) {
         var set = new HashSet<Expression>();
         var prd = qt.stream()
                 .limit(1)

@@ -34,7 +34,7 @@ import com.unitedjiga.common.parsing.ParsingException;
 import com.unitedjiga.common.parsing.PatternExpression;
 import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.ProductionVisitor;
-import com.unitedjiga.common.parsing.QuantifiedProduction;
+import com.unitedjiga.common.parsing.QuantifierExpression;
 import com.unitedjiga.common.parsing.ReferenceExpression;
 import com.unitedjiga.common.parsing.SequenceExpression;
 import com.unitedjiga.common.parsing.Symbol;
@@ -109,7 +109,7 @@ class Interpreter implements ProductionVisitor<Symbol, Context> {
     }
 
     @Override
-    public Symbol visitQuantified(QuantifiedProduction qt, Context args) {
+    public Symbol visitQuantified(QuantifierExpression qt, Context args) {
         var list = new ArrayList<Symbol>();
         var result = qt.withinRange(p -> {
             if (anyMatcher.visit(p, args)) {

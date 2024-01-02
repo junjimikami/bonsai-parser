@@ -61,14 +61,14 @@ public interface ProductionFactory {
                 .build();
     }
 
-    public QuantifiedProduction.Builder createQuantifiedBuilder();
-    public default QuantifiedProduction createOptional(Expression p) {
+    public QuantifierExpression.Builder createQuantifiedBuilder();
+    public default QuantifierExpression createOptional(Expression p) {
         return createQuantifiedBuilder()
                 .set(p)
                 .range(0, 1)
                 .build();
     }
-    public default QuantifiedProduction createZeroOrMore(Expression p) {
+    public default QuantifierExpression createZeroOrMore(Expression p) {
         return createQuantifiedBuilder()
                 .set(p)
                 .atLeast(0)

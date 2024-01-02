@@ -28,14 +28,14 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import com.unitedjiga.common.parsing.Expression;
-import com.unitedjiga.common.parsing.QuantifiedProduction;
+import com.unitedjiga.common.parsing.QuantifierExpression;
 
 /**
  * @author Mikami Junji
  *
  */
-class QtProduction extends AbstractEntityProduction implements QuantifiedProduction {
-    static class Builder extends AbstractProduction.Builder implements QuantifiedProduction.Builder {
+class QtProduction extends AbstractEntityProduction implements QuantifierExpression {
+    static class Builder extends AbstractProduction.Builder implements QuantifierExpression.Builder {
         private String name;
         private long from;
         private long to;
@@ -81,7 +81,7 @@ class QtProduction extends AbstractEntityProduction implements QuantifiedProduct
         }
 
         @Override
-        public QuantifiedProduction build() {
+        public QuantifierExpression build() {
             checkForBuild();
             if (limited) {
                 return new QtProduction(name, from, to, p.get());

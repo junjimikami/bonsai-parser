@@ -23,26 +23,18 @@
  */
 package com.unitedjiga.common.parsing;
 
-import java.util.OptionalLong;
-import java.util.function.Predicate;
+import java.util.OptionalInt;
 import java.util.stream.Stream;
 
 /**
  * @author Mikami Junji
  *
  */
-public interface QuantifiedProduction extends EntityProduction {
+public interface QuantifierExpression extends Expression {
 
-    public static interface Builder extends EntityProduction.Builder {
-        public Builder setName(String name);
-        public Builder set(Expression p);
-        public Builder set(Expression.Builder b);
-        public default Builder exactly(long times) {
-            return range(times, times);
-        }
-        public Builder atLeast(long times);
-        public Builder range(long from, long to);
-        public QuantifiedProduction build();
+    public static interface Builder extends Expression.Builder {
+        public QuantifierExpression build();
+        public QuantifierExpression build(ProductionSet set);
     }
 
     @Override
@@ -55,15 +47,7 @@ public interface QuantifiedProduction extends EntityProduction {
         return visitor.visitQuantified(this, p);
     }
 
-//    public Production get();
-    public long getLowerLimit();
-    public OptionalLong getUpperLimit();
+    public int getLowerLimit();
+    public OptionalInt getUpperLimit();
     public Stream<Expression> stream();
-    public default boolean withinRange(Predicate<? super Expression> predicate) {
-        long count = stream()
-                .takeWhile(predicate)
-                .count();
-        return getLowerLimit() <= count &&
-                count <= getUpperLimit().orElse(count);
-    }
 }

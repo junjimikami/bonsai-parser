@@ -39,6 +39,6 @@ public interface ProductionVisitor<R, P> {
 	public R visitSequential(SequenceExpression prd, P p);
 	public R visitPattern(PatternExpression prd, P p);
 	public R visitReference(ReferenceExpression prd, P p);
-    public R visitQuantified(QuantifiedProduction prd, P p);
+    public R visitQuantified(QuantifierExpression prd, P p);
     public R visitEmpty(Expression prd, P p);
 }

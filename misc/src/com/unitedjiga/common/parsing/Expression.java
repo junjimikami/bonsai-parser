@@ -73,11 +73,11 @@ public interface Expression {
 
     public Kind getKind();
 
-    public default QuantifiedProduction opt() {
+    public default QuantifierExpression opt() {
         throw new UnsupportedOperationException();
     }
 
-    public default QuantifiedProduction repeat() {
+    public default QuantifierExpression repeat() {
         throw new UnsupportedOperationException();
     }
 

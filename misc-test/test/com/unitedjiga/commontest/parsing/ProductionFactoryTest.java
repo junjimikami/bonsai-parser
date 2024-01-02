@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 import com.unitedjiga.common.parsing.ChoiceExpression;
 import com.unitedjiga.common.parsing.PatternExpression;
 import com.unitedjiga.common.parsing.ProductionFactory;
-import com.unitedjiga.common.parsing.QuantifiedProduction;
+import com.unitedjiga.common.parsing.QuantifierExpression;
 import com.unitedjiga.common.parsing.ReferenceExpression;
 import com.unitedjiga.common.parsing.SequenceExpression;
 
@@ -77,14 +77,14 @@ class ProductionFactoryTest {
         assertEquals(ptn1, ref1.get());
 
         var opt1 = pf.createOptional(ptn1);
-        assertInstanceOf(QuantifiedProduction.class, opt1);
+        assertInstanceOf(QuantifierExpression.class, opt1);
         assertEquals(ptn1, opt1.stream().findFirst().get());
         assertEquals(1, opt1.stream().count());
         assertEquals(0, opt1.getLowerLimit());
         assertEquals(1, opt1.getUpperLimit().getAsLong());
 
         var rep1 = pf.createZeroOrMore(ptn1);
-        assertInstanceOf(QuantifiedProduction.class, rep1);
+        assertInstanceOf(QuantifierExpression.class, rep1);
         assertEquals(ptn1, rep1.stream().findFirst().get());
         assertEquals(0, rep1.getLowerLimit());
         assertTrue(rep1.getUpperLimit().isEmpty());

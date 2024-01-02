@@ -26,7 +26,7 @@ package com.unitedjiga.common.parsing.impl;
 import com.unitedjiga.common.parsing.ChoiceExpression;
 import com.unitedjiga.common.parsing.PatternExpression;
 import com.unitedjiga.common.parsing.ProductionFactory;
-import com.unitedjiga.common.parsing.QuantifiedProduction;
+import com.unitedjiga.common.parsing.QuantifierExpression;
 import com.unitedjiga.common.parsing.ReferenceExpression;
 import com.unitedjiga.common.parsing.SequenceExpression;
 
@@ -57,7 +57,7 @@ class DefaultProductionFactory implements ProductionFactory {
     }
 
     @Override
-    public QuantifiedProduction.Builder createQuantifiedBuilder() {
+    public QuantifierExpression.Builder createQuantifiedBuilder() {
         return new QtProduction.Builder();
     }
 
