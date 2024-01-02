@@ -23,50 +23,18 @@
  */
 package com.unitedjiga.common.parsing;
 
-import java.io.Reader;
-import java.util.Iterator;
-import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 /**
  *
  * @author Junji Mikami
  */
 public interface Tokenizer {
-    public static interface Builder {
-        public Tokenizer.Builder set(Reader r);
-//        public Tokenizer.Builder set(Iterator<String> it);
-        public Tokenizer.Builder filter(Predicate<Token> p);
-        public Tokenizer build();
-    }
-
-//    /**
-//     * 
-//     * @param it
-//     * @return
-//     */
-//    public static Tokenizer wrap(Iterator<? extends CharSequence> it) {
-//        return Tokenizers.createTokenizer(it);
-//    }
-//
-//    /**
-//     * 
-//     * @param str
-//     * @return
-//     */
-//    public static Tokenizer wrap(String... str) {
-//        return wrap(Arrays.asList(str).iterator());
-//    }
-
-    public Token read();
 
     public boolean hasNext();
+    public boolean hasNext(String pattern);
+    public boolean hasNext(Pattern pattern);
     public Token next();
-
-    public boolean hasPrevious();
-    public Token previous();
-
-    public default Token peek() {
-        next();
-        return previous();
-    }
+    public Token next(String pattern);
+    public Token next(Pattern pattern);
 }

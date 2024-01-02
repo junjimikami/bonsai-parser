@@ -25,7 +25,7 @@ package com.unitedjiga.common.parsing;
 
 import java.io.Reader;
 
-import com.unitedjiga.common.parsing.grammar.Expression;
+import com.unitedjiga.common.parsing.grammar.Grammar;
 import com.unitedjiga.common.parsing.impl.Tokenizers;
 
 /**
@@ -35,8 +35,8 @@ import com.unitedjiga.common.parsing.impl.Tokenizers;
  */
 public interface TokenizerFactory {
 
-    public static TokenizerFactory newFactory(Expression... productions) {
-        return Tokenizers.createFactory(productions);
+    public static TokenizerFactory newFactory(Grammar grammar) {
+        throw new UnsupportedOperationException();
     }
     
     public static TokenizerFactory loadFactory(String factoryName, ClassLoader cl) {
@@ -47,7 +47,6 @@ public interface TokenizerFactory {
         return Tokenizers.loadFactory(factoryName, null);
     }
 
-    public Tokenizer createTokenizer(Reader r);
-
-    public Tokenizer.Builder createTokenizerBuilder();
+    public Tokenizer createTokenizer(Reader reader);
+    public Tokenizer createTokenizer(Tokenizer tokenizer);
 }

@@ -29,7 +29,5 @@ package com.unitedjiga.common.parsing;
  */
 public interface Token extends Terminal {
 
-    public String getName();
-
     public String getValue();
 }
