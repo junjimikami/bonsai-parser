@@ -33,8 +33,8 @@ public interface AlternativeProduction extends EntityProduction {
 
     public static interface Builder extends EntityProduction.Builder {
         public Builder setName(String name);
-        public Builder add(Production p);
-        public Builder add(Production.Builder b);
+        public Builder add(Expression p);
+        public Builder add(Expression.Builder b);
         public Builder addEmpty();
         public AlternativeProduction build();
     }
@@ -49,5 +49,5 @@ public interface AlternativeProduction extends EntityProduction {
         return visitor.visitAlternative(this, p);
     }
 
-    public List<? extends Production> getProductions();
+    public List<? extends Expression> getProductions();
 }

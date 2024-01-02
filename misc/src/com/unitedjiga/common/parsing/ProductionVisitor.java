@@ -29,10 +29,10 @@ package com.unitedjiga.common.parsing;
  */
 public interface ProductionVisitor<R, P> {
 
-	public default R visit(Production prd) {
+	public default R visit(Expression prd) {
 	    return visit(prd, null);
 	}
-	public default R visit(Production prd, P p) {
+	public default R visit(Expression prd, P p) {
 	    return prd.accept(this, p);
 	}
 	public R visitAlternative(AlternativeProduction prd, P p);
@@ -40,5 +40,5 @@ public interface ProductionVisitor<R, P> {
 	public R visitPattern(PatternProduction prd, P p);
 	public R visitReference(Reference prd, P p);
     public R visitQuantified(QuantifiedProduction prd, P p);
-    public R visitEmpty(Production prd, P p);
+    public R visitEmpty(Expression prd, P p);
 }

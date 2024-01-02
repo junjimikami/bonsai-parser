@@ -36,7 +36,7 @@ import java.util.ServiceLoader;
 import java.util.ServiceLoader.Provider;
 
 import com.unitedjiga.common.parsing.Parser;
-import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.Token;
 import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.TokenizerFactory;
@@ -121,7 +121,7 @@ public final class Tokenizers {
 //        });
 //    }
 
-    public static TokenizerFactory createFactory(Production... productions) {
+    public static TokenizerFactory createFactory(Expression... productions) {
         return createFactory(Arrays.asList(productions));
 //        Objects.requireNonNull(productions, Message.REQUIRE_NON_NULL.format());
 //        return new TokenizerFactory() {
@@ -139,7 +139,7 @@ public final class Tokenizers {
 //            }
 //        };
     }
-    public static TokenizerFactory createFactory(List<? extends Production> productions) {
+    public static TokenizerFactory createFactory(List<? extends Expression> productions) {
         return new DefaultTokenizerFactory(productions);
     }
     

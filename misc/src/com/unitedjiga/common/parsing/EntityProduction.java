@@ -27,9 +27,9 @@ package com.unitedjiga.common.parsing;
  * @author Junji Mikami
  *
  */
-public interface EntityProduction extends Production {
+public interface EntityProduction extends Expression {
 
-    public static interface Builder extends Production.Builder {
+    public static interface Builder extends Expression.Builder {
         public Builder setName(String name);
         public EntityProduction build();
     }

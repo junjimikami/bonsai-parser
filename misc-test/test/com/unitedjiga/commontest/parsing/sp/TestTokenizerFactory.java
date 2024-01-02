@@ -25,7 +25,7 @@ package com.unitedjiga.commontest.parsing.sp;
 
 import java.io.Reader;
 
-import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.Tokenizer.Builder;
 import com.unitedjiga.common.parsing.TokenizerFactory;
@@ -38,9 +38,9 @@ public class TestTokenizerFactory implements TokenizerFactory {
 
     @Override
     public Tokenizer createTokenizer(Reader r) {
-        var prd = Production.oneOf(
-                Production.of("0").repeat(),
-                Production.of("1").repeat());
+        var prd = Expression.oneOf(
+                Expression.of("0").repeat(),
+                Expression.of("1").repeat());
         return TokenizerFactory.newFactory(prd).createTokenizer(r);
     }
 

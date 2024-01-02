@@ -25,7 +25,7 @@ package com.unitedjiga.common.parsing.impl;
 
 import com.unitedjiga.common.parsing.AlternativeProduction;
 import com.unitedjiga.common.parsing.PatternProduction;
-import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.ProductionFactory;
 import com.unitedjiga.common.parsing.ProductionVisitor;
 import com.unitedjiga.common.parsing.SequentialProduction;
@@ -37,7 +37,7 @@ import com.unitedjiga.common.parsing.SequentialProduction;
  */
 public final class Productions {
 
-    private static final Production EMPTY =  new Production() {
+    private static final Expression EMPTY =  new Expression() {
 
         @Override
         public <R, P> R accept(ProductionVisitor<R, P> visitor, P p) {
@@ -50,7 +50,7 @@ public final class Productions {
         }
     };
 
-    static final Production EOF =  new Production() {
+    static final Expression EOF =  new Expression() {
 
         @Override
         public <R, P> R accept(ProductionVisitor<R, P> visitor, P p) {
@@ -93,15 +93,15 @@ public final class Productions {
 //        return new AltProduction.Builder().setName(name);
 //    }
 
-    public static Production empty() {
+    public static Expression empty() {
         return EMPTY;
     }
 
     public static SequentialProduction of(Object... args) {
         SequentialProduction.Builder builder = sequentialBuilder();
         for (Object o : args) {
-            if (o instanceof Production) {
-                builder.add((Production) o);
+            if (o instanceof Expression) {
+                builder.add((Expression) o);
 //            } else if (o instanceof String) {
 //                builder.add((String) o);
 //            } else if (o instanceof Supplier) {
@@ -116,8 +116,8 @@ public final class Productions {
     public static AlternativeProduction oneOf(Object... args) {
         AlternativeProduction.Builder builder = alternativeBuilder();
         for (Object o : args) {
-            if (o instanceof Production) {
-                builder.add((Production) o);
+            if (o instanceof Expression) {
+                builder.add((Expression) o);
 //            } else if (o instanceof String) {
 //                builder.add((String) o);
 //            } else if (o instanceof Supplier) {

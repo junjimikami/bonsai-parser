@@ -29,7 +29,7 @@ import java.util.Objects;
 import com.unitedjiga.common.parsing.NonTerminalSymbol;
 import com.unitedjiga.common.parsing.Parser;
 import com.unitedjiga.common.parsing.ParserFactory;
-import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.Symbol;
 import com.unitedjiga.common.parsing.TerminalSymbol;
 import com.unitedjiga.common.parsing.Tokenizer;
@@ -39,9 +39,9 @@ import com.unitedjiga.common.parsing.Tokenizer;
  *
  */
 class DefaultParserFactory implements ParserFactory {
-    private final Production production;
+    private final Expression production;
 
-    DefaultParserFactory(Production p) {
+    DefaultParserFactory(Expression p) {
         Objects.requireNonNull(p);
         this.production = p;
     }

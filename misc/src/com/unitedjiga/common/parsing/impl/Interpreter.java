@@ -32,7 +32,7 @@ import java.util.Set;
 import com.unitedjiga.common.parsing.AlternativeProduction;
 import com.unitedjiga.common.parsing.ParsingException;
 import com.unitedjiga.common.parsing.PatternProduction;
-import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.ProductionVisitor;
 import com.unitedjiga.common.parsing.QuantifiedProduction;
 import com.unitedjiga.common.parsing.Reference;
@@ -48,18 +48,18 @@ class Interpreter implements ProductionVisitor<Symbol, Context> {
     private final FirstSet firstSet = new FirstSet();
     private final AnyMatcher anyMatcher = new AnyMatcher();
 
-    Symbol parse(Production prd, Tokenizer t) {
+    Symbol parse(Expression prd, Tokenizer t) {
         var s = interpret(prd, t);
         if (t.hasNext()) {
             throw new ParsingException();
         }
         return s;
     }
-    Symbol interpret(Production prd, Tokenizer t) {
+    Symbol interpret(Expression prd, Tokenizer t) {
         var followSet = Set.of(EOF);
         return interpret(prd, t, followSet);
     }
-    Symbol interpret(Production prd, Tokenizer tokenizer, Set<Production> followSet) {
+    Symbol interpret(Expression prd, Tokenizer tokenizer, Set<Expression> followSet) {
         var p = new Context(tokenizer, followSet);
         return visit(prd, p);
     }
@@ -125,7 +125,7 @@ class Interpreter implements ProductionVisitor<Symbol, Context> {
     }
 
     @Override
-    public Symbol visitEmpty(Production empty, Context args) {
+    public Symbol visitEmpty(Expression empty, Context args) {
         if (anyMatcher.visit(empty, args)) {
             return new DefaultNonTerminalSymbol(null);
         }

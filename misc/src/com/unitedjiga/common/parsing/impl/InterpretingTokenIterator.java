@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.stream.Collectors;
 
 import com.unitedjiga.common.parsing.NonTerminalSymbol;
-import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.SymbolVisitor;
 import com.unitedjiga.common.parsing.TerminalSymbol;
 import com.unitedjiga.common.parsing.Token;
@@ -29,10 +29,10 @@ class InterpretingTokenIterator implements Iterator<Token> {
     };
 
     private final Tokenizer tokenizer;
-    private final Production production;
+    private final Expression production;
     private final Interpreter interpreter = new Interpreter();
 
-    InterpretingTokenIterator(Tokenizer tokenizer, Production production) {
+    InterpretingTokenIterator(Tokenizer tokenizer, Expression production) {
         this.tokenizer = tokenizer;
         this.production = production;
     }

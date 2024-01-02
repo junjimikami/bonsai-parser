@@ -55,20 +55,20 @@ public interface ProductionFactory {
     public SequentialProduction.Builder createSequentialBuilder();
 
     public Reference.Builder createReferenceBuilder();
-    public default Reference createReference(Supplier<? extends Production> supplier) {
+    public default Reference createReference(Supplier<? extends Expression> supplier) {
         return createReferenceBuilder()
                 .set(supplier)
                 .build();
     }
 
     public QuantifiedProduction.Builder createQuantifiedBuilder();
-    public default QuantifiedProduction createOptional(Production p) {
+    public default QuantifiedProduction createOptional(Expression p) {
         return createQuantifiedBuilder()
                 .set(p)
                 .range(0, 1)
                 .build();
     }
-    public default QuantifiedProduction createZeroOrMore(Production p) {
+    public default QuantifiedProduction createZeroOrMore(Expression p) {
         return createQuantifiedBuilder()
                 .set(p)
                 .atLeast(0)

@@ -32,7 +32,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 import com.unitedjiga.common.parsing.ParserFactory;
-import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.ProductionFactory;
 import com.unitedjiga.common.parsing.Reference;
 import com.unitedjiga.common.parsing.Tokenizer;
@@ -46,7 +46,7 @@ class ParserTest {
     @Test
     void testName() throws Exception {
         var prdf = ProductionFactory.newFactory();
-        var grammar = new HashMap<String, Production>();
+        var grammar = new HashMap<String, Expression>();
         grammar.put("Type", prdf.createAlternativeBuilder()
                 .add(grammar.get("PrimitiveType"))
                 .add(grammar.get("ReferenceType"))
@@ -98,28 +98,28 @@ class ParserTest {
         class GrammarTest {
             ProductionFactory prdf = ProductionFactory.newFactory();
 
-            Production type() {
+            Expression type() {
                 return prdf.createAlternativeBuilder()
                         .setName("Type")
                         .add(prdf.createReference(this::primitiveType))
                         .add(prdf.createReference(this::referenceType))
                         .build();
             }
-            Production primitiveType() {
+            Expression primitiveType() {
                 return prdf.createAlternativeBuilder()
                         .setName("PrimitiveType")
                         .add(prdf.createReference(this::numericType))
                         .add(prdf.createPattern("boolean"))
                         .build();
             }
-            Production numericType() {
+            Expression numericType() {
                 return prdf.createAlternativeBuilder()
                         .setName("NumericType")
                         .add(prdf.createReference(this::integralType))
                         .add(prdf.createReference(this::floatingPointType))
                         .build();
             }
-            Production integralType() {
+            Expression integralType() {
                 return prdf.createAlternativeBuilder()
                         .setName("IntegralType")
                         .add(prdf.createPattern("byte"))
@@ -128,20 +128,20 @@ class ParserTest {
                         .add(prdf.createPattern("char"))
                         .build();
             }
-            Production floatingPointType() {
+            Expression floatingPointType() {
                 return prdf.createAlternativeBuilder()
                         .setName("FloatingPointType")
                         .add(prdf.createPattern("float"))
                         .add(prdf.createPattern("double"))
                         .build(); 
             }
-            Production referenceType() {
+            Expression referenceType() {
                 return prdf.createAlternativeBuilder()
                         .setName("ReferenceType")
                         .add(prdf.createReference(this::classOrInterfaceType))
                         .build();
             }
-            Production classOrInterfaceType() {
+            Expression classOrInterfaceType() {
                 return prdf.createAlternativeBuilder()
                         .setName("ClassOrInterfaceType")
                         .add(prdf.createSequentialBuilder()

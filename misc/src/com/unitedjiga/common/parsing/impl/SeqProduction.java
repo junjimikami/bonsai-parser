@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.SequentialProduction;
 
 /**
@@ -37,7 +37,7 @@ import com.unitedjiga.common.parsing.SequentialProduction;
 class SeqProduction extends AbstractEntityProduction implements SequentialProduction {
     static class Builder extends AbstractProduction.Builder implements SequentialProduction.Builder {
         private String name;
-        private final List<Supplier<Production>> elements = new ArrayList<>();
+        private final List<Supplier<Expression>> elements = new ArrayList<>();
 
         @Override
         public Builder setName(String name) {
@@ -56,14 +56,14 @@ class SeqProduction extends AbstractEntityProduction implements SequentialProduc
         }
 
         @Override
-        public Builder add(Production p) {
+        public Builder add(Expression p) {
             check();
             elements.add(() -> p);
             return this;
         }
 
         @Override
-        public Builder add(Production.Builder b) {
+        public Builder add(Expression.Builder b) {
             check();
             elements.add(b::build);
             return this;
@@ -77,15 +77,15 @@ class SeqProduction extends AbstractEntityProduction implements SequentialProduc
         }
     }
 
-    private final List<Production> elements;
+    private final List<Expression> elements;
 
-    private SeqProduction(String name, List<Production> elements) {
+    private SeqProduction(String name, List<Expression> elements) {
         super(name);
         this.elements = elements;
     }
 
     @Override
-    public List<Production> getProductions() {
+    public List<Expression> getProductions() {
         return elements;
     }
 }

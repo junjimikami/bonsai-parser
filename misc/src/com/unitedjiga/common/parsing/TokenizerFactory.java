@@ -34,7 +34,7 @@ import com.unitedjiga.common.parsing.impl.Tokenizers;
  */
 public interface TokenizerFactory {
 
-    public static TokenizerFactory newFactory(Production... productions) {
+    public static TokenizerFactory newFactory(Expression... productions) {
         return Tokenizers.createFactory(productions);
     }
     

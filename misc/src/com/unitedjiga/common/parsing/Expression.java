@@ -32,7 +32,7 @@ import com.unitedjiga.common.parsing.impl.Productions;
  * 
  * @author Junji Mikami
  */
-public interface Production {
+public interface Expression {
 
 	public static enum Kind {
 		PATTERN,
@@ -44,10 +44,10 @@ public interface Production {
 	}
 
 	public static interface Builder {
-        public Production build();
+        public Expression build();
     }
 
-    public static final Production EMPTY = Productions.empty();
+    public static final Expression EMPTY = Productions.empty();
 
 	public static PatternProduction ofPattern(String regex) {
 		return Productions.ofPattern(regex);
@@ -64,7 +64,7 @@ public interface Production {
         return Productions.oneOf(args);
     }
 
-    static Supplier<? extends Production> ref(Supplier<? extends Production> p) {
+    static Supplier<? extends Expression> ref(Supplier<? extends Expression> p) {
         return p;
     }
 

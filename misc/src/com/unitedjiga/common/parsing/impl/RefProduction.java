@@ -26,7 +26,7 @@ package com.unitedjiga.common.parsing.impl;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.Reference;
 
 /**
@@ -35,10 +35,10 @@ import com.unitedjiga.common.parsing.Reference;
  */
 class RefProduction extends AbstractProduction implements Reference {
     static class Builder extends AbstractProduction.Builder implements Reference.Builder {
-        private Supplier<? extends Production> p;
+        private Supplier<? extends Expression> p;
 
         @Override
-        public Builder set(Supplier<? extends Production> supplier) {
+        public Builder set(Supplier<? extends Expression> supplier) {
             check();
             this.p = supplier;
             return this;
@@ -52,15 +52,15 @@ class RefProduction extends AbstractProduction implements Reference {
         
     }
 
-    private final Supplier<? extends Production> p;
+    private final Supplier<? extends Expression> p;
 
-    private RefProduction(Supplier<? extends Production> p) {
+    private RefProduction(Supplier<? extends Expression> p) {
         Objects.requireNonNull(p, Message.REQUIRE_NON_NULL.format());
         this.p = p;
     }
 
     @Override
-    public Production get() {
+    public Expression get() {
         return p.get();
     }
 

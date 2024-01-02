@@ -27,7 +27,7 @@ import java.util.OptionalLong;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.QuantifiedProduction;
 
 /**
@@ -40,7 +40,7 @@ class QtProduction extends AbstractEntityProduction implements QuantifiedProduct
         private long from;
         private long to;
         private boolean limited;
-        private Supplier<Production> p;
+        private Supplier<Expression> p;
 
         @Override
         public Builder setName(String name) {
@@ -50,14 +50,14 @@ class QtProduction extends AbstractEntityProduction implements QuantifiedProduct
         }
 
         @Override
-        public Builder set(Production p) {
+        public Builder set(Expression p) {
             check();
             this.p = () -> p;
             return this;
         }
 
         @Override
-        public Builder set(Production.Builder b) {
+        public Builder set(Expression.Builder b) {
             check();
             this.p = b::build;
             return this;
@@ -92,15 +92,15 @@ class QtProduction extends AbstractEntityProduction implements QuantifiedProduct
 
     private final long lowerLimit;
     private final OptionalLong upperLimit;
-    private final Production p;
+    private final Expression p;
 
-    private QtProduction(String name, long lowerLimit, Production p) {
+    private QtProduction(String name, long lowerLimit, Expression p) {
         super(name);
         this.lowerLimit = lowerLimit;
         this.upperLimit = OptionalLong.empty();
         this.p = p;
     }
-    private QtProduction(String name, long lowerLimit, long upperLimit, Production p) {
+    private QtProduction(String name, long lowerLimit, long upperLimit, Expression p) {
         super(name);
         this.lowerLimit = lowerLimit;
         this.upperLimit = OptionalLong.of(upperLimit);
@@ -116,7 +116,7 @@ class QtProduction extends AbstractEntityProduction implements QuantifiedProduct
         return upperLimit;
     }
     @Override
-    public Stream<Production> stream() {
+    public Stream<Expression> stream() {
         var s = Stream.generate(() -> p);
         if (upperLimit.isPresent()) {
             return s.limit(upperLimit.getAsLong());

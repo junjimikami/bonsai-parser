@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import com.unitedjiga.common.parsing.AlternativeProduction;
-import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Expression;
 
 /**
  * 
@@ -39,7 +39,7 @@ import com.unitedjiga.common.parsing.Production;
 class AltProduction extends AbstractEntityProduction implements AlternativeProduction {
     static class Builder extends AbstractProduction.Builder implements AlternativeProduction.Builder {
         private String name;
-        private final List<Supplier<Production>> elements = new ArrayList<>();
+        private final List<Supplier<Expression>> elements = new ArrayList<>();
 
         @Override
         public Builder setName(String name) {
@@ -58,14 +58,14 @@ class AltProduction extends AbstractEntityProduction implements AlternativeProdu
         }
 
         @Override
-        public Builder add(Production p) {
+        public Builder add(Expression p) {
             check();
             elements.add(() -> p);
             return this;
         }
 
         @Override
-        public Builder add(Production.Builder b) {
+        public Builder add(Expression.Builder b) {
             check();
             elements.add(b::build);
             return this;
@@ -80,15 +80,15 @@ class AltProduction extends AbstractEntityProduction implements AlternativeProdu
 
     }
 
-    private final List<? extends Production> elements;
+    private final List<? extends Expression> elements;
 
-    AltProduction(String name, List<? extends Production> elements) {
+    AltProduction(String name, List<? extends Expression> elements) {
         super(name);
         this.elements = elements;
     }
 
     @Override
-    public List<? extends Production> getProductions() {
+    public List<? extends Expression> getProductions() {
         return elements;
     }
 }

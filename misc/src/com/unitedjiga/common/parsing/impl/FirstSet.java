@@ -30,7 +30,7 @@ import java.util.Set;
 
 import com.unitedjiga.common.parsing.AlternativeProduction;
 import com.unitedjiga.common.parsing.PatternProduction;
-import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.ProductionVisitor;
 import com.unitedjiga.common.parsing.QuantifiedProduction;
 import com.unitedjiga.common.parsing.Reference;
@@ -40,19 +40,19 @@ import com.unitedjiga.common.parsing.SequentialProduction;
  * @author Mikami Junji
  *
  */
-class FirstSet implements ProductionVisitor<Set<Production>, Set<Production>> {
+class FirstSet implements ProductionVisitor<Set<Expression>, Set<Expression>> {
 
     @Override
-    public Set<Production> visit(Production prd) {
+    public Set<Expression> visit(Expression prd) {
         return visit(prd, Set.of());
     }
 
     @Override
-    public Set<Production> visitAlternative(AlternativeProduction alt, Set<Production> followSet) {
+    public Set<Expression> visitAlternative(AlternativeProduction alt, Set<Expression> followSet) {
         if (alt.getProductions().isEmpty()) {
             return followSet;
         }
-        var set = new HashSet<Production>();
+        var set = new HashSet<Expression>();
         for (var p : alt.getProductions()) {
             set.addAll(visit(p, followSet));
         }
@@ -60,7 +60,7 @@ class FirstSet implements ProductionVisitor<Set<Production>, Set<Production>> {
     }
 
     @Override
-    public Set<Production> visitSequential(SequentialProduction seq, Set<Production> followSet) {
+    public Set<Expression> visitSequential(SequentialProduction seq, Set<Expression> followSet) {
         if (seq.getProductions().isEmpty()) {
             return followSet;
         }
@@ -74,18 +74,18 @@ class FirstSet implements ProductionVisitor<Set<Production>, Set<Production>> {
     }
 
     @Override
-    public Set<Production> visitPattern(PatternProduction p, Set<Production> followSet) {
+    public Set<Expression> visitPattern(PatternProduction p, Set<Expression> followSet) {
         return Set.of(p);
     }
 
     @Override
-    public Set<Production> visitReference(Reference ref, Set<Production> followSet) {
+    public Set<Expression> visitReference(Reference ref, Set<Expression> followSet) {
         return visit(ref.get(), followSet);
     }
 
     @Override
-    public Set<Production> visitQuantified(QuantifiedProduction qt, Set<Production> followSet) {
-        var set = new HashSet<Production>();
+    public Set<Expression> visitQuantified(QuantifiedProduction qt, Set<Expression> followSet) {
+        var set = new HashSet<Expression>();
         var prd = qt.stream()
                 .limit(1)
                 .findFirst();
@@ -99,7 +99,7 @@ class FirstSet implements ProductionVisitor<Set<Production>, Set<Production>> {
     }
 
     @Override
-    public Set<Production> visitEmpty(Production empty, Set<Production> followSet) {
+    public Set<Expression> visitEmpty(Expression empty, Set<Expression> followSet) {
         return followSet;
     }
 }

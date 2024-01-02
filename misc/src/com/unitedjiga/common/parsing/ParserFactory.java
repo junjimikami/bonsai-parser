@@ -33,7 +33,7 @@ import com.unitedjiga.common.parsing.impl.ParserImpls;
  */
 public interface ParserFactory {
 
-	public static ParserFactory newFactory(Production p) {
+	public static ParserFactory newFactory(Expression p) {
 		return ParserImpls.newFactory(p);
 	}
 

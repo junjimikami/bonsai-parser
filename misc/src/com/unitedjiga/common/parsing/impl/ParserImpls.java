@@ -27,7 +27,7 @@ import java.util.ServiceLoader;
 import java.util.ServiceLoader.Provider;
 
 import com.unitedjiga.common.parsing.ParserFactory;
-import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Expression;
 
 /**
  * @author Junji Mikami
@@ -38,7 +38,7 @@ public final class ParserImpls {
     private ParserImpls() {
     }
 
-    public static ParserFactory newFactory(Production p) {
+    public static ParserFactory newFactory(Expression p) {
         return new DefaultParserFactory(p);
     }
 

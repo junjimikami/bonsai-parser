@@ -29,10 +29,10 @@ import java.util.function.Supplier;
  * @author Junji Mikami
  *
  */
-public interface Reference extends Production {
+public interface Reference extends Expression {
 
-    public static interface Builder extends Production.Builder {
-        public Builder set(Supplier<? extends Production> supplier);
+    public static interface Builder extends Expression.Builder {
+        public Builder set(Supplier<? extends Expression> supplier);
         public Reference build();
     }
 
@@ -46,5 +46,5 @@ public interface Reference extends Production {
         return visitor.visitReference(this, p);
     }
     
-    public Production get();
+    public Expression get();
 }

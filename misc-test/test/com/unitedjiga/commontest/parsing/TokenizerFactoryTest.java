@@ -24,13 +24,13 @@
 package com.unitedjiga.commontest.parsing;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static com.unitedjiga.common.parsing.Production.*;
+import static com.unitedjiga.common.parsing.Expression.*;
 
 import java.io.StringReader;
 
 import org.junit.jupiter.api.Test;
 
-import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.TokenizerFactory;
 
 /**

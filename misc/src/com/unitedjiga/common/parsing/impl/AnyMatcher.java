@@ -26,7 +26,7 @@ package com.unitedjiga.common.parsing.impl;
 import static com.unitedjiga.common.parsing.impl.Productions.EOF;
 
 import com.unitedjiga.common.parsing.PatternProduction;
-import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.util.SimpleProductionVisitor;
 
 /**
@@ -37,7 +37,7 @@ class AnyMatcher implements SimpleProductionVisitor<Boolean, Context> {
     private final FirstSet firstSet = new FirstSet();
 
     @Override
-    public Boolean visit(Production prd, Context args) {
+    public Boolean visit(Expression prd, Context args) {
         if (prd == EOF) {
             var tokenizer = args.getTokenizer();
             return !tokenizer.hasNext();
@@ -56,7 +56,7 @@ class AnyMatcher implements SimpleProductionVisitor<Boolean, Context> {
     }
 
     @Override
-    public Boolean defaultAction(Production prd, Context args) {
+    public Boolean defaultAction(Expression prd, Context args) {
         var followSet = args.getFollowSet();
         return firstSet.visit(prd, followSet)
                 .stream()

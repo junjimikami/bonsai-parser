@@ -35,8 +35,8 @@ public interface QuantifiedProduction extends EntityProduction {
 
     public static interface Builder extends EntityProduction.Builder {
         public Builder setName(String name);
-        public Builder set(Production p);
-        public Builder set(Production.Builder b);
+        public Builder set(Expression p);
+        public Builder set(Expression.Builder b);
         public default Builder exactly(long times) {
             return range(times, times);
         }
@@ -58,8 +58,8 @@ public interface QuantifiedProduction extends EntityProduction {
 //    public Production get();
     public long getLowerLimit();
     public OptionalLong getUpperLimit();
-    public Stream<Production> stream();
-    public default boolean withinRange(Predicate<? super Production> predicate) {
+    public Stream<Expression> stream();
+    public default boolean withinRange(Predicate<? super Expression> predicate) {
         long count = stream()
                 .takeWhile(predicate)
                 .count();

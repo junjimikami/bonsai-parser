@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.Token;
 import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.TokenizerFactory;
@@ -65,13 +65,13 @@ class DefaultTokenizerFactory implements TokenizerFactory {
     }
 
 //    private final List<? extends Production> productions;
-    private final Production production;
+    private final Expression production;
 
-    DefaultTokenizerFactory(List<? extends Production> productions) {
+    DefaultTokenizerFactory(List<? extends Expression> productions) {
         Objects.requireNonNull(productions);
         this.production = new AltProduction(null, productions);
     }
-    DefaultTokenizerFactory(Production production) {
+    DefaultTokenizerFactory(Expression production) {
         Objects.requireNonNull(production);
         this.production = production;
     }

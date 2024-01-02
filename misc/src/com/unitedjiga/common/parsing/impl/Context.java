@@ -25,7 +25,7 @@ package com.unitedjiga.common.parsing.impl;
 
 import java.util.Set;
 
-import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.Tokenizer;
 
 /**
@@ -35,9 +35,9 @@ import com.unitedjiga.common.parsing.Tokenizer;
 class Context {
 
     private final Tokenizer tokenizer;
-    private final Set<Production> followSet;
+    private final Set<Expression> followSet;
 
-    Context(Tokenizer tokenizer, Set<Production> followSet) {
+    Context(Tokenizer tokenizer, Set<Expression> followSet) {
         super();
         this.tokenizer = tokenizer;
         this.followSet = followSet;
@@ -47,7 +47,7 @@ class Context {
         return tokenizer;
     }
 
-    Set<Production> getFollowSet() {
+    Set<Expression> getFollowSet() {
         return followSet;
     }
 }

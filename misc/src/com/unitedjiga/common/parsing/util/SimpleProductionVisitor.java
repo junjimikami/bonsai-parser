@@ -25,7 +25,7 @@ package com.unitedjiga.common.parsing.util;
 
 import com.unitedjiga.common.parsing.AlternativeProduction;
 import com.unitedjiga.common.parsing.PatternProduction;
-import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.ProductionVisitor;
 import com.unitedjiga.common.parsing.QuantifiedProduction;
 import com.unitedjiga.common.parsing.Reference;
@@ -64,9 +64,9 @@ public interface SimpleProductionVisitor<R, P> extends ProductionVisitor<R, P> {
     }
 
     @Override
-    public default R visitEmpty(Production prd, P p) {
+    public default R visitEmpty(Expression prd, P p) {
         return defaultAction(prd, p);
     }
 
-    public R defaultAction(Production prd, P p);
+    public R defaultAction(Expression prd, P p);
 }

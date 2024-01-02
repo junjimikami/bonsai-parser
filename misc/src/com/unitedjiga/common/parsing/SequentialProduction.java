@@ -33,8 +33,8 @@ public interface SequentialProduction extends EntityProduction {
 
     public static interface Builder extends EntityProduction.Builder {
         public Builder setName(String name);
-        public Builder add(Production p);
-        public Builder add(Production.Builder b);
+        public Builder add(Expression p);
+        public Builder add(Expression.Builder b);
         public Builder addEmpty();
         public SequentialProduction build();
     }
@@ -49,5 +49,5 @@ public interface SequentialProduction extends EntityProduction {
         return visitor.visitSequential(this, p);
     }
 
-    public List<Production> getProductions();
+    public List<Expression> getProductions();
 }

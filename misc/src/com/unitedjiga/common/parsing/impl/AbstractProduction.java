@@ -23,15 +23,15 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Expression;
 
 /**
  *
  * @author Junji Mikami
  */
-abstract class AbstractProduction implements Production {
+abstract class AbstractProduction implements Expression {
 
-    static abstract class Builder implements Production.Builder {
+    static abstract class Builder implements Expression.Builder {
         private boolean isBuilt;
     
         protected void check() {

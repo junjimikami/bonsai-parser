@@ -1,14 +1,14 @@
 package com.unitedjiga.commontest.parsing.sp;
 
-import static com.unitedjiga.common.parsing.Production.of;
-import static com.unitedjiga.common.parsing.Production.oneOf;
-import static com.unitedjiga.common.parsing.Production.ref;
+import static com.unitedjiga.common.parsing.Expression.of;
+import static com.unitedjiga.common.parsing.Expression.oneOf;
+import static com.unitedjiga.common.parsing.Expression.ref;
 
 import java.io.Reader;
 
 import com.unitedjiga.common.parsing.AlternativeProduction;
 import com.unitedjiga.common.parsing.Parser;
-import com.unitedjiga.common.parsing.Production;
+import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.SequentialProduction;
 import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.Tokenizer.Builder;
@@ -17,7 +17,7 @@ import com.unitedjiga.common.parsing.TokenizerFactory;
 public class JavaTokenizerFactory implements TokenizerFactory {
 
     private class Layer1 {
-        Production preInputElement() {
+        Expression preInputElement() {
             return oneOf(
                     lineTerminator(),
                     inputElement(),
@@ -26,12 +26,12 @@ public class JavaTokenizerFactory implements TokenizerFactory {
         /*
          * Line Terminators
          */
-        Production lineTerminator() {
+        Expression lineTerminator() {
             return oneOf(
                     "\\n",
                     of("\\r", of("\\n").opt()));
         }
-        Production inputElement() {
+        Expression inputElement() {
             return oneOf(
                     commentOrSlash(),
                     token());
@@ -39,41 +39,41 @@ public class JavaTokenizerFactory implements TokenizerFactory {
         /*
          * Comments or Slash
          */
-        Production commentOrSlash() {
+        Expression commentOrSlash() {
             return of("/", oneOf(
                     traditionalComment(),
                     endOfLineComment()).opt());
         }
-        Production traditionalComment() {
+        Expression traditionalComment() {
             return of("\\*", commentTail());
         }
-        Production commentTail() {
+        Expression commentTail() {
             return oneOf(
                     of("\\*", commentTailStar()),
                     of(notStar(), ref(this::commentTail)));
         }
-        Production commentTailStar() {
+        Expression commentTailStar() {
             return oneOf(
                     "/",
                     of("\\*", ref(this::commentTailStar)),
                     of(notStarNotSlash(), ref(this::commentTail)));
         }
-        Production notStar() {
+        Expression notStar() {
             return oneOf("[^*]", "[\r\n]");
         }
-        Production notStarNotSlash() {
+        Expression notStarNotSlash() {
             return oneOf("[^*/]", "[\r\n]");
         }
-        Production endOfLineComment() {
+        Expression endOfLineComment() {
             return of("/", of("[^\r\n]").repeat());
         }
         /*
          * 
          */
-        Production token() {
+        Expression token() {
             return oneOf(literal());
         }
-        Production literal() {
+        Expression literal() {
             return oneOf(
                     characterLiteral(),
                     stringLiteral());
@@ -81,21 +81,21 @@ public class JavaTokenizerFactory implements TokenizerFactory {
         /*
          * Character Literals
          */
-        Production characterLiteral() {
+        Expression characterLiteral() {
             return of("'", oneOf(
                     singleCharacter(),
                     escapeSequence()), "'");
         }
-        Production singleCharacter() {
+        Expression singleCharacter() {
             return of("[^'\\\\\r\n]");
         }
         /*
          * String Literals
          */
-        Production stringLiteral() {
+        Expression stringLiteral() {
             return of("\"", stringCharacter().repeat(), "\"");
         }
-        Production stringCharacter() {
+        Expression stringCharacter() {
             return oneOf(
                     "[^\"\\\\\r\n]",
                     escapeSequence());
@@ -103,10 +103,10 @@ public class JavaTokenizerFactory implements TokenizerFactory {
         /*
          * Escape Sequences for Character and String Literals
          */
-        Production escapeSequence() {
+        Expression escapeSequence() {
             return of("\\\\", oneOf("b", "t", "n", "f", "r", "\"", "'", "\\\\", octalEscape()));
         }
-        Production octalEscape() {
+        Expression octalEscape() {
             return oneOf(
                     of("[0-3]", of("[0-7]").opt(), of("[0-7]").opt()),
                     of("[0-7]", of("[0-7]").opt()));
@@ -116,13 +116,13 @@ public class JavaTokenizerFactory implements TokenizerFactory {
         /*
          * Line Terminators
          */
-        Production lineTerminator() {
+        Expression lineTerminator() {
             return of("\\n|\\r|\\r\\n");
         }
         /*
          * Input Elements
          */
-        Production inputElement() {
+        Expression inputElement() {
             return oneOf(
                     whiteSpace(),
 //                    comment(),
@@ -132,7 +132,7 @@ public class JavaTokenizerFactory implements TokenizerFactory {
         /*
          * White Space
          */
-        Production whiteSpace() {
+        Expression whiteSpace() {
             return oneOf("[ ]|\\t|\\f", lineTerminator());
         }
 //        /*
@@ -167,7 +167,7 @@ public class JavaTokenizerFactory implements TokenizerFactory {
         /*
          * 
          */
-        Production token() {
+        Expression token() {
             return oneOf(
                     literal(),
                     separator(),
@@ -176,72 +176,72 @@ public class JavaTokenizerFactory implements TokenizerFactory {
         /*
          * Literals
          */
-        Production literal() {
+        Expression literal() {
             return oneOf(
                     integerLiteral(),
                     floatingPointLiteral());
         }
         // Integer Literals
-        Production integerLiteral() {
+        Expression integerLiteral() {
             return oneOf(
                     decimalIntegerLiteral(),
                     hexIntegerLiteral(),
                     ocatlIntegerLiteral(),
                     binaryIntegerLiteral());
         }
-        Production decimalIntegerLiteral() {
+        Expression decimalIntegerLiteral() {
             return of(decimalNumeral(), integerTypeSuffix().opt());
         }
-        Production hexIntegerLiteral() {
+        Expression hexIntegerLiteral() {
             return of(hexNumeral(), integerTypeSuffix().opt());
         }
-        Production ocatlIntegerLiteral() {
+        Expression ocatlIntegerLiteral() {
 //            return of(octalNumeral(), integerTypeSuffix().opt());
             return null;
         }
-        Production binaryIntegerLiteral() {
+        Expression binaryIntegerLiteral() {
             return null;
         }
-        Production integerTypeSuffix() {
+        Expression integerTypeSuffix() {
             return of("l|L");
         }
-        Production decimalNumeral() {
+        Expression decimalNumeral() {
             return oneOf(
                     "0",
                     of("[1-9]", oneOf(
                             digits().opt(),
                             of(underscores(), digits()))));
         }
-        Production digits() {
+        Expression digits() {
             return of("[0-9]", of(digitsAndUnderscores().opt(), "[0-9]").opt());
         }
-        Production digitsAndUnderscores() {
+        Expression digitsAndUnderscores() {
             return of(digitsOrUnderscore(), digitsOrUnderscore().repeat());
         }
-        Production digitsOrUnderscore() {
+        Expression digitsOrUnderscore() {
             return oneOf(
                     "[0-9]",
                     underscores());
         }
-        Production underscores() {
+        Expression underscores() {
             return of("_", of("_").repeat());
         }
-        Production hexNumeral() {
+        Expression hexNumeral() {
             return of("0", "[xX]", hexDigits());
         }
-        Production hexDigits() {
+        Expression hexDigits() {
             return of("[0-9a-fA-F]", hexDigitsAndUnderscores(), "[0-9a-fA-F]");
         }
-        Production hexDigitsAndUnderscores() {
+        Expression hexDigitsAndUnderscores() {
             return of(hexDigitOrUnderscore(), hexDigitOrUnderscore().repeat());
         }
-        Production hexDigitOrUnderscore() {
+        Expression hexDigitOrUnderscore() {
             return oneOf("[0-9a-fA-F]", "_");
         }
         /*
          * Separators
          */
-        Production separator() {
+        Expression separator() {
             return oneOf(
                   of("\\.", of("\\.", "\\.").opt()),
                   of(":", of(":").opt()));
@@ -249,7 +249,7 @@ public class JavaTokenizerFactory implements TokenizerFactory {
         /*
          * Operators
          */
-        Production operator() {
+        Expression operator() {
             return oneOf(
                   of("-", oneOf(
                           "-",
@@ -346,22 +346,22 @@ public class JavaTokenizerFactory implements TokenizerFactory {
     /*
      * Identifiers
      */
-    Production identifier() {
+    Expression identifier() {
         return identifierChars();//but not a Keyword or BooleanLiteral or NullLiteral
     }
-    Production identifierChars() {
+    Expression identifierChars() {
         return of(javaLetter(), javaLetterOrDigit().repeat());
     }
-    Production javaLetter() {
+    Expression javaLetter() {
         return of("[A-Za-z$_]");//any Unicode character that is a "Java letter"
     }
-    Production javaLetterOrDigit() {
+    Expression javaLetterOrDigit() {
         return oneOf("[0-9]", javaLetter());//any Unicode character that is a "Java letter-or-digit"
     }
     /*
      * Keywords
      */
-    Production keyword() {
+    Expression keyword() {
         return oneOf("abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const",
                 "continue", "default", "do", "double", "else", "enum", "extends", "final", "finally", "float", "for",
                 "if", "goto", "implements", "import", "instanceof", "int", "interface", "long", "native", "new",
@@ -394,29 +394,29 @@ public class JavaTokenizerFactory implements TokenizerFactory {
 //        return of("l|L");
 //    }
     // Floating-Point Literals
-    Production floatingPointLiteral() {
+    Expression floatingPointLiteral() {
         return null;
     }
-    Production decimalFloatingPointLiteral() {
+    Expression decimalFloatingPointLiteral() {
         return null;
     }
-    Production hexadecimalFloatingPointLiteral() {
+    Expression hexadecimalFloatingPointLiteral() {
         return null;
     }
     // Boolean Literals
-    Production booleanLiteral() {
+    Expression booleanLiteral() {
         return oneOf("true", "false");
     }
     // Character Literals
-    Production characterLiteral() {
+    Expression characterLiteral() {
         return null;
     }
     // String Literals
-    Production stringLiteral() {
+    Expression stringLiteral() {
         return null;
     }
     // The Null Literal
-    Production nullLiteral() {
+    Expression nullLiteral() {
         return of("null");
     }
 //    /*
@@ -436,8 +436,8 @@ public class JavaTokenizerFactory implements TokenizerFactory {
 
     @Override
     public Tokenizer createTokenizer(Reader r) {
-        Production layer1 = new Layer1().preInputElement();
-        Production layer2 = new Layer2().inputElement();
+        Expression layer1 = new Layer1().preInputElement();
+        Expression layer2 = new Layer2().inputElement();
         return TokenizerFactory.newFactory(layer1, layer2).createTokenizer(r);
     }
     @Override
