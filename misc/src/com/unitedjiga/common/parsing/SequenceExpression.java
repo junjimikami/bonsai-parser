@@ -29,14 +29,15 @@ import java.util.List;
  * @author Junji Mikami
  *
  */
-public interface SequentialProduction extends EntityProduction {
+public interface SequenceExpression extends Expression {
 
-    public static interface Builder extends EntityProduction.Builder {
-        public Builder setName(String name);
-        public Builder add(Expression p);
-        public Builder add(Expression.Builder b);
-        public Builder addEmpty();
-        public SequentialProduction build();
+    public static interface Builder extends Expression.Builder {
+        public SequenceExpression.Builder add(Expression.Builder builder);
+        public SequenceExpression.Builder add(String reference);
+        public SequenceExpression.Builder addPattern(String pattern);
+        public SequenceExpression.Builder addEmpty();
+        public SequenceExpression build();
+        public SequenceExpression build(ProductionSet set);
     }
 
     @Override
@@ -49,5 +50,5 @@ public interface SequentialProduction extends EntityProduction {
         return visitor.visitSequential(this, p);
     }
 
-    public List<Expression> getProductions();
+    public List<Expression> getSequence();
 }

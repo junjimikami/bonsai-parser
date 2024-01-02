@@ -29,7 +29,7 @@ import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.ProductionVisitor;
 import com.unitedjiga.common.parsing.QuantifiedProduction;
 import com.unitedjiga.common.parsing.Reference;
-import com.unitedjiga.common.parsing.SequentialProduction;
+import com.unitedjiga.common.parsing.SequenceExpression;
 
 /**
  * @author Mikami Junji
@@ -44,7 +44,7 @@ public interface SimpleProductionVisitor<R, P> extends ProductionVisitor<R, P> {
     }
 
     @Override
-    public default R visitSequential(SequentialProduction prd, P p) {
+    public default R visitSequential(SequenceExpression prd, P p) {
         return defaultAction(prd, p);
     }
 

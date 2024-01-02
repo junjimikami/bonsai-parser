@@ -34,7 +34,7 @@ import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.ProductionVisitor;
 import com.unitedjiga.common.parsing.QuantifiedProduction;
 import com.unitedjiga.common.parsing.Reference;
-import com.unitedjiga.common.parsing.SequentialProduction;
+import com.unitedjiga.common.parsing.SequenceExpression;
 
 /**
  * @author Mikami Junji
@@ -60,11 +60,11 @@ class FirstSet implements ProductionVisitor<Set<Expression>, Set<Expression>> {
     }
 
     @Override
-    public Set<Expression> visitSequential(SequentialProduction seq, Set<Expression> followSet) {
-        if (seq.getProductions().isEmpty()) {
+    public Set<Expression> visitSequential(SequenceExpression seq, Set<Expression> followSet) {
+        if (seq.getSequence().isEmpty()) {
             return followSet;
         }
-        var list = new ArrayList<>(seq.getProductions());
+        var list = new ArrayList<>(seq.getSequence());
         Collections.reverse(list);
         var set = followSet;
         for (var p : list) {

@@ -28,7 +28,7 @@ import com.unitedjiga.common.parsing.PatternProduction;
 import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.ProductionFactory;
 import com.unitedjiga.common.parsing.ProductionVisitor;
-import com.unitedjiga.common.parsing.SequentialProduction;
+import com.unitedjiga.common.parsing.SequenceExpression;
 
 /**
  * 
@@ -79,7 +79,7 @@ public final class Productions {
         throw new UnsupportedOperationException();
     }
 
-    public static SequentialProduction.Builder sequentialBuilder() {
+    public static SequenceExpression.Builder sequentialBuilder() {
         return new SeqProduction.Builder();
     }
 //    public static SequentialProduction.Builder sequentialBuilder(String name) {
@@ -97,8 +97,8 @@ public final class Productions {
         return EMPTY;
     }
 
-    public static SequentialProduction of(Object... args) {
-        SequentialProduction.Builder builder = sequentialBuilder();
+    public static SequenceExpression of(Object... args) {
+        SequenceExpression.Builder builder = sequentialBuilder();
         for (Object o : args) {
             if (o instanceof Expression) {
                 builder.add((Expression) o);

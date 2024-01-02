@@ -36,7 +36,7 @@ import com.unitedjiga.common.parsing.Expression;
 import com.unitedjiga.common.parsing.ProductionVisitor;
 import com.unitedjiga.common.parsing.QuantifiedProduction;
 import com.unitedjiga.common.parsing.Reference;
-import com.unitedjiga.common.parsing.SequentialProduction;
+import com.unitedjiga.common.parsing.SequenceExpression;
 import com.unitedjiga.common.parsing.Symbol;
 import com.unitedjiga.common.parsing.Tokenizer;
 
@@ -76,12 +76,12 @@ class Interpreter implements ProductionVisitor<Symbol, Context> {
     }
 
     @Override
-    public Symbol visitSequential(SequentialProduction seq, Context args) {
+    public Symbol visitSequential(SequenceExpression seq, Context args) {
         var tokenizer = args.getTokenizer();
         var followSet = args.getFollowSet();
         if (anyMatcher.visit(seq, args)) {
             var list = new ArrayList<Symbol>();
-            var pList = new LinkedList<>(seq.getProductions());
+            var pList = new LinkedList<>(seq.getSequence());
             while (!pList.isEmpty()) {
                 var p = pList.remove();
                 var subseq = Productions.of(pList.toArray());

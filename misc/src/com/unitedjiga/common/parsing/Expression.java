@@ -39,7 +39,10 @@ public interface Expression {
     }
 
     public static interface Builder {
-        public Expression build();
+        public Expression build(ProductionSet set);
+        public default Expression build() {
+            return build(null);
+        }
     }
 
     public static final Expression EMPTY = Productions.empty();
@@ -52,7 +55,7 @@ public interface Expression {
         return Productions.ofPattern(regex, flags);
     }
 
-    public static SequentialProduction of(Object... args) {
+    public static SequenceExpression of(Object... args) {
         return Productions.of(args);
     }
 

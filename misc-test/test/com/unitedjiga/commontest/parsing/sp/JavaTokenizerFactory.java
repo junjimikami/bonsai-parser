@@ -9,7 +9,7 @@ import java.io.Reader;
 import com.unitedjiga.common.parsing.AlternativeProduction;
 import com.unitedjiga.common.parsing.Parser;
 import com.unitedjiga.common.parsing.Expression;
-import com.unitedjiga.common.parsing.SequentialProduction;
+import com.unitedjiga.common.parsing.SequenceExpression;
 import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.Tokenizer.Builder;
 import com.unitedjiga.common.parsing.TokenizerFactory;

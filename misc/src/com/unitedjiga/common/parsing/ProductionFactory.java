@@ -52,7 +52,7 @@ public interface ProductionFactory {
 
     public AlternativeProduction.Builder createAlternativeBuilder();
 
-    public SequentialProduction.Builder createSequentialBuilder();
+    public SequenceExpression.Builder createSequentialBuilder();
 
     public Reference.Builder createReferenceBuilder();
     public default Reference createReference(Supplier<? extends Expression> supplier) {

@@ -28,14 +28,14 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import com.unitedjiga.common.parsing.Expression;
-import com.unitedjiga.common.parsing.SequentialProduction;
+import com.unitedjiga.common.parsing.SequenceExpression;
 
 /**
  *
  * @author Junji Mikami
  */
-class SeqProduction extends AbstractEntityProduction implements SequentialProduction {
-    static class Builder extends AbstractProduction.Builder implements SequentialProduction.Builder {
+class SeqProduction extends AbstractEntityProduction implements SequenceExpression {
+    static class Builder extends AbstractProduction.Builder implements SequenceExpression.Builder {
         private String name;
         private final List<Supplier<Expression>> elements = new ArrayList<>();
 
@@ -47,7 +47,7 @@ class SeqProduction extends AbstractEntityProduction implements SequentialProduc
         }
 
         @Override
-        public SequentialProduction build() {
+        public SequenceExpression build() {
             checkForBuild();
             var el = elements.stream()
                     .map(e -> e.get())
@@ -85,7 +85,7 @@ class SeqProduction extends AbstractEntityProduction implements SequentialProduc
     }
 
     @Override
-    public List<Expression> getProductions() {
+    public List<Expression> getSequence() {
         return elements;
     }
 }

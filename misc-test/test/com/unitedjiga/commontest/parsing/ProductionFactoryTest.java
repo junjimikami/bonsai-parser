@@ -34,7 +34,7 @@ import com.unitedjiga.common.parsing.PatternProduction;
 import com.unitedjiga.common.parsing.ProductionFactory;
 import com.unitedjiga.common.parsing.QuantifiedProduction;
 import com.unitedjiga.common.parsing.Reference;
-import com.unitedjiga.common.parsing.SequentialProduction;
+import com.unitedjiga.common.parsing.SequenceExpression;
 
 /**
  * @author Mikami Junji
@@ -69,8 +69,8 @@ class ProductionFactoryTest {
         assertTrue(alt1.getProductions().isEmpty());
 
         var seq1 = pf.createSequentialBuilder().build();
-        assertInstanceOf(SequentialProduction.class, seq1);
-        assertTrue(seq1.getProductions().isEmpty());
+        assertInstanceOf(SequenceExpression.class, seq1);
+        assertTrue(seq1.getSequence().isEmpty());
 
         var ref1 = pf.createReference(() -> ptn1);
         assertInstanceOf(Reference.class, ref1);

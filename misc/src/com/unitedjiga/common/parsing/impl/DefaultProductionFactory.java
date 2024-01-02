@@ -28,7 +28,7 @@ import com.unitedjiga.common.parsing.PatternProduction;
 import com.unitedjiga.common.parsing.ProductionFactory;
 import com.unitedjiga.common.parsing.QuantifiedProduction;
 import com.unitedjiga.common.parsing.Reference;
-import com.unitedjiga.common.parsing.SequentialProduction;
+import com.unitedjiga.common.parsing.SequenceExpression;
 
 /**
  * @author Mikami Junji
@@ -47,7 +47,7 @@ class DefaultProductionFactory implements ProductionFactory {
     }
 
     @Override
-    public SequentialProduction.Builder createSequentialBuilder() {
+    public SequenceExpression.Builder createSequentialBuilder() {
         return new SeqProduction.Builder();
     }
 
