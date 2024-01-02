@@ -44,15 +44,6 @@ import com.unitedjiga.common.parsing.util.SimpleProductionVisitor;
  */
 class ParserTest {
     @Test
-    void test() throws Exception {
-        var prdFactory = ProductionFactory.newFactory();
-        var prd = prdFactory.createPattern("[01]");
-        
-        var psrFactory = ParserFactory.newFactory(prd);
-        var psr = psrFactory.createParser(null);
-    }
-
-    @Test
     void testName() throws Exception {
         var prdf = ProductionFactory.newFactory();
         var grammar = new HashMap<String, Production>();

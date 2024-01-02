@@ -27,6 +27,7 @@ import java.io.Reader;
 
 import com.unitedjiga.common.parsing.Production;
 import com.unitedjiga.common.parsing.Tokenizer;
+import com.unitedjiga.common.parsing.Tokenizer.Builder;
 import com.unitedjiga.common.parsing.TokenizerFactory;
 
 /**
@@ -41,6 +42,12 @@ public class TestTokenizerFactory implements TokenizerFactory {
                 Production.of("0").repeat(),
                 Production.of("1").repeat());
         return TokenizerFactory.newFactory(prd).createTokenizer(r);
+    }
+
+    @Override
+    public Builder createTokenizerBuilder() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

@@ -81,45 +81,45 @@ public class TokenizerFactoryTest {
 //        assertEquals("def456", tzer.next().getValue());
 //        assertFalse(tzer.hasNext());
 //    }
-    class JavaCommentParsing01 {
-        Production InputElement() {
-            return Production.oneOf(
-                    WhiteSpace(),
-                    Comment()
-                    );
-        }
-        Production WhiteSpace() {
-            return oneOf("\\x20", "\\t", "\\f", LineTerminator());
-        }
-        Production LineTerminator() {
-            return oneOf("\\n", of("\\r", of("\\n").opt()));
-        }
-
-        Production Comment() {
-            return of("/", oneOf(TraditionalComment(), EndOfLineComment()));
-        }
-        Production TraditionalComment() {
-            return of("\\*", CommentTail());
-        }
-        Production CommentTail() {
-            return oneOf(of("\\*", CommentTailStar()),
-                    of(NotStar(), ref(this::CommentTail)));
-        }
-        Production CommentTailStar() {
-            return oneOf("/",
-                    of("\\*", ref(this::CommentTailStar)),
-                    of(NotStarNotSlash(), ref(this::CommentTail)));
-        }
-        Production NotStar() {
-            return oneOf("[^*]", LineTerminator());
-        }
-        Production NotStarNotSlash() {
-            return oneOf("[^*/]", LineTerminator());
-        }
-        Production EndOfLineComment() {
-            return of("/", of(".").repeat());
-        }
-    }
+//    class JavaCommentParsing01 {
+//        Production InputElement() {
+//            return Production.oneOf(
+//                    WhiteSpace(),
+//                    Comment()
+//                    );
+//        }
+//        Production WhiteSpace() {
+//            return oneOf("\\x20", "\\t", "\\f", LineTerminator());
+//        }
+//        Production LineTerminator() {
+//            return oneOf("\\n", of("\\r", of("\\n").opt()));
+//        }
+//
+//        Production Comment() {
+//            return of("/", oneOf(TraditionalComment(), EndOfLineComment()));
+//        }
+//        Production TraditionalComment() {
+//            return of("\\*", CommentTail());
+//        }
+//        Production CommentTail() {
+//            return oneOf(of("\\*", CommentTailStar()),
+//                    of(NotStar(), ref(this::CommentTail)));
+//        }
+//        Production CommentTailStar() {
+//            return oneOf("/",
+//                    of("\\*", ref(this::CommentTailStar)),
+//                    of(NotStarNotSlash(), ref(this::CommentTail)));
+//        }
+//        Production NotStar() {
+//            return oneOf("[^*]", LineTerminator());
+//        }
+//        Production NotStarNotSlash() {
+//            return oneOf("[^*/]", LineTerminator());
+//        }
+//        Production EndOfLineComment() {
+//            return of("/", of(".").repeat());
+//        }
+//    }
 //    @Test
 //    void testJavaCommentParsing01() throws Exception {
 //        var prd = new JavaCommentParsing01().InputElement();
@@ -134,24 +134,24 @@ public class TokenizerFactoryTest {
 //        
 //        tzer.forEachRemaining(t -> System.out.println("[" + t + "]"));
 //    }
-    class JavaCommentParsing02 extends JavaCommentParsing01 {
-        Production CommentStart() {
-            return oneOf(of("/", oneOf("/", "\\*").opt()), "(?s:.)");
-        }
-
-        @Override
-        Production Comment() {
-            return oneOf(TraditionalComment(), EndOfLineComment());
-        }
-        @Override
-        Production TraditionalComment() {
-            return of("/\\*", CommentTail());
-        }
-        @Override
-        Production EndOfLineComment() {
-            return of("//", of(".").repeat());
-        }
-    }
+//    class JavaCommentParsing02 extends JavaCommentParsing01 {
+//        Production CommentStart() {
+//            return oneOf(of("/", oneOf("/", "\\*").opt()), "(?s:.)");
+//        }
+//
+//        @Override
+//        Production Comment() {
+//            return oneOf(TraditionalComment(), EndOfLineComment());
+//        }
+//        @Override
+//        Production TraditionalComment() {
+//            return of("/\\*", CommentTail());
+//        }
+//        @Override
+//        Production EndOfLineComment() {
+//            return of("//", of(".").repeat());
+//        }
+//    }
 //    @Test
 //    void testJavaCommentParsing02() throws Exception {
 //        var prd0 = new JavaCommentParsing02().CommentStart();

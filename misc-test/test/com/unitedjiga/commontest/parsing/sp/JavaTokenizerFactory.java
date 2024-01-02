@@ -11,6 +11,7 @@ import com.unitedjiga.common.parsing.Parser;
 import com.unitedjiga.common.parsing.Production;
 import com.unitedjiga.common.parsing.SequentialProduction;
 import com.unitedjiga.common.parsing.Tokenizer;
+import com.unitedjiga.common.parsing.Tokenizer.Builder;
 import com.unitedjiga.common.parsing.TokenizerFactory;
 
 public class JavaTokenizerFactory implements TokenizerFactory {
@@ -438,6 +439,11 @@ public class JavaTokenizerFactory implements TokenizerFactory {
         Production layer1 = new Layer1().preInputElement();
         Production layer2 = new Layer2().inputElement();
         return TokenizerFactory.newFactory(layer1, layer2).createTokenizer(r);
+    }
+    @Override
+    public Builder createTokenizerBuilder() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }
