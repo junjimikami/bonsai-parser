@@ -29,6 +29,11 @@ import com.unitedjiga.common.parsing.grammar.PatternExpression;
 import com.unitedjiga.common.parsing.grammar.QuantifierExpression;
 import com.unitedjiga.common.parsing.grammar.ReferenceExpression;
 import com.unitedjiga.common.parsing.grammar.SequenceExpression;
+import com.unitedjiga.common.parsing.grammar.impl.DefaultChoiceExpression;
+import com.unitedjiga.common.parsing.grammar.impl.DefaultQuantifierExpression;
+import com.unitedjiga.common.parsing.grammar.impl.DefaultReferenceExpression;
+import com.unitedjiga.common.parsing.grammar.impl.DefaultSequenceExpression;
+import com.unitedjiga.common.parsing.grammar.impl.DefaultPatternExpression;
 
 /**
  * @author Mikami Junji
@@ -38,27 +43,27 @@ class DefaultProductionFactory implements ProductionFactory {
 
     @Override
     public PatternExpression.Builder createPatternBuilder() {
-        return new TermProduction.Builder();
+        return new DefaultPatternExpression.Builder();
     }
 
     @Override
     public ChoiceExpression.Builder createAlternativeBuilder() {
-        return new AltProduction.Builder();
+        return new DefaultChoiceExpression.Builder();
     }
 
     @Override
     public SequenceExpression.Builder createSequentialBuilder() {
-        return new SeqProduction.Builder();
+        return new DefaultSequenceExpression.Builder();
     }
 
     @Override
     public ReferenceExpression.Builder createReferenceBuilder() {
-        return new RefProduction.Builder();
+        return new DefaultReferenceExpression.Builder();
     }
 
     @Override
     public QuantifierExpression.Builder createQuantifiedBuilder() {
-        return new QtProduction.Builder();
+        return new DefaultQuantifierExpression.Builder();
     }
 
 }

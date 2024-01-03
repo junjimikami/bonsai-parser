@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2020 Junji Mikami.
+ * Copyright 2021 Junji Mikami.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,28 +21,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.parsing.impl;
+package com.unitedjiga.common.parsing.grammar.impl;
 
-import com.unitedjiga.common.parsing.grammar.Expression;
+import java.text.MessageFormat;
 
 /**
- *
  * @author Junji Mikami
+ *
  */
-abstract class AbstractProduction implements Expression {
+enum Message {
 
-    static abstract class Builder implements Expression.Builder {
-        private boolean isBuilt;
-    
-        protected void check() {
-            if (isBuilt) {
-                throw new IllegalStateException(Message.ALREADY_BUILT.format());
-            }
-        }
-        protected void checkForBuild() {
-            check();
-            isBuilt = true;
-        }
+    NON_NULL_REQUIRED("Non-null required."),
+    ALREADY_BUILT("Already built."),
+    NO_ELEMENTS("No elements are specified."),
+    NO_SUCH_SYMBOL("Symbol \"{0}\" not found."),
+    PRODUCTION_SET_REQUIRED("Production set required."),
+    ;
+
+    private final MessageFormat msg;
+
+    private Message(String message) {
+        this.msg = new MessageFormat(message);
+    }
+
+    String format(Object... args) {
+        return msg.format(args);
     }
 
 }

@@ -23,8 +23,6 @@
  */
 package com.unitedjiga.common.parsing.grammar;
 
-import com.unitedjiga.common.parsing.impl.Productions;
-
 /**
  * 
  * @author Junji Mikami
@@ -37,12 +35,24 @@ public interface Expression {
 
     public static interface Builder {
         public Expression build(ProductionSet set);
+
         public default Expression build() {
             return build(null);
         }
     }
 
-    public static final Expression EMPTY = Productions.empty();
+    public static final Expression EMPTY = new Expression() {
+
+        @Override
+        public Kind getKind() {
+            return Kind.EMPTY;
+        }
+
+        @Override
+        public <R, P> R accept(ExpressionVisitor<R, P> visitor, P p) {
+            return visitor.visitEmpty(this, p);
+        }
+    };
 
     public <R, P> R accept(ExpressionVisitor<R, P> visitor, P p);
 

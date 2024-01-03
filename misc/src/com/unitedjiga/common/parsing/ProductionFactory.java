@@ -31,7 +31,7 @@ import com.unitedjiga.common.parsing.grammar.PatternExpression;
 import com.unitedjiga.common.parsing.grammar.QuantifierExpression;
 import com.unitedjiga.common.parsing.grammar.ReferenceExpression;
 import com.unitedjiga.common.parsing.grammar.SequenceExpression;
-import com.unitedjiga.common.parsing.impl.Productions;
+import com.unitedjiga.common.parsing.grammar.impl.GrammarService;
 
 /**
  * @author Mikami Junji
@@ -40,7 +40,7 @@ import com.unitedjiga.common.parsing.impl.Productions;
 public interface ProductionFactory {
 
     public static ProductionFactory newFactory() {
-        return Productions.newFactory();
+        return GrammarService.newFactory();
     }
 
     public PatternExpression.Builder createPatternBuilder();

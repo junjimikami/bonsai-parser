@@ -29,23 +29,23 @@ package com.unitedjiga.common.parsing.grammar;
  */
 public interface ExpressionVisitor<R, P> {
 
-    public default R visit(Expression prd) {
-        return visit(prd, null);
+    public default R visit(Expression expression) {
+        return visit(expression, null);
     }
 
-    public default R visit(Expression prd, P p) {
-        return prd.accept(this, p);
+    public default R visit(Expression expression, P p) {
+        return expression.accept(this, p);
     }
 
-    public R visitChoice(ChoiceExpression prd, P p);
+    public R visitChoice(ChoiceExpression expression, P p);
 
-    public R visitSequence(SequenceExpression prd, P p);
+    public R visitSequence(SequenceExpression expression, P p);
 
-    public R visitPattern(PatternExpression prd, P p);
+    public R visitPattern(PatternExpression expression, P p);
 
-    public R visitReference(ReferenceExpression prd, P p);
+    public R visitReference(ReferenceExpression expression, P p);
 
-    public R visitQuantifier(QuantifierExpression prd, P p);
+    public R visitQuantifier(QuantifierExpression expression, P p);
 
-    public R visitEmpty(Expression prd, P p);
+    public R visitEmpty(Expression expression, P p);
 }

@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2021 Junji Mikami.
+ * Copyright 2020 Junji Mikami.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,20 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.parsing;
+package com.unitedjiga.common.parsing.grammar.impl;
 
 import com.unitedjiga.common.parsing.grammar.Expression;
+import com.unitedjiga.common.parsing.grammar.Quantifiable;
+import com.unitedjiga.common.parsing.grammar.QuantifierExpression;
 
 /**
- * @author Junji Mikami
  *
+ * @author Junji Mikami
  */
-public interface EntityProduction extends Expression {
+abstract class AbstractExpression implements Expression {
 
-    public static interface Builder extends Expression.Builder {
-        public Builder setName(String name);
-        public EntityProduction build();
+    static abstract class Builder extends BuilderSupport implements Expression.Builder {
+
     }
 
-    public String getName();
+    static abstract class QuantifiableBuilder extends Builder implements Quantifiable {
+
+        @Override
+        public QuantifierExpression.Builder atLeast(int times) {
+            return new DefaultQuantifierExpression.Builder(this, times);
+        }
+
+        @Override
+        public QuantifierExpression.Builder range(int from, int to) {
+            return new DefaultQuantifierExpression.Builder(this, from, to);
+        }
+    }
 }

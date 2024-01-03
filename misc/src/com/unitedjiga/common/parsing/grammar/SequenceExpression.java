@@ -24,6 +24,9 @@
 package com.unitedjiga.common.parsing.grammar;
 
 import java.util.List;
+import java.util.regex.Pattern;
+
+import com.unitedjiga.common.parsing.grammar.impl.GrammarService;
 
 /**
  * @author Junji Mikami
@@ -34,9 +37,16 @@ public interface SequenceExpression extends Expression {
     public static interface Builder extends Expression.Builder, Quantifiable {
         public SequenceExpression.Builder add(Expression.Builder builder);
         public SequenceExpression.Builder add(String reference);
-        public SequenceExpression.Builder addPattern(String pattern);
-        public SequenceExpression build();
+        public SequenceExpression.Builder addPattern(String regex);
+        public SequenceExpression.Builder addPattern(Pattern pattern);
+        public default SequenceExpression build() {
+            return build(null);
+        }
         public SequenceExpression build(ProductionSet set);
+    }
+
+    public static Builder builder() {
+        return GrammarService.createSequenceBuilder();
     }
 
     @Override
@@ -49,5 +59,5 @@ public interface SequenceExpression extends Expression {
         return visitor.visitSequence(this, p);
     }
 
-    public List<Expression> getSequence();
+    public List<? extends Expression> getSequence();
 }

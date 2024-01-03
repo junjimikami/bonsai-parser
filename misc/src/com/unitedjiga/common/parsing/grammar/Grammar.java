@@ -2,17 +2,23 @@ package com.unitedjiga.common.parsing.grammar;
 
 import java.util.regex.Pattern;
 
-import com.unitedjiga.common.parsing.grammar.Expression.Builder;
+import com.unitedjiga.common.parsing.grammar.impl.GrammarService;
 
 public interface Grammar {
 
     public static interface Builder {
         public Grammar.Builder add(String symbol, Expression.Builder builder);
         public Grammar.Builder add(String symbol, String reference);
-        public Grammar.Builder addPattern(String symbol, String pattern);
-        public Grammar.Builder setSkipPattern(String pattern);
+        public Grammar.Builder addPattern(String symbol, String regex);
+        public Grammar.Builder addPattern(String symbol, Pattern pattern);
+        public Grammar.Builder setSkipPattern(String regex);
+        public Grammar.Builder setSkipPattern(Pattern pattern);
         public Grammar.Builder setStartSymbol(String symbol);
         public Grammar build();
+    }
+
+    public static Builder builder() {
+        return GrammarService.createGrammarBuilder();
     }
 
     public String getStartSymbol();
@@ -21,5 +27,7 @@ public interface Grammar {
     
     public ProductionSet productionSet();
     
-    public Production getStart();
+    public default Production getStart() {
+        return productionSet().get(getStartSymbol());
+    }
 }

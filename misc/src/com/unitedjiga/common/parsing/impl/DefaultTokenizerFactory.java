@@ -10,6 +10,7 @@ import com.unitedjiga.common.parsing.Token;
 import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.TokenizerFactory;
 import com.unitedjiga.common.parsing.grammar.Expression;
+import com.unitedjiga.common.parsing.grammar.impl.DefaultChoiceExpression;
 
 class DefaultTokenizerFactory implements TokenizerFactory {
     static class BaseBuilder implements Tokenizer.Builder {
@@ -69,7 +70,7 @@ class DefaultTokenizerFactory implements TokenizerFactory {
 
     DefaultTokenizerFactory(List<? extends Expression> productions) {
         Objects.requireNonNull(productions);
-        this.production = new AltProduction(null, productions);
+        this.production = new DefaultChoiceExpression(null, productions);
     }
     DefaultTokenizerFactory(Expression production) {
         Objects.requireNonNull(production);

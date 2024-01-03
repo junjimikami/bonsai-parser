@@ -23,7 +23,7 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import static com.unitedjiga.common.parsing.impl.Productions.EOF;
+import static com.unitedjiga.common.parsing.grammar.impl.Productions.EOF;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -39,6 +39,7 @@ import com.unitedjiga.common.parsing.grammar.PatternExpression;
 import com.unitedjiga.common.parsing.grammar.QuantifierExpression;
 import com.unitedjiga.common.parsing.grammar.ReferenceExpression;
 import com.unitedjiga.common.parsing.grammar.SequenceExpression;
+import com.unitedjiga.common.parsing.grammar.impl.GrammarService;
 
 /**
  * @author Mikami Junji
@@ -84,7 +85,7 @@ class Interpreter implements ExpressionVisitor<Tree, Context> {
             var pList = new LinkedList<>(seq.getSequence());
             while (!pList.isEmpty()) {
                 var p = pList.remove();
-                var subseq = Productions.of(pList.toArray());
+                var subseq = GrammarService.of(pList.toArray());
                 var f = firstSet.visitSequence(subseq, followSet);
                 list.add(interpret(p, tokenizer, f));
             }

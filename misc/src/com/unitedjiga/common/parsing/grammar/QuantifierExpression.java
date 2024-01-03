@@ -33,7 +33,9 @@ import java.util.stream.Stream;
 public interface QuantifierExpression extends Expression {
 
     public static interface Builder extends Expression.Builder {
-        public QuantifierExpression build();
+        public default QuantifierExpression build() {
+            return build(null);
+        }
         public QuantifierExpression build(ProductionSet set);
     }
 

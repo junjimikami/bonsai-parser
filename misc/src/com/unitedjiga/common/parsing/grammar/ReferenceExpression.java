@@ -23,6 +23,8 @@
  */
 package com.unitedjiga.common.parsing.grammar;
 
+import com.unitedjiga.common.parsing.grammar.impl.GrammarService;
+
 /**
  * @author Junji Mikami
  *
@@ -30,8 +32,14 @@ package com.unitedjiga.common.parsing.grammar;
 public interface ReferenceExpression extends Expression {
 
     public static interface Builder extends Expression.Builder, Quantifiable {
-        public ReferenceExpression build();
+        public default ReferenceExpression build() {
+            return build(null);
+        }
         public ReferenceExpression build(ProductionSet set);
+    }
+
+    public static Builder builder(String reference) {
+        return GrammarService.createReferenceBuilder(reference);
     }
 
     @Override

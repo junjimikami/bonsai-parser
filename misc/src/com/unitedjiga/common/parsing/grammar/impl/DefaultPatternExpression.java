@@ -21,24 +21,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.parsing.impl;
+package com.unitedjiga.common.parsing.grammar.impl;
 
-import com.unitedjiga.common.parsing.EntityProduction;
+import java.util.Objects;
+import java.util.regex.Pattern;
+
+import com.unitedjiga.common.parsing.grammar.PatternExpression;
+import com.unitedjiga.common.parsing.grammar.ProductionSet;
 
 /**
  *
  * @author Junji Mikami
  */
-abstract class AbstractEntityProduction extends AbstractProduction implements EntityProduction {
-    private final String name;
+class DefaultPatternExpression extends AbstractExpression implements PatternExpression {
+    static class Builder extends AbstractExpression.QuantifiableBuilder implements PatternExpression.Builder {
+        private Pattern pattern;
 
-    AbstractEntityProduction(String name) {
-        this.name = name;
+        Builder(String regex) {
+            Objects.requireNonNull(regex);
+            this.pattern = Pattern.compile(regex);
+        }
+
+        Builder(Pattern pattern) {
+            Objects.requireNonNull(pattern);
+            this.pattern = pattern;
+        }
+
+        @Override
+        public PatternExpression build(ProductionSet set) {
+            checkForBuild();
+            return new DefaultPatternExpression(pattern);
+        }
+
+    }
+
+    private final Pattern pattern;
+
+    private DefaultPatternExpression(Pattern pattern) {
+        assert pattern != null;
+        this.pattern = pattern;
     }
 
     @Override
-    public String getName() {
-        return name;
+    public Pattern getPattern() {
+        return pattern;
     }
-
 }

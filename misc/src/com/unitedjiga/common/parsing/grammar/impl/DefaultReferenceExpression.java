@@ -21,47 +21,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.parsing.impl;
+package com.unitedjiga.common.parsing.grammar.impl;
 
 import java.util.Objects;
-import java.util.function.Supplier;
 
-import com.unitedjiga.common.parsing.grammar.Expression;
+import com.unitedjiga.common.parsing.grammar.Production;
+import com.unitedjiga.common.parsing.grammar.ProductionSet;
 import com.unitedjiga.common.parsing.grammar.ReferenceExpression;
 
 /**
  * @author Junji Mikami
  *
  */
-class RefProduction extends AbstractProduction implements ReferenceExpression {
-    static class Builder extends AbstractProduction.Builder implements ReferenceExpression.Builder {
-        private Supplier<? extends Expression> p;
+class DefaultReferenceExpression extends AbstractExpression implements ReferenceExpression {
+    static class Builder extends AbstractExpression.QuantifiableBuilder implements ReferenceExpression.Builder {
+        private final String symbol;
 
-        @Override
-        public Builder set(Supplier<? extends Expression> supplier) {
-            check();
-            this.p = supplier;
-            return this;
+        Builder(String symbol) {
+            Objects.requireNonNull(symbol);
+            this.symbol = symbol;
         }
 
         @Override
-        public ReferenceExpression build() {
+        public ReferenceExpression build(ProductionSet set) {
             checkForBuild();
-            return new RefProduction(p);
+            Objects.requireNonNull(set, Message.PRODUCTION_SET_REQUIRED.format());
+            var production = set.get(symbol);
+            Objects.requireNonNull(set);
+            return new DefaultReferenceExpression(production);
         }
-        
+
     }
 
-    private final Supplier<? extends Expression> p;
+    private final Production production;
 
-    private RefProduction(Supplier<? extends Expression> p) {
-        Objects.requireNonNull(p, Message.REQUIRE_NON_NULL.format());
-        this.p = p;
+    private DefaultReferenceExpression(Production production) {
+        assert production != null;
+        this.production = production;
     }
 
     @Override
-    public Expression get() {
-        return p.get();
+    public Production get() {
+        return production;
     }
 
 }
