@@ -62,4 +62,7 @@ public interface Tree {
      * @return
      */
     public <R, P> R accept(TreeVisitor<R, P> v, P p);
+    public default <R, P> R accept(TreeVisitor<R, P> v) {
+        return accept(v, null);
+    }
 }

@@ -23,36 +23,31 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import static com.unitedjiga.common.parsing.grammar.impl.Productions.EOF;
 
 import com.unitedjiga.common.parsing.grammar.Expression;
 import com.unitedjiga.common.parsing.grammar.PatternExpression;
-import com.unitedjiga.common.parsing.util.SimpleProductionVisitor;
+import com.unitedjiga.common.parsing.util.SimpleExpressionVisitor;
 
 /**
  * @author Mikami Junji
  *
  */
-class AnyMatcher implements SimpleProductionVisitor<Boolean, Context> {
+class AnyMatcher implements SimpleExpressionVisitor<Boolean, Context> {
     private final FirstSet firstSet = new FirstSet();
 
     @Override
     public Boolean visit(Expression prd, Context args) {
-        if (prd == EOF) {
+        if (prd == Interpreter.EOF) {
             var tokenizer = args.getTokenizer();
             return !tokenizer.hasNext();
         }
-        return SimpleProductionVisitor.super.visit(prd, args);
+        return SimpleExpressionVisitor.super.visit(prd, args);
     }
 
     @Override
     public Boolean visitPattern(PatternExpression prd, Context args) {
         var tokenizer = args.getTokenizer();
-        if (!tokenizer.hasNext()) {
-            return false;
-        }
-        var t = tokenizer.peek();
-        return prd.getPattern().matcher(t.getValue()).matches();
+        return tokenizer.hasNext(prd.getPattern());
     }
 
     @Override

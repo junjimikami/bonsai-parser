@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2020 Junji Mikami.
+ * Copyright 2022 Mikami Junji.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,39 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.parsing.impl;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+package com.unitedjiga.common.parsing.util;
 
 import com.unitedjiga.common.parsing.NonTerminal;
 import com.unitedjiga.common.parsing.Tree;
+import com.unitedjiga.common.parsing.TreeVisitor;
+import com.unitedjiga.common.parsing.Terminal;
 
 /**
- * 
- * @author Junji Mikami
+ * @author Mikami Junji
  *
  */
-class DefaultNonTerminalSymbol extends AbstractSymbol implements NonTerminal {
-    private final List<Tree> list;
+@FunctionalInterface
+public interface SimpleTreeVisitor<R, P> extends TreeVisitor<R, P> {
 
-    DefaultNonTerminalSymbol(String name, List<Tree> list) {
-        super(name);
-        Objects.requireNonNull(list);
-        this.list = list;
-    }
-    DefaultNonTerminalSymbol(String name, Tree s) {
-        super(name);
-        this.list = List.of(s);
-    }
-    DefaultNonTerminalSymbol(String name) {
-        super(name);
-        this.list = List.of();
+    @Override
+    public default R visitTerminal(Terminal s, P p) {
+        return defaultAction(s, p);
     }
 
     @Override
-    public List<Tree> getSubTrees() {
-        return Collections.unmodifiableList(list);
+    public default R visitNonTerminal(NonTerminal s, P p) {
+        return defaultAction(s, p);
     }
+
+    public R defaultAction(Tree s, P p);
 }

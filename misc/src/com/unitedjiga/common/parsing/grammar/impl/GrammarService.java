@@ -26,8 +26,6 @@ package com.unitedjiga.common.parsing.grammar.impl;
 import java.util.regex.Pattern;
 
 import com.unitedjiga.common.parsing.grammar.ChoiceExpression;
-import com.unitedjiga.common.parsing.grammar.Expression;
-import com.unitedjiga.common.parsing.grammar.ExpressionVisitor;
 import com.unitedjiga.common.parsing.grammar.Grammar;
 import com.unitedjiga.common.parsing.grammar.PatternExpression;
 import com.unitedjiga.common.parsing.grammar.ReferenceExpression;
@@ -40,19 +38,6 @@ import com.unitedjiga.common.parsing.grammar.SequenceExpression;
  */
 public final class GrammarService {
     private static final DefaultGrammarProvider provider = new DefaultGrammarProvider();
-
-    static final Expression EOF = new Expression() {
-
-        @Override
-        public <R, P> R accept(ExpressionVisitor<R, P> visitor, P p) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Kind getKind() {
-            throw new UnsupportedOperationException();
-        }
-    };
 
     private GrammarService() {
     }

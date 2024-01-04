@@ -26,6 +26,7 @@ package com.unitedjiga.common.parsing.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.unitedjiga.common.parsing.grammar.ChoiceExpression;
@@ -47,6 +48,19 @@ class FirstSet implements ExpressionVisitor<Set<Expression>, Set<Expression>> {
         return visit(prd, Set.of());
     }
 
+    public Set<Expression> visit(List<? extends Expression> sequence, Set<Expression> followSet) {
+        if (sequence.isEmpty()) {
+            return followSet;
+        }
+        var list = new ArrayList<>(sequence);
+        Collections.reverse(list);
+        var set = followSet;
+        for (var p : list) {
+            set = visit(p, set);
+        }
+        return set;
+    }
+
     @Override
     public Set<Expression> visitChoice(ChoiceExpression alt, Set<Expression> followSet) {
         if (alt.getChoices().isEmpty()) {
@@ -61,16 +75,7 @@ class FirstSet implements ExpressionVisitor<Set<Expression>, Set<Expression>> {
 
     @Override
     public Set<Expression> visitSequence(SequenceExpression seq, Set<Expression> followSet) {
-        if (seq.getSequence().isEmpty()) {
-            return followSet;
-        }
-        var list = new ArrayList<>(seq.getSequence());
-        Collections.reverse(list);
-        var set = followSet;
-        for (var p : list) {
-            set = visit(p, set);
-        }
-        return set;
+        return visit(seq.getSequence(), followSet);
     }
 
     @Override
@@ -80,7 +85,8 @@ class FirstSet implements ExpressionVisitor<Set<Expression>, Set<Expression>> {
 
     @Override
     public Set<Expression> visitReference(ReferenceExpression ref, Set<Expression> followSet) {
-        return visit(ref.get(), followSet);
+        var production = ref.get();
+        return visit(production.getExpression(), followSet);
     }
 
     @Override

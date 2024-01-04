@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2022 Mikami Junji.
+ * Copyright 2020 Junji Mikami.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,29 +21,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.parsing.util;
+package com.unitedjiga.common.parsing.impl;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 import com.unitedjiga.common.parsing.NonTerminal;
 import com.unitedjiga.common.parsing.Tree;
-import com.unitedjiga.common.parsing.TreeVisitor;
-import com.unitedjiga.common.parsing.Terminal;
 
 /**
- * @author Mikami Junji
+ * 
+ * @author Junji Mikami
  *
  */
-@FunctionalInterface
-public interface SimpleSymbolVisitor<R, P> extends TreeVisitor<R, P> {
+class DefaultNonTerminal implements NonTerminal {
+    private final String symbol;
+    private final List<? extends Tree> list;
 
-    @Override
-    public default R visitTerminal(Terminal s, P p) {
-        return defaultAction(s, p);
+    DefaultNonTerminal(String symbol, List<? extends Tree> list) {
+        Objects.requireNonNull(symbol);
+        Objects.requireNonNull(list);
+        this.symbol = symbol;
+        this.list = list;
+    }
+
+    DefaultNonTerminal(String symbol, Tree s) {
+        Objects.requireNonNull(symbol);
+        Objects.requireNonNull(s);
+        this.symbol = symbol;
+        this.list = List.of(s);
+    }
+
+    DefaultNonTerminal(String symbol) {
+        this(symbol, List.of());
     }
 
     @Override
-    public default R visitNonTerminal(NonTerminal s, P p) {
-        return defaultAction(s, p);
+    public String getSymbol() {
+        return symbol;
     }
 
-    public R defaultAction(Tree s, P p);
+    @Override
+    public List<? extends Tree> getSubTrees() {
+        return Collections.unmodifiableList(list);
+    }
 }

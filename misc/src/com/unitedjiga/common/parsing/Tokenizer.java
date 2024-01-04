@@ -32,9 +32,9 @@ import java.util.regex.Pattern;
 public interface Tokenizer {
 
     public boolean hasNext();
-    public boolean hasNext(String pattern);
+    public boolean hasNext(String regex);
     public boolean hasNext(Pattern pattern);
     public Token next();
-    public Token next(String pattern);
+    public Token next(String regex);
     public Token next(Pattern pattern);
 }

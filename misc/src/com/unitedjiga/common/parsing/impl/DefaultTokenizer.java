@@ -23,12 +23,19 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
+import com.unitedjiga.common.parsing.NonTerminal;
+import com.unitedjiga.common.parsing.Terminal;
 import com.unitedjiga.common.parsing.Token;
 import com.unitedjiga.common.parsing.Tokenizer;
+import com.unitedjiga.common.parsing.TreeVisitor;
+import com.unitedjiga.common.parsing.grammar.Grammar;
+import com.unitedjiga.common.parsing.grammar.Production;
 
 /**
  * @author Junji Mikami
@@ -36,45 +43,99 @@ import com.unitedjiga.common.parsing.Tokenizer;
  */
 class DefaultTokenizer implements Tokenizer {
 
-    private final Iterator<Token> itr;
-    private final List<Token> buffer = new LinkedList<>();
-    private int current = 0;
+    private final TreeVisitor<String, Void> treeToString = new TreeVisitor<>() {
+        @Override
+        public String visitNonTerminal(NonTerminal s, Void p) {
+            return s.getSubTrees().stream()
+                    .map(this::visit)
+                    .collect(Collectors.joining());
+        }
 
-    DefaultTokenizer(Iterator<Token> itr) {
-        super();
-        this.itr = itr;
+        @Override
+        public String visitTerminal(Terminal s, Void p) {
+            return s.getValue();
+        }
+    };
+
+    private final Interpreter interpreter = new Interpreter();
+    private final Production production;
+    private final Context context;
+    private String nextToken;
+
+    DefaultTokenizer(Grammar grammar, Tokenizer tokenizer) {
+        this.production = grammar.getStart();
+        this.context = new Context(tokenizer, Set.of());
     }
 
-    @Override
-    public Token read() {
-        if (buffer.size() <= current) {
-            return itr.next();
+    private String read() {
+        if (nextToken != null) {
+            return nextToken;
         }
-        return buffer.remove(current);
+        if (!context.getTokenizer().hasNext()) {
+            return null;
+        }
+        nextToken = interpreter.interpret(production, context)
+                .accept(treeToString);
+        return nextToken;
     }
 
     @Override
     public boolean hasNext() {
-        return current < buffer.size() || itr.hasNext();
+        return read() != null;
+    }
+
+    @Override
+    public boolean hasNext(String regex) {
+        Objects.requireNonNull(regex);
+        var pattern = Pattern.compile(regex);
+        return hasNext(pattern);
+    }
+
+    @Override
+    public boolean hasNext(Pattern pattern) {
+        Objects.requireNonNull(pattern);
+        if (!hasNext()) {
+            return false;
+        }
+        var matcher = pattern.matcher(nextToken);
+        return matcher.lookingAt();
     }
 
     @Override
     public Token next() {
-        if (buffer.size() <= current) {
-            var t = itr.next();
-            buffer.add(t);
+        var value = read();
+        if (value == null) {
+            throw new NoSuchElementException();//TODO:トークンが見つかりません
         }
-        return buffer.get(current++);
+        nextToken = null;
+        return new DefaultToken(value);
     }
 
     @Override
-    public boolean hasPrevious() {
-        return 0 < current;
+    public Token next(String regex) {
+        Objects.requireNonNull(regex);
+        var pattern = Pattern.compile(regex);
+        return next(pattern);
     }
 
     @Override
-    public Token previous() {
-        return buffer.get(--current);
+    public Token next(Pattern pattern) {
+        Objects.requireNonNull(pattern);
+        var value = read();
+        if (value == null) {
+            throw new NoSuchElementException();//TODO:トークンが見つかりません
+        }
+        var matcher = pattern.matcher(value);
+        if (matcher.matches()) {
+            nextToken = null;
+            return new DefaultToken(value);
+        }
+        if (matcher.lookingAt()) {
+            value = matcher.group();
+            nextToken = nextToken.substring(matcher.end());
+            return new DefaultToken(value);
+        }
+        throw new NoSuchElementException();//TODO:patternに合うトークンが見つからない
     }
 
 }

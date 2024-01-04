@@ -21,49 +21,52 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.parsing.impl;
+package com.unitedjiga.common.parsing.util;
 
-import com.unitedjiga.common.parsing.ProductionFactory;
 import com.unitedjiga.common.parsing.grammar.ChoiceExpression;
+import com.unitedjiga.common.parsing.grammar.Expression;
+import com.unitedjiga.common.parsing.grammar.ExpressionVisitor;
 import com.unitedjiga.common.parsing.grammar.PatternExpression;
 import com.unitedjiga.common.parsing.grammar.QuantifierExpression;
 import com.unitedjiga.common.parsing.grammar.ReferenceExpression;
 import com.unitedjiga.common.parsing.grammar.SequenceExpression;
-import com.unitedjiga.common.parsing.grammar.impl.DefaultChoiceExpression;
-import com.unitedjiga.common.parsing.grammar.impl.DefaultQuantifierExpression;
-import com.unitedjiga.common.parsing.grammar.impl.DefaultReferenceExpression;
-import com.unitedjiga.common.parsing.grammar.impl.DefaultSequenceExpression;
-import com.unitedjiga.common.parsing.grammar.impl.DefaultPatternExpression;
 
 /**
  * @author Mikami Junji
  *
  */
-class DefaultProductionFactory implements ProductionFactory {
+@FunctionalInterface
+public interface SimpleExpressionVisitor<R, P> extends ExpressionVisitor<R, P> {
 
     @Override
-    public PatternExpression.Builder createPatternBuilder() {
-        return new DefaultPatternExpression.Builder();
+    public default R visitChoice(ChoiceExpression prd, P p) {
+        return defaultAction(prd, p);
     }
 
     @Override
-    public ChoiceExpression.Builder createAlternativeBuilder() {
-        return new DefaultChoiceExpression.Builder();
+    public default R visitSequence(SequenceExpression prd, P p) {
+        return defaultAction(prd, p);
     }
 
     @Override
-    public SequenceExpression.Builder createSequentialBuilder() {
-        return new DefaultSequenceExpression.Builder();
+    public default R visitPattern(PatternExpression prd, P p) {
+        return defaultAction(prd, p);
     }
 
     @Override
-    public ReferenceExpression.Builder createReferenceBuilder() {
-        return new DefaultReferenceExpression.Builder();
+    public default R visitReference(ReferenceExpression prd, P p) {
+        return defaultAction(prd, p);
     }
 
     @Override
-    public QuantifierExpression.Builder createQuantifiedBuilder() {
-        return new DefaultQuantifierExpression.Builder();
+    public default R visitQuantifier(QuantifierExpression prd, P p) {
+        return defaultAction(prd, p);
     }
 
+    @Override
+    public default R visitEmpty(Expression prd, P p) {
+        return defaultAction(prd, p);
+    }
+
+    public R defaultAction(Expression prd, P p);
 }

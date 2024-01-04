@@ -36,7 +36,7 @@ import com.unitedjiga.common.parsing.ProductionFactory;
 import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.grammar.Expression;
 import com.unitedjiga.common.parsing.grammar.ReferenceExpression;
-import com.unitedjiga.common.parsing.util.SimpleProductionVisitor;
+import com.unitedjiga.common.parsing.util.SimpleExpressionVisitor;
 
 /**
  * @author Junji Mikami

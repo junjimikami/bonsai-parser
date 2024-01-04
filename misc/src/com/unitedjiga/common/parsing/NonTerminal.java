@@ -42,5 +42,5 @@ public interface NonTerminal extends Tree {
     }
 
     public String getSymbol();
-    public List<Tree> getSubTrees();
+    public List<? extends Tree> getSubTrees();
 }

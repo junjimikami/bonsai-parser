@@ -23,113 +23,131 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import static com.unitedjiga.common.parsing.grammar.impl.Productions.EOF;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Set;
+import java.util.List;
 
 import com.unitedjiga.common.parsing.ParsingException;
 import com.unitedjiga.common.parsing.Tree;
-import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.grammar.ChoiceExpression;
 import com.unitedjiga.common.parsing.grammar.Expression;
 import com.unitedjiga.common.parsing.grammar.ExpressionVisitor;
 import com.unitedjiga.common.parsing.grammar.PatternExpression;
+import com.unitedjiga.common.parsing.grammar.Production;
 import com.unitedjiga.common.parsing.grammar.QuantifierExpression;
 import com.unitedjiga.common.parsing.grammar.ReferenceExpression;
 import com.unitedjiga.common.parsing.grammar.SequenceExpression;
-import com.unitedjiga.common.parsing.grammar.impl.GrammarService;
 
 /**
  * @author Mikami Junji
  *
  */
-class Interpreter implements ExpressionVisitor<Tree, Context> {
+class Interpreter implements ExpressionVisitor<List<Tree>, Context> {
+    static final Expression EOF = new Expression() {
+
+        @Override
+        public <R, P> R accept(ExpressionVisitor<R, P> visitor, P p) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Kind getKind() {
+            throw new UnsupportedOperationException();
+        }
+    };
+
     private final FirstSet firstSet = new FirstSet();
     private final AnyMatcher anyMatcher = new AnyMatcher();
 
-    Tree parse(Expression prd, Tokenizer t) {
-        var s = interpret(prd, t);
-        if (t.hasNext()) {
+//    Tree parse(Expression prd, Tokenizer t) {
+//        var s = interpret(prd, t);
+//        if (t.hasNext()) {
+//            throw new ParsingException();
+//        }
+//        return s;
+//    }
+    Tree interpret(Production production, Context context) {
+        var trees = visit(production.getExpression(), context);
+        return new DefaultNonTerminal(production.getSymbol(), trees);
+    }
+//    Tree interpret(Expression prd, Tokenizer t) {
+//        var followSet = Set.of(EOF);
+//        return interpret(prd, t, followSet);
+//    }
+//    Tree interpret(Expression prd, Tokenizer tokenizer, Set<Expression> followSet) {
+//        var p = new Context(tokenizer, followSet);
+//        return visit(prd, p);
+//    }
+
+    @Override
+    public List<Tree> visitChoice(ChoiceExpression alt, Context args) {
+        var list = alt.getChoices().stream()
+                .filter(e -> anyMatcher.visit(e, args))
+                .toList();
+        if (list.size() != 1) {
             throw new ParsingException();
         }
-        return s;
-    }
-    Tree interpret(Expression prd, Tokenizer t) {
-        var followSet = Set.of(EOF);
-        return interpret(prd, t, followSet);
-    }
-    Tree interpret(Expression prd, Tokenizer tokenizer, Set<Expression> followSet) {
-        var p = new Context(tokenizer, followSet);
-        return visit(prd, p);
+        return visit(list.get(0), args);
     }
 
     @Override
-    public Tree visitChoice(ChoiceExpression alt, Context args) {
-        for (var p : alt.getChoices()) {
-            if (anyMatcher.visit(p, args)) {
-                var s = visit(p, args);
-                return new DefaultNonTerminalSymbol(alt.getName(), s);
-            }
-        }
-        throw new ParsingException();
-    }
-
-    @Override
-    public Tree visitSequence(SequenceExpression seq, Context args) {
+    public List<Tree> visitSequence(SequenceExpression seq, Context args) {
         var tokenizer = args.getTokenizer();
         var followSet = args.getFollowSet();
-        if (anyMatcher.visit(seq, args)) {
-            var list = new ArrayList<Tree>();
-            var pList = new LinkedList<>(seq.getSequence());
-            while (!pList.isEmpty()) {
-                var p = pList.remove();
-                var subseq = GrammarService.of(pList.toArray());
-                var f = firstSet.visitSequence(subseq, followSet);
-                list.add(interpret(p, tokenizer, f));
-            }
-            return new DefaultNonTerminalSymbol(seq.getName(), list);
+        if (!anyMatcher.visit(seq, args)) {
+            throw new ParsingException();
         }
-        throw new ParsingException();
-    }
-
-    @Override
-    public Tree visitPattern(PatternExpression p, Context args) {
-        var tokenizer = args.getTokenizer();
-        if (anyMatcher.visit(p, args)) {
-            var t = tokenizer.read();
-            return new DefaultNonTerminalSymbol(p.getName(), t);
-        }
-        throw new ParsingException();
-    }
-
-    @Override
-    public Tree visitReference(ReferenceExpression ref, Context args) {
-        return visit(ref.get(), args);
-    }
-
-    @Override
-    public Tree visitQuantifier(QuantifierExpression qt, Context args) {
         var list = new ArrayList<Tree>();
-        var result = qt.withinRange(p -> {
-            if (anyMatcher.visit(p, args)) {
-                list.add(visit(p, args));
+        var subSequence = new LinkedList<>(seq.getSequence());
+        while (!subSequence.isEmpty()) {
+            var expression = subSequence.remove();
+            followSet = firstSet.visit(subSequence, followSet);
+            var context2 = new Context(tokenizer, followSet);
+            list.addAll(visit(expression, context2));
+        }
+        return list;
+    }
+
+    @Override
+    public List<Tree> visitPattern(PatternExpression pattern, Context args) {
+        if (!anyMatcher.visit(pattern, args)) {
+            throw new ParsingException();
+        }
+        var tokenizer = args.getTokenizer();
+        var token = tokenizer.next(pattern.getPattern());
+        return List.of(token);
+    }
+
+    @Override
+    public List<Tree> visitReference(ReferenceExpression reference, Context args) {
+        var tree = interpret(reference.get(), args);
+        return List.of(tree);
+    }
+
+    @Override
+    public List<Tree> visitQuantifier(QuantifierExpression quantfier, Context args) {
+        var list = new ArrayList<Tree>();
+        var count = quantfier.stream().takeWhile(e -> {
+            if (anyMatcher.visit(e, args)) {
+                list.addAll(visit(e, args));
                 return true;
             }
             return false;
-        });
-        if (result) {
-            return new DefaultNonTerminalSymbol(qt.getName(), list);
+        }).count();
+        if (count < quantfier.getLowerLimit()
+                || quantfier.getUpperLimit().orElse(Integer.MAX_VALUE) < count
+                || Integer.MAX_VALUE < count) {
+            throw new ParsingException();
         }
-        throw new ParsingException();
+        return list;
     }
 
     @Override
-    public Tree visitEmpty(Expression empty, Context args) {
-        if (anyMatcher.visit(empty, args)) {
-            return new DefaultNonTerminalSymbol(null);
+    public List<Tree> visitEmpty(Expression empty, Context args) {
+        if (!anyMatcher.visit(empty, args)) {
+            throw new ParsingException();
         }
-        throw new ParsingException();
+        return List.of();
     }
 }
