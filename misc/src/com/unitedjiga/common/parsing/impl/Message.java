@@ -31,13 +31,14 @@ import java.text.MessageFormat;
  */
 enum Message {
 
-    TOO_MANY_TOKEN("Expected EOF, but {0}."),
-    RULE_MISMATCH("Expected {0}, but {1}."),
-    REQUIRE_NON_NULL("Non-null required."),
-    CANNOT_PUSHBACK(""),
-    CANNOT_REMOVE(""),
-    ALREADY_BUILT(""),
-    NO_SUCH_ELEMENT("")
+    NON_NULL_REQUIRED("Non-null required."),
+    NO_SUCH_TOKEN("Token not found."),
+    NO_SUCH_TOKEN_MATCHING_PATTERN("No token matching pattern \"{0}\"."),
+    TOO_MANY_TOKEN("Expected EOF, but found extra token."),
+    NO_MATCHING_TOKEN("No matching token found."),
+    AMBIGUOUS_RULE("Ambiguous rule. More than one token matches."),
+    OCCURENCES_OUT_OF_RANGE("Number of occurences out of range."),
+    UNEXPECTED_OCCURENCES("Unexpected number of occurences."),
     ;
 
     private MessageFormat msg;

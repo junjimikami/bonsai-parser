@@ -72,7 +72,7 @@ class ReaderTokenizer implements Tokenizer {
     public Token next() {
         var value = read();
         if (value == null) {
-            throw new NoSuchElementException();//TODO:トークンが見つかりません
+            throw new NoSuchElementException(Message.NO_SUCH_TOKEN.format());
         }
         nextToken = null;
         return new DefaultToken(value);
@@ -88,11 +88,11 @@ class ReaderTokenizer implements Tokenizer {
         Objects.requireNonNull(pattern);
         var value = read();
         if (value == null) {
-            throw new NoSuchElementException();//TODO:トークンが見つかりません
+            throw new NoSuchElementException(Message.NO_SUCH_TOKEN.format());
         }
         var matcher = pattern.matcher(value);
         if (!matcher.matches()) {
-            throw new NoSuchElementException();//TODO:トークンが見つかりません
+            throw new NoSuchElementException(Message.NO_SUCH_TOKEN_MATCHING_PATTERN.format(pattern));
         }
         nextToken = null;
         return new DefaultToken(value);

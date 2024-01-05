@@ -62,6 +62,8 @@ class DefaultTokenizer implements Tokenizer {
     private String nextToken;
 
     DefaultTokenizer(Grammar grammar, Tokenizer tokenizer) {
+        Objects.requireNonNull(grammar);
+        Objects.requireNonNull(tokenizer);
         this.production = grammar.getStart();
         this.context = new Context(tokenizer, Set.of());
     }
@@ -104,7 +106,7 @@ class DefaultTokenizer implements Tokenizer {
     public Token next() {
         var value = read();
         if (value == null) {
-            throw new NoSuchElementException();//TODO:トークンが見つかりません
+            throw new NoSuchElementException(Message.NO_SUCH_TOKEN.format());
         }
         nextToken = null;
         return new DefaultToken(value);
@@ -122,7 +124,7 @@ class DefaultTokenizer implements Tokenizer {
         Objects.requireNonNull(pattern);
         var value = read();
         if (value == null) {
-            throw new NoSuchElementException();//TODO:トークンが見つかりません
+            throw new NoSuchElementException(Message.NO_SUCH_TOKEN.format());
         }
         var matcher = pattern.matcher(value);
         if (matcher.matches()) {
@@ -134,7 +136,7 @@ class DefaultTokenizer implements Tokenizer {
             nextToken = nextToken.substring(matcher.end());
             return new DefaultToken(value);
         }
-        throw new NoSuchElementException();//TODO:patternに合うトークンが見つからない
+        throw new NoSuchElementException(Message.NO_SUCH_TOKEN_MATCHING_PATTERN.format(pattern));
     }
 
 }

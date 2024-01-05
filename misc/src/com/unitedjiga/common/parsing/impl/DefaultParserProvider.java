@@ -1,5 +1,6 @@
 package com.unitedjiga.common.parsing.impl;
 
+import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.ServiceLoader.Provider;
 
@@ -9,6 +10,7 @@ import com.unitedjiga.common.parsing.grammar.Grammar;
 class DefaultParserProvider {
 
     ParserFactory createFacotry(Grammar grammar) {
+        Objects.requireNonNull(grammar, Message.NON_NULL_REQUIRED.format());
         return new DefaultParserFactory(grammar);
     }
 

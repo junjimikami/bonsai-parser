@@ -1,5 +1,6 @@
 package com.unitedjiga.common.parsing.impl;
 
+import java.util.Objects;
 import java.util.Set;
 
 import com.unitedjiga.common.parsing.NonTerminal;
@@ -16,6 +17,8 @@ class DefaultParser implements Parser {
     private final Context context;
 
     DefaultParser(Grammar grammar, Tokenizer tokenizer) {
+        Objects.requireNonNull(grammar);
+        Objects.requireNonNull(tokenizer);
         this.production = grammar.getStart();
         this.context = new Context(tokenizer, Set.of());
     }
@@ -23,7 +26,7 @@ class DefaultParser implements Parser {
     public Tree parse() {
         var tree = Interpreter.parse(production, context);
         if (context.getTokenizer().hasNext()) {
-            throw new ParsingException();//TODO:パースエラー
+            throw new ParsingException(Message.TOO_MANY_TOKEN.format());
         }
         return tree;
     }
