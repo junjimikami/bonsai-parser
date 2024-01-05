@@ -26,51 +26,33 @@ package com.unitedjiga.common.parsing.impl;
 import java.io.Reader;
 import java.util.Objects;
 
-import com.unitedjiga.common.parsing.NonTerminal;
 import com.unitedjiga.common.parsing.Parser;
 import com.unitedjiga.common.parsing.ParserFactory;
-import com.unitedjiga.common.parsing.Tree;
-import com.unitedjiga.common.parsing.Terminal;
 import com.unitedjiga.common.parsing.Tokenizer;
-import com.unitedjiga.common.parsing.grammar.Expression;
+import com.unitedjiga.common.parsing.grammar.Grammar;
 
 /**
  * @author Mikami Junji
  *
  */
 class DefaultParserFactory implements ParserFactory {
-    private final Expression production;
+    private final Grammar grammar;
 
-    DefaultParserFactory(Expression p) {
-        Objects.requireNonNull(p);
-        this.production = p;
+    DefaultParserFactory(Grammar grammar) {
+        Objects.requireNonNull(grammar);
+        this.grammar = grammar;
     }
 
     @Override
     public Parser createParser(Tokenizer tokenizer) {
         Objects.requireNonNull(tokenizer);
-        return new Parser() {
-            private Interpreter interpreter = new Interpreter();
-            @Override
-            public Tree parse() {
-                return interpreter.parse(production, tokenizer);
-            }
-            @Override
-            public NonTerminal parseNonTerminal() {
-                return (NonTerminal) parse();
-            }
-            @Override
-            public Terminal parseTerminal() {
-                return (Terminal) parse();
-            }
-        };
+        return new DefaultParser(grammar, tokenizer);
     }
 
     @Override
     public Parser createParser(Reader reader) {
-        var it = new TokenIterator(reader);
-        var tzer = new DefaultTokenizer(it);
-        return createParser(tzer);
+        var tokenizer = new ReaderTokenizer(reader);
+        return createParser(tokenizer);
     }
 
 }

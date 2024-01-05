@@ -57,7 +57,6 @@ class DefaultTokenizer implements Tokenizer {
         }
     };
 
-    private final Interpreter interpreter = new Interpreter();
     private final Production production;
     private final Context context;
     private String nextToken;
@@ -74,7 +73,7 @@ class DefaultTokenizer implements Tokenizer {
         if (!context.getTokenizer().hasNext()) {
             return null;
         }
-        nextToken = interpreter.interpret(production, context)
+        nextToken = Interpreter.parse(production, context)
                 .accept(treeToString);
         return nextToken;
     }

@@ -23,38 +23,37 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-
 import com.unitedjiga.common.parsing.grammar.Expression;
 import com.unitedjiga.common.parsing.grammar.PatternExpression;
-import com.unitedjiga.common.parsing.util.SimpleExpressionVisitor;
 
 /**
  * @author Mikami Junji
  *
  */
-class AnyMatcher implements SimpleExpressionVisitor<Boolean, Context> {
-    private final FirstSet firstSet = new FirstSet();
+final class AnyMatcher implements SimpleExpressionVisitor<Boolean, Context> {
+    private static final AnyMatcher instance = new AnyMatcher();
 
-    @Override
-    public Boolean visit(Expression prd, Context args) {
-        if (prd == Interpreter.EOF) {
-            var tokenizer = args.getTokenizer();
-            return !tokenizer.hasNext();
-        }
-        return SimpleExpressionVisitor.super.visit(prd, args);
+    private AnyMatcher() {
+    }
+
+    static boolean scan(Expression expression, Context context) {
+        return instance.visit(expression, context);
     }
 
     @Override
-    public Boolean visitPattern(PatternExpression prd, Context args) {
+    public Boolean visitPattern(PatternExpression pattern, Context args) {
         var tokenizer = args.getTokenizer();
-        return tokenizer.hasNext(prd.getPattern());
+        return tokenizer.hasNext(pattern.getPattern());
     }
 
     @Override
-    public Boolean defaultAction(Expression prd, Context args) {
+    public Boolean defaultAction(Expression expression, Context args) {
         var followSet = args.getFollowSet();
-        return firstSet.visit(prd, followSet)
-                .stream()
+        var firstSet = FirstSet.of(expression, followSet);
+        if (firstSet.isEmpty()) {
+            return !args.getTokenizer().hasNext();
+        }
+        return firstSet.stream()
                 .anyMatch(e -> visit(e, args));
     }
 }

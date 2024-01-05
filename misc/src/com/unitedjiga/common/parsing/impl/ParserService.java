@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2022 Mikami Junji.
+ * Copyright 2021 Junji Mikami.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,29 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.parsing.util;
+package com.unitedjiga.common.parsing.impl;
 
-import com.unitedjiga.common.parsing.NonTerminal;
-import com.unitedjiga.common.parsing.Tree;
-import com.unitedjiga.common.parsing.TreeVisitor;
-import com.unitedjiga.common.parsing.Terminal;
+import com.unitedjiga.common.parsing.ParserFactory;
+import com.unitedjiga.common.parsing.grammar.Grammar;
 
 /**
- * @author Mikami Junji
+ * @author Junji Mikami
  *
  */
-@FunctionalInterface
-public interface SimpleTreeVisitor<R, P> extends TreeVisitor<R, P> {
+public final class ParserService {
+    private static final DefaultParserProvider provider = new DefaultParserProvider();
 
-    @Override
-    public default R visitTerminal(Terminal s, P p) {
-        return defaultAction(s, p);
+    private ParserService() {
     }
 
-    @Override
-    public default R visitNonTerminal(NonTerminal s, P p) {
-        return defaultAction(s, p);
+    public static ParserFactory createFactory(Grammar grammar) {
+        return provider.createFacotry(grammar);
     }
 
-    public R defaultAction(Tree s, P p);
+    public static ParserFactory loadFactory(String factoryName, ClassLoader cl) {
+        return provider.loadFacotry(factoryName, cl);
+    }
 }

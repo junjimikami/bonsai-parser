@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.parsing.util;
+package com.unitedjiga.common.parsing.impl;
 
 import com.unitedjiga.common.parsing.grammar.ChoiceExpression;
 import com.unitedjiga.common.parsing.grammar.Expression;
@@ -35,7 +35,6 @@ import com.unitedjiga.common.parsing.grammar.SequenceExpression;
  * @author Mikami Junji
  *
  */
-@FunctionalInterface
 public interface SimpleExpressionVisitor<R, P> extends ExpressionVisitor<R, P> {
 
     @Override

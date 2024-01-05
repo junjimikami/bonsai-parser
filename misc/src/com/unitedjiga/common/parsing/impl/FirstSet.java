@@ -41,7 +41,18 @@ import com.unitedjiga.common.parsing.grammar.SequenceExpression;
  * @author Mikami Junji
  *
  */
-class FirstSet implements ExpressionVisitor<Set<Expression>, Set<Expression>> {
+final class FirstSet implements ExpressionVisitor<Set<Expression>, Set<Expression>> {
+    private static final FirstSet instance = new FirstSet();
+
+    private FirstSet() {
+    }
+
+    static Set<Expression> of(Expression expression, Set<Expression> followSet) {
+        return instance.visit(expression, followSet);
+    }
+    static Set<Expression> of(List<? extends Expression> sequence, Set<Expression> followSet) {
+        return instance.visit(sequence, followSet);
+    }
 
     @Override
     public Set<Expression> visit(Expression prd) {

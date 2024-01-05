@@ -55,6 +55,9 @@ public interface Expression {
     };
 
     public <R, P> R accept(ExpressionVisitor<R, P> visitor, P p);
+    public default <R, P> R accept(ExpressionVisitor<R, P> visitor) {
+        return accept(visitor, null);
+    }
 
     public Kind getKind();
 }

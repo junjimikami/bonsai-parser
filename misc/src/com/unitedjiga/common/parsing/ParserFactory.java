@@ -26,7 +26,7 @@ package com.unitedjiga.common.parsing;
 import java.io.Reader;
 
 import com.unitedjiga.common.parsing.grammar.Grammar;
-import com.unitedjiga.common.parsing.impl.ParserImpls;
+import com.unitedjiga.common.parsing.impl.ParserService;
 
 /**
  * @author Junji Mikami
@@ -35,15 +35,15 @@ import com.unitedjiga.common.parsing.impl.ParserImpls;
 public interface ParserFactory {
 
     public static ParserFactory newFactory(Grammar grammar) {
-        throw new UnsupportedOperationException();
+        return ParserService.createFactory(grammar);
     }
 
     public static ParserFactory loadFactory(String factoryName, ClassLoader cl) {
-        return ParserImpls.loadFactory(factoryName, cl);
+        return ParserService.loadFactory(factoryName, cl);
     }
 
     public static ParserFactory loadFactory(String factoryName) {
-        return ParserImpls.loadFactory(factoryName, null);
+        return ParserService.loadFactory(factoryName, null);
     }
 
     public Parser createParser(Tokenizer tokenizer);

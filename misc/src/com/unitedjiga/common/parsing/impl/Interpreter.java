@@ -23,7 +23,6 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,47 +42,25 @@ import com.unitedjiga.common.parsing.grammar.SequenceExpression;
  * @author Mikami Junji
  *
  */
-class Interpreter implements ExpressionVisitor<List<Tree>, Context> {
-    static final Expression EOF = new Expression() {
+final class Interpreter implements ExpressionVisitor<List<Tree>, Context> {
+    private static final Interpreter instance = new Interpreter();
 
-        @Override
-        public <R, P> R accept(ExpressionVisitor<R, P> visitor, P p) {
-            throw new UnsupportedOperationException();
-        }
+    private Interpreter() {
+    }
 
-        @Override
-        public Kind getKind() {
-            throw new UnsupportedOperationException();
-        }
-    };
+    static Tree parse(Production production, Context context) {
+        return instance.interpret(production, context);
+    }
 
-    private final FirstSet firstSet = new FirstSet();
-    private final AnyMatcher anyMatcher = new AnyMatcher();
-
-//    Tree parse(Expression prd, Tokenizer t) {
-//        var s = interpret(prd, t);
-//        if (t.hasNext()) {
-//            throw new ParsingException();
-//        }
-//        return s;
-//    }
     Tree interpret(Production production, Context context) {
         var trees = visit(production.getExpression(), context);
         return new DefaultNonTerminal(production.getSymbol(), trees);
     }
-//    Tree interpret(Expression prd, Tokenizer t) {
-//        var followSet = Set.of(EOF);
-//        return interpret(prd, t, followSet);
-//    }
-//    Tree interpret(Expression prd, Tokenizer tokenizer, Set<Expression> followSet) {
-//        var p = new Context(tokenizer, followSet);
-//        return visit(prd, p);
-//    }
 
     @Override
     public List<Tree> visitChoice(ChoiceExpression alt, Context args) {
         var list = alt.getChoices().stream()
-                .filter(e -> anyMatcher.visit(e, args))
+                .filter(e -> AnyMatcher.scan(e, args))
                 .toList();
         if (list.size() != 1) {
             throw new ParsingException();
@@ -95,14 +72,14 @@ class Interpreter implements ExpressionVisitor<List<Tree>, Context> {
     public List<Tree> visitSequence(SequenceExpression seq, Context args) {
         var tokenizer = args.getTokenizer();
         var followSet = args.getFollowSet();
-        if (!anyMatcher.visit(seq, args)) {
+        if (!AnyMatcher.scan(seq, args)) {
             throw new ParsingException();
         }
         var list = new ArrayList<Tree>();
         var subSequence = new LinkedList<>(seq.getSequence());
         while (!subSequence.isEmpty()) {
             var expression = subSequence.remove();
-            followSet = firstSet.visit(subSequence, followSet);
+            followSet = FirstSet.of(subSequence, followSet);
             var context2 = new Context(tokenizer, followSet);
             list.addAll(visit(expression, context2));
         }
@@ -111,7 +88,7 @@ class Interpreter implements ExpressionVisitor<List<Tree>, Context> {
 
     @Override
     public List<Tree> visitPattern(PatternExpression pattern, Context args) {
-        if (!anyMatcher.visit(pattern, args)) {
+        if (!AnyMatcher.scan(pattern, args)) {
             throw new ParsingException();
         }
         var tokenizer = args.getTokenizer();
@@ -128,13 +105,15 @@ class Interpreter implements ExpressionVisitor<List<Tree>, Context> {
     @Override
     public List<Tree> visitQuantifier(QuantifierExpression quantfier, Context args) {
         var list = new ArrayList<Tree>();
-        var count = quantfier.stream().takeWhile(e -> {
-            if (anyMatcher.visit(e, args)) {
-                list.addAll(visit(e, args));
-                return true;
-            }
-            return false;
-        }).count();
+        var count = quantfier.stream()
+                .takeWhile(e -> {
+                    if (AnyMatcher.scan(e, args)) {
+                        list.addAll(visit(e, args));
+                        return true;
+                    }
+                    return false;
+                })
+                .count();
         if (count < quantfier.getLowerLimit()
                 || quantfier.getUpperLimit().orElse(Integer.MAX_VALUE) < count
                 || Integer.MAX_VALUE < count) {
@@ -145,7 +124,7 @@ class Interpreter implements ExpressionVisitor<List<Tree>, Context> {
 
     @Override
     public List<Tree> visitEmpty(Expression empty, Context args) {
-        if (!anyMatcher.visit(empty, args)) {
+        if (!AnyMatcher.scan(empty, args)) {
             throw new ParsingException();
         }
         return List.of();

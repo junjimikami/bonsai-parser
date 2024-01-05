@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2022 Mikami Junji.
+ * Copyright 2021 Junji Mikami.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,22 +23,20 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import com.unitedjiga.common.parsing.Tree;
+import com.unitedjiga.common.parsing.TokenizerFactory;
+import com.unitedjiga.common.parsing.grammar.Grammar;
 
-/**
- * @author Mikami Junji
- *
- */
-abstract class AbstractSymbol implements Tree {
-    private final String name;
+public final class TokenizerService {
+    private static final DefaultTokenizerProvider provider = new DefaultTokenizerProvider();
 
-    AbstractSymbol(String name) {
-        this.name = name;
+    private TokenizerService() {
     }
 
-    @Override
-    public String getName() {
-        return name;
+    public static TokenizerFactory createFactory(Grammar grammar) {
+        return provider.createFactory(grammar);
     }
 
+    public static TokenizerFactory loadFactory(String factoryName, ClassLoader cl) {
+        return provider.loadFactory(factoryName, cl);
+    }
 }
