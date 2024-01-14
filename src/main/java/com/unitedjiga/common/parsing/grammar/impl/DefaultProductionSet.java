@@ -22,7 +22,7 @@ class DefaultProductionSet implements ProductionSet {
                 .findFirst()
                 .orElseThrow(() -> new NoSuchElementException(Message.NO_SUCH_SYMBOL.format(symbol)));
     }
-    
+
     void add(String symbol, Expression expression) {
         set.add(new DefaultProduction(symbol, expression));
     }

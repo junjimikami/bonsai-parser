@@ -16,12 +16,12 @@ class DefaultGrammarProvider {
     }
 
     PatternExpression.Builder createPatternBuilder(String regex) {
-        Objects.requireNonNull(regex, Message.NON_NULL_REQUIRED.format());
+        Objects.requireNonNull(regex, Message.NULL_PARAMETER.format());
         return new DefaultPatternExpression.Builder(regex);
     }
 
     PatternExpression.Builder createPatternBuilder(Pattern pattern) {
-        Objects.requireNonNull(pattern, Message.NON_NULL_REQUIRED.format());
+        Objects.requireNonNull(pattern, Message.NULL_PARAMETER.format());
         return new DefaultPatternExpression.Builder(pattern);
     }
 
@@ -34,7 +34,7 @@ class DefaultGrammarProvider {
     }
 
     ReferenceExpression.Builder createReferenceBuilder(String reference) {
-        Objects.requireNonNull(reference, Message.NON_NULL_REQUIRED.format());
+        Objects.requireNonNull(reference, Message.NULL_PARAMETER.format());
         return new DefaultReferenceExpression.Builder(reference);
     }
 

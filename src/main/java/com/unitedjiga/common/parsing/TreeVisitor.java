@@ -32,15 +32,15 @@ package com.unitedjiga.common.parsing;
  */
 public interface TreeVisitor<R, P> {
 
-    public default R visit(Tree s) {
-        return visit(s, null);
+    public default R visit(Tree tree) {
+        return visit(tree, null);
     }
 
-    public default R visit(Tree s, P p) {
-        return s.accept(this, p);
+    public default R visit(Tree tree, P p) {
+        return tree.accept(this, p);
     }
 
-    public R visitTerminal(Terminal s, P p);
+    public R visitTerminal(Terminal tree, P p);
 
-    public R visitNonTerminal(NonTerminal s, P p);
+    public R visitNonTerminal(NonTerminal tree, P p);
 }

@@ -25,7 +25,6 @@ package com.unitedjiga.common.parsing.grammar.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import com.unitedjiga.common.parsing.grammar.ChoiceExpression;
 import com.unitedjiga.common.parsing.grammar.Expression;
@@ -47,7 +46,7 @@ class DefaultChoiceExpression extends AbstractExpression implements ChoiceExpres
         protected void checkForBuild() {
             super.checkForBuild();
             if (builders.isEmpty()) {
-                throw new IllegalStateException(Message.NO_ELEMENTS.format());
+                throw new IllegalStateException(Message.NO_ELELEMNTS_BUILD.format());
             }
         }
 
@@ -62,20 +61,6 @@ class DefaultChoiceExpression extends AbstractExpression implements ChoiceExpres
         public Builder add(String reference) {
             check(reference);
             builders.add(new DefaultReferenceExpression.Builder(reference));
-            return this;
-        }
-
-        @Override
-        public Builder addPattern(String regex) {
-            check(regex);
-            builders.add(new DefaultPatternExpression.Builder(regex));
-            return this;
-        }
-
-        @Override
-        public Builder addPattern(Pattern pattern) {
-            check(pattern);
-            builders.add(new DefaultPatternExpression.Builder(pattern));
             return this;
         }
 

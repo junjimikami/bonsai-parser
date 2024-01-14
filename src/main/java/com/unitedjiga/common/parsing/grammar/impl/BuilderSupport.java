@@ -13,13 +13,7 @@ abstract class BuilderSupport {
 
     protected void check(Object o) {
         check();
-        Objects.requireNonNull(o, Message.NON_NULL_REQUIRED.format());
-    }
-
-    protected void check(String symbol, Object o) {
-        check();
-        Objects.requireNonNull(symbol, Message.NON_NULL_REQUIRED.format());
-        Objects.requireNonNull(o, Message.NON_NULL_REQUIRED.format());
+        Objects.requireNonNull(o, Message.NULL_PARAMETER.format());
     }
 
     protected void checkForBuild() {

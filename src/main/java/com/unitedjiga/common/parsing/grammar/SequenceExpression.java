@@ -24,7 +24,6 @@
 package com.unitedjiga.common.parsing.grammar;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
 import com.unitedjiga.common.parsing.grammar.impl.GrammarService;
 
@@ -37,8 +36,6 @@ public interface SequenceExpression extends Expression {
     public static interface Builder extends Expression.Builder, Quantifiable {
         public SequenceExpression.Builder add(Expression.Builder builder);
         public SequenceExpression.Builder add(String reference);
-        public SequenceExpression.Builder addPattern(String regex);
-        public SequenceExpression.Builder addPattern(Pattern pattern);
         public default SequenceExpression build() {
             return build(null);
         }

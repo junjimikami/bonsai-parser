@@ -24,6 +24,7 @@
 package com.unitedjiga.common.parsing.grammar.impl;
 
 import java.util.Objects;
+import java.util.function.Supplier;
 
 import com.unitedjiga.common.parsing.grammar.Production;
 import com.unitedjiga.common.parsing.grammar.ProductionSet;
@@ -45,24 +46,22 @@ class DefaultReferenceExpression extends AbstractExpression implements Reference
         @Override
         public ReferenceExpression build(ProductionSet set) {
             checkForBuild();
-            Objects.requireNonNull(set, Message.PRODUCTION_SET_REQUIRED.format());
-            var production = set.get(symbol);
-            Objects.requireNonNull(set);
-            return new DefaultReferenceExpression(production);
+            Objects.requireNonNull(set, Message.NULL_PARAMETER.format());
+            return new DefaultReferenceExpression(() -> set.get(symbol));
         }
 
     }
 
-    private final Production production;
+    private final Supplier<Production> production;
 
-    private DefaultReferenceExpression(Production production) {
+    private DefaultReferenceExpression(Supplier<Production> production) {
         assert production != null;
         this.production = production;
     }
 
     @Override
     public Production get() {
-        return production;
+        return production.get();
     }
 
 }

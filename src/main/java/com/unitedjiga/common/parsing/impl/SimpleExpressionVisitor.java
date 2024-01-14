@@ -35,7 +35,7 @@ import com.unitedjiga.common.parsing.grammar.SequenceExpression;
  * @author Mikami Junji
  *
  */
-public interface SimpleExpressionVisitor<R, P> extends ExpressionVisitor<R, P> {
+interface SimpleExpressionVisitor<R, P> extends ExpressionVisitor<R, P> {
 
     @Override
     public default R visitChoice(ChoiceExpression prd, P p) {

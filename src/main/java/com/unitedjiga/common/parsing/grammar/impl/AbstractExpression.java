@@ -41,11 +41,20 @@ abstract class AbstractExpression implements Expression {
 
         @Override
         public QuantifierExpression.Builder atLeast(int times) {
+            if (times < 0) {
+                throw new IllegalArgumentException(Message.NEGATIVE_PARAMETER.format());
+            }
             return new DefaultQuantifierExpression.Builder(this, times);
         }
 
         @Override
         public QuantifierExpression.Builder range(int from, int to) {
+            if (from < 0) {
+                throw new IllegalArgumentException(Message.NEGATIVE_PARAMETER.format());
+            }
+            if (to < from) {
+                throw new IllegalArgumentException(Message.INVALID_UPPER_LIMIT.format());
+            }
             return new DefaultQuantifierExpression.Builder(this, from, to);
         }
     }

@@ -10,7 +10,7 @@ import com.unitedjiga.common.parsing.grammar.Grammar;
 class DefaultTokenizerProvider {
 
     TokenizerFactory createFactory(Grammar grammar) {
-        Objects.requireNonNull(grammar, Message.NON_NULL_REQUIRED.format());
+        Objects.requireNonNull(grammar, Message.NULL_PARAMETER.format());
         return new DefaultTokenizerFactory(grammar);
     }
 

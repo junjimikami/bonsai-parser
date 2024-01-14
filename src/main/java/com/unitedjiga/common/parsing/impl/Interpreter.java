@@ -33,7 +33,6 @@ import com.unitedjiga.common.parsing.grammar.ChoiceExpression;
 import com.unitedjiga.common.parsing.grammar.Expression;
 import com.unitedjiga.common.parsing.grammar.ExpressionVisitor;
 import com.unitedjiga.common.parsing.grammar.PatternExpression;
-import com.unitedjiga.common.parsing.grammar.Production;
 import com.unitedjiga.common.parsing.grammar.QuantifierExpression;
 import com.unitedjiga.common.parsing.grammar.ReferenceExpression;
 import com.unitedjiga.common.parsing.grammar.SequenceExpression;
@@ -48,91 +47,99 @@ final class Interpreter implements ExpressionVisitor<List<Tree>, Context> {
     private Interpreter() {
     }
 
-    static Tree parse(Production production, Context context) {
-        return instance.interpret(production, context);
+    static Tree parse(Context context) {
+        return instance.interpret(context);
     }
 
-    Tree interpret(Production production, Context context) {
+    Tree interpret(Context context) {
+        var production = context.getProduction();
         var trees = visit(production.getExpression(), context);
         return new DefaultNonTerminal(production.getSymbol(), trees);
     }
 
     @Override
-    public List<Tree> visitChoice(ChoiceExpression alt, Context args) {
-        var list = alt.getChoices().stream()
-                .filter(e -> AnyMatcher.scan(e, args))
+    public List<Tree> visitChoice(ChoiceExpression choice, Context context) {
+        var list = choice.getChoices().stream()
+                .filter(e -> AnyMatcher.scan(e, context))
                 .toList();
         if (list.isEmpty()) {
-            throw new ParsingException(Message.NO_MATCHING_TOKEN.format());
+            var message = MessageSupport.tokenNotMatchExpression(choice, context);
+            throw new ParsingException(message);
         }
         if (1 < list.size()) {
-            throw new ParsingException(Message.AMBIGUOUS_RULE.format());
+            var message = MessageSupport.ambiguousChoice(choice, context);
+            throw new ParsingException(message);
         }
-        return visit(list.get(0), args);
+        return visit(list.get(0), context);
     }
 
     @Override
-    public List<Tree> visitSequence(SequenceExpression seq, Context args) {
-        var tokenizer = args.getTokenizer();
-        var followSet = args.getFollowSet();
-        if (!AnyMatcher.scan(seq, args)) {
-            throw new ParsingException(Message.NO_MATCHING_TOKEN.format());
+    public List<Tree> visitSequence(SequenceExpression sequence, Context context) {
+        var production = context.getProduction();
+        var tokenizer = context.getTokenizer();
+        var followSet = context.getFollowSet();
+        if (!AnyMatcher.scan(sequence, context)) {
+            var message = MessageSupport.tokenNotMatchExpression(sequence, context);
+            throw new ParsingException(message);
         }
         var list = new ArrayList<Tree>();
-        var subSequence = new LinkedList<>(seq.getSequence());
+        var subSequence = new LinkedList<>(sequence.getSequence());
         while (!subSequence.isEmpty()) {
             var expression = subSequence.remove();
             followSet = FirstSet.of(subSequence, followSet);
-            var context2 = new Context(tokenizer, followSet);
+            var context2 = new Context(production, tokenizer, followSet);
             list.addAll(visit(expression, context2));
         }
         return list;
     }
 
     @Override
-    public List<Tree> visitPattern(PatternExpression pattern, Context args) {
-        if (!AnyMatcher.scan(pattern, args)) {
-            throw new ParsingException(Message.NO_MATCHING_TOKEN.format());
+    public List<Tree> visitPattern(PatternExpression pattern, Context context) {
+        if (!AnyMatcher.scan(pattern, context)) {
+            var message = MessageSupport.tokenNotMatchExpression(pattern, context);
+            throw new ParsingException(message);
         }
-        var tokenizer = args.getTokenizer();
+        var tokenizer = context.getTokenizer();
         var token = tokenizer.next(pattern.getPattern());
         return List.of(token);
     }
 
     @Override
-    public List<Tree> visitReference(ReferenceExpression reference, Context args) {
-        var tree = interpret(reference.get(), args);
+    public List<Tree> visitReference(ReferenceExpression reference, Context context) {
+        var production = reference.get();
+        var context2 = new Context(production, context.getTokenizer(), context.getFollowSet());
+        var tree = interpret(context2);
         return List.of(tree);
     }
 
     @Override
-    public List<Tree> visitQuantifier(QuantifierExpression quantfier, Context args) {
+    public List<Tree> visitQuantifier(QuantifierExpression quantfier, Context context) {
         var list = new ArrayList<Tree>();
-        var count = quantfier.stream()
+        var count = (int) quantfier.stream()
                 .takeWhile(e -> {
-                    if (!AnyMatcher.scan(e, args)) {
+                    if (!AnyMatcher.scan(e, context)) {
                         return false;
                     }
-                    list.addAll(visit(e, args));
+                    list.addAll(visit(e, context));
                     return true;
                 })
                 .count();
-        if (Integer.MAX_VALUE < count) {
-            throw new ParsingException(Message.UNEXPECTED_OCCURENCES.format());
-        }
         var lowerLimit = quantfier.getLowerLimit();
-        var upperLimit = quantfier.getUpperLimit().orElse((int) count);
+        var upperLimit = quantfier.getUpperLimit().orElse(count);
         if (count < lowerLimit || upperLimit < count) {
-            throw new ParsingException(Message.OCCURENCES_OUT_OF_RANGE.format());
+            var message = MessageSupport.tokenCountOutOfRange(quantfier, context, count);
+            throw new ParsingException(message);
         }
         return list;
     }
 
     @Override
-    public List<Tree> visitEmpty(Expression empty, Context args) {
-        if (!AnyMatcher.scan(empty, args)) {
-            throw new ParsingException(Message.NO_MATCHING_TOKEN.format());
+    public List<Tree> visitEmpty(Expression empty, Context context) {
+        if (!AnyMatcher.scan(empty, context)) {
+            var message = MessageSupport.tokenNotMatchExpression(empty, context);
+            throw new ParsingException(message);
         }
         return List.of();
     }
+
 }

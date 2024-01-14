@@ -27,6 +27,7 @@ import java.util.Set;
 
 import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.grammar.Expression;
+import com.unitedjiga.common.parsing.grammar.Production;
 
 /**
  * @author Mikami Junji
@@ -34,13 +35,19 @@ import com.unitedjiga.common.parsing.grammar.Expression;
  */
 class Context {
 
+    private final Production production;
     private final Tokenizer tokenizer;
     private final Set<Expression> followSet;
 
-    Context(Tokenizer tokenizer, Set<Expression> followSet) {
+    Context(Production production, Tokenizer tokenizer, Set<Expression> followSet) {
         super();
+        this.production = production;
         this.tokenizer = tokenizer;
         this.followSet = followSet;
+    }
+
+    Production getProduction() {
+        return production;
     }
 
     Tokenizer getTokenizer() {

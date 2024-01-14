@@ -2,6 +2,7 @@ package com.unitedjiga.common.parsing.grammar.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import com.unitedjiga.common.parsing.grammar.Expression;
@@ -18,9 +19,10 @@ class DefaultGrammar implements Grammar {
         Builder() {
         }
 
-        @Override
-        protected void check(String symbol, Object o) {
-            super.check(symbol, o);
+        private void checkForAdd(String symbol, Object o) {
+            super.check();
+            Objects.requireNonNull(symbol, Message.NULL_PARAMETER.format());
+            Objects.requireNonNull(o, Message.NULL_PARAMETER.format());
             if (startSymbol == null) {
                 startSymbol = symbol;
             }
@@ -30,35 +32,21 @@ class DefaultGrammar implements Grammar {
         protected void checkForBuild() {
             super.checkForBuild();
             if (startSymbol == null || builders.isEmpty()) {
-                throw new IllegalStateException(Message.NO_ELEMENTS.format());
+                throw new IllegalStateException(Message.NO_ELELEMNTS_BUILD.format());
             }
         }
 
         @Override
         public Builder add(String symbol, Expression.Builder builder) {
-            check(symbol, builder);
+            checkForAdd(symbol, builder);
             builders.put(symbol, builder);
             return this;
         }
 
         @Override
         public Builder add(String symbol, String reference) {
-            check(symbol, reference);
+            checkForAdd(symbol, reference);
             builders.put(symbol, new DefaultReferenceExpression.Builder(reference));
-            return this;
-        }
-
-        @Override
-        public Builder addPattern(String symbol, String regex) {
-            check(symbol, regex);
-            builders.put(symbol, new DefaultPatternExpression.Builder(regex));
-            return this;
-        }
-
-        @Override
-        public Builder addPattern(String symbol, Pattern pattern) {
-            check(symbol, pattern);
-            builders.put(symbol, new DefaultPatternExpression.Builder(pattern));
             return this;
         }
 
@@ -87,7 +75,7 @@ class DefaultGrammar implements Grammar {
         public Grammar build() {
             checkForBuild();
             var set = new DefaultProductionSet();
-            builders.forEach((symbol,builder) -> {
+            builders.forEach((symbol, builder) -> {
                 var expression = builder.build(set);
                 set.add(symbol, expression);
             });
@@ -95,9 +83,9 @@ class DefaultGrammar implements Grammar {
         }
     }
 
-    private ProductionSet set;
-    private String startSymbol;
-    private Pattern skipPattern;
+    private final ProductionSet set;
+    private final String startSymbol;
+    private final Pattern skipPattern;
 
     private DefaultGrammar(ProductionSet set, String startSymbol, Pattern skipPattern) {
         assert set != null;
@@ -116,7 +104,7 @@ class DefaultGrammar implements Grammar {
     public Pattern getSkipPattern() {
         return skipPattern;
     }
-    
+
     @Override
     public ProductionSet productionSet() {
         return set;

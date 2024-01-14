@@ -31,17 +31,16 @@ import java.text.MessageFormat;
  */
 enum Message {
 
-    NON_NULL_REQUIRED("Non-null required."),
-    NO_SUCH_TOKEN("Token not found."),
-    NO_SUCH_TOKEN_MATCHING_PATTERN("No token matching pattern \"{0}\"."),
-    TOO_MANY_TOKEN("Expected EOF, but found extra token."),
-    NO_MATCHING_TOKEN("No matching token found."),
-    AMBIGUOUS_RULE("Ambiguous rule. More than one token matches."),
-    OCCURENCES_OUT_OF_RANGE("Number of occurences out of range."),
-    UNEXPECTED_OCCURENCES("Unexpected number of occurences."),
+    NULL_PARAMETER("Null was passed to the parameter."),
+    TOKEN_NOT_FOUND("No tokens were found."),
+    TOKEN_NOT_MATCH_PATTERN("Token did not match pattern {0}."),
+    TOKEN_NOT_MATCH_EXPRESSION("In production rule {0}, {1} was expected, but {2} was found."),
+    AMBIGUOUS_CHOICE("In production rule {0}, the choice expression {1} is ambiguous."),
+    TOKEN_COUNT_OUT_OF_RANGE("In production rule {0}, {1} was expected to occur {2} times, but it occurred {3} times."),
+    TOKENS_REMAIND("EOF was expected, but tokens remained."),
     ;
 
-    private MessageFormat msg;
+    private final MessageFormat msg;
 
     private Message(String message) {
         this.msg = new MessageFormat(message);

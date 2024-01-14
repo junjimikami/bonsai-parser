@@ -47,6 +47,7 @@ class DefaultQuantifierExpression extends AbstractExpression implements Quantifi
             this.from = from;
             this.to = null;
         }
+
         Builder(Expression.Builder builder, int from, int to) {
             Objects.requireNonNull(builder);
             this.builder = builder;
@@ -80,14 +81,18 @@ class DefaultQuantifierExpression extends AbstractExpression implements Quantifi
     public int getLowerLimit() {
         return lowerLimit;
     }
+
     @Override
     public OptionalInt getUpperLimit() {
         return upperLimit;
     }
+
     @Override
     public Stream<Expression> stream() {
         var stream = Stream.generate(() -> expression);
-        upperLimit.ifPresent(stream::limit);
+        if (upperLimit.isPresent()) {
+            return stream.limit(upperLimit.getAsInt());
+        }
         return stream;
     }
 }

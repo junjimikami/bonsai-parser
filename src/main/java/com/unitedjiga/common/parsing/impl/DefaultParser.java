@@ -10,23 +10,21 @@ import com.unitedjiga.common.parsing.Terminal;
 import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.Tree;
 import com.unitedjiga.common.parsing.grammar.Grammar;
-import com.unitedjiga.common.parsing.grammar.Production;
 
 class DefaultParser implements Parser {
-    private final Production production;
     private final Context context;
 
     DefaultParser(Grammar grammar, Tokenizer tokenizer) {
         Objects.requireNonNull(grammar);
         Objects.requireNonNull(tokenizer);
-        this.production = grammar.getStart();
-        this.context = new Context(tokenizer, Set.of());
+        var production = grammar.getStart();
+        context = new Context(production, tokenizer, Set.of());
     }
     @Override
     public Tree parse() {
-        var tree = Interpreter.parse(production, context);
+        var tree = Interpreter.parse(context);
         if (context.getTokenizer().hasNext()) {
-            throw new ParsingException(Message.TOO_MANY_TOKEN.format());
+            throw new ParsingException(Message.TOKENS_REMAIND.format());
         }
         return tree;
     }

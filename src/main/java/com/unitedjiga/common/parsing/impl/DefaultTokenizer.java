@@ -35,7 +35,6 @@ import com.unitedjiga.common.parsing.Token;
 import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.TreeVisitor;
 import com.unitedjiga.common.parsing.grammar.Grammar;
-import com.unitedjiga.common.parsing.grammar.Production;
 
 /**
  * @author Junji Mikami
@@ -57,15 +56,14 @@ class DefaultTokenizer implements Tokenizer {
         }
     };
 
-    private final Production production;
     private final Context context;
     private String nextToken;
 
     DefaultTokenizer(Grammar grammar, Tokenizer tokenizer) {
         Objects.requireNonNull(grammar);
         Objects.requireNonNull(tokenizer);
-        this.production = grammar.getStart();
-        this.context = new Context(tokenizer, Set.of());
+        var production = grammar.getStart();
+        context = new Context(production, tokenizer, Set.of());
     }
 
     private String read() {
@@ -75,7 +73,7 @@ class DefaultTokenizer implements Tokenizer {
         if (!context.getTokenizer().hasNext()) {
             return null;
         }
-        nextToken = Interpreter.parse(production, context)
+        nextToken = Interpreter.parse(context)
                 .accept(treeToString);
         return nextToken;
     }
@@ -106,7 +104,7 @@ class DefaultTokenizer implements Tokenizer {
     public Token next() {
         var value = read();
         if (value == null) {
-            throw new NoSuchElementException(Message.NO_SUCH_TOKEN.format());
+            throw new NoSuchElementException(Message.TOKEN_NOT_FOUND.format());
         }
         nextToken = null;
         return new DefaultToken(value);
@@ -124,7 +122,7 @@ class DefaultTokenizer implements Tokenizer {
         Objects.requireNonNull(pattern);
         var value = read();
         if (value == null) {
-            throw new NoSuchElementException(Message.NO_SUCH_TOKEN.format());
+            throw new NoSuchElementException(Message.TOKEN_NOT_FOUND.format());
         }
         var matcher = pattern.matcher(value);
         if (matcher.matches()) {
@@ -136,7 +134,7 @@ class DefaultTokenizer implements Tokenizer {
             nextToken = nextToken.substring(matcher.end());
             return new DefaultToken(value);
         }
-        throw new NoSuchElementException(Message.NO_SUCH_TOKEN_MATCHING_PATTERN.format(pattern));
+        throw new NoSuchElementException(Message.TOKEN_NOT_MATCH_PATTERN.format(pattern));
     }
 
 }

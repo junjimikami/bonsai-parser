@@ -24,7 +24,6 @@
 package com.unitedjiga.common.parsing.grammar;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
 import com.unitedjiga.common.parsing.grammar.impl.GrammarService;
 
@@ -37,8 +36,6 @@ public interface ChoiceExpression extends Expression {
     public static interface Builder extends Expression.Builder, Quantifiable {
         public ChoiceExpression.Builder add(Expression.Builder builder);
         public ChoiceExpression.Builder add(String reference);
-        public ChoiceExpression.Builder addPattern(String regex);
-        public ChoiceExpression.Builder addPattern(Pattern pattern);
         public ChoiceExpression.Builder addEmpty();
         public default ChoiceExpression build() {
             return build(null);

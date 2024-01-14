@@ -59,7 +59,7 @@ final class FirstSet implements ExpressionVisitor<Set<Expression>, Set<Expressio
         return visit(prd, Set.of());
     }
 
-    public Set<Expression> visit(List<? extends Expression> sequence, Set<Expression> followSet) {
+    private Set<Expression> visit(List<? extends Expression> sequence, Set<Expression> followSet) {
         if (sequence.isEmpty()) {
             return followSet;
         }
