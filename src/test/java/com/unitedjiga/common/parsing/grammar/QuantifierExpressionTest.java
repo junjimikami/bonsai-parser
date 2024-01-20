@@ -6,10 +6,6 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicNode;
 import org.junit.jupiter.api.Nested;
@@ -23,22 +19,6 @@ import com.unitedjiga.common.parsing.grammar.Expression.Kind;
 
 class QuantifierExpressionTest implements ExpressionTest {
 
-    @BeforeAll
-    static void setUpBeforeClass() throws Exception {
-    }
-
-    @AfterAll
-    static void tearDownAfterClass() throws Exception {
-    }
-
-    @BeforeEach
-    void setUp() throws Exception {
-    }
-
-    @AfterEach
-    void tearDown() throws Exception {
-    }
-
     @Nested
     class BuilderTest {
 
@@ -51,17 +31,17 @@ class QuantifierExpressionTest implements ExpressionTest {
         }
 
         @TestFactory
-        Stream<DynamicNode> buildPostBuild() throws Exception {
+        Stream<DynamicNode> buildInCasePostBuild() throws Exception {
             return builderTests().map(test -> dynamicTest(
                     "build() [Post-build operation]",
-                    test::buildPostBuild));
+                    test::buildInCasePostBuild));
         }
 
         @TestFactory
-        Stream<DynamicNode> buildPsPostBuild() throws Exception {
+        Stream<DynamicNode> buildPsInCasePostBuild() throws Exception {
             return builderTests().map(test -> dynamicTest(
                     "build(ps:ProductionSet) [Post-build operation]",
-                    test::buildPsPostBuild));
+                    test::buildPsInCasePostBuild));
         }
 
         private Stream<ReferenceRelatedTest> referenceRelatedTest() {
@@ -72,24 +52,24 @@ class QuantifierExpressionTest implements ExpressionTest {
         }
 
         @TestFactory
-        Stream<DynamicNode> buildNullProductionSet() throws Exception {
+        Stream<DynamicNode> buildInCaseNullProductionSet() throws Exception {
             return referenceRelatedTest().map(test -> dynamicTest(
                     "build() [Null production set]",
-                    test::buildNullProductionSet));
+                    test::buildInCaseNullProductionSet));
         }
 
         @TestFactory
-        Stream<DynamicNode> buildPsNullProductionSet() throws Exception {
+        Stream<DynamicNode> buildPsInCaseNullProductionSet() throws Exception {
             return referenceRelatedTest().map(test -> dynamicTest(
                     "build(ps:ProductionSet) [Null production set]",
-                    test::buildPsNullProductionSet));
+                    test::buildPsInCaseNullProductionSet));
         }
 
         @TestFactory
-        Stream<DynamicNode> buildPsInvalidProductionSet() throws Exception {
+        Stream<DynamicNode> buildPsInCaseInvalidReference() throws Exception {
             return referenceRelatedTest().map(test -> dynamicTest(
                     "build(ps:ProductionSet) [Invalid production set]",
-                    test::buildPsInvalidProductionSet));
+                    test::buildPsInCaseInvalidReference));
         }
     }
 

@@ -7,10 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,22 +14,6 @@ import org.junit.jupiter.api.Test;
 import com.unitedjiga.common.parsing.grammar.Expression.Kind;
 
 class PatternExpressionTest implements ExpressionTest {
-
-    @BeforeAll
-    static void setUpBeforeClass() throws Exception {
-    }
-
-    @AfterAll
-    static void tearDownAfterClass() throws Exception {
-    }
-
-    @BeforeEach
-    void setUp() throws Exception {
-    }
-
-    @AfterEach
-    void tearDown() throws Exception {
-    }
 
     @Nested
     class BuilderTest implements ExpressionTest.BulderTest, QuantifiableTest {
@@ -50,21 +30,21 @@ class PatternExpressionTest implements ExpressionTest {
 
     @Test
     @DisplayName("builder(st:String) [Null parameter]")
-    void builderStNull() throws Exception {
+    void builderStInCaseNullParameter() throws Exception {
         assertThrows(NullPointerException.class, () -> PatternExpression.builder((String) null))
                 .printStackTrace();
     }
 
     @Test
     @DisplayName("builder(pa:Pattern) [Null parameter]")
-    void builderPaNull() throws Exception {
+    void builderPaInCaseNullParameter() throws Exception {
         assertThrows(NullPointerException.class, () -> PatternExpression.builder((Pattern) null))
                 .printStackTrace();
     }
 
     @Test
     @DisplayName("builder(st:String) [Invalid regex]")
-    void builderStInvalidRegex() throws Exception {
+    void builderStInCaseInvalidRegex() throws Exception {
         assertThrows(PatternSyntaxException.class, () -> PatternExpression.builder("["))
                 .printStackTrace();
     }

@@ -14,7 +14,7 @@ interface QuantifiableTest {
 
     @Test
     @DisplayName("exactly(int) [Negative parameter]")
-    default void exactlyNegative() throws Exception {
+    default void exactlyInCaseNegative() throws Exception {
         var builder = builder();
 
         assertThrows(IllegalArgumentException.class, () -> builder.exactly(-1))
@@ -23,7 +23,7 @@ interface QuantifiableTest {
 
     @Test
     @DisplayName("atLeast(int) [Negative parameter]")
-    default void atLeastNegative() throws Exception {
+    default void atLeastInCaseNegative() throws Exception {
         var builder = builder();
 
         assertThrows(IllegalArgumentException.class, () -> builder.atLeast(-1))
@@ -32,7 +32,7 @@ interface QuantifiableTest {
 
     @Test
     @DisplayName("range(int, int) [Negative parameter]")
-    default void rangeNegative() throws Exception {
+    default void rangeInCaseNegative() throws Exception {
         var builder = builder();
 
         assertThrows(IllegalArgumentException.class, () -> builder.range(-1, 0))
@@ -41,10 +41,10 @@ interface QuantifiableTest {
 
     @ParameterizedTest
     @CsvSource({
-        "0,-1", "1,0","2,1"
+            "0,-1", "1,0", "2,1"
     })
     @DisplayName("range(int, int) [Upper limit is lower than lower limit]")
-    default void rangeInvalidUpperLimit(int min, int max) throws Exception {
+    default void rangeInCaseInvalidUpperLimit(int min, int max) throws Exception {
         var builder = builder();
 
         assertThrows(IllegalArgumentException.class, () -> builder.range(min, max))
@@ -113,7 +113,7 @@ interface QuantifiableTest {
 
     @Test
     @DisplayName("exactly(int) [Post-build operation]")
-    default void exactlyPostBuild() throws Exception {
+    default void exactlyInCasePostBuild() throws Exception {
         var builder = builder();
         builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
@@ -123,7 +123,7 @@ interface QuantifiableTest {
 
     @Test
     @DisplayName("atLeast(int) [Post-build operation]")
-    default void atLeastPostBuild() throws Exception {
+    default void atLeastInCasePostBuild() throws Exception {
         var builder = builder();
         builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
@@ -133,7 +133,7 @@ interface QuantifiableTest {
 
     @Test
     @DisplayName("range(int, int) [Post-build operation]")
-    default void rangePostBuild() throws Exception {
+    default void rangeInCasePostBuild() throws Exception {
         var builder = builder();
         builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
@@ -143,7 +143,7 @@ interface QuantifiableTest {
 
     @Test
     @DisplayName("opt() [Post-build operation]")
-    default void optPostBuild() throws Exception {
+    default void optInCasePostBuild() throws Exception {
         var builder = builder();
         builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
@@ -153,7 +153,7 @@ interface QuantifiableTest {
 
     @Test
     @DisplayName("zeroOrMore() [Post-build operation]")
-    default void zeroOrMorePostBuild() throws Exception {
+    default void zeroOrMoreInCasePostBuild() throws Exception {
         var builder = builder();
         builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
@@ -163,7 +163,7 @@ interface QuantifiableTest {
 
     @Test
     @DisplayName("oneOrMore() [Post-build operation]")
-    default void oneOrMorePostBuild() throws Exception {
+    default void oneOrMoreInCasePostBuild() throws Exception {
         var builder = builder();
         builder.build(Stubs.DUMMY_PRODUCTION_SET);
 

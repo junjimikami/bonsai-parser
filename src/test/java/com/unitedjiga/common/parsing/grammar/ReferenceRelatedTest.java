@@ -13,7 +13,7 @@ interface ReferenceRelatedTest {
 
     @Test
     @DisplayName("build() [Null production set]")
-    default void buildNullProductionSet() throws Exception {
+    default void buildInCaseNullProductionSet() throws Exception {
         var builder = builder();
 
         assertThrows(NullPointerException.class, () -> builder.build())
@@ -22,7 +22,7 @@ interface ReferenceRelatedTest {
 
     @Test
     @DisplayName("build(ps:ProductionSet) [Null production set]")
-    default void buildPsNullProductionSet() throws Exception {
+    default void buildPsInCaseNullProductionSet() throws Exception {
         var builder = builder();
 
         assertThrows(NullPointerException.class, () -> builder.build(null))
@@ -30,11 +30,11 @@ interface ReferenceRelatedTest {
     }
 
     @Test
-    @DisplayName("build(ps:ProductionSet) [Invalid production set]")
-    default void buildPsInvalidProductionSet() throws Exception {
+    @DisplayName("build(ps:ProductionSet) [Invalid reference]")
+    default void buildPsInCaseInvalidReference() throws Exception {
         var builder = builder();
 
-        assertThrows(NoSuchElementException.class, () -> builder.build(Stubs.INVALID_PRODUCTION_SET))
+        assertThrows(NoSuchElementException.class, () -> builder.build(Stubs.EMPTY_PRODUCTION_SET))
                 .printStackTrace();
     }
 

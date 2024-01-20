@@ -13,7 +13,7 @@ interface ExpressionTest {
 
         @Test
         @DisplayName("build() [Post-build operation]")
-        default void buildPostBuild() throws Exception {
+        default void buildInCasePostBuild() throws Exception {
             var builder = builder();
             builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
@@ -23,7 +23,7 @@ interface ExpressionTest {
 
         @Test
         @DisplayName("build(ps:ProductionSet) [Post-build operation]")
-        default void buildPsPostBuild() throws Exception {
+        default void buildPsInCasePostBuild() throws Exception {
             var builder = builder();
             builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
@@ -37,7 +37,7 @@ interface ExpressionTest {
 
     @Test
     @DisplayName("accept(ev:ElementVisitor) [Null parameter]")
-    default void acceptEvNull() throws Exception {
+    default void acceptEvInCaseNullParameter() throws Exception {
         var expression = build();
 
         assertThrows(NullPointerException.class, () -> expression.accept(null));

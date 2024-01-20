@@ -4,10 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -15,22 +11,6 @@ import org.junit.jupiter.api.Test;
 import com.unitedjiga.common.parsing.grammar.Expression.Kind;
 
 class ReferenceExpressionTest implements ExpressionTest {
-
-    @BeforeAll
-    static void setUpBeforeClass() throws Exception {
-    }
-
-    @AfterAll
-    static void tearDownAfterClass() throws Exception {
-    }
-
-    @BeforeEach
-    void setUp() throws Exception {
-    }
-
-    @AfterEach
-    void tearDown() throws Exception {
-    }
 
     @Nested
     class BuilderTest implements ExpressionTest.BulderTest, QuantifiableTest, ReferenceRelatedTest {
@@ -49,7 +29,7 @@ class ReferenceExpressionTest implements ExpressionTest {
 
     @Test
     @DisplayName("builder(String) [Null parameter]")
-    void builderNull() throws Exception {
+    void builderInCaseNullParameter() throws Exception {
         assertThrows(NullPointerException.class, () -> ReferenceExpression.builder(null))
                 .printStackTrace();
     }
@@ -101,7 +81,6 @@ class ReferenceExpressionTest implements ExpressionTest {
         var production = reference.get();
 
         assertEquals(symbol, production.getSymbol());
-//        assertEquals(Stubs.DUMMY_EXPRESSION, production.getExpression());
     }
 
 }

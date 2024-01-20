@@ -20,7 +20,7 @@ final class Stubs {
             return productionOf(symbol);
         }
     };
-    static final ProductionSet INVALID_PRODUCTION_SET = new ProductionSet() {
+    static final ProductionSet EMPTY_PRODUCTION_SET = new ProductionSet() {
 
         @Override
         public boolean contains(String symbol) {
