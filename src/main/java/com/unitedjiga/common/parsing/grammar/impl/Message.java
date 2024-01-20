@@ -33,7 +33,7 @@ enum Message {
 
     NULL_PARAMETER("Null was passed to the parameter."),
     ALREADY_BUILT("The builder has already built."),
-    NO_ELELEMNTS_BUILD("No elements have been added to the builder."),
+    NO_ELELEMNTS("No elements have been added to the builder."),
     NEGATIVE_PARAMETER("A negative number was passed to the quantifier parameter."),
     INVALID_UPPER_LIMIT("The upper limit is lower than the lower limit."),
     NO_SUCH_SYMBOL("No production rule named symbol {0} was found."),

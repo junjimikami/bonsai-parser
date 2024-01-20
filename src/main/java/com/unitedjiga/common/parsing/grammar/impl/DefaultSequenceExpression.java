@@ -23,9 +23,7 @@
  */
 package com.unitedjiga.common.parsing.grammar.impl;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import com.unitedjiga.common.parsing.grammar.Expression;
 import com.unitedjiga.common.parsing.grammar.ProductionSet;
@@ -35,31 +33,22 @@ import com.unitedjiga.common.parsing.grammar.SequenceExpression;
  *
  * @author Junji Mikami
  */
-class DefaultSequenceExpression extends AbstractExpression implements SequenceExpression {
-    static class Builder extends AbstractExpression.QuantifiableBuilder implements SequenceExpression.Builder {
-        private final List<Expression.Builder> builders = new ArrayList<>();
+class DefaultSequenceExpression extends AbstractCompositeExpression implements SequenceExpression {
+    static class Builder extends AbstractCompositeExpression.Builder implements SequenceExpression.Builder {
 
         Builder() {
         }
 
         @Override
-        protected void checkForBuild() {
-            super.checkForBuild();
-            if (builders.isEmpty()) {
-                throw new IllegalStateException(Message.NO_ELELEMNTS_BUILD.format());
-            }
-        }
-
-        @Override
         public Builder add(Expression.Builder builder) {
-            check(builder);
+            checkParameter(builder);
             builders.add(builder);
             return this;
         }
 
         @Override
         public Builder add(String reference) {
-            check(reference);
+            checkParameter(reference);
             builders.add(new DefaultReferenceExpression.Builder(reference));
             return this;
         }
@@ -73,11 +62,8 @@ class DefaultSequenceExpression extends AbstractExpression implements SequenceEx
 
     }
 
-    private final List<? extends Expression> elements;
-
     private DefaultSequenceExpression(List<Expression> elements) {
-        assert elements != null;
-        this.elements = Objects.requireNonNull(elements);
+        super(elements);
     }
 
     @Override

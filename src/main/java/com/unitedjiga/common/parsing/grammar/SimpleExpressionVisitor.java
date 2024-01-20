@@ -21,51 +21,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.unitedjiga.common.parsing.impl;
-
-import com.unitedjiga.common.parsing.grammar.ChoiceExpression;
-import com.unitedjiga.common.parsing.grammar.Expression;
-import com.unitedjiga.common.parsing.grammar.ExpressionVisitor;
-import com.unitedjiga.common.parsing.grammar.PatternExpression;
-import com.unitedjiga.common.parsing.grammar.QuantifierExpression;
-import com.unitedjiga.common.parsing.grammar.ReferenceExpression;
-import com.unitedjiga.common.parsing.grammar.SequenceExpression;
+package com.unitedjiga.common.parsing.grammar;
 
 /**
  * @author Mikami Junji
  *
  */
-interface SimpleExpressionVisitor<R, P> extends ExpressionVisitor<R, P> {
+public interface SimpleExpressionVisitor<R, P> extends ExpressionVisitor<R, P> {
 
     @Override
-    public default R visitChoice(ChoiceExpression prd, P p) {
-        return defaultAction(prd, p);
+    public default R visitChoice(ChoiceExpression choice, P p) {
+        return defaultAction(choice, p);
     }
 
     @Override
-    public default R visitSequence(SequenceExpression prd, P p) {
-        return defaultAction(prd, p);
+    public default R visitSequence(SequenceExpression sequence, P p) {
+        return defaultAction(sequence, p);
     }
 
     @Override
-    public default R visitPattern(PatternExpression prd, P p) {
-        return defaultAction(prd, p);
+    public default R visitPattern(PatternExpression pattern, P p) {
+        return defaultAction(pattern, p);
     }
 
     @Override
-    public default R visitReference(ReferenceExpression prd, P p) {
-        return defaultAction(prd, p);
+    public default R visitReference(ReferenceExpression reference, P p) {
+        return defaultAction(reference, p);
     }
 
     @Override
-    public default R visitQuantifier(QuantifierExpression prd, P p) {
-        return defaultAction(prd, p);
+    public default R visitQuantifier(QuantifierExpression quantifier, P p) {
+        return defaultAction(quantifier, p);
     }
 
     @Override
-    public default R visitEmpty(Expression prd, P p) {
-        return defaultAction(prd, p);
+    public default R visitEmpty(Expression empty, P p) {
+        return defaultAction(empty, p);
     }
 
-    public R defaultAction(Expression prd, P p);
+    public R defaultAction(Expression expression, P p);
 }

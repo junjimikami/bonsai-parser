@@ -23,7 +23,6 @@
  */
 package com.unitedjiga.common.parsing.grammar.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.unitedjiga.common.parsing.grammar.ChoiceExpression;
@@ -35,31 +34,22 @@ import com.unitedjiga.common.parsing.grammar.ProductionSet;
  * @author Junji Mikami
  *
  */
-class DefaultChoiceExpression extends AbstractExpression implements ChoiceExpression {
-    static class Builder extends AbstractExpression.QuantifiableBuilder implements ChoiceExpression.Builder {
-        private final List<Expression.Builder> builders = new ArrayList<>();
+class DefaultChoiceExpression extends AbstractCompositeExpression implements ChoiceExpression {
+    static class Builder extends AbstractCompositeExpression.Builder implements ChoiceExpression.Builder {
 
         Builder() {
         }
 
         @Override
-        protected void checkForBuild() {
-            super.checkForBuild();
-            if (builders.isEmpty()) {
-                throw new IllegalStateException(Message.NO_ELELEMNTS_BUILD.format());
-            }
-        }
-
-        @Override
         public Builder add(Expression.Builder builder) {
-            check(builder);
+            checkParameter(builder);
             builders.add(builder);
             return this;
         }
 
         @Override
         public Builder add(String reference) {
-            check(reference);
+            checkParameter(reference);
             builders.add(new DefaultReferenceExpression.Builder(reference));
             return this;
         }
@@ -88,11 +78,8 @@ class DefaultChoiceExpression extends AbstractExpression implements ChoiceExpres
         }
     };
 
-    private final List<? extends Expression> elements;
-
     private DefaultChoiceExpression(List<? extends Expression> elements) {
-        assert elements != null;
-        this.elements = elements;
+        super(elements);
     }
 
     @Override

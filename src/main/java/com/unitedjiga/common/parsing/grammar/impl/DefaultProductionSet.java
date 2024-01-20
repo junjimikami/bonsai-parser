@@ -1,6 +1,7 @@
 package com.unitedjiga.common.parsing.grammar.impl;
 
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -9,21 +10,28 @@ import com.unitedjiga.common.parsing.grammar.Production;
 import com.unitedjiga.common.parsing.grammar.ProductionSet;
 
 class DefaultProductionSet implements ProductionSet {
+    private final Map<String, Production> map = new HashMap<>();
 
-    private final Set<Production> set = new HashSet<>();
+    DefaultProductionSet(Set<String> keys) {
+        keys.forEach(key -> map.put(key, null));
+    }
 
-    DefaultProductionSet() {
+    @Override
+    public boolean contains(String symbol) {
+        return map.containsKey(symbol);
     }
 
     @Override
     public Production get(String symbol) {
-        return set.stream()
-                .filter(p -> p.getSymbol().equals(symbol))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException(Message.NO_SUCH_SYMBOL.format(symbol)));
+        var p = map.get(symbol);
+        if (p == null) {
+            throw new NoSuchElementException(Message.NO_SUCH_SYMBOL.format(symbol));
+        }
+        return p;
     }
 
     void add(String symbol, Expression expression) {
-        set.add(new DefaultProduction(symbol, expression));
+        var production = new DefaultProduction(symbol, expression);
+        map.put(symbol, production);
     }
 }

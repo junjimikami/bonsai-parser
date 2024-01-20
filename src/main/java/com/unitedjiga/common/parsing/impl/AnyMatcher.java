@@ -25,6 +25,7 @@ package com.unitedjiga.common.parsing.impl;
 
 import com.unitedjiga.common.parsing.grammar.Expression;
 import com.unitedjiga.common.parsing.grammar.PatternExpression;
+import com.unitedjiga.common.parsing.grammar.SimpleExpressionVisitor;
 
 /**
  * @author Mikami Junji

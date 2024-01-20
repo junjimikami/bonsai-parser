@@ -30,4 +30,7 @@ package com.unitedjiga.common.parsing;
 public interface Token extends Terminal {
 
     public String getValue();
+
+    @Override
+    public String toString();
 }

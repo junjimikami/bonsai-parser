@@ -1,6 +1,6 @@
 package com.unitedjiga.common.parsing.grammar;
 
-public interface Quantifiable {
+public interface Quantifiable extends Expression.Builder {
 
     public default QuantifierExpression.Builder opt() {
         return range(0, 1);

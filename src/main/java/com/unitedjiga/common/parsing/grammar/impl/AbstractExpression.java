@@ -34,13 +34,16 @@ import com.unitedjiga.common.parsing.grammar.QuantifierExpression;
 abstract class AbstractExpression implements Expression {
 
     static abstract class Builder extends BuilderSupport implements Expression.Builder {
-
     }
 
     static abstract class QuantifiableBuilder extends Builder implements Quantifiable {
+        protected void checkForQuantifiable() {
+            check();
+        }
 
         @Override
         public QuantifierExpression.Builder atLeast(int times) {
+            checkForQuantifiable();
             if (times < 0) {
                 throw new IllegalArgumentException(Message.NEGATIVE_PARAMETER.format());
             }
@@ -49,6 +52,7 @@ abstract class AbstractExpression implements Expression {
 
         @Override
         public QuantifierExpression.Builder range(int from, int to) {
+            checkForQuantifiable();
             if (from < 0) {
                 throw new IllegalArgumentException(Message.NEGATIVE_PARAMETER.format());
             }
@@ -58,4 +62,5 @@ abstract class AbstractExpression implements Expression {
             return new DefaultQuantifierExpression.Builder(this, from, to);
         }
     }
+
 }

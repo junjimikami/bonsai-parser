@@ -25,7 +25,5 @@ public interface Grammar {
     
     public ProductionSet productionSet();
     
-    public default Production getStart() {
-        return productionSet().get(getStartSymbol());
-    }
+    public Production getStart();
 }

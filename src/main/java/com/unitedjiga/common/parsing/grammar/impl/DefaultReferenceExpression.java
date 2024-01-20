@@ -23,8 +23,8 @@
  */
 package com.unitedjiga.common.parsing.grammar.impl;
 
+import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.function.Supplier;
 
 import com.unitedjiga.common.parsing.grammar.Production;
 import com.unitedjiga.common.parsing.grammar.ProductionSet;
@@ -47,21 +47,27 @@ class DefaultReferenceExpression extends AbstractExpression implements Reference
         public ReferenceExpression build(ProductionSet set) {
             checkForBuild();
             Objects.requireNonNull(set, Message.NULL_PARAMETER.format());
-            return new DefaultReferenceExpression(() -> set.get(symbol));
+            if (!set.contains(symbol)) {
+                throw new NoSuchElementException(Message.NO_SUCH_SYMBOL.format(symbol));
+            }
+            return new DefaultReferenceExpression(set, symbol);
         }
 
     }
 
-    private final Supplier<Production> production;
+    private final ProductionSet set;
+    private final String symbol;
 
-    private DefaultReferenceExpression(Supplier<Production> production) {
-        assert production != null;
-        this.production = production;
+    private DefaultReferenceExpression(ProductionSet set, String symbol) {
+        assert set != null;
+        assert symbol != null;
+        this.set = set;
+        this.symbol = symbol;
     }
 
     @Override
     public Production get() {
-        return production.get();
+        return set.get(symbol);
     }
 
 }

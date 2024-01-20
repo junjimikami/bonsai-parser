@@ -11,7 +11,7 @@ abstract class BuilderSupport {
         }
     }
 
-    protected void check(Object o) {
+    protected void checkParameter(Object o) {
         check();
         Objects.requireNonNull(o, Message.NULL_PARAMETER.format());
     }

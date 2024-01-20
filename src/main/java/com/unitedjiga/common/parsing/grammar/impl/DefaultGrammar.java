@@ -2,11 +2,13 @@ package com.unitedjiga.common.parsing.grammar.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
 import com.unitedjiga.common.parsing.grammar.Expression;
 import com.unitedjiga.common.parsing.grammar.Grammar;
+import com.unitedjiga.common.parsing.grammar.Production;
 import com.unitedjiga.common.parsing.grammar.ProductionSet;
 
 class DefaultGrammar implements Grammar {
@@ -32,7 +34,10 @@ class DefaultGrammar implements Grammar {
         protected void checkForBuild() {
             super.checkForBuild();
             if (startSymbol == null || builders.isEmpty()) {
-                throw new IllegalStateException(Message.NO_ELELEMNTS_BUILD.format());
+                throw new IllegalStateException(Message.NO_ELELEMNTS.format());
+            }
+            if (!builders.containsKey(startSymbol)) {
+                throw new NoSuchElementException(Message.NO_SUCH_SYMBOL.format(startSymbol));
             }
         }
 
@@ -52,21 +57,21 @@ class DefaultGrammar implements Grammar {
 
         @Override
         public Builder setSkipPattern(String regex) {
-            check(regex);
+            checkParameter(regex);
             var pattern = Pattern.compile(regex);
             return setSkipPattern(pattern);
         }
 
         @Override
         public Builder setSkipPattern(Pattern pattern) {
-            check(pattern);
+            checkParameter(pattern);
             this.skipPattern = pattern;
             return this;
         }
 
         @Override
         public Builder setStartSymbol(String symbol) {
-            check(symbol);
+            checkParameter(symbol);
             this.startSymbol = symbol;
             return this;
         }
@@ -74,11 +79,14 @@ class DefaultGrammar implements Grammar {
         @Override
         public Grammar build() {
             checkForBuild();
-            var set = new DefaultProductionSet();
+            var set = new DefaultProductionSet(builders.keySet());
             builders.forEach((symbol, builder) -> {
                 var expression = builder.build(set);
                 set.add(symbol, expression);
             });
+            if (!set.contains(startSymbol)) {
+                throw new NoSuchElementException(Message.NO_SUCH_SYMBOL.format(startSymbol));
+            }
             return new DefaultGrammar(set, startSymbol, skipPattern);
         }
     }
@@ -108,5 +116,10 @@ class DefaultGrammar implements Grammar {
     @Override
     public ProductionSet productionSet() {
         return set;
+    }
+
+    @Override
+    public Production getStart() {
+        return set.get(startSymbol);
     }
 }
