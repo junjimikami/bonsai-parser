@@ -24,6 +24,7 @@
 package com.unitedjiga.common.parsing.grammar.impl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.unitedjiga.common.parsing.grammar.ChoiceExpression;
 import com.unitedjiga.common.parsing.grammar.Expression;
@@ -85,5 +86,12 @@ class DefaultChoiceExpression extends AbstractCompositeExpression implements Cho
     @Override
     public List<? extends Expression> getChoices() {
         return elements;
+    }
+
+    @Override
+    public String toString() {
+        return elements.stream()
+                .map(Expression::toString)
+                .collect(Collectors.joining("|", "(", ")"));
     }
 }

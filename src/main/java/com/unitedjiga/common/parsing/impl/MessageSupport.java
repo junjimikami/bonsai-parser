@@ -11,20 +11,20 @@ final class MessageSupport {
     }
 
     static String tokenNotMatchExpression(Expression expression, Context context) {
-        var symbol = context.getProduction().getSymbol();
-        var firsetSet = FirstSet.of(expression, context.getFollowSet())
+        var symbol = context.production().getSymbol();
+        var firsetSet = FirstSet.of(expression, context.followSet())
                 .stream()
                 .map(Expression::toString)
                 .collect(Collectors.joining(", ", "[", "]"));
-        var token = context.getTokenizer().hasNext()
-                ? context.getTokenizer().next().toString()
+        var token = context.tokenizer().hasNext()
+                ? context.tokenizer().next().toString()
                 : "EOF";
         return Message.TOKEN_NOT_MATCH_EXPRESSION.format(symbol, firsetSet, token);
     }
 
     static String ambiguousChoice(Expression expression, Context context) {
-        var symbol = context.getProduction().getSymbol();
-        var firsetSet = FirstSet.of(expression, context.getFollowSet())
+        var symbol = context.production().getSymbol();
+        var firsetSet = FirstSet.of(expression, context.followSet())
                 .stream()
                 .map(Expression::toString)
                 .collect(Collectors.joining(", ", "[", "]"));
@@ -32,8 +32,8 @@ final class MessageSupport {
     }
 
     static String tokenCountOutOfRange(QuantifierExpression quantfier, Context context, int count) {
-        var symbol = context.getProduction().getSymbol();
-        var firsetSet = FirstSet.of(quantfier, context.getFollowSet())
+        var symbol = context.production().getSymbol();
+        var firsetSet = FirstSet.of(quantfier, context.followSet())
                 .stream()
                 .map(Expression::toString)
                 .collect(Collectors.joining(", ", "[", "]"));

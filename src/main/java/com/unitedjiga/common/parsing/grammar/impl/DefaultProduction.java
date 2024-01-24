@@ -9,8 +9,7 @@ class DefaultProduction implements Production {
 
     private final String symbol;
     private final Expression expression;
-    
-    
+
     /**
      * @param symbol
      * @param expression
@@ -26,9 +25,14 @@ class DefaultProduction implements Production {
     public String getSymbol() {
         return symbol;
     }
-    
+
     @Override
     public Expression getExpression() {
         return expression;
+    }
+
+    @Override
+    public String toString() {
+        return "%s::=%s".formatted(symbol, expression);
     }
 }

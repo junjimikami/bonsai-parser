@@ -18,22 +18,24 @@ class DefaultParser implements Parser {
         Objects.requireNonNull(grammar);
         Objects.requireNonNull(tokenizer);
         var production = grammar.getStart();
-        context = new Context(production, tokenizer, Set.of());
+        var skipPattern = grammar.getSkipPattern();
+        context = new Context(production, tokenizer, Set.of(), skipPattern);
     }
+
     @Override
     public Tree parse() {
         var tree = Interpreter.parse(context);
-        if (context.getTokenizer().hasNext()) {
-            throw new ParsingException(Message.TOKENS_REMAIND.format());
+        if (context.postCheck()) {
+            throw new ParsingException(Message.TOKENS_REMAINED.format());
         }
         return tree;
     }
-    
+
     @Override
     public NonTerminal parseNonTerminal() {
         return (NonTerminal) parse();
     }
-    
+
     @Override
     public Terminal parseTerminal() {
         return (Terminal) parse();

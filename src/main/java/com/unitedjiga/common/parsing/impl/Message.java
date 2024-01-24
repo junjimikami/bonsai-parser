@@ -37,7 +37,7 @@ enum Message {
     TOKEN_NOT_MATCH_EXPRESSION("In production rule {0}, {1} was expected, but {2} was found."),
     AMBIGUOUS_CHOICE("In production rule {0}, the choice expression {1} is ambiguous."),
     TOKEN_COUNT_OUT_OF_RANGE("In production rule {0}, {1} was expected to occur {2} times, but it occurred {3} times."),
-    TOKENS_REMAIND("EOF was expected, but tokens remained."),
+    TOKENS_REMAINED("EOF was expected, but tokens remained."),
     ;
 
     private final MessageFormat msg;

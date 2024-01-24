@@ -34,4 +34,9 @@ class DefaultProductionSet implements ProductionSet {
         var production = new DefaultProduction(symbol, expression);
         map.put(symbol, production);
     }
+
+    @Override
+    public String toString() {
+        return map.values().toString();
+    }
 }

@@ -254,6 +254,22 @@ class TokenizerTest {
             assertFalse(tokenizer.hasNext());
         }
 
+        @Test
+        void test17() {
+            var grammar = Grammar.builder()
+                    .setSkipPattern("\\s")
+                    .add("A", sequence()
+                            .add(pattern("1"))
+                            .add(choice()
+                                    .add(pattern("0"))
+                                    .addEmpty()))
+                    .build();
+            var factory = TokenizerFactory.newFactory(grammar);
+            var tokenizer = factory.createTokenizer(new StringReader("10"));
+            assertTrue(tokenizer.hasNext());
+            assertEquals("10", tokenizer.next().getValue());
+            assertFalse(tokenizer.hasNext());
+        }
     }
 
 }

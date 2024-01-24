@@ -51,10 +51,18 @@ final class Interpreter implements ExpressionVisitor<List<Tree>, Context> {
         return instance.interpret(context);
     }
 
-    Tree interpret(Context context) {
-        var production = context.getProduction();
+    private Tree interpret(Context context) {
+        var production = context.production();
         var trees = visit(production.getExpression(), context);
         return new DefaultNonTerminal(production.getSymbol(), trees);
+    }
+
+    @Override
+    public List<Tree> visit(Expression expression, Context context) {
+        if (!AnyMatcher.scan(expression, context)) {
+            context.skip();
+        }
+        return ExpressionVisitor.super.visit(expression, context);
     }
 
     @Override
@@ -75,9 +83,6 @@ final class Interpreter implements ExpressionVisitor<List<Tree>, Context> {
 
     @Override
     public List<Tree> visitSequence(SequenceExpression sequence, Context context) {
-        var production = context.getProduction();
-        var tokenizer = context.getTokenizer();
-        var followSet = context.getFollowSet();
         if (!AnyMatcher.scan(sequence, context)) {
             var message = MessageSupport.tokenNotMatchExpression(sequence, context);
             throw new ParsingException(message);
@@ -86,8 +91,8 @@ final class Interpreter implements ExpressionVisitor<List<Tree>, Context> {
         var subSequence = new LinkedList<>(sequence.getSequence());
         while (!subSequence.isEmpty()) {
             var expression = subSequence.remove();
-            followSet = FirstSet.of(subSequence, followSet);
-            var context2 = new Context(production, tokenizer, followSet);
+            var followSet = FirstSet.of(subSequence, context.followSet());
+            var context2 = context.withFollowSet(followSet);
             list.addAll(visit(expression, context2));
         }
         return list;
@@ -99,7 +104,7 @@ final class Interpreter implements ExpressionVisitor<List<Tree>, Context> {
             var message = MessageSupport.tokenNotMatchExpression(pattern, context);
             throw new ParsingException(message);
         }
-        var tokenizer = context.getTokenizer();
+        var tokenizer = context.tokenizer();
         var token = tokenizer.next(pattern.getPattern());
         return List.of(token);
     }
@@ -107,7 +112,7 @@ final class Interpreter implements ExpressionVisitor<List<Tree>, Context> {
     @Override
     public List<Tree> visitReference(ReferenceExpression reference, Context context) {
         var production = reference.get();
-        var context2 = new Context(production, context.getTokenizer(), context.getFollowSet());
+        var context2 = context.withProduction(production);
         var tree = interpret(context2);
         return List.of(tree);
     }

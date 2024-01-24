@@ -42,19 +42,17 @@ final class AnyMatcher implements SimpleExpressionVisitor<Boolean, Context> {
     }
 
     @Override
-    public Boolean visitPattern(PatternExpression pattern, Context args) {
-        var tokenizer = args.getTokenizer();
+    public Boolean visitPattern(PatternExpression pattern, Context context) {
+        var tokenizer = context.tokenizer();
         return tokenizer.hasNext(pattern.getPattern());
     }
 
     @Override
-    public Boolean defaultAction(Expression expression, Context args) {
-        var followSet = args.getFollowSet();
-        var firstSet = FirstSet.of(expression, followSet);
+    public Boolean defaultAction(Expression expression, Context context) {
+        var firstSet = FirstSet.of(expression, context.followSet());
         if (firstSet.isEmpty()) {
-            return !args.getTokenizer().hasNext();
+            return !context.tokenizer().hasNext();
         }
-        return firstSet.stream()
-                .anyMatch(e -> visit(e, args));
+        return firstSet.stream().anyMatch(e -> visit(e, context));
     }
 }

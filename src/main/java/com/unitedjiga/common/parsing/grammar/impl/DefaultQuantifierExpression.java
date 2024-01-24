@@ -95,4 +95,18 @@ class DefaultQuantifierExpression extends AbstractExpression implements Quantifi
         }
         return stream;
     }
+
+    @Override
+    public String toString() {
+        var sb = new StringBuilder();
+        sb.append(lowerLimit);
+        if (upperLimit.isEmpty()) {
+            sb.append("*");
+        } else if (lowerLimit != upperLimit.getAsInt()) {
+            sb.append("*");
+            sb.append(upperLimit.getAsInt());
+        }
+        sb.append(expression);
+        return sb.toString();
+    }
 }

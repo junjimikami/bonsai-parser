@@ -37,4 +37,17 @@ public interface Tokenizer {
     public Token next();
     public Token next(String regex);
     public Token next(Pattern pattern);
+
+    public default Tokenizer skip(String regex) {
+        while (hasNext(regex)) {
+            next(regex);
+        }
+        return this;
+    }
+    public default Tokenizer skip(Pattern pattern) {
+        while (hasNext(pattern)) {
+            next(pattern);
+        }
+        return this;
+    }
 }

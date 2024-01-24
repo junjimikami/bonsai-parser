@@ -66,4 +66,9 @@ class DefaultPatternExpression extends AbstractExpression implements PatternExpr
     public Pattern getPattern() {
         return pattern;
     }
+
+    @Override
+    public String toString() {
+        return "\"%s\"".formatted(pattern.pattern());
+    }
 }

@@ -52,6 +52,11 @@ public interface Expression {
         public <R, P> R accept(ExpressionVisitor<R, P> visitor, P p) {
             return visitor.visitEmpty(this, p);
         }
+        
+        @Override
+        public String toString() {
+            return "empty";
+        }
     };
 
     public <R, P> R accept(ExpressionVisitor<R, P> visitor, P p);

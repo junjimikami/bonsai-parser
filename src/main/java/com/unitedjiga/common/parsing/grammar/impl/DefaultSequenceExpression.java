@@ -24,6 +24,7 @@
 package com.unitedjiga.common.parsing.grammar.impl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.unitedjiga.common.parsing.grammar.Expression;
 import com.unitedjiga.common.parsing.grammar.ProductionSet;
@@ -69,5 +70,12 @@ class DefaultSequenceExpression extends AbstractCompositeExpression implements S
     @Override
     public List<? extends Expression> getSequence() {
         return elements;
+    }
+
+    @Override
+    public String toString() {
+        return elements.stream()
+                .map(Expression::toString)
+                .collect(Collectors.joining(",", "(", ")"));
     }
 }

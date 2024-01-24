@@ -70,4 +70,8 @@ class DefaultReferenceExpression extends AbstractExpression implements Reference
         return set.get(symbol);
     }
 
+    @Override
+    public String toString() {
+        return symbol;
+    }
 }

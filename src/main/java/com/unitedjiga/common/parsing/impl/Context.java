@@ -24,6 +24,7 @@
 package com.unitedjiga.common.parsing.impl;
 
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.grammar.Expression;
@@ -33,28 +34,32 @@ import com.unitedjiga.common.parsing.grammar.Production;
  * @author Mikami Junji
  *
  */
-class Context {
+record Context(Production production, Tokenizer tokenizer, Set<Expression> followSet, Pattern skipPattern) {
 
-    private final Production production;
-    private final Tokenizer tokenizer;
-    private final Set<Expression> followSet;
-
-    Context(Production production, Tokenizer tokenizer, Set<Expression> followSet) {
-        super();
-        this.production = production;
-        this.tokenizer = tokenizer;
-        this.followSet = followSet;
+    Context withProduction(Production production) {
+        return new Context(production, this.tokenizer, this.followSet, this.skipPattern);
     }
 
-    Production getProduction() {
-        return production;
+    Context withFollowSet(Set<Expression> followSet) {
+        return new Context(this.production, this.tokenizer, followSet, this.skipPattern);
     }
 
-    Tokenizer getTokenizer() {
-        return tokenizer;
+    void skip() {
+        if (skipPattern != null) {
+            tokenizer.skip(skipPattern);
+        }
+    }
+    boolean preCheck() {
+        var expression = production().getExpression();
+        if (!AnyMatcher.scan(expression, this)) {
+            skip();
+        }
+        return tokenizer().hasNext();
     }
 
-    Set<Expression> getFollowSet() {
-        return followSet;
+    boolean postCheck() {
+        skip();
+        return tokenizer().hasNext();
     }
+
 }

@@ -63,14 +63,15 @@ class DefaultTokenizer implements Tokenizer {
         Objects.requireNonNull(grammar);
         Objects.requireNonNull(tokenizer);
         var production = grammar.getStart();
-        context = new Context(production, tokenizer, Set.of());
+        var skipPattern = grammar.getSkipPattern();
+        context = new Context(production, tokenizer, Set.of(), skipPattern);
     }
 
     private String read() {
         if (nextToken != null) {
             return nextToken;
         }
-        if (!context.getTokenizer().hasNext()) {
+        if (!context.preCheck()) {
             return null;
         }
         nextToken = Interpreter.parse(context)
