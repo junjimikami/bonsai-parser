@@ -254,7 +254,7 @@ class ChoiceExpressionTest implements ExpressionTest {
 
         assertIterableEquals(list, choice.getChoices().stream()
                 .map(e -> (ReferenceExpression) e)
-                .map(e -> e.get().getSymbol())
+                .map(e -> e.getProduction().getSymbol())
                 .toList());
     }
 

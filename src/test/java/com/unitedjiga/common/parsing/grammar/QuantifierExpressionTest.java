@@ -122,8 +122,8 @@ class QuantifierExpressionTest implements ExpressionTest {
     void opt() throws Exception {
         var quantifier = PatternExpression.builder("").opt().build();
 
-        assertEquals(0, quantifier.getLowerLimit());
-        assertEquals(1, quantifier.getUpperLimit().getAsInt());
+        assertEquals(0, quantifier.getMinCount());
+        assertEquals(1, quantifier.getMaxCount().getAsInt());
         assertEquals(1, quantifier.stream().count());
     }
 
@@ -132,8 +132,8 @@ class QuantifierExpressionTest implements ExpressionTest {
     void zeroOrMore() throws Exception {
         var quantifier = PatternExpression.builder("").zeroOrMore().build();
 
-        assertEquals(0, quantifier.getLowerLimit());
-        assertEquals(true, quantifier.getUpperLimit().isEmpty());
+        assertEquals(0, quantifier.getMinCount());
+        assertEquals(true, quantifier.getMaxCount().isEmpty());
     }
 
     @Test
@@ -141,8 +141,8 @@ class QuantifierExpressionTest implements ExpressionTest {
     void oneOrMore() throws Exception {
         var quantifier = PatternExpression.builder("").oneOrMore().build();
 
-        assertEquals(1, quantifier.getLowerLimit());
-        assertEquals(true, quantifier.getUpperLimit().isEmpty());
+        assertEquals(1, quantifier.getMinCount());
+        assertEquals(true, quantifier.getMaxCount().isEmpty());
     }
 
     @Test
@@ -150,8 +150,8 @@ class QuantifierExpressionTest implements ExpressionTest {
     void exactly() throws Exception {
         var quantifier = PatternExpression.builder("").exactly(0).build();
 
-        assertEquals(0, quantifier.getLowerLimit());
-        assertEquals(0, quantifier.getUpperLimit().getAsInt());
+        assertEquals(0, quantifier.getMinCount());
+        assertEquals(0, quantifier.getMaxCount().getAsInt());
     }
 
     @ParameterizedTest
@@ -160,8 +160,8 @@ class QuantifierExpressionTest implements ExpressionTest {
     void atLeast(int times) throws Exception {
         var quantifier = PatternExpression.builder("").atLeast(times).build();
 
-        assertEquals(times, quantifier.getLowerLimit());
-        assertEquals(true, quantifier.getUpperLimit().isEmpty());
+        assertEquals(times, quantifier.getMinCount());
+        assertEquals(true, quantifier.getMaxCount().isEmpty());
     }
 
     @ParameterizedTest
@@ -173,8 +173,8 @@ class QuantifierExpressionTest implements ExpressionTest {
     void range(int min, int max) throws Exception {
         var quantifier = PatternExpression.builder("").range(min, max).build();
 
-        assertEquals(min, quantifier.getLowerLimit());
-        assertEquals(max, quantifier.getUpperLimit().getAsInt());
+        assertEquals(min, quantifier.getMinCount());
+        assertEquals(max, quantifier.getMaxCount().getAsInt());
     }
 
 }

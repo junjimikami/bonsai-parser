@@ -280,7 +280,7 @@ class GrammarTest {
                 .add("A", Stubs.DUMMY_EXPRESSION_BUILDER)
                 .build();
 
-        assertEquals("S", grammar.getStart().getSymbol());
+        assertEquals("S", grammar.getStartProduction().getSymbol());
     }
 
     @Test
@@ -292,7 +292,7 @@ class GrammarTest {
                 .setStartSymbol("A")
                 .build();
         
-        assertEquals("A", grammar.getStart().getSymbol());
+        assertEquals("A", grammar.getStartProduction().getSymbol());
     }
     
 }

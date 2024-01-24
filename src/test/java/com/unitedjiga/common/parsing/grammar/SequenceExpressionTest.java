@@ -251,7 +251,7 @@ class SequenceExpressionTest implements ExpressionTest {
 
         assertIterableEquals(list, sequence.getSequence().stream()
                 .map(e -> (ReferenceExpression) e)
-                .map(e -> e.get().getSymbol())
+                .map(e -> e.getProduction().getSymbol())
                 .toList());
     }
 

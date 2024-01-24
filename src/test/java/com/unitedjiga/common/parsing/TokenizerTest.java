@@ -3,10 +3,7 @@ package com.unitedjiga.common.parsing;
 import static com.unitedjiga.common.parsing.grammar.Expressions.choice;
 import static com.unitedjiga.common.parsing.grammar.Expressions.pattern;
 import static com.unitedjiga.common.parsing.grammar.Expressions.sequence;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.StringReader;
 
@@ -17,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import com.unitedjiga.common.parsing.grammar.Expression;
 import com.unitedjiga.common.parsing.grammar.Grammar;
 
 class TokenizerTest {
@@ -268,6 +266,20 @@ class TokenizerTest {
             var tokenizer = factory.createTokenizer(new StringReader("10"));
             assertTrue(tokenizer.hasNext());
             assertEquals("10", tokenizer.next().getValue());
+            assertFalse(tokenizer.hasNext());
+        }
+        
+        @Test
+        void test18() throws Exception {
+            var grammar = Grammar.builder()
+                    .add("A", sequence()
+                            .add(pattern("1"))
+                            .add(set -> Expression.EMPTY))
+                    .build();
+            var factory = TokenizerFactory.newFactory(grammar);
+            var tokenizer = factory.createTokenizer(new StringReader("1"));
+            assertTrue(tokenizer.hasNext());
+            assertEquals("1", tokenizer.next().getValue());
             assertFalse(tokenizer.hasNext());
         }
     }

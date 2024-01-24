@@ -52,5 +52,5 @@ public interface ReferenceExpression extends Expression {
         return visitor.visitReference(this, p);
     }
     
-    public Production get();
+    public Production getProduction();
 }

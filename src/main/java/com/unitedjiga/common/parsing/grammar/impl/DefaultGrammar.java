@@ -119,7 +119,7 @@ class DefaultGrammar implements Grammar {
     }
 
     @Override
-    public Production getStart() {
+    public Production getStartProduction() {
         return set.get(startSymbol);
     }
 }

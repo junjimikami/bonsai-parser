@@ -25,5 +25,5 @@ public interface Grammar {
     
     public ProductionSet productionSet();
     
-    public Production getStart();
+    public Production getStartProduction();
 }

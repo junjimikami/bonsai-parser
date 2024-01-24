@@ -62,7 +62,7 @@ class DefaultTokenizer implements Tokenizer {
     DefaultTokenizer(Grammar grammar, Tokenizer tokenizer) {
         Objects.requireNonNull(grammar);
         Objects.requireNonNull(tokenizer);
-        var production = grammar.getStart();
+        var production = grammar.getStartProduction();
         var skipPattern = grammar.getSkipPattern();
         context = new Context(production, tokenizer, Set.of(), skipPattern);
     }

@@ -78,7 +78,7 @@ class ReferenceExpressionTest implements ExpressionTest {
     void get() throws Exception {
         var symbol = "S";
         var reference = ReferenceExpression.builder(symbol).build(Stubs.DUMMY_PRODUCTION_SET);
-        var production = reference.get();
+        var production = reference.getProduction();
 
         assertEquals(symbol, production.getSymbol());
     }

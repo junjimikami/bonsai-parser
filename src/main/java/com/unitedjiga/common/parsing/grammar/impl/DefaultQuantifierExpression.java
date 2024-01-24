@@ -78,12 +78,12 @@ class DefaultQuantifierExpression extends AbstractExpression implements Quantifi
     }
 
     @Override
-    public int getLowerLimit() {
+    public int getMinCount() {
         return lowerLimit;
     }
 
     @Override
-    public OptionalInt getUpperLimit() {
+    public OptionalInt getMaxCount() {
         return upperLimit;
     }
 

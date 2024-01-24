@@ -111,7 +111,7 @@ final class Interpreter implements ExpressionVisitor<List<Tree>, Context> {
 
     @Override
     public List<Tree> visitReference(ReferenceExpression reference, Context context) {
-        var production = reference.get();
+        var production = reference.getProduction();
         var context2 = context.withProduction(production);
         var tree = interpret(context2);
         return List.of(tree);
@@ -129,8 +129,8 @@ final class Interpreter implements ExpressionVisitor<List<Tree>, Context> {
                     return true;
                 })
                 .count();
-        var lowerLimit = quantfier.getLowerLimit();
-        var upperLimit = quantfier.getUpperLimit().orElse(count);
+        var lowerLimit = quantfier.getMinCount();
+        var upperLimit = quantfier.getMaxCount().orElse(count);
         if (count < lowerLimit || upperLimit < count) {
             var message = MessageSupport.tokenCountOutOfRange(quantfier, context, count);
             throw new ParsingException(message);

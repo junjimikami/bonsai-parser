@@ -49,7 +49,7 @@ public interface QuantifierExpression extends Expression {
         return visitor.visitQuantifier(this, p);
     }
 
-    public int getLowerLimit();
-    public OptionalInt getUpperLimit();
+    public int getMinCount();
+    public OptionalInt getMaxCount();
     public Stream<Expression> stream();
 }

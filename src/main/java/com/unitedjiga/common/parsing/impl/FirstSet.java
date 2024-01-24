@@ -96,7 +96,7 @@ final class FirstSet implements ExpressionVisitor<Set<Expression>, Set<Expressio
 
     @Override
     public Set<Expression> visitReference(ReferenceExpression ref, Set<Expression> followSet) {
-        var production = ref.get();
+        var production = ref.getProduction();
         return visit(production.getExpression(), followSet);
     }
 
@@ -109,7 +109,7 @@ final class FirstSet implements ExpressionVisitor<Set<Expression>, Set<Expressio
         if (prd.isPresent()) {
             set.addAll(visit(prd.get()));
         }
-        if (qt.getLowerLimit() == 0) {
+        if (qt.getMinCount() == 0) {
             set.addAll(followSet);
         }
         return set;

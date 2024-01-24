@@ -37,9 +37,9 @@ final class MessageSupport {
                 .stream()
                 .map(Expression::toString)
                 .collect(Collectors.joining(", ", "[", "]"));
-        var from = quantfier.getLowerLimit();
-        if (quantfier.getUpperLimit().isPresent()) {
-            var to = quantfier.getUpperLimit().getAsInt();
+        var from = quantfier.getMinCount();
+        if (quantfier.getMaxCount().isPresent()) {
+            var to = quantfier.getMaxCount().getAsInt();
             return Message.TOKEN_COUNT_OUT_OF_RANGE.format(symbol, firsetSet, "%d-%d".formatted(from, to), count);
         }
         return Message.TOKEN_COUNT_OUT_OF_RANGE.format(symbol, firsetSet, from, count);

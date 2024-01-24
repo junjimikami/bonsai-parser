@@ -66,7 +66,7 @@ class DefaultReferenceExpression extends AbstractExpression implements Reference
     }
 
     @Override
-    public Production get() {
+    public Production getProduction() {
         return set.get(symbol);
     }
 
