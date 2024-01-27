@@ -36,9 +36,7 @@ public interface SequenceExpression extends Expression {
     public static interface Builder extends Expression.Builder, Quantifiable {
         public SequenceExpression.Builder add(Expression.Builder builder);
         public SequenceExpression.Builder add(String reference);
-        public default SequenceExpression build() {
-            return build(null);
-        }
+        @Override
         public SequenceExpression build(ProductionSet set);
     }
 

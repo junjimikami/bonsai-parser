@@ -45,9 +45,13 @@ record Context(Production production, Tokenizer tokenizer, Set<Expression> follo
     }
 
     void skip() {
-        if (skipPattern != null) {
-            tokenizer.skip(skipPattern);
+        if (skipPattern == null) {
+            return;
         }
+        if (!tokenizer.hasNext(skipPattern)) {
+            return;
+        }
+        tokenizer.skip(skipPattern);
     }
     boolean preCheck() {
         var expression = production().getExpression();

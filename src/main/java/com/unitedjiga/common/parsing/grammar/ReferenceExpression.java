@@ -32,9 +32,7 @@ import com.unitedjiga.common.parsing.grammar.impl.GrammarService;
 public interface ReferenceExpression extends Expression {
 
     public static interface Builder extends Expression.Builder, Quantifiable {
-        public default ReferenceExpression build() {
-            return build(null);
-        }
+        @Override
         public ReferenceExpression build(ProductionSet set);
     }
 

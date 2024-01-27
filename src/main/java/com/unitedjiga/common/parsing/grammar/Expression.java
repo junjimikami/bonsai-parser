@@ -33,12 +33,9 @@ public interface Expression {
         PATTERN, SEQUENCE, CHOICE, REFERENCE, QUANTIFIER, EMPTY;
     }
 
+    @FunctionalInterface
     public static interface Builder {
         public Expression build(ProductionSet set);
-
-        public default Expression build() {
-            return build(null);
-        }
     }
 
     public static final Expression EMPTY = new Expression() {

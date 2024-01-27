@@ -4,36 +4,27 @@ import static com.unitedjiga.common.parsing.grammar.Expressions.choice;
 import static com.unitedjiga.common.parsing.grammar.Expressions.pattern;
 import static com.unitedjiga.common.parsing.grammar.Expressions.sequence;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
+import java.io.Reader;
 import java.io.StringReader;
+import java.io.UncheckedIOException;
+import java.util.NoSuchElementException;
+import java.util.function.Consumer;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import com.unitedjiga.common.parsing.grammar.Expression;
 import com.unitedjiga.common.parsing.grammar.Grammar;
 
 class TokenizerTest {
-
-    @BeforeAll
-    static void setUpBeforeClass() throws Exception {
-    }
-
-    @AfterAll
-    static void tearDownAfterClass() throws Exception {
-    }
-
-    @BeforeEach
-    void setUp() throws Exception {
-    }
-
-    @AfterEach
-    void tearDown() throws Exception {
-    }
 
     @Nested
     class MonkeyTest {
@@ -268,7 +259,7 @@ class TokenizerTest {
             assertEquals("10", tokenizer.next().getValue());
             assertFalse(tokenizer.hasNext());
         }
-        
+
         @Test
         void test18() throws Exception {
             var grammar = Grammar.builder()
@@ -284,4 +275,424 @@ class TokenizerTest {
         }
     }
 
+    static Stream<Arguments> allMethods() {
+        return Stream.of(
+                arguments("hasNext()", (Consumer<Tokenizer>) t -> t.hasNext()),
+                arguments("hasNext(String)", (Consumer<Tokenizer>) t -> t.hasNext("")),
+                arguments("hasNext(Pattern)", (Consumer<Tokenizer>) t -> t.hasNext(Pattern.compile(""))),
+                arguments("next()", (Consumer<Tokenizer>) t -> t.next()),
+                arguments("next(String)", (Consumer<Tokenizer>) t -> t.next("")),
+                arguments("next(Pattern)", (Consumer<Tokenizer>) t -> t.next(Pattern.compile(""))),
+                arguments("skip(String)", (Consumer<Tokenizer>) t -> t.skip("")),
+                arguments("skip(Pattern)", (Consumer<Tokenizer>) t -> t.skip(Pattern.compile(""))));
+    }
+
+    @DisplayName("[Stream closed]")
+    @ParameterizedTest(name = "{0} {displayName}")
+    @MethodSource("allMethods")
+    void streamClosed(String name, Consumer<Tokenizer> method) throws Exception {
+        var factory = TokenizerFactory.newFactory(Stubs.DUMMY_GRAMMAR);
+        var tokenizer = factory.createTokenizer(Stubs.closedReader());
+
+        assertThrows(UncheckedIOException.class, () -> method.accept(tokenizer))
+                .printStackTrace();
+    }
+
+    @DisplayName("[Ambiguous rule]")
+    @ParameterizedTest(name = "{0} {displayName}")
+    @MethodSource("allMethods")
+    void ambiguousRule(String name, Consumer<Tokenizer> method) throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", choice()
+                        .add("A")
+                        .add("B"))
+                .add("A", pattern("1"))
+                .add("B", pattern("."))
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader("1"));
+
+        assertThrows(ParsingException.class, () -> method.accept(tokenizer))
+                .printStackTrace();
+    }
+
+    @DisplayName("[Occurrence count out of range]")
+    @ParameterizedTest(name = "{0} {displayName}")
+    @MethodSource("allMethods")
+    void occurrenceCountOutOfRange(String name, Consumer<Tokenizer> method) throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", pattern("1").range(3, 5))
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader("11"));
+
+        assertThrows(ParsingException.class, () -> method.accept(tokenizer))
+                .printStackTrace();
+    }
+
+    @DisplayName("[Token not match pattern rule]")
+    @ParameterizedTest(name = "{0} {displayName}")
+    @MethodSource("allMethods")
+    void tokenNotMatchPatternRule(String name, Consumer<Tokenizer> method) throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", pattern("0"))
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader("1"));
+
+        assertThrows(ParsingException.class, () -> method.accept(tokenizer))
+                .printStackTrace();
+    }
+
+    @DisplayName("[Token not match choice rule]")
+    @ParameterizedTest(name = "{0} {displayName}")
+    @MethodSource("allMethods")
+    void tokenNotMatchChoiceRule(String name, Consumer<Tokenizer> method) throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", choice()
+                        .add(pattern("0")))
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader("1"));
+
+        assertThrows(ParsingException.class, () -> method.accept(tokenizer))
+                .printStackTrace();
+    }
+
+    @DisplayName("[Token not match sequence rule]")
+    @ParameterizedTest(name = "{0} {displayName}")
+    @MethodSource("allMethods")
+    void tokenNotMatchSequenceRule(String name, Consumer<Tokenizer> method) throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", sequence()
+                        .add(pattern("0")))
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader("1"));
+
+        assertThrows(ParsingException.class, () -> method.accept(tokenizer))
+                .printStackTrace();
+    }
+
+    @DisplayName("[Token not match empty rule]")
+    @ParameterizedTest(name = "{0} {displayName}")
+    @MethodSource("allMethods")
+    void tokenNotMatchEmptyRule(String name, Consumer<Tokenizer> method) throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", set -> Expression.EMPTY)
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader("1"));
+
+        assertThrows(ParsingException.class, () -> method.accept(tokenizer))
+                .printStackTrace();
+    }
+
+    @Test
+    @DisplayName("hasNext(st:String) [Null parameter]")
+    void hasNextStInCaseNullParameter() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", pattern("1"))
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader("1"));
+
+        assertThrows(NullPointerException.class, () -> tokenizer.hasNext((String) null))
+                .printStackTrace();
+    }
+
+    @Test
+    @DisplayName("hasNext(pa:Pattern) [Null parameter]")
+    void hasNextPaInCaseNullParameter() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", pattern("1"))
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader("1"));
+
+        assertThrows(NullPointerException.class, () -> tokenizer.hasNext((Pattern) null))
+                .printStackTrace();
+    }
+
+    @Test
+    @DisplayName("next(st:String) [Null parameter]")
+    void nextStInCaseNullParameter() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", pattern("1"))
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader("1"));
+
+        assertThrows(NullPointerException.class, () -> tokenizer.next((String) null))
+                .printStackTrace();
+    }
+
+    @Test
+    @DisplayName("next(pa:Pattern) [Null parameter]")
+    void nextPaInCaseNullParameter() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", pattern("1"))
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader("1"));
+
+        assertThrows(NullPointerException.class, () -> tokenizer.next((Pattern) null))
+                .printStackTrace();
+    }
+
+    @Test
+    @DisplayName("skip(st:String) [Null parameter]")
+    void skipStInCaseNullParameter() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", pattern("1"))
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader("1"));
+
+        assertThrows(NullPointerException.class, () -> tokenizer.skip((String) null))
+                .printStackTrace();
+    }
+
+    @Test
+    @DisplayName("skip(pa:Pattern) [Null parameter]")
+    void skipPaInCaseNullParameter() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", pattern("1"))
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader("1"));
+
+        assertThrows(NullPointerException.class, () -> tokenizer.skip((Pattern) null))
+                .printStackTrace();
+    }
+
+    @Test
+    @DisplayName("next(st:String) [No tokens matching pattern]")
+    void nextStInCaseNoTokensMatchingPattern() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", pattern("1"))
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader("1"));
+
+        assertThrows(NoSuchElementException.class, () -> tokenizer.next("2"))
+                .printStackTrace();
+    }
+
+    @Test
+    @DisplayName("next(pa:Pattern) [No tokens matching pattern]")
+    void nextPaInCaseNoTokensMatchingPattern() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", pattern("1"))
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader("1"));
+        var pattern = Pattern.compile("2");
+
+        assertThrows(NoSuchElementException.class, () -> tokenizer.next(pattern))
+                .printStackTrace();
+    }
+
+    @Test
+    @DisplayName("hasNext() [Token remaining]")
+    void hasNextInCaseTokenRemaining() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", pattern("1"))
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader("1"));
+
+        assertTrue(tokenizer.hasNext());
+    }
+
+    @Test
+    @DisplayName("hasNext(st:String) [Token remaining]")
+    void hasNextStInCaseTokenRemaining() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", pattern("1"))
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader("1"));
+
+        assertTrue(tokenizer.hasNext("1"));
+    }
+
+    @Test
+    @DisplayName("hasNext(pa:Pattern) [Token remaining]")
+    void hasNextPaInCaseTokenRemaining() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", pattern("1"))
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader("1"));
+        var pattern = Pattern.compile("1");
+
+        assertTrue(tokenizer.hasNext(pattern));
+    }
+
+    @Test
+    @DisplayName("hasNext() [No tokens remaining]")
+    void hasNextInCaseNoTokensRemaining() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", set -> Expression.EMPTY)
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(Reader.nullReader());
+
+        assertFalse(tokenizer.hasNext());
+    }
+
+    @Test
+    @DisplayName("hasNext(st:String) [No tokens remaining]")
+    void hasNextStInCaseNoTokensRemaining() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", set -> Expression.EMPTY)
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(Reader.nullReader());
+
+        assertFalse(tokenizer.hasNext(""));
+    }
+
+    @Test
+    @DisplayName("hasNext(pa:Pattern) [No tokens remaining]")
+    void hasNextPaInCaseNoTokensRemaining() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", set -> Expression.EMPTY)
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(Reader.nullReader());
+        var pattern = Pattern.compile("");
+
+        assertFalse(tokenizer.hasNext(pattern));
+    }
+
+    @Test
+    @DisplayName("next() [Token remaining]")
+    void nextInCaseTokenRemaining() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", pattern("1"))
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader("1"));
+
+        assertEquals("1", tokenizer.next().getValue());
+    }
+
+    @Test
+    @DisplayName("next(st:String) [Token remaining]")
+    void nextStInCaseTokenRemaining() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", pattern("1"))
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader("1"));
+
+        assertEquals("1", tokenizer.next("1").getValue());
+    }
+
+    @Test
+    @DisplayName("next(pa:Pattern) [Token remaining]")
+    void nextPaInCaseTokenRemaining() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", pattern("1"))
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader("1"));
+        var pattern = Pattern.compile("1");
+
+        assertEquals("1", tokenizer.next(pattern).getValue());
+    }
+
+    @Test
+    @DisplayName("next() [No tokens remaining]")
+    void nextInCaseNoTokensRemaining() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", set -> Expression.EMPTY)
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(Reader.nullReader());
+
+        assertThrows(NoSuchElementException.class, () -> tokenizer.next())
+                .printStackTrace();
+    }
+
+    @Test
+    @DisplayName("next(st:String) [No tokens remaining]")
+    void nextStInCaseNoTokensRemaining() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", set -> Expression.EMPTY)
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(Reader.nullReader());
+
+        assertThrows(NoSuchElementException.class, () -> tokenizer.next(""))
+                .printStackTrace();
+    }
+
+    @Test
+    @DisplayName("next(pa:Pattern) [No tokens remaining]")
+    void nextPaInCaseNoTokensRemaining() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", set -> Expression.EMPTY)
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(Reader.nullReader());
+        var pattern = Pattern.compile("");
+
+        assertThrows(NoSuchElementException.class, () -> tokenizer.next(pattern))
+                .printStackTrace();
+    }
+
+    @Test
+    @DisplayName("skip(st:String) [Token remaining]")
+    void skipStInCaseTokenRemaining() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", pattern("1"))
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader("1"));
+
+        assertFalse(tokenizer.skip("1").hasNext());
+    }
+
+    @Test
+    @DisplayName("skip(pa:Pattern) [Token remaining]")
+    void skipPaInCaseTokenRemaining() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", pattern("1"))
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader("1"));
+        var pattern = Pattern.compile("1");
+
+        assertFalse(tokenizer.skip(pattern).hasNext());
+    }
+
+    @Test
+    @DisplayName("skip(st:String) [No tokens remaining]")
+    void skipStInCaseNoTokensRemaining() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", pattern("1"))
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader("1"));
+
+        assertThrows(NoSuchElementException.class, () -> tokenizer.skip("2"))
+                .printStackTrace();
+    }
+
+    @Test
+    @DisplayName("skip(pa:Pattern) [No tokens remaining]")
+    void skipPaInCaseNoTokensRemaining() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", pattern("1"))
+                .build();
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader("1"));
+        var pattern = Pattern.compile("2");
+
+        assertThrows(NoSuchElementException.class, () -> tokenizer.skip(pattern))
+                .printStackTrace();
+    }
 }

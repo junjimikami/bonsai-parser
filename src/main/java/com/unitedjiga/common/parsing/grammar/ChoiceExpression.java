@@ -37,9 +37,7 @@ public interface ChoiceExpression extends Expression {
         public ChoiceExpression.Builder add(Expression.Builder builder);
         public ChoiceExpression.Builder add(String reference);
         public ChoiceExpression.Builder addEmpty();
-        public default ChoiceExpression build() {
-            return build(null);
-        }
+        @Override
         public ChoiceExpression build(ProductionSet set);
     }
 

@@ -259,22 +259,23 @@ class GrammarTest {
                 .add("S", Stubs.DUMMY_EXPRESSION_BUILDER)
                 .add("A", Stubs.DUMMY_EXPRESSION_BUILDER)
                 .build();
+        var productionSet = grammar.productionSet();
 
-        assertTrue(grammar.productionSet().contains("S"));
-        assertEquals("S", grammar.productionSet().get("S").getSymbol());
-        assertEquals(Stubs.DUMMY_EXPRESSION, grammar.productionSet().get("S").getExpression());
+        assertTrue(productionSet.contains("S"));
+        assertEquals("S", productionSet.get("S").getSymbol());
+        assertEquals(Stubs.DUMMY_EXPRESSION, productionSet.get("S").getExpression());
 
-        assertTrue(grammar.productionSet().contains("A"));
-        assertEquals("A", grammar.productionSet().get("A").getSymbol());
-        assertEquals(Stubs.DUMMY_EXPRESSION, grammar.productionSet().get("A").getExpression());
+        assertTrue(productionSet.contains("A"));
+        assertEquals("A", productionSet.get("A").getSymbol());
+        assertEquals(Stubs.DUMMY_EXPRESSION, productionSet.get("A").getExpression());
 
-        assertFalse(grammar.productionSet().contains("B"));
-        assertThrows(NoSuchElementException.class, () -> grammar.productionSet().get("B"));
+        assertFalse(productionSet.contains("B"));
+        assertThrows(NoSuchElementException.class, () -> productionSet.get("B"));
     }
 
     @Test
-    @DisplayName("getStart()")
-    void getStart() throws Exception {
+    @DisplayName("getStartProduction()")
+    void getStartProduction() throws Exception {
         var grammar = Grammar.builder()
                 .add("S", Stubs.DUMMY_EXPRESSION_BUILDER)
                 .add("A", Stubs.DUMMY_EXPRESSION_BUILDER)
@@ -284,8 +285,8 @@ class GrammarTest {
     }
 
     @Test
-    @DisplayName("getStart() [Start symbol changed]")
-    void getStartInCaseStartSymbolChanged() throws Exception {
+    @DisplayName("getStartProduction() [Start symbol changed]")
+    void getStartProductionInCaseStartSymbolChanged() throws Exception {
         var grammar = Grammar.builder()
                 .add("S", Stubs.DUMMY_EXPRESSION_BUILDER)
                 .add("A", Stubs.DUMMY_EXPRESSION_BUILDER)

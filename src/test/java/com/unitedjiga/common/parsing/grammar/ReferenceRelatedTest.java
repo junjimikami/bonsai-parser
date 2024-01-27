@@ -7,18 +7,8 @@ import java.util.NoSuchElementException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@FunctionalInterface
 interface ReferenceRelatedTest {
     Expression.Builder builder();
-
-    @Test
-    @DisplayName("build() [Null production set]")
-    default void buildInCaseNullProductionSet() throws Exception {
-        var builder = builder();
-
-        assertThrows(NullPointerException.class, () -> builder.build())
-                .printStackTrace();
-    }
 
     @Test
     @DisplayName("build(ps:ProductionSet) [Null production set]")

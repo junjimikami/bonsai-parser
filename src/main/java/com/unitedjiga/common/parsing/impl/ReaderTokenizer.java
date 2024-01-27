@@ -9,9 +9,8 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 import com.unitedjiga.common.parsing.Token;
-import com.unitedjiga.common.parsing.Tokenizer;
 
-class ReaderTokenizer implements Tokenizer {
+class ReaderTokenizer extends AbstractTokenizer {
 
     private final PushbackReader reader;
     private String nextToken;

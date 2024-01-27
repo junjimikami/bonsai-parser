@@ -2,7 +2,6 @@ package com.unitedjiga.common.parsing.grammar;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
@@ -29,15 +28,6 @@ class ChoiceExpressionTest implements ExpressionTest {
         @Override
         public ChoiceExpression.Builder builder() {
             return ChoiceExpression.builder().add("");
-        }
-
-        @Test
-        @DisplayName("build() [No elements]")
-        void buildInCaseNoElements() throws Exception {
-            var builder = ChoiceExpression.builder();
-
-            assertThrows(IllegalStateException.class, () -> builder.build())
-                    .printStackTrace();
         }
 
         @Test
@@ -126,7 +116,7 @@ class ChoiceExpressionTest implements ExpressionTest {
         void addEbInCasePostBuild() throws Exception {
             var builder = ChoiceExpression.builder()
                     .addEmpty();
-            builder.build();
+            builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
             assertThrows(IllegalStateException.class, () -> builder.add((Expression.Builder) null))
                     .printStackTrace();
@@ -137,7 +127,7 @@ class ChoiceExpressionTest implements ExpressionTest {
         void addStInCasePostBuild() throws Exception {
             var builder = ChoiceExpression.builder()
                     .addEmpty();
-            builder.build();
+            builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
             assertThrows(IllegalStateException.class, () -> builder.add((String) null))
                     .printStackTrace();
@@ -167,52 +157,44 @@ class ChoiceExpressionTest implements ExpressionTest {
             assertEquals(builder, builder.addEmpty());
         }
 
+        @Nested
+        class QuantifierBuilderTest implements QuantifierExpressionTest.BuilderTest, ReferenceRelatedTest {
+            @Override
+            public QuantifierExpression.Builder builder() {
+                return ChoiceExpressionTest.BuilderTest.this.builder().opt();
+            }
+        }
+
+        @Nested
+        class QuantifierTest implements QuantifierExpressionTest {
+            @Override
+            public Quantifiable builder() {
+                return ChoiceExpressionTest.BuilderTest.this.builder();
+            }
+        }
+
     }
 
     @Override
     public Expression build() {
         return ChoiceExpression.builder()
                 .addEmpty()
-                .build();
+                .build(Stubs.DUMMY_PRODUCTION_SET);
     }
 
-    @Test
-    @DisplayName("getKind()")
-    void getKind() throws Exception {
-        var choice = build();
-
-        assertEquals(Kind.CHOICE, choice.getKind());
+    @Override
+    public Kind kind() {
+        return Kind.CHOICE;
     }
 
-    @Test
-    @DisplayName("accept(ev:ElementVisitor)")
-    void acceptEv() throws Exception {
-        var choice = build();
-
-        choice.accept(new TestExpressionVisitor<Void, Object>() {
+    @Override
+    public ExpressionVisitor<Object[], String> elementVisitor() {
+        return new TestExpressionVisitor<Object[], String>() {
             @Override
-            public Void visitChoice(ChoiceExpression expression, Object p) {
-                assertEquals(choice, expression);
-                assertNull(p);
-                return null;
+            public Object[] visitChoice(ChoiceExpression choice, String p) {
+                return new Object[] { choice, p };
             }
-        });
-    }
-
-    @Test
-    @DisplayName("accept(ev:ElementVisitor, p:P)")
-    void acceptEvP() throws Exception {
-        var choice = build();
-        var arg = new Object();
-
-        choice.accept(new TestExpressionVisitor<Void, Object>() {
-            @Override
-            public Void visitChoice(ChoiceExpression expression, Object p) {
-                assertEquals(choice, expression);
-                assertEquals(arg, p);
-                return null;
-            }
-        }, arg);
+        };
     }
 
     @Test
@@ -220,7 +202,7 @@ class ChoiceExpressionTest implements ExpressionTest {
     void getChoicesInCaseContainingEmpty() throws Exception {
         var choice = ChoiceExpression.builder()
                 .addEmpty()
-                .build();
+                .build(Stubs.DUMMY_PRODUCTION_SET);
 
         assertIterableEquals(List.of(Expression.EMPTY), choice.getChoices());
     }
@@ -231,13 +213,13 @@ class ChoiceExpressionTest implements ExpressionTest {
     void getChoices(List<Expression> list) throws Exception {
         var builder = ChoiceExpression.builder();
         list.stream()
-        .map(Stubs::builderOf)
-        .forEach(builder::add);
-        var choice = builder.build();
-        
+                .map(Stubs::builderOf)
+                .forEach(builder::add);
+        var choice = builder.build(Stubs.DUMMY_PRODUCTION_SET);
+
         assertIterableEquals(list, choice.getChoices());
     }
-    
+
     static Stream<List<Expression>> getChoices() {
         return Stream.of(
                 List.of(Stubs.expression("A")),

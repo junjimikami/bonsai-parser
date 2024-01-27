@@ -1,126 +1,47 @@
 package com.unitedjiga.common.parsing.grammar;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.DynamicTest.dynamicTest;
-
-import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DynamicNode;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import com.unitedjiga.common.parsing.grammar.Expression.Kind;
 
-class QuantifierExpressionTest implements ExpressionTest {
+interface QuantifierExpressionTest extends ExpressionTest {
 
-    @Nested
-    class BuilderTest {
+    interface BuilderTest extends ExpressionTest.BulderTest {
+        QuantifierExpression.Builder builder();
+    }
 
-        private Stream<ExpressionTest.BulderTest> builderTests() {
-            return Stream.of(
-                    () -> ChoiceExpression.builder().add("").opt(),
-                    () -> SequenceExpression.builder().add("").opt(),
-                    () -> PatternExpression.builder("").opt(),
-                    () -> ReferenceExpression.builder("").opt());
-        }
+    Quantifiable builder();
 
-        @TestFactory
-        Stream<DynamicNode> buildInCasePostBuild() throws Exception {
-            return builderTests().map(test -> dynamicTest(
-                    "build() [Post-build operation]",
-                    test::buildInCasePostBuild));
-        }
-
-        @TestFactory
-        Stream<DynamicNode> buildPsInCasePostBuild() throws Exception {
-            return builderTests().map(test -> dynamicTest(
-                    "build(ps:ProductionSet) [Post-build operation]",
-                    test::buildPsInCasePostBuild));
-        }
-
-        private Stream<ReferenceRelatedTest> referenceRelatedTest() {
-            return Stream.of(
-                    () -> ChoiceExpression.builder().add("").opt(),
-                    () -> SequenceExpression.builder().add("").opt(),
-                    () -> ReferenceExpression.builder("").opt());
-        }
-
-        @TestFactory
-        Stream<DynamicNode> buildInCaseNullProductionSet() throws Exception {
-            return referenceRelatedTest().map(test -> dynamicTest(
-                    "build() [Null production set]",
-                    test::buildInCaseNullProductionSet));
-        }
-
-        @TestFactory
-        Stream<DynamicNode> buildPsInCaseNullProductionSet() throws Exception {
-            return referenceRelatedTest().map(test -> dynamicTest(
-                    "build(ps:ProductionSet) [Null production set]",
-                    test::buildPsInCaseNullProductionSet));
-        }
-
-        @TestFactory
-        Stream<DynamicNode> buildPsInCaseInvalidReference() throws Exception {
-            return referenceRelatedTest().map(test -> dynamicTest(
-                    "build(ps:ProductionSet) [Invalid production set]",
-                    test::buildPsInCaseInvalidReference));
-        }
+    @Override
+    default Expression build() {
+        return builder().opt().build(Stubs.DUMMY_PRODUCTION_SET);
     }
 
     @Override
-    public Expression build() {
-        return PatternExpression.builder("").opt().build();
+    default Kind kind() {
+        return Kind.QUANTIFIER;
     }
 
-    @Test
-    @DisplayName("getKind()")
-    void getKind() throws Exception {
-        var quantifier = build();
-
-        assertEquals(Kind.QUANTIFIER, quantifier.getKind());
-    }
-
-    @Test
-    @DisplayName("accept(ev:ElementVisitor)")
-    void acceptEv() throws Exception {
-        var quantifier = build();
-
-        quantifier.accept(new TestExpressionVisitor<Void, Object>() {
+    @Override
+    default ExpressionVisitor<Object[], String> elementVisitor() {
+        return new TestExpressionVisitor<Object[], String>() {
             @Override
-            public Void visitQuantifier(QuantifierExpression expression, Object p) {
-                assertEquals(quantifier, expression);
-                assertNull(p);
-                return null;
+            public Object[] visitQuantifier(QuantifierExpression quantifier, String p) {
+                return new Object[] { quantifier, p };
             }
-        });
-    }
-
-    @Test
-    @DisplayName("accept(ev:ElementVisitor, p:P)")
-    void acceptEvP() throws Exception {
-        var quantifier = build();
-        var arg = new Object();
-
-        quantifier.accept(new TestExpressionVisitor<Void, Object>() {
-            @Override
-            public Void visitQuantifier(QuantifierExpression expression, Object p) {
-                assertEquals(quantifier, expression);
-                assertEquals(arg, p);
-                return null;
-            }
-        }, arg);
+        };
     }
 
     @Test
     @DisplayName("opt()")
-    void opt() throws Exception {
-        var quantifier = PatternExpression.builder("").opt().build();
+    default void opt() throws Exception {
+        var quantifier = builder().opt().build(Stubs.DUMMY_PRODUCTION_SET);
 
         assertEquals(0, quantifier.getMinCount());
         assertEquals(1, quantifier.getMaxCount().getAsInt());
@@ -129,8 +50,8 @@ class QuantifierExpressionTest implements ExpressionTest {
 
     @Test
     @DisplayName("zeroOrMore()")
-    void zeroOrMore() throws Exception {
-        var quantifier = PatternExpression.builder("").zeroOrMore().build();
+    default void zeroOrMore() throws Exception {
+        var quantifier = builder().zeroOrMore().build(Stubs.DUMMY_PRODUCTION_SET);
 
         assertEquals(0, quantifier.getMinCount());
         assertEquals(true, quantifier.getMaxCount().isEmpty());
@@ -138,8 +59,8 @@ class QuantifierExpressionTest implements ExpressionTest {
 
     @Test
     @DisplayName("oneOrMore()")
-    void oneOrMore() throws Exception {
-        var quantifier = PatternExpression.builder("").oneOrMore().build();
+    default void oneOrMore() throws Exception {
+        var quantifier = builder().oneOrMore().build(Stubs.DUMMY_PRODUCTION_SET);
 
         assertEquals(1, quantifier.getMinCount());
         assertEquals(true, quantifier.getMaxCount().isEmpty());
@@ -147,8 +68,8 @@ class QuantifierExpressionTest implements ExpressionTest {
 
     @Test
     @DisplayName("exactly()")
-    void exactly() throws Exception {
-        var quantifier = PatternExpression.builder("").exactly(0).build();
+    default void exactly() throws Exception {
+        var quantifier = builder().exactly(0).build(Stubs.DUMMY_PRODUCTION_SET);
 
         assertEquals(0, quantifier.getMinCount());
         assertEquals(0, quantifier.getMaxCount().getAsInt());
@@ -157,8 +78,8 @@ class QuantifierExpressionTest implements ExpressionTest {
     @ParameterizedTest
     @ValueSource(ints = { 0, 1, 2 })
     @DisplayName("atLeast(int)")
-    void atLeast(int times) throws Exception {
-        var quantifier = PatternExpression.builder("").atLeast(times).build();
+    default void atLeast(int times) throws Exception {
+        var quantifier = builder().atLeast(times).build(Stubs.DUMMY_PRODUCTION_SET);
 
         assertEquals(times, quantifier.getMinCount());
         assertEquals(true, quantifier.getMaxCount().isEmpty());
@@ -170,8 +91,8 @@ class QuantifierExpressionTest implements ExpressionTest {
             "1,1", "1,2",
     })
     @DisplayName("range()")
-    void range(int min, int max) throws Exception {
-        var quantifier = PatternExpression.builder("").range(min, max).build();
+    default void range(int min, int max) throws Exception {
+        var quantifier = builder().range(min, max).build(Stubs.DUMMY_PRODUCTION_SET);
 
         assertEquals(min, quantifier.getMinCount());
         assertEquals(max, quantifier.getMaxCount().getAsInt());

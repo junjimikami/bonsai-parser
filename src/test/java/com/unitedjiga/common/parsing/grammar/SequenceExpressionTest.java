@@ -2,16 +2,11 @@ package com.unitedjiga.common.parsing.grammar;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -22,37 +17,12 @@ import com.unitedjiga.common.parsing.grammar.Expression.Kind;
 
 class SequenceExpressionTest implements ExpressionTest {
 
-    @BeforeAll
-    static void setUpBeforeClass() throws Exception {
-    }
-
-    @AfterAll
-    static void tearDownAfterClass() throws Exception {
-    }
-
-    @BeforeEach
-    void setUp() throws Exception {
-    }
-
-    @AfterEach
-    void tearDown() throws Exception {
-    }
-
     @Nested
     class BuilderTest implements ExpressionTest.BulderTest, QuantifiableTest, ReferenceRelatedTest {
 
         @Override
         public SequenceExpression.Builder builder() {
             return SequenceExpression.builder().add("");
-        }
-
-        @Test
-        @DisplayName("build() [No elements]")
-        void buildWithNoElements() throws Exception {
-            var builder = SequenceExpression.builder();
-
-            assertThrows(IllegalStateException.class, () -> builder.build())
-                    .printStackTrace();
         }
 
         @Test
@@ -141,7 +111,7 @@ class SequenceExpressionTest implements ExpressionTest {
         void addEbPostBuild() throws Exception {
             var builder = SequenceExpression.builder()
                     .add(Stubs.DUMMY_EXPRESSION_BUILDER);
-            builder.build();
+            builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
             assertThrows(IllegalStateException.class, () -> builder.add((Expression.Builder) null))
                     .printStackTrace();
@@ -152,7 +122,7 @@ class SequenceExpressionTest implements ExpressionTest {
         void addStPostBuild() throws Exception {
             var builder = SequenceExpression.builder()
                     .add(Stubs.DUMMY_EXPRESSION_BUILDER);
-            builder.build();
+            builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
             assertThrows(IllegalStateException.class, () -> builder.add((String) null))
                     .printStackTrace();
@@ -174,52 +144,43 @@ class SequenceExpressionTest implements ExpressionTest {
             assertEquals(builder, builder.add("SYMBOL"));
         }
 
+        @Nested
+        class QuantifierBuilderTest implements QuantifierExpressionTest.BuilderTest, ReferenceRelatedTest {
+            @Override
+            public QuantifierExpression.Builder builder() {
+                return SequenceExpressionTest.BuilderTest.this.builder().opt();
+            }
+        }
+
+        @Nested
+        class QuantifierTest implements QuantifierExpressionTest {
+            @Override
+            public Quantifiable builder() {
+                return SequenceExpressionTest.BuilderTest.this.builder();
+            }
+        }
     }
 
     @Override
     public Expression build() {
         return SequenceExpression.builder()
                 .add(Stubs.DUMMY_EXPRESSION_BUILDER)
-                .build();
+                .build(Stubs.DUMMY_PRODUCTION_SET);
     }
 
-    @Test
-    @DisplayName("getKind()")
-    void getKind() throws Exception {
-        var sequence = build();
-
-        assertEquals(Kind.SEQUENCE, sequence.getKind());
+    @Override
+    public Kind kind() {
+        return Kind.SEQUENCE;
     }
 
-    @Test
-    @DisplayName("accept(ev:ElementVisitor)")
-    void acceptEv() throws Exception {
-        var sequence = build();
-
-        sequence.accept(new TestExpressionVisitor<Void, Object>() {
+    @Override
+    public ExpressionVisitor<Object[], String> elementVisitor() {
+        return new TestExpressionVisitor<Object[], String>() {
             @Override
-            public Void visitSequence(SequenceExpression expression, Object p) {
-                assertEquals(sequence, expression);
-                assertNull(p);
-                return null;
+            public Object[] visitSequence(SequenceExpression sequence, String p) {
+                return new Object[] { sequence, p };
             }
-        });
-    }
-
-    @Test
-    @DisplayName("accept(ev:ElementVisitor, p:P)")
-    void acceptEvP() throws Exception {
-        var sequence = build();
-        var arg = new Object();
-
-        sequence.accept(new TestExpressionVisitor<Void, Object>() {
-            @Override
-            public Void visitSequence(SequenceExpression expression, Object p) {
-                assertEquals(sequence, expression);
-                assertEquals(arg, p);
-                return null;
-            }
-        }, arg);
+        };
     }
 
     @ParameterizedTest
@@ -230,7 +191,7 @@ class SequenceExpressionTest implements ExpressionTest {
         list.stream()
                 .map(Stubs::builderOf)
                 .forEach(builder::add);
-        var sequence = builder.build();
+        var sequence = builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
         assertIterableEquals(list, sequence.getSequence());
     }

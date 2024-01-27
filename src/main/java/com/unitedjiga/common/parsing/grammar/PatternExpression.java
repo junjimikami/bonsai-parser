@@ -34,10 +34,7 @@ import com.unitedjiga.common.parsing.grammar.impl.GrammarService;
 public interface PatternExpression extends Expression {
 
     public static interface Builder extends Expression.Builder, Quantifiable {
-        public default PatternExpression build() {
-            return build(null);
-        }
-
+        @Override
         public PatternExpression build(ProductionSet set);
     }
 

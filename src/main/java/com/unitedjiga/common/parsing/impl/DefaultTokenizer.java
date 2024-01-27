@@ -40,7 +40,7 @@ import com.unitedjiga.common.parsing.grammar.Grammar;
  * @author Junji Mikami
  *
  */
-class DefaultTokenizer implements Tokenizer {
+class DefaultTokenizer extends AbstractTokenizer {
 
     private final TreeVisitor<String, Void> treeToString = new TreeVisitor<>() {
         @Override

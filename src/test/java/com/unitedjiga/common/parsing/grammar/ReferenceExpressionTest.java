@@ -1,7 +1,7 @@
 package com.unitedjiga.common.parsing.grammar;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.DisplayName;
@@ -20,11 +20,41 @@ class ReferenceExpressionTest implements ExpressionTest {
             return ReferenceExpression.builder("");
         }
 
+        @Nested
+        class QuantifierBuilderTest implements QuantifierExpressionTest.BuilderTest, ReferenceRelatedTest {
+            @Override
+            public QuantifierExpression.Builder builder() {
+                return ReferenceExpressionTest.BuilderTest.this.builder().opt();
+            }
+        }
+
+        @Nested
+        class QuantifierTest implements QuantifierExpressionTest {
+            @Override
+            public Quantifiable builder() {
+                return ReferenceExpressionTest.BuilderTest.this.builder();
+            }
+        }
     }
 
     @Override
     public Expression build() {
         return ReferenceExpression.builder("").build(Stubs.DUMMY_PRODUCTION_SET);
+    }
+
+    @Override
+    public Kind kind() {
+        return Kind.REFERENCE;
+    }
+
+    @Override
+    public ExpressionVisitor<Object[], String> elementVisitor() {
+        return new TestExpressionVisitor<Object[], String>() {
+            @Override
+            public Object[] visitReference(ReferenceExpression reference, String p) {
+                return new Object[] { reference, p };
+            }
+        };
     }
 
     @Test
@@ -35,42 +65,9 @@ class ReferenceExpressionTest implements ExpressionTest {
     }
 
     @Test
-    @DisplayName("getKind()")
-    void getKind() throws Exception {
-        var reference = build();
-
-        assertEquals(Kind.REFERENCE, reference.getKind());
-    }
-
-    @Test
-    @DisplayName("accept(ev:ElementVisitor)")
-    void acceptEv() throws Exception {
-        var reference = build();
-
-        reference.accept(new TestExpressionVisitor<Void, Object>() {
-            @Override
-            public Void visitReference(ReferenceExpression expression, Object p) {
-                assertEquals(reference, expression);
-                assertNull(p);
-                return null;
-            }
-        });
-    }
-
-    @Test
-    @DisplayName("accept(ev:ElementVisitor, p:P)")
-    void acceptEvP() throws Exception {
-        var reference = build();
-        var arg = new Object();
-
-        reference.accept(new TestExpressionVisitor<Void, Object>() {
-            @Override
-            public Void visitReference(ReferenceExpression expression, Object p) {
-                assertEquals(reference, expression);
-                assertEquals(arg, p);
-                return null;
-            }
-        }, arg);
+    @DisplayName("builder(String)")
+    void builder() throws Exception {
+        assertNotNull(ReferenceExpression.builder(""));
     }
 
     @Test
