@@ -6,7 +6,6 @@ interface TestExpressionVisitor<R, P> extends SimpleExpressionVisitor<R, P> {
 
     @Override
     default R defaultAction(Expression expression, P p) {
-        fail();
-        return null;
+        return fail();
     }
 }

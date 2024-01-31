@@ -3,10 +3,8 @@ package com.unitedjiga.common.parsing.impl;
 import java.util.Objects;
 import java.util.Set;
 
-import com.unitedjiga.common.parsing.NonTerminal;
 import com.unitedjiga.common.parsing.Parser;
 import com.unitedjiga.common.parsing.ParsingException;
-import com.unitedjiga.common.parsing.Terminal;
 import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.Tree;
 import com.unitedjiga.common.parsing.grammar.Grammar;
@@ -31,13 +29,4 @@ class DefaultParser implements Parser {
         return tree;
     }
 
-    @Override
-    public NonTerminal parseNonTerminal() {
-        return (NonTerminal) parse();
-    }
-
-    @Override
-    public Terminal parseTerminal() {
-        return (Terminal) parse();
-    }
 }

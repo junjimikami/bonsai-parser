@@ -26,6 +26,4 @@ package com.unitedjiga.common.parsing;
 public interface Parser {
 
     public Tree parse();
-    public NonTerminal parseNonTerminal();
-    public Terminal parseTerminal();
 }

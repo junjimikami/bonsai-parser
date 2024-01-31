@@ -19,7 +19,7 @@ class DefaultTokenizerProvider {
                 .filter(p -> p.type().getCanonicalName().equals(factoryName))
                 .map(Provider::get)
                 .findFirst()
-                .get();
+                .orElseThrow();
     }
 
 }

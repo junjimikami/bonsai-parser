@@ -49,6 +49,16 @@ class GrammarTest {
         }
 
         @Test
+        @DisplayName("build() [Builder returning null]")
+        void buildInCaseBuilderReturningNull() throws Exception {
+            var builder = Grammar.builder();
+            builder.add("A", set -> null);
+
+            assertThrows(NullPointerException.class, () -> builder.build())
+                    .printStackTrace();
+        }
+
+        @Test
         @DisplayName("add(st:String, eb:Expression.Builder) [st == null]")
         void addStEbInCaseStIsNull() throws Exception {
             var builder = Grammar.builder();
@@ -292,8 +302,8 @@ class GrammarTest {
                 .add("A", Stubs.DUMMY_EXPRESSION_BUILDER)
                 .setStartSymbol("A")
                 .build();
-        
+
         assertEquals("A", grammar.getStartProduction().getSymbol());
     }
-    
+
 }

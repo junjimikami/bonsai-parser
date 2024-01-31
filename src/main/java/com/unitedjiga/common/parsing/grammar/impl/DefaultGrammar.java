@@ -33,7 +33,7 @@ class DefaultGrammar implements Grammar {
         @Override
         protected void checkForBuild() {
             super.checkForBuild();
-            if (startSymbol == null || builders.isEmpty()) {
+            if (builders.isEmpty()) {
                 throw new IllegalStateException(Message.NO_ELELEMNTS.format());
             }
             if (!builders.containsKey(startSymbol)) {
@@ -84,9 +84,7 @@ class DefaultGrammar implements Grammar {
                 var expression = builder.build(set);
                 set.add(symbol, expression);
             });
-            if (!set.contains(startSymbol)) {
-                throw new NoSuchElementException(Message.NO_SUCH_SYMBOL.format(startSymbol));
-            }
+            assert set.contains(startSymbol);
             return new DefaultGrammar(set, startSymbol, skipPattern);
         }
     }

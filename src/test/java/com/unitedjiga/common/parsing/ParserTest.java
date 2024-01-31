@@ -1,64 +1,159 @@
 package com.unitedjiga.common.parsing;
 
+import static com.unitedjiga.common.parsing.grammar.Expressions.choice;
+import static com.unitedjiga.common.parsing.grammar.Expressions.pattern;
+import static com.unitedjiga.common.parsing.grammar.Expressions.sequence;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Named.named;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import java.io.StringReader;
-import java.util.stream.Collectors;
+import java.io.UncheckedIOException;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import com.unitedjiga.common.parsing.grammar.Expressions;
+import com.unitedjiga.common.parsing.Tree.Kind;
+import com.unitedjiga.common.parsing.grammar.Expression;
 import com.unitedjiga.common.parsing.grammar.Grammar;
-import static com.unitedjiga.common.parsing.grammar.Expressions.*
-;
 
 class ParserTest {
 
-    @BeforeAll
-    static void setUpBeforeClass() throws Exception {
+    static Stream<Arguments> allMethods() {
+        return Stream.of(arguments(named("parse()", (Consumer<Parser>) p -> p.parse())));
     }
 
-    @AfterAll
-    static void tearDownAfterClass() throws Exception {
+    @DisplayName("[Stream closed]")
+    @ParameterizedTest(name = "{0} {displayName}")
+    @MethodSource("allMethods")
+    void streamClosed(Consumer<Parser> method) throws Exception {
+        var factory = ParserFactory.newFactory(Stubs.DUMMY_GRAMMAR);
+        var parser = factory.createParser(Stubs.closedReader());
+
+        assertThrows(UncheckedIOException.class, () -> method.accept(parser))
+                .printStackTrace();
     }
 
-    @BeforeEach
-    void setUp() throws Exception {
+    @DisplayName("[Ambiguous rule]")
+    @ParameterizedTest(name = "{0} {displayName}")
+    @MethodSource("allMethods")
+    void ambiguousRule(Consumer<Parser> method) throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", choice()
+                        .add("A")
+                        .add("B"))
+                .add("A", pattern("1"))
+                .add("B", pattern("."))
+                .build();
+        var factory = ParserFactory.newFactory(grammar);
+        var parser = factory.createParser(new StringReader("1"));
+
+        assertThrows(ParsingException.class, () -> method.accept(parser))
+                .printStackTrace();
     }
 
-    @AfterEach
-    void tearDown() throws Exception {
+    @DisplayName("[Occurrence count out of range]")
+    @ParameterizedTest(name = "{0} {displayName}")
+    @MethodSource("allMethods")
+    void occurrenceCountOutOfRange(Consumer<Parser> method) throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", pattern("1").range(3, 5))
+                .build();
+        var factory = ParserFactory.newFactory(grammar);
+        var parser = factory.createParser(new StringReader("11"));
+
+        assertThrows(ParsingException.class, () -> method.accept(parser))
+                .printStackTrace();
+    }
+
+    @DisplayName("[Token not match pattern rule]")
+    @ParameterizedTest(name = "{0} {displayName}")
+    @MethodSource("allMethods")
+    void tokenNotMatchPatternRule(Consumer<Parser> method) throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", pattern("0"))
+                .build();
+        var factory = ParserFactory.newFactory(grammar);
+        var parser = factory.createParser(new StringReader("1"));
+
+        assertThrows(ParsingException.class, () -> method.accept(parser))
+                .printStackTrace();
+    }
+
+    @DisplayName("[Token not match choice rule]")
+    @ParameterizedTest(name = "{0} {displayName}")
+    @MethodSource("allMethods")
+    void tokenNotMatchChoiceRule(Consumer<Parser> method) throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", choice()
+                        .add(pattern("0")))
+                .build();
+        var factory = ParserFactory.newFactory(grammar);
+        var parser = factory.createParser(new StringReader("1"));
+
+        assertThrows(ParsingException.class, () -> method.accept(parser))
+                .printStackTrace();
+    }
+
+    @DisplayName("[Token not match sequence rule]")
+    @ParameterizedTest(name = "{0} {displayName}")
+    @MethodSource("allMethods")
+    void tokenNotMatchSequenceRule(Consumer<Parser> method) throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", sequence()
+                        .add(pattern("0")))
+                .build();
+        var factory = ParserFactory.newFactory(grammar);
+        var parser = factory.createParser(new StringReader("1"));
+
+        assertThrows(ParsingException.class, () -> method.accept(parser))
+                .printStackTrace();
+    }
+
+    @DisplayName("[Token not match empty rule]")
+    @ParameterizedTest(name = "{0} {displayName}")
+    @MethodSource("allMethods")
+    void tokenNotMatchEmptyRule(Consumer<Parser> method) throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", set -> Expression.EMPTY)
+                .build();
+        var factory = ParserFactory.newFactory(grammar);
+        var parser = factory.createParser(new StringReader("1"));
+
+        assertThrows(ParsingException.class, () -> method.accept(parser))
+                .printStackTrace();
     }
 
     @Test
-    void test() {
+    @DisplayName("parse() [Token remained]")
+    void parseInCaseToeknRemained() throws Exception {
         var grammar = Grammar.builder()
-                .add("A", "B")
-                .add("B", pattern("0"))
+                .add("S", pattern("1"))
                 .build();
         var factory = ParserFactory.newFactory(grammar);
-        var parser = factory.createParser(new StringReader("0"));
-        var tree = parser.parse();
-        assertTrue(tree.getKind().isNonTerminal());
-        var name = tree.accept(new TreeVisitor<String, Void>() {
-            @Override
-            public String visitNonTerminal(NonTerminal s, Void p) {
-                return s.getSymbol() + s.getSubTrees().stream()
-                        .filter(t -> t.getKind().isNonTerminal())
-                        .map(this::visit)
-                        .collect(Collectors.joining(",", "(", ")"));
-            }
+        var parser = factory.createParser(new StringReader("11"));
 
-            @Override
-            public String visitTerminal(Terminal s, Void p) {
-                return null;
-            }
-        });
-        assertEquals("A(B())", name);
+        assertThrows(ParsingException.class, () -> parser.parse())
+                .printStackTrace();
+    }
+
+    @Test
+    @DisplayName("parse()")
+    void parse() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", pattern("1"))
+                .build();
+        var factory = ParserFactory.newFactory(grammar);
+        var parser = factory.createParser(new StringReader("1"));
+        var tree = parser.parse();
+
+        assertEquals(Kind.NON_TERMINAL, tree.getKind());
+        assertTrue(tree.getKind().isNonTerminal());
     }
 
 }
