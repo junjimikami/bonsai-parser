@@ -25,7 +25,7 @@ package com.unitedjiga.common.parsing.grammar;
 
 import java.util.List;
 
-import com.unitedjiga.common.parsing.grammar.impl.GrammarService;
+import com.unitedjiga.common.parsing.grammar.impl.GrammarProviders;
 
 /**
  * @author Junji Mikami
@@ -41,7 +41,7 @@ public interface SequenceExpression extends Expression {
     }
 
     public static Builder builder() {
-        return GrammarService.createSequenceBuilder();
+        return GrammarProviders.provider().createSequenceBuilder();
     }
 
     @Override

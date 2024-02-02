@@ -23,7 +23,7 @@
  */
 package com.unitedjiga.common.parsing.grammar;
 
-import com.unitedjiga.common.parsing.grammar.impl.GrammarService;
+import com.unitedjiga.common.parsing.grammar.impl.GrammarProviders;
 
 /**
  * @author Junji Mikami
@@ -37,7 +37,7 @@ public interface ReferenceExpression extends Expression {
     }
 
     public static Builder builder(String reference) {
-        return GrammarService.createReferenceBuilder(reference);
+        return GrammarProviders.provider().createReferenceBuilder(reference);
     }
 
     @Override

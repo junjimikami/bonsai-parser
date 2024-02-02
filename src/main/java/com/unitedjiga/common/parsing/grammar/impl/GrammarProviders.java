@@ -23,47 +23,21 @@
  */
 package com.unitedjiga.common.parsing.grammar.impl;
 
-import java.util.regex.Pattern;
-
-import com.unitedjiga.common.parsing.grammar.ChoiceExpression;
-import com.unitedjiga.common.parsing.grammar.Grammar;
-import com.unitedjiga.common.parsing.grammar.PatternExpression;
-import com.unitedjiga.common.parsing.grammar.ReferenceExpression;
-import com.unitedjiga.common.parsing.grammar.SequenceExpression;
+import com.unitedjiga.common.parsing.grammar.spi.GrammarProvider;
 
 /**
  * 
  * @author Junji Mikami
  *
  */
-public final class GrammarService {
+public final class GrammarProviders {
     private static final DefaultGrammarProvider provider = new DefaultGrammarProvider();
 
-    private GrammarService() {
+    private GrammarProviders() {
     }
 
-    public static Grammar.Builder createGrammarBuilder() {
-        return provider.createGrammarBuilder();
-    }
-
-    public static PatternExpression.Builder createPatternBuilder(String regex) {
-        return provider.createPatternBuilder(regex);
-    }
-
-    public static PatternExpression.Builder createPatternBuilder(Pattern pattern) {
-        return provider.createPatternBuilder(pattern);
-    }
-
-    public static SequenceExpression.Builder createSequenceBuilder() {
-        return provider.createSequenceBuilder();
-    }
-
-    public static ChoiceExpression.Builder createChoiceBuilder() {
-        return provider.createChoiceBuilder();
-    }
-
-    public static ReferenceExpression.Builder createReferenceBuilder(String reference) {
-        return provider.createReferenceBuilder(reference);
+    public static GrammarProvider provider() {
+        return provider;
     }
 
 }

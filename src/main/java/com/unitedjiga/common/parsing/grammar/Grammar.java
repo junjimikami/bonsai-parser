@@ -2,7 +2,7 @@ package com.unitedjiga.common.parsing.grammar;
 
 import java.util.regex.Pattern;
 
-import com.unitedjiga.common.parsing.grammar.impl.GrammarService;
+import com.unitedjiga.common.parsing.grammar.impl.GrammarProviders;
 
 public interface Grammar {
 
@@ -16,7 +16,7 @@ public interface Grammar {
     }
 
     public static Builder builder() {
-        return GrammarService.createGrammarBuilder();
+        return GrammarProviders.provider().createGrammarBuilder();
     }
 
     public String getStartSymbol();

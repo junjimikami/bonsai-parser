@@ -13,7 +13,7 @@ import com.unitedjiga.common.parsing.grammar.ProductionSet;
 
 class DefaultGrammar implements Grammar {
 
-    static class Builder extends BuilderSupport implements Grammar.Builder {
+    static class Builder extends BaseBuilder implements Grammar.Builder {
         private final Map<String, Expression.Builder> builders = new HashMap<>();
         private Pattern skipPattern;
         private String startSymbol;

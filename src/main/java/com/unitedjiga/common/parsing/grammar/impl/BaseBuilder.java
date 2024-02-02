@@ -2,7 +2,7 @@ package com.unitedjiga.common.parsing.grammar.impl;
 
 import java.util.Objects;
 
-abstract class BuilderSupport {
+abstract class BaseBuilder {
     private boolean isBuilt;
 
     protected void check() {

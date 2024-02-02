@@ -33,7 +33,7 @@ import com.unitedjiga.common.parsing.grammar.QuantifierExpression;
  */
 abstract class AbstractExpression implements Expression {
 
-    static abstract class Builder extends BuilderSupport implements Expression.Builder {
+    static abstract class Builder extends BaseBuilder implements Expression.Builder {
     }
 
     static abstract class QuantifiableBuilder extends Builder implements Quantifiable {

@@ -25,7 +25,7 @@ package com.unitedjiga.common.parsing.grammar;
 
 import java.util.List;
 
-import com.unitedjiga.common.parsing.grammar.impl.GrammarService;
+import com.unitedjiga.common.parsing.grammar.impl.GrammarProviders;
 
 /**
  * @author Junji Mikami
@@ -42,7 +42,7 @@ public interface ChoiceExpression extends Expression {
     }
 
     public static Builder builder() {
-        return GrammarService.createChoiceBuilder();
+        return GrammarProviders.provider().createChoiceBuilder();
     }
 
     @Override

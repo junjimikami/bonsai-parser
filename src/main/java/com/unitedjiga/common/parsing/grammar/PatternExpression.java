@@ -25,7 +25,7 @@ package com.unitedjiga.common.parsing.grammar;
 
 import java.util.regex.Pattern;
 
-import com.unitedjiga.common.parsing.grammar.impl.GrammarService;
+import com.unitedjiga.common.parsing.grammar.impl.GrammarProviders;
 
 /**
  * @author Junji Mikami
@@ -39,11 +39,11 @@ public interface PatternExpression extends Expression {
     }
 
     public static Builder builder(String regex) {
-        return GrammarService.createPatternBuilder(regex);
+        return GrammarProviders.provider().createPatternBuilder(regex);
     }
 
     public static Builder builder(Pattern pattern) {
-        return GrammarService.createPatternBuilder(pattern);
+        return GrammarProviders.provider().createPatternBuilder(pattern);
     }
 
     @Override
