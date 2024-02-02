@@ -53,7 +53,7 @@ class ParserTest {
         var factory = ParserFactory.newFactory(grammar);
         var parser = factory.createParser(new StringReader("1"));
 
-        assertThrows(ParsingException.class, () -> method.accept(parser))
+        assertThrows(ParseException.class, () -> method.accept(parser))
                 .printStackTrace();
     }
 
@@ -67,7 +67,7 @@ class ParserTest {
         var factory = ParserFactory.newFactory(grammar);
         var parser = factory.createParser(new StringReader("11"));
 
-        assertThrows(ParsingException.class, () -> method.accept(parser))
+        assertThrows(ParseException.class, () -> method.accept(parser))
                 .printStackTrace();
     }
 
@@ -81,7 +81,7 @@ class ParserTest {
         var factory = ParserFactory.newFactory(grammar);
         var parser = factory.createParser(new StringReader("1"));
 
-        assertThrows(ParsingException.class, () -> method.accept(parser))
+        assertThrows(ParseException.class, () -> method.accept(parser))
                 .printStackTrace();
     }
 
@@ -96,7 +96,7 @@ class ParserTest {
         var factory = ParserFactory.newFactory(grammar);
         var parser = factory.createParser(new StringReader("1"));
 
-        assertThrows(ParsingException.class, () -> method.accept(parser))
+        assertThrows(ParseException.class, () -> method.accept(parser))
                 .printStackTrace();
     }
 
@@ -111,7 +111,7 @@ class ParserTest {
         var factory = ParserFactory.newFactory(grammar);
         var parser = factory.createParser(new StringReader("1"));
 
-        assertThrows(ParsingException.class, () -> method.accept(parser))
+        assertThrows(ParseException.class, () -> method.accept(parser))
                 .printStackTrace();
     }
 
@@ -125,7 +125,7 @@ class ParserTest {
         var factory = ParserFactory.newFactory(grammar);
         var parser = factory.createParser(new StringReader("1"));
 
-        assertThrows(ParsingException.class, () -> method.accept(parser))
+        assertThrows(ParseException.class, () -> method.accept(parser))
                 .printStackTrace();
     }
 
@@ -138,7 +138,7 @@ class ParserTest {
         var factory = ParserFactory.newFactory(grammar);
         var parser = factory.createParser(new StringReader("11"));
 
-        assertThrows(ParsingException.class, () -> parser.parse())
+        assertThrows(ParseException.class, () -> parser.parse())
                 .printStackTrace();
     }
 

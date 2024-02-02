@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.unitedjiga.common.parsing.ParsingException;
+import com.unitedjiga.common.parsing.ParseException;
 import com.unitedjiga.common.parsing.Tree;
 import com.unitedjiga.common.parsing.grammar.ChoiceExpression;
 import com.unitedjiga.common.parsing.grammar.Expression;
@@ -72,11 +72,11 @@ final class Interpreter implements ExpressionVisitor<List<Tree>, Context> {
                 .toList();
         if (list.isEmpty()) {
             var message = MessageSupport.tokenNotMatchExpression(choice, context);
-            throw new ParsingException(message);
+            throw new ParseException(message);
         }
         if (1 < list.size()) {
             var message = MessageSupport.ambiguousChoice(choice, context);
-            throw new ParsingException(message);
+            throw new ParseException(message);
         }
         return visit(list.get(0), context);
     }
@@ -85,7 +85,7 @@ final class Interpreter implements ExpressionVisitor<List<Tree>, Context> {
     public List<Tree> visitSequence(SequenceExpression sequence, Context context) {
         if (!AnyMatcher.scan(sequence, context)) {
             var message = MessageSupport.tokenNotMatchExpression(sequence, context);
-            throw new ParsingException(message);
+            throw new ParseException(message);
         }
         var list = new ArrayList<Tree>();
         var subSequence = new LinkedList<>(sequence.getSequence());
@@ -102,7 +102,7 @@ final class Interpreter implements ExpressionVisitor<List<Tree>, Context> {
     public List<Tree> visitPattern(PatternExpression pattern, Context context) {
         if (!AnyMatcher.scan(pattern, context)) {
             var message = MessageSupport.tokenNotMatchExpression(pattern, context);
-            throw new ParsingException(message);
+            throw new ParseException(message);
         }
         var tokenizer = context.tokenizer();
         var token = tokenizer.next(pattern.getPattern());
@@ -133,7 +133,7 @@ final class Interpreter implements ExpressionVisitor<List<Tree>, Context> {
         var upperLimit = quantfier.getMaxCount().orElse(count);
         if (count < lowerLimit || upperLimit < count) {
             var message = MessageSupport.tokenCountOutOfRange(quantfier, context, count);
-            throw new ParsingException(message);
+            throw new ParseException(message);
         }
         return list;
     }
@@ -142,7 +142,7 @@ final class Interpreter implements ExpressionVisitor<List<Tree>, Context> {
     public List<Tree> visitEmpty(Expression empty, Context context) {
         if (!AnyMatcher.scan(empty, context)) {
             var message = MessageSupport.tokenNotMatchExpression(empty, context);
-            throw new ParsingException(message);
+            throw new ParseException(message);
         }
         return List.of();
     }

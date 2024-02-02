@@ -27,7 +27,7 @@ package com.unitedjiga.common.parsing;
  * @author Junji Mikami
  *
  */
-public class ParsingException extends RuntimeException {
+public class ParseException extends RuntimeException {
 
     /**
      * 
@@ -37,14 +37,14 @@ public class ParsingException extends RuntimeException {
     /**
      * 
      */
-    public ParsingException() {
+    public ParseException() {
         super();
     }
 
     /**
      * 
      */
-    public ParsingException(String message) {
+    public ParseException(String message) {
         super(message);
     }
 }

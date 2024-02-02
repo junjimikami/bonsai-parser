@@ -4,7 +4,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import com.unitedjiga.common.parsing.Parser;
-import com.unitedjiga.common.parsing.ParsingException;
+import com.unitedjiga.common.parsing.ParseException;
 import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.Tree;
 import com.unitedjiga.common.parsing.grammar.Grammar;
@@ -24,7 +24,7 @@ class DefaultParser implements Parser {
     public Tree parse() {
         var tree = Interpreter.parse(context);
         if (context.postCheck()) {
-            throw new ParsingException(Message.TOKENS_REMAINED.format());
+            throw new ParseException(Message.TOKENS_REMAINED.format());
         }
         return tree;
     }

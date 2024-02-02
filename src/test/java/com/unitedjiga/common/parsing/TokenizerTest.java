@@ -115,7 +115,7 @@ class TokenizerTest {
                     .build();
             var factory = TokenizerFactory.newFactory(grammar);
             var tokenizer = factory.createTokenizer(new StringReader("0"));
-            assertThrows(ParsingException.class, () -> tokenizer.hasNext());
+            assertThrows(ParseException.class, () -> tokenizer.hasNext());
         }
 
         @Test
@@ -150,7 +150,7 @@ class TokenizerTest {
                     .build();
             var factory = TokenizerFactory.newFactory(grammar);
             var tokenizer = factory.createTokenizer(new StringReader("0"));
-            assertThrows(ParsingException.class, () -> tokenizer.hasNext())
+            assertThrows(ParseException.class, () -> tokenizer.hasNext())
                     .printStackTrace();
         }
 
@@ -175,7 +175,7 @@ class TokenizerTest {
             var factory = TokenizerFactory.newFactory(grammar);
             var tokenizer = factory.createTokenizer(new StringReader("000"));
             assertEquals("00", tokenizer.next().getValue());
-            assertThrows(ParsingException.class, () -> tokenizer.hasNext())
+            assertThrows(ParseException.class, () -> tokenizer.hasNext())
                     .printStackTrace();
         }
 
@@ -187,7 +187,7 @@ class TokenizerTest {
                     .build();
             var factory = TokenizerFactory.newFactory(grammar);
             var tokenizer = factory.createTokenizer(new StringReader("0"));
-            assertThrows(ParsingException.class, () -> tokenizer.hasNext())
+            assertThrows(ParseException.class, () -> tokenizer.hasNext())
                     .printStackTrace();
         }
 
@@ -224,7 +224,7 @@ class TokenizerTest {
             var factory = TokenizerFactory.newFactory(grammar);
             var tokenizer = factory.createTokenizer(new StringReader("0000"));
             assertEquals("000", tokenizer.next().getValue());
-            assertThrows(ParsingException.class, () -> tokenizer.hasNext())
+            assertThrows(ParseException.class, () -> tokenizer.hasNext())
                     .printStackTrace();
         }
 
@@ -313,7 +313,7 @@ class TokenizerTest {
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
-        assertThrows(ParsingException.class, () -> method.accept(tokenizer))
+        assertThrows(ParseException.class, () -> method.accept(tokenizer))
                 .printStackTrace();
     }
 
@@ -327,7 +327,7 @@ class TokenizerTest {
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("11"));
 
-        assertThrows(ParsingException.class, () -> method.accept(tokenizer))
+        assertThrows(ParseException.class, () -> method.accept(tokenizer))
                 .printStackTrace();
     }
 
@@ -341,7 +341,7 @@ class TokenizerTest {
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
-        assertThrows(ParsingException.class, () -> method.accept(tokenizer))
+        assertThrows(ParseException.class, () -> method.accept(tokenizer))
                 .printStackTrace();
     }
 
@@ -356,7 +356,7 @@ class TokenizerTest {
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
-        assertThrows(ParsingException.class, () -> method.accept(tokenizer))
+        assertThrows(ParseException.class, () -> method.accept(tokenizer))
                 .printStackTrace();
     }
 
@@ -371,7 +371,7 @@ class TokenizerTest {
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
-        assertThrows(ParsingException.class, () -> method.accept(tokenizer))
+        assertThrows(ParseException.class, () -> method.accept(tokenizer))
                 .printStackTrace();
     }
 
@@ -385,7 +385,7 @@ class TokenizerTest {
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
-        assertThrows(ParsingException.class, () -> method.accept(tokenizer))
+        assertThrows(ParseException.class, () -> method.accept(tokenizer))
                 .printStackTrace();
     }
 
