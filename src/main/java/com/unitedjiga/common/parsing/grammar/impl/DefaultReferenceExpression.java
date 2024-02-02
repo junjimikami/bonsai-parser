@@ -47,7 +47,7 @@ class DefaultReferenceExpression extends AbstractExpression implements Reference
         public ReferenceExpression build(ProductionSet set) {
             checkForBuild();
             Objects.requireNonNull(set, Message.NULL_PARAMETER.format());
-            if (!set.contains(symbol)) {
+            if (!set.containsSymbol(symbol)) {
                 throw new NoSuchElementException(Message.NO_SUCH_SYMBOL.format(symbol));
             }
             return new DefaultReferenceExpression(set, symbol);

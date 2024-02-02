@@ -84,7 +84,7 @@ class DefaultGrammar implements Grammar {
                 var expression = builder.build(set);
                 set.add(symbol, expression);
             });
-            assert set.contains(startSymbol);
+            assert set.containsSymbol(startSymbol);
             return new DefaultGrammar(set, startSymbol, skipPattern);
         }
     }

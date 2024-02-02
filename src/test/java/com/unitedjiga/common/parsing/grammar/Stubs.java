@@ -11,7 +11,7 @@ final class Stubs {
     static final ProductionSet DUMMY_PRODUCTION_SET = new ProductionSet() {
 
         @Override
-        public boolean contains(String symbol) {
+        public boolean containsSymbol(String symbol) {
             return true;
         }
 
@@ -23,7 +23,7 @@ final class Stubs {
     static final ProductionSet EMPTY_PRODUCTION_SET = new ProductionSet() {
 
         @Override
-        public boolean contains(String symbol) {
+        public boolean containsSymbol(String symbol) {
             return false;
         }
 

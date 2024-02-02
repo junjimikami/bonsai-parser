@@ -271,15 +271,15 @@ class GrammarTest {
                 .build();
         var productionSet = grammar.productionSet();
 
-        assertTrue(productionSet.contains("S"));
+        assertTrue(productionSet.containsSymbol("S"));
         assertEquals("S", productionSet.get("S").getSymbol());
         assertEquals(Stubs.DUMMY_EXPRESSION, productionSet.get("S").getExpression());
 
-        assertTrue(productionSet.contains("A"));
+        assertTrue(productionSet.containsSymbol("A"));
         assertEquals("A", productionSet.get("A").getSymbol());
         assertEquals(Stubs.DUMMY_EXPRESSION, productionSet.get("A").getExpression());
 
-        assertFalse(productionSet.contains("B"));
+        assertFalse(productionSet.containsSymbol("B"));
         assertThrows(NoSuchElementException.class, () -> productionSet.get("B"));
     }
 

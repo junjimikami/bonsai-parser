@@ -17,7 +17,7 @@ class DefaultProductionSet implements ProductionSet {
     }
 
     @Override
-    public boolean contains(String symbol) {
+    public boolean containsSymbol(String symbol) {
         return map.containsKey(symbol);
     }
 
