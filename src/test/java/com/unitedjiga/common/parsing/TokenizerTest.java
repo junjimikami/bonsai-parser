@@ -272,6 +272,21 @@ class TokenizerTest {
             assertEquals("1", tokenizer.next().getValue());
             assertFalse(tokenizer.hasNext());
         }
+
+        @Test
+        void test19() throws Exception {
+            var grammar = Grammar.builder()
+                    .add("A", pattern("0"))
+                    .add("A", pattern("1"))
+                    .build();
+            var factory = TokenizerFactory.newFactory(grammar);
+            var tokenizer = factory.createTokenizer(new StringReader("1001"));
+            assertEquals("1", tokenizer.next().getValue());
+            assertEquals("0", tokenizer.next().getValue());
+            assertEquals("0", tokenizer.next().getValue());
+            assertEquals("1", tokenizer.next().getValue());
+            assertFalse(tokenizer.hasNext());
+        }
     }
 
     static Stream<Arguments> allMethods() {

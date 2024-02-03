@@ -2,6 +2,7 @@ package com.unitedjiga.common.parsing.grammar;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -12,6 +13,8 @@ import java.util.regex.Pattern;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import com.unitedjiga.common.parsing.grammar.Rule.Kind;
 
 class GrammarTest {
 
@@ -281,6 +284,30 @@ class GrammarTest {
 
         assertFalse(productionSet.containsSymbol("B"));
         assertThrows(NoSuchElementException.class, () -> productionSet.get("B"));
+    }
+
+    @Test
+    @DisplayName("productionSet() [Add multiple rules to one symbol]")
+    void productionSetInCaseAddMultipleRulesToOneSymbol() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", set -> Stubs.rule("RULE0"))
+                .add("S", set -> Stubs.rule("RULE1"))
+                .build();
+        var productionSet = grammar.productionSet();
+
+        assertTrue(productionSet.containsSymbol("S"));
+        assertEquals("S", productionSet.get("S").getSymbol());
+        var rule = productionSet.get("S").getRule();
+        assertInstanceOf(ChoiceRule.class, rule);
+        assertEquals(Kind.CHOICE, rule.getKind());
+        rule.accept(new TestRuleVisitor<Void, Void>() {
+            public Void visitChoice(ChoiceRule choice, Void p) {
+                assertEquals(2, choice.getChoices().size());
+                assertEquals("RULE0", choice.getChoices().get(0).toString());
+                assertEquals("RULE1", choice.getChoices().get(1).toString());
+                return null;
+            };
+        });
     }
 
     @Test

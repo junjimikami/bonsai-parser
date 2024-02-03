@@ -44,14 +44,19 @@ class DefaultGrammar implements Grammar {
         @Override
         public Builder add(String symbol, Rule.Builder builder) {
             checkForAdd(symbol, builder);
-            builders.put(symbol, builder);
+            builders.merge(symbol, builder, (b0, b1) -> new DefaultChoiceRule.Builder()
+                    .add(b0)
+                    .add(b1));
             return this;
         }
 
         @Override
         public Builder add(String symbol, String reference) {
             checkForAdd(symbol, reference);
-            builders.put(symbol, new DefaultReferenceRule.Builder(reference));
+            var builder = new DefaultReferenceRule.Builder(reference);
+            builders.merge(symbol, builder, (b0, b1) -> new DefaultChoiceRule.Builder()
+                    .add(b0)
+                    .add(b1));
             return this;
         }
 
