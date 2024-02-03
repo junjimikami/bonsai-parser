@@ -8,38 +8,38 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.unitedjiga.common.parsing.grammar.Expression.Kind;
+import com.unitedjiga.common.parsing.grammar.Rule.Kind;
 
-class ReferenceExpressionTest implements ExpressionTest {
+class ReferenceRuleTest implements RuleTest {
 
     @Nested
-    class BuilderTest implements ExpressionTest.BulderTest, QuantifiableTest, ReferenceRelatedTest {
+    class BuilderTest implements RuleTest.BulderTest, QuantifiableTest, ReferenceRelatedTest {
 
         @Override
-        public ReferenceExpression.Builder builder() {
-            return ReferenceExpression.builder("");
+        public ReferenceRule.Builder builder() {
+            return ReferenceRule.builder("");
         }
 
         @Nested
-        class QuantifierBuilderTest implements QuantifierExpressionTest.BuilderTest, ReferenceRelatedTest {
+        class QuantifierBuilderTest implements QuantifierRuleTest.BuilderTest, ReferenceRelatedTest {
             @Override
-            public QuantifierExpression.Builder builder() {
-                return ReferenceExpressionTest.BuilderTest.this.builder().opt();
+            public QuantifierRule.Builder builder() {
+                return ReferenceRuleTest.BuilderTest.this.builder().opt();
             }
         }
 
         @Nested
-        class QuantifierTest implements QuantifierExpressionTest {
+        class QuantifierTest implements QuantifierRuleTest {
             @Override
             public Quantifiable builder() {
-                return ReferenceExpressionTest.BuilderTest.this.builder();
+                return ReferenceRuleTest.BuilderTest.this.builder();
             }
         }
     }
 
     @Override
-    public Expression build() {
-        return ReferenceExpression.builder("").build(Stubs.DUMMY_PRODUCTION_SET);
+    public Rule build() {
+        return ReferenceRule.builder("").build(Stubs.DUMMY_PRODUCTION_SET);
     }
 
     @Override
@@ -48,10 +48,10 @@ class ReferenceExpressionTest implements ExpressionTest {
     }
 
     @Override
-    public ExpressionVisitor<Object[], String> elementVisitor() {
-        return new TestExpressionVisitor<Object[], String>() {
+    public RuleVisitor<Object[], String> visitor() {
+        return new TestRuleVisitor<Object[], String>() {
             @Override
-            public Object[] visitReference(ReferenceExpression reference, String p) {
+            public Object[] visitReference(ReferenceRule reference, String p) {
                 return new Object[] { reference, p };
             }
         };
@@ -60,21 +60,21 @@ class ReferenceExpressionTest implements ExpressionTest {
     @Test
     @DisplayName("builder(String) [Null parameter]")
     void builderInCaseNullParameter() throws Exception {
-        assertThrows(NullPointerException.class, () -> ReferenceExpression.builder(null))
+        assertThrows(NullPointerException.class, () -> ReferenceRule.builder(null))
                 .printStackTrace();
     }
 
     @Test
     @DisplayName("builder(String)")
     void builder() throws Exception {
-        assertNotNull(ReferenceExpression.builder(""));
+        assertNotNull(ReferenceRule.builder(""));
     }
 
     @Test
     @DisplayName("builder(String)")
     void get() throws Exception {
         var symbol = "S";
-        var reference = ReferenceExpression.builder(symbol).build(Stubs.DUMMY_PRODUCTION_SET);
+        var reference = ReferenceRule.builder(symbol).build(Stubs.DUMMY_PRODUCTION_SET);
         var production = reference.getProduction();
 
         assertEquals(symbol, production.getSymbol());

@@ -2,23 +2,23 @@ package com.unitedjiga.common.parsing.grammar.impl;
 
 import java.util.Objects;
 
-import com.unitedjiga.common.parsing.grammar.Expression;
+import com.unitedjiga.common.parsing.grammar.Rule;
 import com.unitedjiga.common.parsing.grammar.Production;
 
 class DefaultProduction implements Production {
 
     private final String symbol;
-    private final Expression expression;
+    private final Rule rule;
 
     /**
      * @param symbol
-     * @param expression
+     * @param rule
      */
-    DefaultProduction(String symbol, Expression expression) {
+    DefaultProduction(String symbol, Rule rule) {
         Objects.requireNonNull(symbol);
-        Objects.requireNonNull(expression);
+        Objects.requireNonNull(rule);
         this.symbol = symbol;
-        this.expression = expression;
+        this.rule = rule;
     }
 
     @Override
@@ -27,12 +27,12 @@ class DefaultProduction implements Production {
     }
 
     @Override
-    public Expression getExpression() {
-        return expression;
+    public Rule getRule() {
+        return rule;
     }
 
     @Override
     public String toString() {
-        return "%s::=%s".formatted(symbol, expression);
+        return "%s::=%s".formatted(symbol, rule);
     }
 }

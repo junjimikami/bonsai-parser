@@ -11,12 +11,12 @@ import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import com.unitedjiga.common.parsing.grammar.Expression.Kind;
+import com.unitedjiga.common.parsing.grammar.Rule.Kind;
 
-interface ExpressionTest {
+interface RuleTest {
 
     interface BulderTest {
-        Expression.Builder builder();
+        Rule.Builder builder();
 
         @Test
         @DisplayName("build(ps:ProductionSet) [Post-build operation]")
@@ -30,43 +30,43 @@ interface ExpressionTest {
 
     }
 
-    Expression build();
+    Rule build();
 
     Kind kind();
 
-    ExpressionVisitor<Object[], String> elementVisitor();
+    RuleVisitor<Object[], String> visitor();
 
     @Test
     @DisplayName("objectMethods()")
     default void objectMethods() throws Exception {
-        var expression = build();
+        var rule = build();
 
-        expression.toString();
+        rule.toString();
     }
 
     @Test
     @DisplayName("getKind()")
     default void getKind() throws Exception {
-        var expression = build();
+        var rule = build();
 
-        assertEquals(kind(), expression.getKind());
+        assertEquals(kind(), rule.getKind());
     }
 
     @Test
     @DisplayName("accept(ev:ElementVisitor) [Null parameter]")
     default void acceptEvInCaseNullParameter() throws Exception {
-        var expression = build();
+        var rule = build();
 
-        assertThrows(NullPointerException.class, () -> expression.accept(null));
+        assertThrows(NullPointerException.class, () -> rule.accept(null));
     }
 
     @Test
     @DisplayName("accept(ev:ElementVisitor)")
     default void acceptEv() throws Exception {
-        var expression = build();
-        var visitor = elementVisitor();
-        var expected = new Object[] { expression, null };
-        var result = expression.accept(visitor);
+        var rule = build();
+        var visitor = visitor();
+        var expected = new Object[] { rule, null };
+        var result = rule.accept(visitor);
 
         assertArrayEquals(expected, result);
     }
@@ -77,10 +77,10 @@ interface ExpressionTest {
     @EmptySource
     @ValueSource(strings = { "test" })
     default void acceptEvP(String arg) throws Exception {
-        var expression = build();
-        var visitor = elementVisitor();
-        var expected = new Object[] { expression, arg };
-        var result = expression.accept(visitor, arg);
+        var rule = build();
+        var visitor = visitor();
+        var expected = new Object[] { rule, arg };
+        var result = rule.accept(visitor, arg);
 
         assertArrayEquals(expected, result);
     }

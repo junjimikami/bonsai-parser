@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2022 Mikami Junji.
+ * Copyright 2021 Junji Mikami.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,31 +23,37 @@
  */
 package com.unitedjiga.common.parsing.grammar;
 
-import java.util.OptionalInt;
-import java.util.stream.Stream;
+import java.util.List;
+
+import com.unitedjiga.common.parsing.grammar.impl.GrammarProviders;
 
 /**
- * @author Mikami Junji
+ * @author Junji Mikami
  *
  */
-public interface QuantifierExpression extends Expression {
+public interface ChoiceRule extends Rule {
 
-    public static interface Builder extends Expression.Builder {
+    public static interface Builder extends Rule.Builder, Quantifiable {
+        public ChoiceRule.Builder add(Rule.Builder builder);
+        public ChoiceRule.Builder add(String reference);
+        public ChoiceRule.Builder addEmpty();
         @Override
-        public QuantifierExpression build(ProductionSet set);
+        public ChoiceRule build(ProductionSet set);
+    }
+
+    public static Builder builder() {
+        return GrammarProviders.provider().createChoiceBuilder();
     }
 
     @Override
     public default Kind getKind() {
-        return Kind.QUANTIFIER;
+    	return Kind.CHOICE;
     }
 
     @Override
-    public default <R, P> R accept(ExpressionVisitor<R, P> visitor, P p) {
-        return visitor.visitQuantifier(this, p);
+    public default <R, P> R accept(RuleVisitor<R, P> visitor, P p) {
+        return visitor.visitChoice(this, p);
     }
 
-    public int getMinCount();
-    public OptionalInt getMaxCount();
-    public Stream<Expression> stream();
+    public List<? extends Rule> getChoices();
 }

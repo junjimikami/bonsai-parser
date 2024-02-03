@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2021 Junji Mikami.
+ * Copyright 2020 Junji Mikami.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,38 +23,43 @@
  */
 package com.unitedjiga.common.parsing.grammar;
 
-import java.util.regex.Pattern;
-
-import com.unitedjiga.common.parsing.grammar.impl.GrammarProviders;
-
 /**
+ * 
  * @author Junji Mikami
- *
  */
-public interface PatternExpression extends Expression {
+public interface Rule {
 
-    public static interface Builder extends Expression.Builder, Quantifiable {
+    public static enum Kind {
+        PATTERN, SEQUENCE, CHOICE, REFERENCE, QUANTIFIER, EMPTY;
+    }
+
+    @FunctionalInterface
+    public static interface Builder {
+        public Rule build(ProductionSet set);
+    }
+
+    public static final Rule EMPTY = new Rule() {
+
         @Override
-        public PatternExpression build(ProductionSet set);
+        public Kind getKind() {
+            return Kind.EMPTY;
+        }
+
+        @Override
+        public <R, P> R accept(RuleVisitor<R, P> visitor, P p) {
+            return visitor.visitEmpty(this, p);
+        }
+        
+        @Override
+        public String toString() {
+            return "empty";
+        }
+    };
+
+    public <R, P> R accept(RuleVisitor<R, P> visitor, P p);
+    public default <R, P> R accept(RuleVisitor<R, P> visitor) {
+        return accept(visitor, null);
     }
 
-    public static Builder builder(String regex) {
-        return GrammarProviders.provider().createPatternBuilder(regex);
-    }
-
-    public static Builder builder(Pattern pattern) {
-        return GrammarProviders.provider().createPatternBuilder(pattern);
-    }
-
-    @Override
-    public default Kind getKind() {
-        return Kind.PATTERN;
-    }
-
-    @Override
-    public default <R, P> R accept(ExpressionVisitor<R, P> visitor, P p) {
-        return visitor.visitPattern(this, p);
-    }
-
-    public Pattern getPattern();
+    public Kind getKind();
 }

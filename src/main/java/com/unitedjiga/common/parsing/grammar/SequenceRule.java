@@ -31,13 +31,13 @@ import com.unitedjiga.common.parsing.grammar.impl.GrammarProviders;
  * @author Junji Mikami
  *
  */
-public interface SequenceExpression extends Expression {
+public interface SequenceRule extends Rule {
 
-    public static interface Builder extends Expression.Builder, Quantifiable {
-        public SequenceExpression.Builder add(Expression.Builder builder);
-        public SequenceExpression.Builder add(String reference);
+    public static interface Builder extends Rule.Builder, Quantifiable {
+        public SequenceRule.Builder add(Rule.Builder builder);
+        public SequenceRule.Builder add(String reference);
         @Override
-        public SequenceExpression build(ProductionSet set);
+        public SequenceRule build(ProductionSet set);
     }
 
     public static Builder builder() {
@@ -50,9 +50,9 @@ public interface SequenceExpression extends Expression {
     }
 
     @Override
-    public default <R, P> R accept(ExpressionVisitor<R, P> visitor, P p) {
+    public default <R, P> R accept(RuleVisitor<R, P> visitor, P p) {
         return visitor.visitSequence(this, p);
     }
 
-    public List<? extends Expression> getSequence();
+    public List<? extends Rule> getRules();
 }

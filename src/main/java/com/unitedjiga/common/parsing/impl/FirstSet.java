@@ -29,37 +29,37 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.unitedjiga.common.parsing.grammar.ChoiceExpression;
-import com.unitedjiga.common.parsing.grammar.Expression;
-import com.unitedjiga.common.parsing.grammar.ExpressionVisitor;
-import com.unitedjiga.common.parsing.grammar.PatternExpression;
-import com.unitedjiga.common.parsing.grammar.QuantifierExpression;
-import com.unitedjiga.common.parsing.grammar.ReferenceExpression;
-import com.unitedjiga.common.parsing.grammar.SequenceExpression;
+import com.unitedjiga.common.parsing.grammar.ChoiceRule;
+import com.unitedjiga.common.parsing.grammar.Rule;
+import com.unitedjiga.common.parsing.grammar.RuleVisitor;
+import com.unitedjiga.common.parsing.grammar.PatternRule;
+import com.unitedjiga.common.parsing.grammar.QuantifierRule;
+import com.unitedjiga.common.parsing.grammar.ReferenceRule;
+import com.unitedjiga.common.parsing.grammar.SequenceRule;
 
 /**
  * @author Mikami Junji
  *
  */
-final class FirstSet implements ExpressionVisitor<Set<Expression>, Set<Expression>> {
+final class FirstSet implements RuleVisitor<Set<Rule>, Set<Rule>> {
     private static final FirstSet instance = new FirstSet();
 
     private FirstSet() {
     }
 
-    static Set<Expression> of(Expression expression, Set<Expression> followSet) {
-        return instance.visit(expression, followSet);
+    static Set<Rule> of(Rule rule, Set<Rule> followSet) {
+        return instance.visit(rule, followSet);
     }
-    static Set<Expression> of(List<? extends Expression> sequence, Set<Expression> followSet) {
+    static Set<Rule> of(List<? extends Rule> sequence, Set<Rule> followSet) {
         return instance.visit(sequence, followSet);
     }
 
     @Override
-    public Set<Expression> visit(Expression prd) {
+    public Set<Rule> visit(Rule prd) {
         return visit(prd, Set.of());
     }
 
-    private Set<Expression> visit(List<? extends Expression> sequence, Set<Expression> followSet) {
+    private Set<Rule> visit(List<? extends Rule> sequence, Set<Rule> followSet) {
         if (sequence.isEmpty()) {
             return followSet;
         }
@@ -73,11 +73,11 @@ final class FirstSet implements ExpressionVisitor<Set<Expression>, Set<Expressio
     }
 
     @Override
-    public Set<Expression> visitChoice(ChoiceExpression alt, Set<Expression> followSet) {
+    public Set<Rule> visitChoice(ChoiceRule alt, Set<Rule> followSet) {
         if (alt.getChoices().isEmpty()) {
             return followSet;
         }
-        var set = new HashSet<Expression>();
+        var set = new HashSet<Rule>();
         for (var p : alt.getChoices()) {
             set.addAll(visit(p, followSet));
         }
@@ -85,24 +85,24 @@ final class FirstSet implements ExpressionVisitor<Set<Expression>, Set<Expressio
     }
 
     @Override
-    public Set<Expression> visitSequence(SequenceExpression seq, Set<Expression> followSet) {
-        return visit(seq.getSequence(), followSet);
+    public Set<Rule> visitSequence(SequenceRule seq, Set<Rule> followSet) {
+        return visit(seq.getRules(), followSet);
     }
 
     @Override
-    public Set<Expression> visitPattern(PatternExpression p, Set<Expression> followSet) {
+    public Set<Rule> visitPattern(PatternRule p, Set<Rule> followSet) {
         return Set.of(p);
     }
 
     @Override
-    public Set<Expression> visitReference(ReferenceExpression ref, Set<Expression> followSet) {
+    public Set<Rule> visitReference(ReferenceRule ref, Set<Rule> followSet) {
         var production = ref.getProduction();
-        return visit(production.getExpression(), followSet);
+        return visit(production.getRule(), followSet);
     }
 
     @Override
-    public Set<Expression> visitQuantifier(QuantifierExpression qt, Set<Expression> followSet) {
-        var set = new HashSet<Expression>();
+    public Set<Rule> visitQuantifier(QuantifierRule qt, Set<Rule> followSet) {
+        var set = new HashSet<Rule>();
         var prd = qt.stream()
                 .limit(1)
                 .findFirst();
@@ -116,7 +116,7 @@ final class FirstSet implements ExpressionVisitor<Set<Expression>, Set<Expressio
     }
 
     @Override
-    public Set<Expression> visitEmpty(Expression empty, Set<Expression> followSet) {
+    public Set<Rule> visitEmpty(Rule empty, Set<Rule> followSet) {
         return followSet;
     }
 }

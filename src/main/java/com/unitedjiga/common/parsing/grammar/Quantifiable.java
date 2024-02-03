@@ -1,19 +1,19 @@
 package com.unitedjiga.common.parsing.grammar;
 
-public interface Quantifiable extends Expression.Builder {
+public interface Quantifiable extends Rule.Builder {
 
-    public default QuantifierExpression.Builder opt() {
+    public default QuantifierRule.Builder opt() {
         return range(0, 1);
     }
-    public default QuantifierExpression.Builder zeroOrMore() {
+    public default QuantifierRule.Builder zeroOrMore() {
         return atLeast(0);
     }
-    public default QuantifierExpression.Builder oneOrMore() {
+    public default QuantifierRule.Builder oneOrMore() {
         return atLeast(1);
     }
-    public default QuantifierExpression.Builder exactly(int times) {
+    public default QuantifierRule.Builder exactly(int times) {
         return range(times, times);
     }
-    public QuantifierExpression.Builder atLeast(int times);
-    public QuantifierExpression.Builder range(int from, int to);
+    public QuantifierRule.Builder atLeast(int times);
+    public QuantifierRule.Builder range(int from, int to);
 }

@@ -27,20 +27,20 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import com.unitedjiga.common.parsing.Tokenizer;
-import com.unitedjiga.common.parsing.grammar.Expression;
+import com.unitedjiga.common.parsing.grammar.Rule;
 import com.unitedjiga.common.parsing.grammar.Production;
 
 /**
  * @author Mikami Junji
  *
  */
-record Context(Production production, Tokenizer tokenizer, Set<Expression> followSet, Pattern skipPattern) {
+record Context(Production production, Tokenizer tokenizer, Set<Rule> followSet, Pattern skipPattern) {
 
     Context withProduction(Production production) {
         return new Context(production, this.tokenizer, this.followSet, this.skipPattern);
     }
 
-    Context withFollowSet(Set<Expression> followSet) {
+    Context withFollowSet(Set<Rule> followSet) {
         return new Context(this.production, this.tokenizer, followSet, this.skipPattern);
     }
 
@@ -54,8 +54,8 @@ record Context(Production production, Tokenizer tokenizer, Set<Expression> follo
         tokenizer.skip(skipPattern);
     }
     boolean preCheck() {
-        var expression = production().getExpression();
-        if (!AnyMatcher.scan(expression, this)) {
+        var rule = production().getRule();
+        if (!AnyMatcher.scan(rule, this)) {
             skip();
         }
         return tokenizer().hasNext();

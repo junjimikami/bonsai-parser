@@ -13,38 +13,38 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import com.unitedjiga.common.parsing.grammar.Expression.Kind;
+import com.unitedjiga.common.parsing.grammar.Rule.Kind;
 
-class PatternExpressionTest implements ExpressionTest {
+class PatternRuleTest implements RuleTest {
 
     @Nested
-    class BuilderTest implements ExpressionTest.BulderTest, QuantifiableTest {
+    class BuilderTest implements RuleTest.BulderTest, QuantifiableTest {
 
         @Override
-        public PatternExpression.Builder builder() {
-            return PatternExpression.builder("");
+        public PatternRule.Builder builder() {
+            return PatternRule.builder("");
         }
 
         @Nested
-        class QuantifierBuilderTest implements QuantifierExpressionTest.BuilderTest {
+        class QuantifierBuilderTest implements QuantifierRuleTest.BuilderTest {
             @Override
-            public QuantifierExpression.Builder builder() {
-                return PatternExpressionTest.BuilderTest.this.builder().opt();
+            public QuantifierRule.Builder builder() {
+                return PatternRuleTest.BuilderTest.this.builder().opt();
             }
         }
 
         @Nested
-        class QuantifierTest implements QuantifierExpressionTest {
+        class QuantifierTest implements QuantifierRuleTest {
             @Override
             public Quantifiable builder() {
-                return PatternExpressionTest.BuilderTest.this.builder();
+                return PatternRuleTest.BuilderTest.this.builder();
             }
         }
     }
 
     @Override
-    public PatternExpression build() {
-        return PatternExpression.builder("").build(Stubs.DUMMY_PRODUCTION_SET);
+    public PatternRule build() {
+        return PatternRule.builder("").build(Stubs.DUMMY_PRODUCTION_SET);
     }
 
     @Override
@@ -53,10 +53,10 @@ class PatternExpressionTest implements ExpressionTest {
     }
 
     @Override
-    public ExpressionVisitor<Object[], String> elementVisitor() {
-        return new TestExpressionVisitor<Object[], String>() {
+    public RuleVisitor<Object[], String> visitor() {
+        return new TestRuleVisitor<Object[], String>() {
             @Override
-            public Object[] visitPattern(PatternExpression pattern, String p) {
+            public Object[] visitPattern(PatternRule pattern, String p) {
                 return new Object[] { pattern, p };
             }
         };
@@ -65,34 +65,34 @@ class PatternExpressionTest implements ExpressionTest {
     @Test
     @DisplayName("builder(st:String) [Null parameter]")
     void builderStInCaseNullParameter() throws Exception {
-        assertThrows(NullPointerException.class, () -> PatternExpression.builder((String) null))
+        assertThrows(NullPointerException.class, () -> PatternRule.builder((String) null))
                 .printStackTrace();
     }
 
     @Test
     @DisplayName("builder(pa:Pattern) [Null parameter]")
     void builderPaInCaseNullParameter() throws Exception {
-        assertThrows(NullPointerException.class, () -> PatternExpression.builder((Pattern) null))
+        assertThrows(NullPointerException.class, () -> PatternRule.builder((Pattern) null))
                 .printStackTrace();
     }
 
     @Test
     @DisplayName("builder(st:String) [Invalid regex]")
     void builderStInCaseInvalidRegex() throws Exception {
-        assertThrows(PatternSyntaxException.class, () -> PatternExpression.builder("["))
+        assertThrows(PatternSyntaxException.class, () -> PatternRule.builder("["))
                 .printStackTrace();
     }
 
     @Test
     @DisplayName("builder(st:String)")
     void builderSt() throws Exception {
-        PatternExpression.builder("");
+        PatternRule.builder("");
     }
 
     @Test
     @DisplayName("builder(pa:Pattern)")
     void builderPa() throws Exception {
-        PatternExpression.builder(Pattern.compile(""));
+        PatternRule.builder(Pattern.compile(""));
     }
 
     @ParameterizedTest
@@ -100,7 +100,7 @@ class PatternExpressionTest implements ExpressionTest {
     @ValueSource(strings = { "test", "[0-9]" })
     @DisplayName("getPattern()")
     void getPattern(String regex) throws Exception {
-        var pattern = PatternExpression.builder(regex).build(Stubs.DUMMY_PRODUCTION_SET);
+        var pattern = PatternRule.builder(regex).build(Stubs.DUMMY_PRODUCTION_SET);
 
         assertEquals(regex, pattern.getPattern().pattern());
     }

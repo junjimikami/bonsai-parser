@@ -2,40 +2,40 @@ package com.unitedjiga.common.parsing.impl;
 
 import java.util.stream.Collectors;
 
-import com.unitedjiga.common.parsing.grammar.Expression;
-import com.unitedjiga.common.parsing.grammar.QuantifierExpression;
+import com.unitedjiga.common.parsing.grammar.Rule;
+import com.unitedjiga.common.parsing.grammar.QuantifierRule;
 
 final class MessageSupport {
 
     private MessageSupport() {
     }
 
-    static String tokenNotMatchExpression(Expression expression, Context context) {
+    static String tokenNotMatchRule(Rule rule, Context context) {
         var symbol = context.production().getSymbol();
-        var firsetSet = FirstSet.of(expression, context.followSet())
+        var firsetSet = FirstSet.of(rule, context.followSet())
                 .stream()
-                .map(Expression::toString)
+                .map(Rule::toString)
                 .collect(Collectors.joining(", ", "[", "]"));
         var token = context.tokenizer().hasNext()
                 ? context.tokenizer().next().toString()
                 : "EOF";
-        return Message.TOKEN_NOT_MATCH_EXPRESSION.format(symbol, firsetSet, token);
+        return Message.TOKEN_NOT_MATCH_RULE.format(symbol, firsetSet, token);
     }
 
-    static String ambiguousChoice(Expression expression, Context context) {
+    static String ambiguousChoice(Rule rule, Context context) {
         var symbol = context.production().getSymbol();
-        var firsetSet = FirstSet.of(expression, context.followSet())
+        var firsetSet = FirstSet.of(rule, context.followSet())
                 .stream()
-                .map(Expression::toString)
+                .map(Rule::toString)
                 .collect(Collectors.joining(", ", "[", "]"));
         return Message.AMBIGUOUS_CHOICE.format(symbol, firsetSet);
     }
 
-    static String tokenCountOutOfRange(QuantifierExpression quantfier, Context context, int count) {
+    static String tokenCountOutOfRange(QuantifierRule quantfier, Context context, int count) {
         var symbol = context.production().getSymbol();
         var firsetSet = FirstSet.of(quantfier, context.followSet())
                 .stream()
-                .map(Expression::toString)
+                .map(Rule::toString)
                 .collect(Collectors.joining(", ", "[", "]"));
         var from = quantfier.getMinCount();
         if (quantfier.getMaxCount().isPresent()) {

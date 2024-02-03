@@ -23,33 +23,33 @@
  */
 package com.unitedjiga.common.parsing.impl;
 
-import com.unitedjiga.common.parsing.grammar.Expression;
-import com.unitedjiga.common.parsing.grammar.PatternExpression;
-import com.unitedjiga.common.parsing.grammar.SimpleExpressionVisitor;
+import com.unitedjiga.common.parsing.grammar.Rule;
+import com.unitedjiga.common.parsing.grammar.PatternRule;
+import com.unitedjiga.common.parsing.grammar.SimpleRuleVisitor;
 
 /**
  * @author Mikami Junji
  *
  */
-final class AnyMatcher implements SimpleExpressionVisitor<Boolean, Context> {
+final class AnyMatcher implements SimpleRuleVisitor<Boolean, Context> {
     private static final AnyMatcher instance = new AnyMatcher();
 
     private AnyMatcher() {
     }
 
-    static boolean scan(Expression expression, Context context) {
-        return instance.visit(expression, context);
+    static boolean scan(Rule rule, Context context) {
+        return instance.visit(rule, context);
     }
 
     @Override
-    public Boolean visitPattern(PatternExpression pattern, Context context) {
+    public Boolean visitPattern(PatternRule pattern, Context context) {
         var tokenizer = context.tokenizer();
         return tokenizer.hasNext(pattern.getPattern());
     }
 
     @Override
-    public Boolean defaultAction(Expression expression, Context context) {
-        var firstSet = FirstSet.of(expression, context.followSet());
+    public Boolean defaultAction(Rule rule, Context context) {
+        var firstSet = FirstSet.of(rule, context.followSet());
         if (firstSet.isEmpty()) {
             return !context.tokenizer().hasNext();
         }

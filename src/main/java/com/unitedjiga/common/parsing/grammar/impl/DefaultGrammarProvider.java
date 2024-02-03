@@ -3,11 +3,11 @@ package com.unitedjiga.common.parsing.grammar.impl;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import com.unitedjiga.common.parsing.grammar.ChoiceExpression;
+import com.unitedjiga.common.parsing.grammar.ChoiceRule;
 import com.unitedjiga.common.parsing.grammar.Grammar;
-import com.unitedjiga.common.parsing.grammar.PatternExpression;
-import com.unitedjiga.common.parsing.grammar.ReferenceExpression;
-import com.unitedjiga.common.parsing.grammar.SequenceExpression;
+import com.unitedjiga.common.parsing.grammar.PatternRule;
+import com.unitedjiga.common.parsing.grammar.ReferenceRule;
+import com.unitedjiga.common.parsing.grammar.SequenceRule;
 import com.unitedjiga.common.parsing.grammar.spi.GrammarProvider;
 
 class DefaultGrammarProvider implements GrammarProvider {
@@ -18,31 +18,31 @@ class DefaultGrammarProvider implements GrammarProvider {
     }
 
     @Override
-    public PatternExpression.Builder createPatternBuilder(String regex) {
+    public PatternRule.Builder createPatternBuilder(String regex) {
         Objects.requireNonNull(regex, Message.NULL_PARAMETER.format());
-        return new DefaultPatternExpression.Builder(regex);
+        return new DefaultPatternRule.Builder(regex);
     }
 
     @Override
-    public PatternExpression.Builder createPatternBuilder(Pattern pattern) {
+    public PatternRule.Builder createPatternBuilder(Pattern pattern) {
         Objects.requireNonNull(pattern, Message.NULL_PARAMETER.format());
-        return new DefaultPatternExpression.Builder(pattern);
+        return new DefaultPatternRule.Builder(pattern);
     }
 
     @Override
-    public SequenceExpression.Builder createSequenceBuilder() {
-        return new DefaultSequenceExpression.Builder();
+    public SequenceRule.Builder createSequenceBuilder() {
+        return new DefaultSequenceRule.Builder();
     }
 
     @Override
-    public ChoiceExpression.Builder createChoiceBuilder() {
-        return new DefaultChoiceExpression.Builder();
+    public ChoiceRule.Builder createChoiceBuilder() {
+        return new DefaultChoiceRule.Builder();
     }
 
     @Override
-    public ReferenceExpression.Builder createReferenceBuilder(String reference) {
+    public ReferenceRule.Builder createReferenceBuilder(String reference) {
         Objects.requireNonNull(reference, Message.NULL_PARAMETER.format());
-        return new DefaultReferenceExpression.Builder(reference);
+        return new DefaultReferenceRule.Builder(reference);
     }
 
 }

@@ -41,7 +41,7 @@ class GrammarTest {
         @DisplayName("build() [No such start symbol]")
         void buildInCaseNoSuchStartSymbol() throws Exception {
             var builder = Grammar.builder();
-            builder.add("A", Stubs.DUMMY_EXPRESSION_BUILDER);
+            builder.add("A", Stubs.DUMMY_RULE_BUILDER);
             builder.setStartSymbol("B");
 
             assertThrows(NoSuchElementException.class, () -> builder.build())
@@ -59,11 +59,11 @@ class GrammarTest {
         }
 
         @Test
-        @DisplayName("add(st:String, eb:Expression.Builder) [st == null]")
+        @DisplayName("add(st:String, eb:Rule.Builder) [st == null]")
         void addStEbInCaseStIsNull() throws Exception {
             var builder = Grammar.builder();
 
-            assertThrows(NullPointerException.class, () -> builder.add(null, Stubs.DUMMY_EXPRESSION_BUILDER))
+            assertThrows(NullPointerException.class, () -> builder.add(null, Stubs.DUMMY_RULE_BUILDER))
                     .printStackTrace();
         }
 
@@ -77,11 +77,11 @@ class GrammarTest {
         }
 
         @Test
-        @DisplayName("add(st:String, eb:Expression.Builder) [eb == null]")
+        @DisplayName("add(st:String, eb:Rule.Builder) [eb == null]")
         void addStEbInCaseEbIsNull() throws Exception {
             var builder = Grammar.builder();
 
-            assertThrows(NullPointerException.class, () -> builder.add("A", (Expression.Builder) null))
+            assertThrows(NullPointerException.class, () -> builder.add("A", (Rule.Builder) null))
                     .printStackTrace();
         }
 
@@ -122,13 +122,13 @@ class GrammarTest {
         }
 
         @Test
-        @DisplayName("add(st:String, eb:Expression.Builder) [Post-build operation]")
+        @DisplayName("add(st:String, eb:Rule.Builder) [Post-build operation]")
         void addStEbInCasePostBuild() throws Exception {
             var builder = Grammar.builder();
-            builder.add("A", Stubs.DUMMY_EXPRESSION_BUILDER);
+            builder.add("A", Stubs.DUMMY_RULE_BUILDER);
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.add("A", Stubs.DUMMY_EXPRESSION_BUILDER))
+            assertThrows(IllegalStateException.class, () -> builder.add("A", Stubs.DUMMY_RULE_BUILDER))
                     .printStackTrace();
         }
 
@@ -136,7 +136,7 @@ class GrammarTest {
         @DisplayName("add(st:String, st2:String) [Post-build operation]")
         void addStSt2InCasePostBuild() throws Exception {
             var builder = Grammar.builder();
-            builder.add("A", Stubs.DUMMY_EXPRESSION_BUILDER);
+            builder.add("A", Stubs.DUMMY_RULE_BUILDER);
             builder.build();
 
             assertThrows(IllegalStateException.class, () -> builder.add("A", "B"))
@@ -147,7 +147,7 @@ class GrammarTest {
         @DisplayName("setSkipPattern(st:String) [Post-build operation]")
         void setSkipPatternStInCasePostBuild() throws Exception {
             var builder = Grammar.builder();
-            builder.add("A", Stubs.DUMMY_EXPRESSION_BUILDER);
+            builder.add("A", Stubs.DUMMY_RULE_BUILDER);
             builder.build();
 
             assertThrows(IllegalStateException.class, () -> builder.setSkipPattern(""))
@@ -158,7 +158,7 @@ class GrammarTest {
         @DisplayName("setSkipPattern(pa:Pattern) [Post-build operation]")
         void setSkipPatternPaInCasePostBuild() throws Exception {
             var builder = Grammar.builder();
-            builder.add("A", Stubs.DUMMY_EXPRESSION_BUILDER);
+            builder.add("A", Stubs.DUMMY_RULE_BUILDER);
             builder.build();
 
             assertThrows(IllegalStateException.class, () -> builder.setSkipPattern(Pattern.compile("")))
@@ -169,7 +169,7 @@ class GrammarTest {
         @DisplayName("setStartSymbol(st:String) [Post-build operation]")
         void setStartSymbolInCasePostBuild() throws Exception {
             var builder = Grammar.builder();
-            builder.add("A", Stubs.DUMMY_EXPRESSION_BUILDER);
+            builder.add("A", Stubs.DUMMY_RULE_BUILDER);
             builder.build();
 
             assertThrows(IllegalStateException.class, () -> builder.build())
@@ -177,11 +177,11 @@ class GrammarTest {
         }
 
         @Test
-        @DisplayName("add(st:String, eb:Expression.Builder)")
+        @DisplayName("add(st:String, eb:Rule.Builder)")
         void addStEb() throws Exception {
             var builder = Grammar.builder();
 
-            assertEquals(builder, builder.add("A", Stubs.DUMMY_EXPRESSION_BUILDER));
+            assertEquals(builder, builder.add("A", Stubs.DUMMY_RULE_BUILDER));
         }
 
         @Test
@@ -189,7 +189,7 @@ class GrammarTest {
         void addStSt2() throws Exception {
             var builder = Grammar.builder();
 
-            assertEquals(builder, builder.add("A", Stubs.DUMMY_EXPRESSION_BUILDER));
+            assertEquals(builder, builder.add("A", Stubs.DUMMY_RULE_BUILDER));
         }
 
         @Test
@@ -197,7 +197,7 @@ class GrammarTest {
         void setSkipPatternSt() throws Exception {
             var builder = Grammar.builder();
 
-            assertEquals(builder, builder.add("A", Stubs.DUMMY_EXPRESSION_BUILDER));
+            assertEquals(builder, builder.add("A", Stubs.DUMMY_RULE_BUILDER));
         }
 
         @Test
@@ -205,7 +205,7 @@ class GrammarTest {
         void setSkipPatternPa() throws Exception {
             var builder = Grammar.builder();
 
-            assertEquals(builder, builder.add("A", Stubs.DUMMY_EXPRESSION_BUILDER));
+            assertEquals(builder, builder.add("A", Stubs.DUMMY_RULE_BUILDER));
         }
 
         @Test
@@ -213,7 +213,7 @@ class GrammarTest {
         void setStartSymbol() throws Exception {
             var builder = Grammar.builder();
 
-            assertEquals(builder, builder.add("A", Stubs.DUMMY_EXPRESSION_BUILDER));
+            assertEquals(builder, builder.add("A", Stubs.DUMMY_RULE_BUILDER));
         }
 
     }
@@ -222,8 +222,8 @@ class GrammarTest {
     @DisplayName("getStartSymbol()")
     void getStartSymbol() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", Stubs.DUMMY_EXPRESSION_BUILDER)
-                .add("A", Stubs.DUMMY_EXPRESSION_BUILDER)
+                .add("S", Stubs.DUMMY_RULE_BUILDER)
+                .add("A", Stubs.DUMMY_RULE_BUILDER)
                 .build();
 
         assertEquals("S", grammar.getStartSymbol());
@@ -233,8 +233,8 @@ class GrammarTest {
     @DisplayName("getStartSymbol() [Start symbol changed]")
     void getStartSymbolInCaseStartSymbolChanged() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", Stubs.DUMMY_EXPRESSION_BUILDER)
-                .add("A", Stubs.DUMMY_EXPRESSION_BUILDER)
+                .add("S", Stubs.DUMMY_RULE_BUILDER)
+                .add("A", Stubs.DUMMY_RULE_BUILDER)
                 .setStartSymbol("A")
                 .build();
 
@@ -245,7 +245,7 @@ class GrammarTest {
     @DisplayName("getSkipPattern()")
     void getSkipPattern() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", Stubs.DUMMY_EXPRESSION_BUILDER)
+                .add("S", Stubs.DUMMY_RULE_BUILDER)
                 .build();
 
         assertNull(grammar.getSkipPattern());
@@ -255,7 +255,7 @@ class GrammarTest {
     @DisplayName("getSkipPattern() [Skip pattern set]")
     void getSkipPatternInCaseSkipPatternSet() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", Stubs.DUMMY_EXPRESSION_BUILDER)
+                .add("S", Stubs.DUMMY_RULE_BUILDER)
                 .setSkipPattern("123")
                 .build();
 
@@ -266,18 +266,18 @@ class GrammarTest {
     @DisplayName("productionSet()")
     void productionSet() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", Stubs.DUMMY_EXPRESSION_BUILDER)
-                .add("A", Stubs.DUMMY_EXPRESSION_BUILDER)
+                .add("S", Stubs.DUMMY_RULE_BUILDER)
+                .add("A", Stubs.DUMMY_RULE_BUILDER)
                 .build();
         var productionSet = grammar.productionSet();
 
         assertTrue(productionSet.containsSymbol("S"));
         assertEquals("S", productionSet.get("S").getSymbol());
-        assertEquals(Stubs.DUMMY_EXPRESSION, productionSet.get("S").getExpression());
+        assertEquals(Stubs.DUMMY_RULE, productionSet.get("S").getRule());
 
         assertTrue(productionSet.containsSymbol("A"));
         assertEquals("A", productionSet.get("A").getSymbol());
-        assertEquals(Stubs.DUMMY_EXPRESSION, productionSet.get("A").getExpression());
+        assertEquals(Stubs.DUMMY_RULE, productionSet.get("A").getRule());
 
         assertFalse(productionSet.containsSymbol("B"));
         assertThrows(NoSuchElementException.class, () -> productionSet.get("B"));
@@ -287,8 +287,8 @@ class GrammarTest {
     @DisplayName("getStartProduction()")
     void getStartProduction() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", Stubs.DUMMY_EXPRESSION_BUILDER)
-                .add("A", Stubs.DUMMY_EXPRESSION_BUILDER)
+                .add("S", Stubs.DUMMY_RULE_BUILDER)
+                .add("A", Stubs.DUMMY_RULE_BUILDER)
                 .build();
 
         assertEquals("S", grammar.getStartProduction().getSymbol());
@@ -298,8 +298,8 @@ class GrammarTest {
     @DisplayName("getStartProduction() [Start symbol changed]")
     void getStartProductionInCaseStartSymbolChanged() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", Stubs.DUMMY_EXPRESSION_BUILDER)
-                .add("A", Stubs.DUMMY_EXPRESSION_BUILDER)
+                .add("S", Stubs.DUMMY_RULE_BUILDER)
+                .add("A", Stubs.DUMMY_RULE_BUILDER)
                 .setStartSymbol("A")
                 .build();
 

@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2020 Junji Mikami.
+ * Copyright 2022 Mikami Junji.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,42 +24,40 @@
 package com.unitedjiga.common.parsing.grammar;
 
 /**
- * 
- * @author Junji Mikami
+ * @author Mikami Junji
+ *
  */
-public interface Expression {
+public interface SimpleRuleVisitor<R, P> extends RuleVisitor<R, P> {
 
-    public static enum Kind {
-        PATTERN, SEQUENCE, CHOICE, REFERENCE, QUANTIFIER, EMPTY;
+    @Override
+    public default R visitChoice(ChoiceRule choice, P p) {
+        return defaultAction(choice, p);
     }
 
-    @FunctionalInterface
-    public static interface Builder {
-        public Expression build(ProductionSet set);
+    @Override
+    public default R visitSequence(SequenceRule sequence, P p) {
+        return defaultAction(sequence, p);
     }
 
-    public static final Expression EMPTY = new Expression() {
-
-        @Override
-        public Kind getKind() {
-            return Kind.EMPTY;
-        }
-
-        @Override
-        public <R, P> R accept(ExpressionVisitor<R, P> visitor, P p) {
-            return visitor.visitEmpty(this, p);
-        }
-        
-        @Override
-        public String toString() {
-            return "empty";
-        }
-    };
-
-    public <R, P> R accept(ExpressionVisitor<R, P> visitor, P p);
-    public default <R, P> R accept(ExpressionVisitor<R, P> visitor) {
-        return accept(visitor, null);
+    @Override
+    public default R visitPattern(PatternRule pattern, P p) {
+        return defaultAction(pattern, p);
     }
 
-    public Kind getKind();
+    @Override
+    public default R visitReference(ReferenceRule reference, P p) {
+        return defaultAction(reference, p);
+    }
+
+    @Override
+    public default R visitQuantifier(QuantifierRule quantifier, P p) {
+        return defaultAction(quantifier, p);
+    }
+
+    @Override
+    public default R visitEmpty(Rule empty, P p) {
+        return defaultAction(empty, p);
+    }
+
+    public R defaultAction(Rule rule, P p);
 }

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 interface ReferenceRelatedTest {
-    Expression.Builder builder();
+    Rule.Builder builder();
 
     @Test
     @DisplayName("build(ps:ProductionSet) [Null production set]")

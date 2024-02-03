@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import com.unitedjiga.common.parsing.grammar.Expression;
+import com.unitedjiga.common.parsing.grammar.Rule;
 import com.unitedjiga.common.parsing.grammar.Production;
 import com.unitedjiga.common.parsing.grammar.ProductionSet;
 
@@ -30,8 +30,8 @@ class DefaultProductionSet implements ProductionSet {
         return p;
     }
 
-    void add(String symbol, Expression expression) {
-        var production = new DefaultProduction(symbol, expression);
+    void add(String symbol, Rule rule) {
+        var production = new DefaultProduction(symbol, rule);
         map.put(symbol, production);
     }
 

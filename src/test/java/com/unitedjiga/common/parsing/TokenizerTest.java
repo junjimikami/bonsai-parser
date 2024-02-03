@@ -1,8 +1,8 @@
 package com.unitedjiga.common.parsing;
 
-import static com.unitedjiga.common.parsing.grammar.Expressions.choice;
-import static com.unitedjiga.common.parsing.grammar.Expressions.pattern;
-import static com.unitedjiga.common.parsing.grammar.Expressions.sequence;
+import static com.unitedjiga.common.parsing.grammar.Rules.choiceBuilder;
+import static com.unitedjiga.common.parsing.grammar.Rules.pattern;
+import static com.unitedjiga.common.parsing.grammar.Rules.sequenceBuilder;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Named.named;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -22,7 +22,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import com.unitedjiga.common.parsing.grammar.Expression;
+import com.unitedjiga.common.parsing.grammar.Rule;
 import com.unitedjiga.common.parsing.grammar.Grammar;
 
 class TokenizerTest {
@@ -62,7 +62,7 @@ class TokenizerTest {
         @Test
         void test3() {
             var grammar = Grammar.builder()
-                    .add("A", choice()
+                    .add("A", choiceBuilder()
                             .add(pattern("0"))
                             .add(pattern("1")))
                     .build();
@@ -78,7 +78,7 @@ class TokenizerTest {
         @Test
         void test4() {
             var grammar = Grammar.builder()
-                    .add("A", choice()
+                    .add("A", choiceBuilder()
                             .add("B")
                             .add("C"))
                     .add("B", pattern("0"))
@@ -96,7 +96,7 @@ class TokenizerTest {
         @Test
         void test5() {
             var grammar = Grammar.builder()
-                    .add("A", sequence()
+                    .add("A", sequenceBuilder()
                             .add(pattern("0"))
                             .add(pattern("1")))
                     .build();
@@ -231,7 +231,7 @@ class TokenizerTest {
         @Test
         void test16() {
             var grammar = Grammar.builder()
-                    .add("A", sequence()
+                    .add("A", sequenceBuilder()
                             .add("B")
                             .add("C"))
                     .add("B", pattern("0").opt())
@@ -248,9 +248,9 @@ class TokenizerTest {
         void test17() {
             var grammar = Grammar.builder()
                     .setSkipPattern("\\s")
-                    .add("A", sequence()
+                    .add("A", sequenceBuilder()
                             .add(pattern("1"))
-                            .add(choice()
+                            .add(choiceBuilder()
                                     .add(pattern("0"))
                                     .addEmpty()))
                     .build();
@@ -264,9 +264,9 @@ class TokenizerTest {
         @Test
         void test18() throws Exception {
             var grammar = Grammar.builder()
-                    .add("A", sequence()
+                    .add("A", sequenceBuilder()
                             .add(pattern("1"))
-                            .add(set -> Expression.EMPTY))
+                            .add(set -> Rule.EMPTY))
                     .build();
             var factory = TokenizerFactory.newFactory(grammar);
             var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -304,7 +304,7 @@ class TokenizerTest {
     @MethodSource("allMethods")
     void ambiguousRule(Consumer<Tokenizer> method) throws Exception {
         var grammar = Grammar.builder()
-                .add("S", choice()
+                .add("S", choiceBuilder()
                         .add("A")
                         .add("B"))
                 .add("A", pattern("1"))
@@ -350,7 +350,7 @@ class TokenizerTest {
     @MethodSource("allMethods")
     void tokenNotMatchChoiceRule(Consumer<Tokenizer> method) throws Exception {
         var grammar = Grammar.builder()
-                .add("S", choice()
+                .add("S", choiceBuilder()
                         .add(pattern("0")))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
@@ -365,7 +365,7 @@ class TokenizerTest {
     @MethodSource("allMethods")
     void tokenNotMatchSequenceRule(Consumer<Tokenizer> method) throws Exception {
         var grammar = Grammar.builder()
-                .add("S", sequence()
+                .add("S", sequenceBuilder()
                         .add(pattern("0")))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
@@ -380,7 +380,7 @@ class TokenizerTest {
     @MethodSource("allMethods")
     void tokenNotMatchEmptyRule(Consumer<Tokenizer> method) throws Exception {
         var grammar = Grammar.builder()
-                .add("S", set -> Expression.EMPTY)
+                .add("S", set -> Rule.EMPTY)
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -535,7 +535,7 @@ class TokenizerTest {
     @DisplayName("hasNext() [No tokens remaining]")
     void hasNextInCaseNoTokensRemaining() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", set -> Expression.EMPTY)
+                .add("S", set -> Rule.EMPTY)
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(Reader.nullReader());
@@ -547,7 +547,7 @@ class TokenizerTest {
     @DisplayName("hasNext(st:String) [No tokens remaining]")
     void hasNextStInCaseNoTokensRemaining() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", set -> Expression.EMPTY)
+                .add("S", set -> Rule.EMPTY)
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(Reader.nullReader());
@@ -559,7 +559,7 @@ class TokenizerTest {
     @DisplayName("hasNext(pa:Pattern) [No tokens remaining]")
     void hasNextPaInCaseNoTokensRemaining() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", set -> Expression.EMPTY)
+                .add("S", set -> Rule.EMPTY)
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(Reader.nullReader());
@@ -609,7 +609,7 @@ class TokenizerTest {
     @DisplayName("next() [No tokens remaining]")
     void nextInCaseNoTokensRemaining() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", set -> Expression.EMPTY)
+                .add("S", set -> Rule.EMPTY)
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(Reader.nullReader());
@@ -622,7 +622,7 @@ class TokenizerTest {
     @DisplayName("next(st:String) [No tokens remaining]")
     void nextStInCaseNoTokensRemaining() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", set -> Expression.EMPTY)
+                .add("S", set -> Rule.EMPTY)
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(Reader.nullReader());
@@ -635,7 +635,7 @@ class TokenizerTest {
     @DisplayName("next(pa:Pattern) [No tokens remaining]")
     void nextPaInCaseNoTokensRemaining() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", set -> Expression.EMPTY)
+                .add("S", set -> Rule.EMPTY)
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(Reader.nullReader());

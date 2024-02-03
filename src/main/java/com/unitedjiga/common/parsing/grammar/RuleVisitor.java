@@ -27,25 +27,25 @@ package com.unitedjiga.common.parsing.grammar;
  * @author Mikami Junji
  *
  */
-public interface ExpressionVisitor<R, P> {
+public interface RuleVisitor<R, P> {
 
-    public default R visit(Expression expression) {
-        return visit(expression, null);
+    public default R visit(Rule rule) {
+        return visit(rule, null);
     }
 
-    public default R visit(Expression expression, P p) {
-        return expression.accept(this, p);
+    public default R visit(Rule rule, P p) {
+        return rule.accept(this, p);
     }
 
-    public R visitChoice(ChoiceExpression expression, P p);
+    public R visitChoice(ChoiceRule choice, P p);
 
-    public R visitSequence(SequenceExpression expression, P p);
+    public R visitSequence(SequenceRule sequence, P p);
 
-    public R visitPattern(PatternExpression expression, P p);
+    public R visitPattern(PatternRule pattern, P p);
 
-    public R visitReference(ReferenceExpression expression, P p);
+    public R visitReference(ReferenceRule reference, P p);
 
-    public R visitQuantifier(QuantifierExpression expression, P p);
+    public R visitQuantifier(QuantifierRule quantifier, P p);
 
-    public R visitEmpty(Expression expression, P p);
+    public R visitEmpty(Rule rule, P p);
 }
