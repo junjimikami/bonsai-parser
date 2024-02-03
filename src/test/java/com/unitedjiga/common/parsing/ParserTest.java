@@ -1,8 +1,8 @@
 package com.unitedjiga.common.parsing;
 
-import static com.unitedjiga.common.parsing.grammar.Expressions.choice;
-import static com.unitedjiga.common.parsing.grammar.Expressions.pattern;
-import static com.unitedjiga.common.parsing.grammar.Expressions.sequence;
+import static com.unitedjiga.common.parsing.grammar.Rules.choiceBuilder;
+import static com.unitedjiga.common.parsing.grammar.Rules.pattern;
+import static com.unitedjiga.common.parsing.grammar.Rules.sequenceBuilder;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Named.named;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -19,7 +19,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import com.unitedjiga.common.parsing.Tree.Kind;
-import com.unitedjiga.common.parsing.grammar.Expression;
+import com.unitedjiga.common.parsing.grammar.Rule;
 import com.unitedjiga.common.parsing.grammar.Grammar;
 
 class ParserTest {
@@ -44,7 +44,7 @@ class ParserTest {
     @MethodSource("allMethods")
     void ambiguousRule(Consumer<Parser> method) throws Exception {
         var grammar = Grammar.builder()
-                .add("S", choice()
+                .add("S", choiceBuilder()
                         .add("A")
                         .add("B"))
                 .add("A", pattern("1"))
@@ -90,7 +90,7 @@ class ParserTest {
     @MethodSource("allMethods")
     void tokenNotMatchChoiceRule(Consumer<Parser> method) throws Exception {
         var grammar = Grammar.builder()
-                .add("S", choice()
+                .add("S", choiceBuilder()
                         .add(pattern("0")))
                 .build();
         var factory = ParserFactory.newFactory(grammar);
@@ -105,7 +105,7 @@ class ParserTest {
     @MethodSource("allMethods")
     void tokenNotMatchSequenceRule(Consumer<Parser> method) throws Exception {
         var grammar = Grammar.builder()
-                .add("S", sequence()
+                .add("S", sequenceBuilder()
                         .add(pattern("0")))
                 .build();
         var factory = ParserFactory.newFactory(grammar);
@@ -120,7 +120,7 @@ class ParserTest {
     @MethodSource("allMethods")
     void tokenNotMatchEmptyRule(Consumer<Parser> method) throws Exception {
         var grammar = Grammar.builder()
-                .add("S", set -> Expression.EMPTY)
+                .add("S", set -> Rule.EMPTY)
                 .build();
         var factory = ParserFactory.newFactory(grammar);
         var parser = factory.createParser(new StringReader("1"));

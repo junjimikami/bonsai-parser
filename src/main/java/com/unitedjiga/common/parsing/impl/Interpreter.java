@@ -29,19 +29,19 @@ import java.util.List;
 
 import com.unitedjiga.common.parsing.ParseException;
 import com.unitedjiga.common.parsing.Tree;
-import com.unitedjiga.common.parsing.grammar.ChoiceExpression;
-import com.unitedjiga.common.parsing.grammar.Expression;
-import com.unitedjiga.common.parsing.grammar.ExpressionVisitor;
-import com.unitedjiga.common.parsing.grammar.PatternExpression;
-import com.unitedjiga.common.parsing.grammar.QuantifierExpression;
-import com.unitedjiga.common.parsing.grammar.ReferenceExpression;
-import com.unitedjiga.common.parsing.grammar.SequenceExpression;
+import com.unitedjiga.common.parsing.grammar.ChoiceRule;
+import com.unitedjiga.common.parsing.grammar.Rule;
+import com.unitedjiga.common.parsing.grammar.RuleVisitor;
+import com.unitedjiga.common.parsing.grammar.PatternRule;
+import com.unitedjiga.common.parsing.grammar.QuantifierRule;
+import com.unitedjiga.common.parsing.grammar.ReferenceRule;
+import com.unitedjiga.common.parsing.grammar.SequenceRule;
 
 /**
  * @author Mikami Junji
  *
  */
-final class Interpreter implements ExpressionVisitor<List<Tree>, Context> {
+final class Interpreter implements RuleVisitor<List<Tree>, Context> {
     private static final Interpreter instance = new Interpreter();
 
     private Interpreter() {
@@ -53,25 +53,25 @@ final class Interpreter implements ExpressionVisitor<List<Tree>, Context> {
 
     private Tree interpret(Context context) {
         var production = context.production();
-        var trees = visit(production.getExpression(), context);
+        var trees = visit(production.getRule(), context);
         return new DefaultNonTerminal(production.getSymbol(), trees);
     }
 
     @Override
-    public List<Tree> visit(Expression expression, Context context) {
-        if (!AnyMatcher.scan(expression, context)) {
+    public List<Tree> visit(Rule rule, Context context) {
+        if (!AnyMatcher.scan(rule, context)) {
             context.skip();
         }
-        return ExpressionVisitor.super.visit(expression, context);
+        return RuleVisitor.super.visit(rule, context);
     }
 
     @Override
-    public List<Tree> visitChoice(ChoiceExpression choice, Context context) {
+    public List<Tree> visitChoice(ChoiceRule choice, Context context) {
         var list = choice.getChoices().stream()
                 .filter(e -> AnyMatcher.scan(e, context))
                 .toList();
         if (list.isEmpty()) {
-            var message = MessageSupport.tokenNotMatchExpression(choice, context);
+            var message = MessageSupport.tokenNotMatchRule(choice, context);
             throw new ParseException(message);
         }
         if (1 < list.size()) {
@@ -82,26 +82,26 @@ final class Interpreter implements ExpressionVisitor<List<Tree>, Context> {
     }
 
     @Override
-    public List<Tree> visitSequence(SequenceExpression sequence, Context context) {
+    public List<Tree> visitSequence(SequenceRule sequence, Context context) {
         if (!AnyMatcher.scan(sequence, context)) {
-            var message = MessageSupport.tokenNotMatchExpression(sequence, context);
+            var message = MessageSupport.tokenNotMatchRule(sequence, context);
             throw new ParseException(message);
         }
         var list = new ArrayList<Tree>();
-        var subSequence = new LinkedList<>(sequence.getSequence());
+        var subSequence = new LinkedList<>(sequence.getRules());
         while (!subSequence.isEmpty()) {
-            var expression = subSequence.remove();
+            var rule = subSequence.remove();
             var followSet = FirstSet.of(subSequence, context.followSet());
             var context2 = context.withFollowSet(followSet);
-            list.addAll(visit(expression, context2));
+            list.addAll(visit(rule, context2));
         }
         return list;
     }
 
     @Override
-    public List<Tree> visitPattern(PatternExpression pattern, Context context) {
+    public List<Tree> visitPattern(PatternRule pattern, Context context) {
         if (!AnyMatcher.scan(pattern, context)) {
-            var message = MessageSupport.tokenNotMatchExpression(pattern, context);
+            var message = MessageSupport.tokenNotMatchRule(pattern, context);
             throw new ParseException(message);
         }
         var tokenizer = context.tokenizer();
@@ -110,7 +110,7 @@ final class Interpreter implements ExpressionVisitor<List<Tree>, Context> {
     }
 
     @Override
-    public List<Tree> visitReference(ReferenceExpression reference, Context context) {
+    public List<Tree> visitReference(ReferenceRule reference, Context context) {
         var production = reference.getProduction();
         var context2 = context.withProduction(production);
         var tree = interpret(context2);
@@ -118,7 +118,7 @@ final class Interpreter implements ExpressionVisitor<List<Tree>, Context> {
     }
 
     @Override
-    public List<Tree> visitQuantifier(QuantifierExpression quantfier, Context context) {
+    public List<Tree> visitQuantifier(QuantifierRule quantfier, Context context) {
         var list = new ArrayList<Tree>();
         var count = (int) quantfier.stream()
                 .takeWhile(e -> {
@@ -139,9 +139,9 @@ final class Interpreter implements ExpressionVisitor<List<Tree>, Context> {
     }
 
     @Override
-    public List<Tree> visitEmpty(Expression empty, Context context) {
+    public List<Tree> visitEmpty(Rule empty, Context context) {
         if (!AnyMatcher.scan(empty, context)) {
-            var message = MessageSupport.tokenNotMatchExpression(empty, context);
+            var message = MessageSupport.tokenNotMatchRule(empty, context);
             throw new ParseException(message);
         }
         return List.of();

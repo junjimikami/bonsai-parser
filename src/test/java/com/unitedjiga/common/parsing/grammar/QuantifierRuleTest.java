@@ -8,18 +8,18 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import com.unitedjiga.common.parsing.grammar.Expression.Kind;
+import com.unitedjiga.common.parsing.grammar.Rule.Kind;
 
-interface QuantifierExpressionTest extends ExpressionTest {
+interface QuantifierRuleTest extends RuleTest {
 
-    interface BuilderTest extends ExpressionTest.BulderTest {
-        QuantifierExpression.Builder builder();
+    interface BuilderTest extends RuleTest.BulderTest {
+        QuantifierRule.Builder builder();
     }
 
     Quantifiable builder();
 
     @Override
-    default Expression build() {
+    default Rule build() {
         return builder().opt().build(Stubs.DUMMY_PRODUCTION_SET);
     }
 
@@ -29,10 +29,10 @@ interface QuantifierExpressionTest extends ExpressionTest {
     }
 
     @Override
-    default ExpressionVisitor<Object[], String> elementVisitor() {
-        return new TestExpressionVisitor<Object[], String>() {
+    default RuleVisitor<Object[], String> visitor() {
+        return new TestRuleVisitor<Object[], String>() {
             @Override
-            public Object[] visitQuantifier(QuantifierExpression quantifier, String p) {
+            public Object[] visitQuantifier(QuantifierRule quantifier, String p) {
                 return new Object[] { quantifier, p };
             }
         };

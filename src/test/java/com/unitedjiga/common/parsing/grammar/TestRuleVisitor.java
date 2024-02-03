@@ -2,10 +2,10 @@ package com.unitedjiga.common.parsing.grammar;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
-interface TestExpressionVisitor<R, P> extends SimpleExpressionVisitor<R, P> {
+interface TestRuleVisitor<R, P> extends SimpleRuleVisitor<R, P> {
 
     @Override
-    default R defaultAction(Expression expression, P p) {
+    default R defaultAction(Rule rule, P p) {
         return fail();
     }
 }

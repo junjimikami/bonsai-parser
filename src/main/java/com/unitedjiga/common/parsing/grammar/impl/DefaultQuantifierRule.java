@@ -27,28 +27,28 @@ import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.stream.Stream;
 
-import com.unitedjiga.common.parsing.grammar.Expression;
+import com.unitedjiga.common.parsing.grammar.Rule;
 import com.unitedjiga.common.parsing.grammar.ProductionSet;
-import com.unitedjiga.common.parsing.grammar.QuantifierExpression;
+import com.unitedjiga.common.parsing.grammar.QuantifierRule;
 
 /**
  * @author Mikami Junji
  *
  */
-class DefaultQuantifierExpression extends AbstractExpression implements QuantifierExpression {
-    static class Builder extends AbstractExpression.Builder implements QuantifierExpression.Builder {
-        private final Expression.Builder builder;
+class DefaultQuantifierRule extends AbstractRule implements QuantifierRule {
+    static class Builder extends AbstractRule.Builder implements QuantifierRule.Builder {
+        private final Rule.Builder builder;
         private final int from;
         private final Integer to;
 
-        Builder(Expression.Builder builder, int from) {
+        Builder(Rule.Builder builder, int from) {
             Objects.requireNonNull(builder);
             this.builder = builder;
             this.from = from;
             this.to = null;
         }
 
-        Builder(Expression.Builder builder, int from, int to) {
+        Builder(Rule.Builder builder, int from, int to) {
             Objects.requireNonNull(builder);
             this.builder = builder;
             this.from = from;
@@ -56,19 +56,19 @@ class DefaultQuantifierExpression extends AbstractExpression implements Quantifi
         }
 
         @Override
-        public QuantifierExpression build(ProductionSet set) {
+        public QuantifierRule build(ProductionSet set) {
             checkForBuild();
-            return new DefaultQuantifierExpression(builder.build(set), from, to);
+            return new DefaultQuantifierRule(builder.build(set), from, to);
         }
     }
 
-    private final Expression expression;
+    private final Rule rule;
     private final int lowerLimit;
     private final OptionalInt upperLimit;
 
-    private DefaultQuantifierExpression(Expression expression, int lowerLimit, Integer upperLimit) {
-        assert expression != null;
-        this.expression = expression;
+    private DefaultQuantifierRule(Rule rule, int lowerLimit, Integer upperLimit) {
+        assert rule != null;
+        this.rule = rule;
         this.lowerLimit = lowerLimit;
         if (upperLimit == null) {
             this.upperLimit = OptionalInt.empty();
@@ -88,8 +88,8 @@ class DefaultQuantifierExpression extends AbstractExpression implements Quantifi
     }
 
     @Override
-    public Stream<Expression> stream() {
-        var stream = Stream.generate(() -> expression);
+    public Stream<Rule> stream() {
+        var stream = Stream.generate(() -> rule);
         if (upperLimit.isPresent()) {
             return stream.limit(upperLimit.getAsInt());
         }
@@ -106,7 +106,7 @@ class DefaultQuantifierExpression extends AbstractExpression implements Quantifi
             sb.append("*");
             sb.append(upperLimit.getAsInt());
         }
-        sb.append(expression);
+        sb.append(rule);
         return sb.toString();
     }
 }

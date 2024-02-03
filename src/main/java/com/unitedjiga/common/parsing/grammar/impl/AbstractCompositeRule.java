@@ -3,11 +3,11 @@ package com.unitedjiga.common.parsing.grammar.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.unitedjiga.common.parsing.grammar.Expression;
+import com.unitedjiga.common.parsing.grammar.Rule;
 
-abstract class AbstractCompositeExpression extends AbstractExpression {
+abstract class AbstractCompositeRule extends AbstractRule {
     static abstract class Builder extends QuantifiableBuilder {
-        protected final List<Expression.Builder> builders = new ArrayList<>();
+        protected final List<Rule.Builder> builders = new ArrayList<>();
 
         @Override
         protected void checkForBuild() {
@@ -26,9 +26,9 @@ abstract class AbstractCompositeExpression extends AbstractExpression {
         }
     }
 
-    protected final List<? extends Expression> elements;
+    protected final List<? extends Rule> elements;
 
-    AbstractCompositeExpression(List<? extends Expression> elements) {
+    AbstractCompositeRule(List<? extends Rule> elements) {
         this.elements = elements;
     }
 }

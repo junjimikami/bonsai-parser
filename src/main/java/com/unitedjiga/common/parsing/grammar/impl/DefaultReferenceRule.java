@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2020 Junji Mikami.
+ * Copyright 2021 Junji Mikami.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,52 +23,55 @@
  */
 package com.unitedjiga.common.parsing.grammar.impl;
 
+import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.regex.Pattern;
 
-import com.unitedjiga.common.parsing.grammar.PatternExpression;
+import com.unitedjiga.common.parsing.grammar.Production;
 import com.unitedjiga.common.parsing.grammar.ProductionSet;
+import com.unitedjiga.common.parsing.grammar.ReferenceRule;
 
 /**
- *
  * @author Junji Mikami
+ *
  */
-class DefaultPatternExpression extends AbstractExpression implements PatternExpression {
-    static class Builder extends AbstractExpression.QuantifiableBuilder implements PatternExpression.Builder {
-        private Pattern pattern;
+class DefaultReferenceRule extends AbstractRule implements ReferenceRule {
+    static class Builder extends AbstractRule.QuantifiableBuilder implements ReferenceRule.Builder {
+        private final String symbol;
 
-        Builder(String regex) {
-            Objects.requireNonNull(regex);
-            this.pattern = Pattern.compile(regex);
-        }
-
-        Builder(Pattern pattern) {
-            Objects.requireNonNull(pattern);
-            this.pattern = pattern;
+        Builder(String symbol) {
+            Objects.requireNonNull(symbol);
+            this.symbol = symbol;
         }
 
         @Override
-        public PatternExpression build(ProductionSet set) {
+        public ReferenceRule build(ProductionSet set) {
             checkForBuild();
-            return new DefaultPatternExpression(pattern);
+            Objects.requireNonNull(set, Message.NULL_PARAMETER.format());
+            if (!set.containsSymbol(symbol)) {
+                throw new NoSuchElementException(Message.NO_SUCH_SYMBOL.format(symbol));
+            }
+            return new DefaultReferenceRule(set, symbol);
         }
 
     }
 
-    private final Pattern pattern;
+    private final ProductionSet set;
+    private final String symbol;
 
-    private DefaultPatternExpression(Pattern pattern) {
-        assert pattern != null;
-        this.pattern = pattern;
+    private DefaultReferenceRule(ProductionSet set, String symbol) {
+        assert set != null;
+        assert symbol != null;
+        this.set = set;
+        this.symbol = symbol;
     }
 
     @Override
-    public Pattern getPattern() {
-        return pattern;
+    public Production getProduction() {
+        return set.get(symbol);
     }
 
     @Override
     public String toString() {
-        return "\"%s\"".formatted(pattern.pattern());
+        return symbol;
     }
 }

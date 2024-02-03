@@ -58,7 +58,7 @@ interface QuantifiableTest {
         var quantifier = builder.exactly(0);
 
         assertNotEquals(builder, quantifier);
-        assertInstanceOf(QuantifierExpression.Builder.class, quantifier);
+        assertInstanceOf(QuantifierRule.Builder.class, quantifier);
     }
 
     @Test
@@ -68,7 +68,7 @@ interface QuantifiableTest {
         var quantifier = builder.atLeast(0);
 
         assertNotEquals(builder, quantifier);
-        assertInstanceOf(QuantifierExpression.Builder.class, quantifier);
+        assertInstanceOf(QuantifierRule.Builder.class, quantifier);
     }
 
     @Test
@@ -78,7 +78,7 @@ interface QuantifiableTest {
         var quantifier = builder.range(0, 0);
 
         assertNotEquals(builder, quantifier);
-        assertInstanceOf(QuantifierExpression.Builder.class, quantifier);
+        assertInstanceOf(QuantifierRule.Builder.class, quantifier);
     }
 
     @Test
@@ -88,7 +88,7 @@ interface QuantifiableTest {
         var quantifier = builder.opt();
 
         assertNotEquals(builder, quantifier);
-        assertInstanceOf(QuantifierExpression.Builder.class, quantifier);
+        assertInstanceOf(QuantifierRule.Builder.class, quantifier);
     }
 
     @Test
@@ -98,7 +98,7 @@ interface QuantifiableTest {
         var quantifier = builder.zeroOrMore();
 
         assertNotEquals(builder, quantifier);
-        assertInstanceOf(QuantifierExpression.Builder.class, quantifier);
+        assertInstanceOf(QuantifierRule.Builder.class, quantifier);
     }
 
     @Test
@@ -108,7 +108,7 @@ interface QuantifiableTest {
         var quantifier = builder.oneOrMore();
 
         assertNotEquals(builder, quantifier);
-        assertInstanceOf(QuantifierExpression.Builder.class, quantifier);
+        assertInstanceOf(QuantifierRule.Builder.class, quantifier);
     }
 
     @Test

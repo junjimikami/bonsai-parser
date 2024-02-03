@@ -23,59 +23,52 @@
  */
 package com.unitedjiga.common.parsing.grammar.impl;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
+import java.util.regex.Pattern;
 
-import com.unitedjiga.common.parsing.grammar.Expression;
+import com.unitedjiga.common.parsing.grammar.PatternRule;
 import com.unitedjiga.common.parsing.grammar.ProductionSet;
-import com.unitedjiga.common.parsing.grammar.SequenceExpression;
 
 /**
  *
  * @author Junji Mikami
  */
-class DefaultSequenceExpression extends AbstractCompositeExpression implements SequenceExpression {
-    static class Builder extends AbstractCompositeExpression.Builder implements SequenceExpression.Builder {
+class DefaultPatternRule extends AbstractRule implements PatternRule {
+    static class Builder extends AbstractRule.QuantifiableBuilder implements PatternRule.Builder {
+        private Pattern pattern;
 
-        Builder() {
+        Builder(String regex) {
+            Objects.requireNonNull(regex);
+            this.pattern = Pattern.compile(regex);
+        }
+
+        Builder(Pattern pattern) {
+            Objects.requireNonNull(pattern);
+            this.pattern = pattern;
         }
 
         @Override
-        public Builder add(Expression.Builder builder) {
-            checkParameter(builder);
-            builders.add(builder);
-            return this;
-        }
-
-        @Override
-        public Builder add(String reference) {
-            checkParameter(reference);
-            builders.add(new DefaultReferenceExpression.Builder(reference));
-            return this;
-        }
-
-        @Override
-        public SequenceExpression build(ProductionSet set) {
+        public PatternRule build(ProductionSet set) {
             checkForBuild();
-            var elements = builders.stream().map(e -> e.build(set)).toList();
-            return new DefaultSequenceExpression(elements);
+            return new DefaultPatternRule(pattern);
         }
 
     }
 
-    private DefaultSequenceExpression(List<Expression> elements) {
-        super(elements);
+    private final Pattern pattern;
+
+    private DefaultPatternRule(Pattern pattern) {
+        assert pattern != null;
+        this.pattern = pattern;
     }
 
     @Override
-    public List<? extends Expression> getSequence() {
-        return elements;
+    public Pattern getPattern() {
+        return pattern;
     }
 
     @Override
     public String toString() {
-        return elements.stream()
-                .map(Expression::toString)
-                .collect(Collectors.joining(",", "(", ")"));
+        return "\"%s\"".formatted(pattern.pattern());
     }
 }

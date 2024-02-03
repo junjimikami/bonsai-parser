@@ -6,7 +6,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import com.unitedjiga.common.parsing.grammar.Expression;
+import com.unitedjiga.common.parsing.grammar.Rule;
 import com.unitedjiga.common.parsing.grammar.Grammar;
 import com.unitedjiga.common.parsing.grammar.Production;
 import com.unitedjiga.common.parsing.grammar.ProductionSet;
@@ -14,7 +14,7 @@ import com.unitedjiga.common.parsing.grammar.ProductionSet;
 class DefaultGrammar implements Grammar {
 
     static class Builder extends BaseBuilder implements Grammar.Builder {
-        private final Map<String, Expression.Builder> builders = new HashMap<>();
+        private final Map<String, Rule.Builder> builders = new HashMap<>();
         private Pattern skipPattern;
         private String startSymbol;
 
@@ -42,7 +42,7 @@ class DefaultGrammar implements Grammar {
         }
 
         @Override
-        public Builder add(String symbol, Expression.Builder builder) {
+        public Builder add(String symbol, Rule.Builder builder) {
             checkForAdd(symbol, builder);
             builders.put(symbol, builder);
             return this;
@@ -51,7 +51,7 @@ class DefaultGrammar implements Grammar {
         @Override
         public Builder add(String symbol, String reference) {
             checkForAdd(symbol, reference);
-            builders.put(symbol, new DefaultReferenceExpression.Builder(reference));
+            builders.put(symbol, new DefaultReferenceRule.Builder(reference));
             return this;
         }
 
@@ -81,8 +81,8 @@ class DefaultGrammar implements Grammar {
             checkForBuild();
             var set = new DefaultProductionSet(builders.keySet());
             builders.forEach((symbol, builder) -> {
-                var expression = builder.build(set);
-                set.add(symbol, expression);
+                var rule = builder.build(set);
+                set.add(symbol, rule);
             });
             assert set.containsSymbol(startSymbol);
             return new DefaultGrammar(set, startSymbol, skipPattern);

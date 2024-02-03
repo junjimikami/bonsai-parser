@@ -29,11 +29,11 @@ import com.unitedjiga.common.parsing.grammar.impl.GrammarProviders;
  * @author Junji Mikami
  *
  */
-public interface ReferenceExpression extends Expression {
+public interface ReferenceRule extends Rule {
 
-    public static interface Builder extends Expression.Builder, Quantifiable {
+    public static interface Builder extends Rule.Builder, Quantifiable {
         @Override
-        public ReferenceExpression build(ProductionSet set);
+        public ReferenceRule build(ProductionSet set);
     }
 
     public static Builder builder(String reference) {
@@ -46,7 +46,7 @@ public interface ReferenceExpression extends Expression {
     }
 
     @Override
-    public default <R, P> R accept(ExpressionVisitor<R, P> visitor, P p) {
+    public default <R, P> R accept(RuleVisitor<R, P> visitor, P p) {
         return visitor.visitReference(this, p);
     }
     

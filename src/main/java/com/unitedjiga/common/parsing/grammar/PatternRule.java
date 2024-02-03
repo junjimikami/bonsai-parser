@@ -23,7 +23,7 @@
  */
 package com.unitedjiga.common.parsing.grammar;
 
-import java.util.List;
+import java.util.regex.Pattern;
 
 import com.unitedjiga.common.parsing.grammar.impl.GrammarProviders;
 
@@ -31,29 +31,30 @@ import com.unitedjiga.common.parsing.grammar.impl.GrammarProviders;
  * @author Junji Mikami
  *
  */
-public interface ChoiceExpression extends Expression {
+public interface PatternRule extends Rule {
 
-    public static interface Builder extends Expression.Builder, Quantifiable {
-        public ChoiceExpression.Builder add(Expression.Builder builder);
-        public ChoiceExpression.Builder add(String reference);
-        public ChoiceExpression.Builder addEmpty();
+    public static interface Builder extends Rule.Builder, Quantifiable {
         @Override
-        public ChoiceExpression build(ProductionSet set);
+        public PatternRule build(ProductionSet set);
     }
 
-    public static Builder builder() {
-        return GrammarProviders.provider().createChoiceBuilder();
+    public static Builder builder(String regex) {
+        return GrammarProviders.provider().createPatternBuilder(regex);
+    }
+
+    public static Builder builder(Pattern pattern) {
+        return GrammarProviders.provider().createPatternBuilder(pattern);
     }
 
     @Override
     public default Kind getKind() {
-    	return Kind.CHOICE;
+        return Kind.PATTERN;
     }
 
     @Override
-    public default <R, P> R accept(ExpressionVisitor<R, P> visitor, P p) {
-        return visitor.visitChoice(this, p);
+    public default <R, P> R accept(RuleVisitor<R, P> visitor, P p) {
+        return visitor.visitPattern(this, p);
     }
 
-    public List<? extends Expression> getChoices();
+    public Pattern getPattern();
 }

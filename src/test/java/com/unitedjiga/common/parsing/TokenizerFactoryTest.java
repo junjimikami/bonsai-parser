@@ -7,7 +7,7 @@ import java.util.NoSuchElementException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.unitedjiga.common.parsing.grammar.Expressions;
+import com.unitedjiga.common.parsing.grammar.Rules;
 import com.unitedjiga.common.parsing.grammar.Grammar;
 
 class TokenizerFactoryTest {
@@ -23,7 +23,7 @@ class TokenizerFactoryTest {
     @DisplayName("newFactory(Grammar)")
     void newFactory() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", Expressions.pattern(""))
+                .add("S", Rules.pattern(""))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
 

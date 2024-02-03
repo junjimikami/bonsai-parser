@@ -13,27 +13,27 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import com.unitedjiga.common.parsing.grammar.Expression.Kind;
+import com.unitedjiga.common.parsing.grammar.Rule.Kind;
 
 /**
  * 
  * @author Junji Mikami
  *
  */
-class ChoiceExpressionTest implements ExpressionTest {
+class ChoiceRuleTest implements RuleTest {
 
     @Nested
-    class BuilderTest implements ExpressionTest.BulderTest, QuantifiableTest, ReferenceRelatedTest {
+    class BuilderTest implements RuleTest.BulderTest, QuantifiableTest, ReferenceRelatedTest {
 
         @Override
-        public ChoiceExpression.Builder builder() {
-            return ChoiceExpression.builder().add("");
+        public ChoiceRule.Builder builder() {
+            return ChoiceRule.builder().add("");
         }
 
         @Test
         @DisplayName("build(ps:ProductionSet) [No elements]")
         void buildPsInCaseNoElements() throws Exception {
-            var builder = ChoiceExpression.builder();
+            var builder = ChoiceRule.builder();
 
             assertThrows(IllegalStateException.class, () -> builder.build(null))
                     .printStackTrace();
@@ -42,7 +42,7 @@ class ChoiceExpressionTest implements ExpressionTest {
         @Test
         @DisplayName("exactly(int) [No elements]")
         void exactlyInCaseNoElements() throws Exception {
-            var builder = ChoiceExpression.builder();
+            var builder = ChoiceRule.builder();
 
             assertThrows(IllegalStateException.class, () -> builder.exactly(0))
                     .printStackTrace();
@@ -51,7 +51,7 @@ class ChoiceExpressionTest implements ExpressionTest {
         @Test
         @DisplayName("atLeast(int) [No elements]")
         void atLeastInCaseNoElements() throws Exception {
-            var builder = ChoiceExpression.builder();
+            var builder = ChoiceRule.builder();
 
             assertThrows(IllegalStateException.class, () -> builder.atLeast(0))
                     .printStackTrace();
@@ -60,7 +60,7 @@ class ChoiceExpressionTest implements ExpressionTest {
         @Test
         @DisplayName("range(int, int) [No elements]")
         void rangeInCaseNoElements() throws Exception {
-            var builder = ChoiceExpression.builder();
+            var builder = ChoiceRule.builder();
 
             assertThrows(IllegalStateException.class, () -> builder.range(0, 0))
                     .printStackTrace();
@@ -69,7 +69,7 @@ class ChoiceExpressionTest implements ExpressionTest {
         @Test
         @DisplayName("opt() [No elements]")
         void optInCaseNoElements() throws Exception {
-            var builder = ChoiceExpression.builder();
+            var builder = ChoiceRule.builder();
 
             assertThrows(IllegalStateException.class, () -> builder.opt())
                     .printStackTrace();
@@ -78,7 +78,7 @@ class ChoiceExpressionTest implements ExpressionTest {
         @Test
         @DisplayName("zeroOrMore() [No elements]")
         void zeroOrMoreInCaseNoElements() throws Exception {
-            var builder = ChoiceExpression.builder();
+            var builder = ChoiceRule.builder();
 
             assertThrows(IllegalStateException.class, () -> builder.zeroOrMore())
                     .printStackTrace();
@@ -87,45 +87,45 @@ class ChoiceExpressionTest implements ExpressionTest {
         @Test
         @DisplayName("oneOrMore() [No elements]")
         void oneOrMoreInCaseNoElements() throws Exception {
-            var builder = ChoiceExpression.builder();
+            var builder = ChoiceRule.builder();
 
             assertThrows(IllegalStateException.class, () -> builder.oneOrMore())
                     .printStackTrace();
         }
 
         @Test
-        @DisplayName("add(Expression.Builder) [Null parameter]")
+        @DisplayName("add(Rule.Builder) [Null parameter]")
         void addEbInCaseNullParameter() throws Exception {
-            var builder = ChoiceExpression.builder();
+            var builder = ChoiceRule.builder();
 
-            assertThrows(NullPointerException.class, () -> builder.add((Expression.Builder) null))
+            assertThrows(NullPointerException.class, () -> builder.add((Rule.Builder) null))
                     .printStackTrace();
         }
 
         @Test
         @DisplayName("add(String) [Null parameter]")
         void addStInCaseNullParameter() throws Exception {
-            var builder = ChoiceExpression.builder();
+            var builder = ChoiceRule.builder();
 
             assertThrows(NullPointerException.class, () -> builder.add((String) null))
                     .printStackTrace();
         }
 
         @Test
-        @DisplayName("add(eb:Expression.Builder) [Post-build operation]")
+        @DisplayName("add(eb:Rule.Builder) [Post-build operation]")
         void addEbInCasePostBuild() throws Exception {
-            var builder = ChoiceExpression.builder()
+            var builder = ChoiceRule.builder()
                     .addEmpty();
             builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
-            assertThrows(IllegalStateException.class, () -> builder.add((Expression.Builder) null))
+            assertThrows(IllegalStateException.class, () -> builder.add((Rule.Builder) null))
                     .printStackTrace();
         }
 
         @Test
         @DisplayName("add(st:String) [Post-build operation]")
         void addStInCasePostBuild() throws Exception {
-            var builder = ChoiceExpression.builder()
+            var builder = ChoiceRule.builder()
                     .addEmpty();
             builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
@@ -134,17 +134,17 @@ class ChoiceExpressionTest implements ExpressionTest {
         }
 
         @Test
-        @DisplayName("add(eb:Expression.Builder)")
+        @DisplayName("add(eb:Rule.Builder)")
         void addEb() throws Exception {
-            var builder = ChoiceExpression.builder();
+            var builder = ChoiceRule.builder();
 
-            assertEquals(builder, builder.add(Stubs.DUMMY_EXPRESSION_BUILDER));
+            assertEquals(builder, builder.add(Stubs.DUMMY_RULE_BUILDER));
         }
 
         @Test
         @DisplayName("add(st:String)")
         void addSt() throws Exception {
-            var builder = ChoiceExpression.builder();
+            var builder = ChoiceRule.builder();
 
             assertEquals(builder, builder.add("SYMBOL"));
         }
@@ -152,32 +152,32 @@ class ChoiceExpressionTest implements ExpressionTest {
         @Test
         @DisplayName("addEmpty()")
         void addEmpty() throws Exception {
-            var builder = ChoiceExpression.builder();
+            var builder = ChoiceRule.builder();
 
             assertEquals(builder, builder.addEmpty());
         }
 
         @Nested
-        class QuantifierBuilderTest implements QuantifierExpressionTest.BuilderTest, ReferenceRelatedTest {
+        class QuantifierBuilderTest implements QuantifierRuleTest.BuilderTest, ReferenceRelatedTest {
             @Override
-            public QuantifierExpression.Builder builder() {
-                return ChoiceExpressionTest.BuilderTest.this.builder().opt();
+            public QuantifierRule.Builder builder() {
+                return ChoiceRuleTest.BuilderTest.this.builder().opt();
             }
         }
 
         @Nested
-        class QuantifierTest implements QuantifierExpressionTest {
+        class QuantifierTest implements QuantifierRuleTest {
             @Override
             public Quantifiable builder() {
-                return ChoiceExpressionTest.BuilderTest.this.builder();
+                return ChoiceRuleTest.BuilderTest.this.builder();
             }
         }
 
     }
 
     @Override
-    public Expression build() {
-        return ChoiceExpression.builder()
+    public Rule build() {
+        return ChoiceRule.builder()
                 .addEmpty()
                 .build(Stubs.DUMMY_PRODUCTION_SET);
     }
@@ -188,10 +188,10 @@ class ChoiceExpressionTest implements ExpressionTest {
     }
 
     @Override
-    public ExpressionVisitor<Object[], String> elementVisitor() {
-        return new TestExpressionVisitor<Object[], String>() {
+    public RuleVisitor<Object[], String> visitor() {
+        return new TestRuleVisitor<Object[], String>() {
             @Override
-            public Object[] visitChoice(ChoiceExpression choice, String p) {
+            public Object[] visitChoice(ChoiceRule choice, String p) {
                 return new Object[] { choice, p };
             }
         };
@@ -200,18 +200,18 @@ class ChoiceExpressionTest implements ExpressionTest {
     @Test
     @DisplayName("getChoices() [Containing empty]")
     void getChoicesInCaseContainingEmpty() throws Exception {
-        var choice = ChoiceExpression.builder()
+        var choice = ChoiceRule.builder()
                 .addEmpty()
                 .build(Stubs.DUMMY_PRODUCTION_SET);
 
-        assertIterableEquals(List.of(Expression.EMPTY), choice.getChoices());
+        assertIterableEquals(List.of(Rule.EMPTY), choice.getChoices());
     }
 
     @ParameterizedTest
     @MethodSource
     @DisplayName("getChoices()")
-    void getChoices(List<Expression> list) throws Exception {
-        var builder = ChoiceExpression.builder();
+    void getChoices(List<Rule> list) throws Exception {
+        var builder = ChoiceRule.builder();
         list.stream()
                 .map(Stubs::builderOf)
                 .forEach(builder::add);
@@ -220,22 +220,22 @@ class ChoiceExpressionTest implements ExpressionTest {
         assertIterableEquals(list, choice.getChoices());
     }
 
-    static Stream<List<Expression>> getChoices() {
+    static Stream<List<Rule>> getChoices() {
         return Stream.of(
-                List.of(Stubs.expression("A")),
-                List.of(Stubs.expression("A"), Stubs.expression("B")));
+                List.of(Stubs.rule("A")),
+                List.of(Stubs.rule("A"), Stubs.rule("B")));
     }
 
     @ParameterizedTest
     @MethodSource
     @DisplayName("getChoices() [Containing references]")
     void getChoicesInCaseContainingreferences(List<String> list) throws Exception {
-        var builder = ChoiceExpression.builder();
+        var builder = ChoiceRule.builder();
         list.stream().forEach(builder::add);
         var choice = builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
         assertIterableEquals(list, choice.getChoices().stream()
-                .map(e -> (ReferenceExpression) e)
+                .map(e -> (ReferenceRule) e)
                 .map(e -> e.getProduction().getSymbol())
                 .toList());
     }

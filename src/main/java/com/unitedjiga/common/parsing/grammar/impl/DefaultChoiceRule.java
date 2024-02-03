@@ -26,8 +26,8 @@ package com.unitedjiga.common.parsing.grammar.impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.unitedjiga.common.parsing.grammar.ChoiceExpression;
-import com.unitedjiga.common.parsing.grammar.Expression;
+import com.unitedjiga.common.parsing.grammar.ChoiceRule;
+import com.unitedjiga.common.parsing.grammar.Rule;
 import com.unitedjiga.common.parsing.grammar.ProductionSet;
 
 /**
@@ -35,14 +35,14 @@ import com.unitedjiga.common.parsing.grammar.ProductionSet;
  * @author Junji Mikami
  *
  */
-class DefaultChoiceExpression extends AbstractCompositeExpression implements ChoiceExpression {
-    static class Builder extends AbstractCompositeExpression.Builder implements ChoiceExpression.Builder {
+class DefaultChoiceRule extends AbstractCompositeRule implements ChoiceRule {
+    static class Builder extends AbstractCompositeRule.Builder implements ChoiceRule.Builder {
 
         Builder() {
         }
 
         @Override
-        public Builder add(Expression.Builder builder) {
+        public Builder add(Rule.Builder builder) {
             checkParameter(builder);
             builders.add(builder);
             return this;
@@ -51,7 +51,7 @@ class DefaultChoiceExpression extends AbstractCompositeExpression implements Cho
         @Override
         public Builder add(String reference) {
             checkParameter(reference);
-            builders.add(new DefaultReferenceExpression.Builder(reference));
+            builders.add(new DefaultReferenceRule.Builder(reference));
             return this;
         }
 
@@ -63,35 +63,35 @@ class DefaultChoiceExpression extends AbstractCompositeExpression implements Cho
         }
 
         @Override
-        public ChoiceExpression build(ProductionSet set) {
+        public ChoiceRule build(ProductionSet set) {
             checkForBuild();
             var elements = builders.stream().map(e -> e.build(set)).toList();
-            return new DefaultChoiceExpression(elements);
+            return new DefaultChoiceRule(elements);
         }
 
     }
 
-    private static final Expression.Builder emptyBuilder = new Expression.Builder() {
+    private static final Rule.Builder emptyBuilder = new Rule.Builder() {
 
         @Override
-        public Expression build(ProductionSet set) {
-            return Expression.EMPTY;
+        public Rule build(ProductionSet set) {
+            return Rule.EMPTY;
         }
     };
 
-    private DefaultChoiceExpression(List<? extends Expression> elements) {
+    private DefaultChoiceRule(List<? extends Rule> elements) {
         super(elements);
     }
 
     @Override
-    public List<? extends Expression> getChoices() {
+    public List<? extends Rule> getChoices() {
         return elements;
     }
 
     @Override
     public String toString() {
         return elements.stream()
-                .map(Expression::toString)
+                .map(Rule::toString)
                 .collect(Collectors.joining("|", "(", ")"));
     }
 }

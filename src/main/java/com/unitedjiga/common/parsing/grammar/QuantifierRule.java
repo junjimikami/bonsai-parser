@@ -23,41 +23,31 @@
  */
 package com.unitedjiga.common.parsing.grammar;
 
+import java.util.OptionalInt;
+import java.util.stream.Stream;
+
 /**
  * @author Mikami Junji
  *
  */
-public interface SimpleExpressionVisitor<R, P> extends ExpressionVisitor<R, P> {
+public interface QuantifierRule extends Rule {
 
-    @Override
-    public default R visitChoice(ChoiceExpression choice, P p) {
-        return defaultAction(choice, p);
+    public static interface Builder extends Rule.Builder {
+        @Override
+        public QuantifierRule build(ProductionSet set);
     }
 
     @Override
-    public default R visitSequence(SequenceExpression sequence, P p) {
-        return defaultAction(sequence, p);
+    public default Kind getKind() {
+        return Kind.QUANTIFIER;
     }
 
     @Override
-    public default R visitPattern(PatternExpression pattern, P p) {
-        return defaultAction(pattern, p);
+    public default <R, P> R accept(RuleVisitor<R, P> visitor, P p) {
+        return visitor.visitQuantifier(this, p);
     }
 
-    @Override
-    public default R visitReference(ReferenceExpression reference, P p) {
-        return defaultAction(reference, p);
-    }
-
-    @Override
-    public default R visitQuantifier(QuantifierExpression quantifier, P p) {
-        return defaultAction(quantifier, p);
-    }
-
-    @Override
-    public default R visitEmpty(Expression empty, P p) {
-        return defaultAction(empty, p);
-    }
-
-    public R defaultAction(Expression expression, P p);
+    public int getMinCount();
+    public OptionalInt getMaxCount();
+    public Stream<Rule> stream();
 }

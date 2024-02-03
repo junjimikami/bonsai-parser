@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2021 Junji Mikami.
+ * Copyright 2020 Junji Mikami.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,55 +23,59 @@
  */
 package com.unitedjiga.common.parsing.grammar.impl;
 
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import com.unitedjiga.common.parsing.grammar.Production;
+import com.unitedjiga.common.parsing.grammar.Rule;
 import com.unitedjiga.common.parsing.grammar.ProductionSet;
-import com.unitedjiga.common.parsing.grammar.ReferenceExpression;
+import com.unitedjiga.common.parsing.grammar.SequenceRule;
 
 /**
- * @author Junji Mikami
  *
+ * @author Junji Mikami
  */
-class DefaultReferenceExpression extends AbstractExpression implements ReferenceExpression {
-    static class Builder extends AbstractExpression.QuantifiableBuilder implements ReferenceExpression.Builder {
-        private final String symbol;
+class DefaultSequenceRule extends AbstractCompositeRule implements SequenceRule {
+    static class Builder extends AbstractCompositeRule.Builder implements SequenceRule.Builder {
 
-        Builder(String symbol) {
-            Objects.requireNonNull(symbol);
-            this.symbol = symbol;
+        Builder() {
         }
 
         @Override
-        public ReferenceExpression build(ProductionSet set) {
+        public Builder add(Rule.Builder builder) {
+            checkParameter(builder);
+            builders.add(builder);
+            return this;
+        }
+
+        @Override
+        public Builder add(String reference) {
+            checkParameter(reference);
+            builders.add(new DefaultReferenceRule.Builder(reference));
+            return this;
+        }
+
+        @Override
+        public SequenceRule build(ProductionSet set) {
             checkForBuild();
-            Objects.requireNonNull(set, Message.NULL_PARAMETER.format());
-            if (!set.containsSymbol(symbol)) {
-                throw new NoSuchElementException(Message.NO_SUCH_SYMBOL.format(symbol));
-            }
-            return new DefaultReferenceExpression(set, symbol);
+            var elements = builders.stream().map(e -> e.build(set)).toList();
+            return new DefaultSequenceRule(elements);
         }
 
     }
 
-    private final ProductionSet set;
-    private final String symbol;
-
-    private DefaultReferenceExpression(ProductionSet set, String symbol) {
-        assert set != null;
-        assert symbol != null;
-        this.set = set;
-        this.symbol = symbol;
+    private DefaultSequenceRule(List<Rule> elements) {
+        super(elements);
     }
 
     @Override
-    public Production getProduction() {
-        return set.get(symbol);
+    public List<? extends Rule> getRules() {
+        return elements;
     }
 
     @Override
     public String toString() {
-        return symbol;
+        return elements.stream()
+                .map(Rule::toString)
+                .collect(Collectors.joining(",", "(", ")"));
     }
 }

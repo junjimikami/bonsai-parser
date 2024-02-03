@@ -4,9 +4,9 @@ import java.util.NoSuchElementException;
 
 final class Stubs {
 
-    static final Expression DUMMY_EXPRESSION = expression("DUMMY_EXPRESSION");
+    static final Rule DUMMY_RULE = rule("DUMMY_RULE");
 
-    static final Expression.Builder DUMMY_EXPRESSION_BUILDER = builderOf(DUMMY_EXPRESSION);
+    static final Rule.Builder DUMMY_RULE_BUILDER = builderOf(DUMMY_RULE);
 
     static final ProductionSet DUMMY_PRODUCTION_SET = new ProductionSet() {
 
@@ -33,8 +33,8 @@ final class Stubs {
         }
     };
 
-    static Expression expression(String s) {
-        return new Expression() {
+    static Rule rule(String s) {
+        return new Rule() {
 
             @Override
             public Kind getKind() {
@@ -42,7 +42,7 @@ final class Stubs {
             }
 
             @Override
-            public <R, P> R accept(ExpressionVisitor<R, P> visitor, P p) {
+            public <R, P> R accept(RuleVisitor<R, P> visitor, P p) {
                 throw new AssertionError();
             }
 
@@ -53,12 +53,12 @@ final class Stubs {
         };
     }
 
-    static Expression.Builder builderOf(Expression expression) {
-        return new Expression.Builder() {
+    static Rule.Builder builderOf(Rule rule) {
+        return new Rule.Builder() {
 
             @Override
-            public Expression build(ProductionSet set) {
-                return expression;
+            public Rule build(ProductionSet set) {
+                return rule;
             }
         };
     }
@@ -72,8 +72,8 @@ final class Stubs {
             }
 
             @Override
-            public Expression getExpression() {
-                return expression(symbol);
+            public Rule getRule() {
+                return rule(symbol);
             }
         };
     }
