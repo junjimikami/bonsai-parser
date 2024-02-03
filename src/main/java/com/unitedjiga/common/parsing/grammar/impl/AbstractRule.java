@@ -57,7 +57,7 @@ abstract class AbstractRule implements Rule {
                 throw new IllegalArgumentException(Message.NEGATIVE_PARAMETER.format());
             }
             if (to < from) {
-                throw new IllegalArgumentException(Message.INVALID_UPPER_LIMIT.format());
+                throw new IllegalArgumentException(Message.INVALID_MAX_COUNT.format());
             }
             return new DefaultQuantifierRule.Builder(this, from, to);
         }

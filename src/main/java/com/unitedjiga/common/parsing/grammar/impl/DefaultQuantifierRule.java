@@ -63,35 +63,35 @@ class DefaultQuantifierRule extends AbstractRule implements QuantifierRule {
     }
 
     private final Rule rule;
-    private final int lowerLimit;
-    private final OptionalInt upperLimit;
+    private final int minCount;
+    private final OptionalInt maxCount;
 
-    private DefaultQuantifierRule(Rule rule, int lowerLimit, Integer upperLimit) {
+    private DefaultQuantifierRule(Rule rule, int minCount, Integer maxCount) {
         assert rule != null;
         this.rule = rule;
-        this.lowerLimit = lowerLimit;
-        if (upperLimit == null) {
-            this.upperLimit = OptionalInt.empty();
+        this.minCount = minCount;
+        if (maxCount == null) {
+            this.maxCount = OptionalInt.empty();
         } else {
-            this.upperLimit = OptionalInt.of(upperLimit);
+            this.maxCount = OptionalInt.of(maxCount);
         }
     }
 
     @Override
     public int getMinCount() {
-        return lowerLimit;
+        return minCount;
     }
 
     @Override
     public OptionalInt getMaxCount() {
-        return upperLimit;
+        return maxCount;
     }
 
     @Override
     public Stream<Rule> stream() {
         var stream = Stream.generate(() -> rule);
-        if (upperLimit.isPresent()) {
-            return stream.limit(upperLimit.getAsInt());
+        if (maxCount.isPresent()) {
+            return stream.limit(maxCount.getAsInt());
         }
         return stream;
     }
@@ -99,12 +99,12 @@ class DefaultQuantifierRule extends AbstractRule implements QuantifierRule {
     @Override
     public String toString() {
         var sb = new StringBuilder();
-        sb.append(lowerLimit);
-        if (upperLimit.isEmpty()) {
+        sb.append(minCount);
+        if (maxCount.isEmpty()) {
             sb.append("*");
-        } else if (lowerLimit != upperLimit.getAsInt()) {
+        } else if (minCount != maxCount.getAsInt()) {
             sb.append("*");
-            sb.append(upperLimit.getAsInt());
+            sb.append(maxCount.getAsInt());
         }
         sb.append(rule);
         return sb.toString();

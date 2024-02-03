@@ -43,8 +43,8 @@ interface QuantifiableTest {
     @CsvSource({
             "0,-1", "1,0", "2,1"
     })
-    @DisplayName("range(int, int) [Upper limit is lower than lower limit]")
-    default void rangeInCaseInvalidUpperLimit(int min, int max) throws Exception {
+    @DisplayName("range(int, int) [Max count is lower than min count]")
+    default void rangeInCaseInvalidMaxCount(int min, int max) throws Exception {
         var builder = builder();
 
         assertThrows(IllegalArgumentException.class, () -> builder.range(min, max))

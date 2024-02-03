@@ -129,9 +129,9 @@ final class Interpreter implements RuleVisitor<List<Tree>, Context> {
                     return true;
                 })
                 .count();
-        var lowerLimit = quantfier.getMinCount();
-        var upperLimit = quantfier.getMaxCount().orElse(count);
-        if (count < lowerLimit || upperLimit < count) {
+        var minCount = quantfier.getMinCount();
+        var maxCount = quantfier.getMaxCount().orElse(count);
+        if (count < minCount || maxCount < count) {
             var message = MessageSupport.tokenCountOutOfRange(quantfier, context, count);
             throw new ParseException(message);
         }
