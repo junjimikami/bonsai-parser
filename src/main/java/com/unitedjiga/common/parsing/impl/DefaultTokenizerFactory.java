@@ -1,7 +1,6 @@
 package com.unitedjiga.common.parsing.impl;
 
 import java.io.Reader;
-import java.util.Objects;
 
 import com.unitedjiga.common.parsing.Tokenizer;
 import com.unitedjiga.common.parsing.TokenizerFactory;
@@ -11,7 +10,7 @@ class DefaultTokenizerFactory implements TokenizerFactory {
     private final Grammar grammar;
 
     DefaultTokenizerFactory(Grammar grammar) {
-        Objects.requireNonNull(grammar);
+        assert grammar != null;
         this.grammar = grammar;
     }
 

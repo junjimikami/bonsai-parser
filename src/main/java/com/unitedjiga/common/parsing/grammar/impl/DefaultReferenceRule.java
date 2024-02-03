@@ -39,7 +39,7 @@ class DefaultReferenceRule extends AbstractRule implements ReferenceRule {
         private final String symbol;
 
         Builder(String symbol) {
-            Objects.requireNonNull(symbol);
+            assert symbol != null;
             this.symbol = symbol;
         }
 

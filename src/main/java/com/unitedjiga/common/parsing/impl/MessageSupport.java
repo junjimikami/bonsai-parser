@@ -31,7 +31,7 @@ final class MessageSupport {
         return Message.AMBIGUOUS_CHOICE.format(symbol, firsetSet);
     }
 
-    static String tokenCountOutOfRange(QuantifierRule quantfier, Context context, int count) {
+    static String tokenCountOutOfRange(QuantifierRule quantfier, Context context, long count) {
         var symbol = context.production().getSymbol();
         var firsetSet = FirstSet.of(quantfier, context.followSet())
                 .stream()

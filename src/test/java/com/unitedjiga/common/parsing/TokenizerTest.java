@@ -174,8 +174,7 @@ class TokenizerTest {
                     .build();
             var factory = TokenizerFactory.newFactory(grammar);
             var tokenizer = factory.createTokenizer(new StringReader("000"));
-            assertEquals("00", tokenizer.next().getValue());
-            assertThrows(ParseException.class, () -> tokenizer.hasNext())
+            assertThrows(ParseException.class, () -> tokenizer.next())
                     .printStackTrace();
         }
 
@@ -223,8 +222,7 @@ class TokenizerTest {
                     .build();
             var factory = TokenizerFactory.newFactory(grammar);
             var tokenizer = factory.createTokenizer(new StringReader("0000"));
-            assertEquals("000", tokenizer.next().getValue());
-            assertThrows(ParseException.class, () -> tokenizer.hasNext())
+            assertThrows(ParseException.class, () -> tokenizer.next())
                     .printStackTrace();
         }
 

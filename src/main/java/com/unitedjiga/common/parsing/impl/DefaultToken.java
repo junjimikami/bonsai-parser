@@ -1,7 +1,5 @@
 package com.unitedjiga.common.parsing.impl;
 
-import java.util.Objects;
-
 import com.unitedjiga.common.parsing.Token;
 
 class DefaultToken implements Token {
@@ -11,7 +9,7 @@ class DefaultToken implements Token {
      * @param value
      */
     DefaultToken(String value) {
-        Objects.requireNonNull(value);
+        assert value != null;
         this.value = value;
     }
 

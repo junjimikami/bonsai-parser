@@ -45,7 +45,6 @@ interface QuantifierRuleTest extends RuleTest {
 
         assertEquals(0, quantifier.getMinCount());
         assertEquals(1, quantifier.getMaxCount().getAsInt());
-        assertEquals(1, quantifier.stream().count());
     }
 
     @Test

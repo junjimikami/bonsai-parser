@@ -82,6 +82,7 @@ class DefaultGrammar implements Grammar {
             var set = new DefaultProductionSet(builders.keySet());
             builders.forEach((symbol, builder) -> {
                 var rule = builder.build(set);
+                Objects.requireNonNull(rule, Message.NULL_BUILD_RESULT.format(symbol));
                 set.add(symbol, rule);
             });
             assert set.containsSymbol(startSymbol);

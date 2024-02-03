@@ -24,7 +24,6 @@
 package com.unitedjiga.common.parsing.impl;
 
 import java.io.Reader;
-import java.util.Objects;
 
 import com.unitedjiga.common.parsing.Parser;
 import com.unitedjiga.common.parsing.ParserFactory;
@@ -39,13 +38,13 @@ class DefaultParserFactory implements ParserFactory {
     private final Grammar grammar;
 
     DefaultParserFactory(Grammar grammar) {
-        Objects.requireNonNull(grammar);
+        assert grammar != null;
         this.grammar = grammar;
     }
 
     @Override
     public Parser createParser(Tokenizer tokenizer) {
-        Objects.requireNonNull(tokenizer);
+        assert tokenizer != null;
         return new DefaultParser(grammar, tokenizer);
     }
 

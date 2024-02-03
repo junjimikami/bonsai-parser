@@ -48,12 +48,8 @@ final class Interpreter implements RuleVisitor<List<Tree>, Context> {
     }
 
     static Tree parse(Context context) {
-        return instance.interpret(context);
-    }
-
-    private Tree interpret(Context context) {
         var production = context.production();
-        var trees = visit(production.getRule(), context);
+        var trees = instance.visit(production.getRule(), context);
         return new DefaultNonTerminal(production.getSymbol(), trees);
     }
 
@@ -67,18 +63,18 @@ final class Interpreter implements RuleVisitor<List<Tree>, Context> {
 
     @Override
     public List<Tree> visitChoice(ChoiceRule choice, Context context) {
-        var list = choice.getChoices().stream()
+        var rules = choice.getChoices().stream()
                 .filter(e -> AnyMatcher.scan(e, context))
                 .toList();
-        if (list.isEmpty()) {
+        if (rules.isEmpty()) {
             var message = MessageSupport.tokenNotMatchRule(choice, context);
             throw new ParseException(message);
         }
-        if (1 < list.size()) {
+        if (1 < rules.size()) {
             var message = MessageSupport.ambiguousChoice(choice, context);
             throw new ParseException(message);
         }
-        return visit(list.get(0), context);
+        return visit(rules.get(0), context);
     }
 
     @Override
@@ -87,15 +83,15 @@ final class Interpreter implements RuleVisitor<List<Tree>, Context> {
             var message = MessageSupport.tokenNotMatchRule(sequence, context);
             throw new ParseException(message);
         }
-        var list = new ArrayList<Tree>();
-        var subSequence = new LinkedList<>(sequence.getRules());
-        while (!subSequence.isEmpty()) {
-            var rule = subSequence.remove();
-            var followSet = FirstSet.of(subSequence, context.followSet());
-            var context2 = context.withFollowSet(followSet);
-            list.addAll(visit(rule, context2));
+        var trees = new ArrayList<Tree>();
+        var rules = new LinkedList<>(sequence.getRules());
+        while (!rules.isEmpty()) {
+            var rule = rules.removeFirst();
+            var subFollowSet = FirstSet.of(rules, context.followSet());
+            var subContext = context.withFollowSet(subFollowSet);
+            trees.addAll(visit(rule, subContext));
         }
-        return list;
+        return trees;
     }
 
     @Override
@@ -112,30 +108,33 @@ final class Interpreter implements RuleVisitor<List<Tree>, Context> {
     @Override
     public List<Tree> visitReference(ReferenceRule reference, Context context) {
         var production = reference.getProduction();
-        var context2 = context.withProduction(production);
-        var tree = interpret(context2);
+        var subContext = context.withProduction(production);
+        var tree = parse(subContext);
         return List.of(tree);
     }
 
     @Override
     public List<Tree> visitQuantifier(QuantifierRule quantfier, Context context) {
-        var list = new ArrayList<Tree>();
-        var count = (int) quantfier.stream()
+        var trees = new ArrayList<Tree>();
+        long count = quantfier.stream()
                 .takeWhile(e -> {
                     if (!AnyMatcher.scan(e, context)) {
                         return false;
                     }
-                    list.addAll(visit(e, context));
-                    return true;
+                    return trees.addAll(visit(e, context));
                 })
                 .count();
-        var minCount = quantfier.getMinCount();
-        var maxCount = quantfier.getMaxCount().orElse(count);
-        if (count < minCount || maxCount < count) {
+        if (count < quantfier.getMinCount()) {
             var message = MessageSupport.tokenCountOutOfRange(quantfier, context, count);
             throw new ParseException(message);
         }
-        return list;
+        quantfier.getMaxCount().ifPresent(maxCount -> {
+            if (maxCount < count) {
+                var message = MessageSupport.tokenCountOutOfRange(quantfier, context, count);
+                throw new ParseException(message);
+            }
+        });
+        return trees;
     }
 
     @Override

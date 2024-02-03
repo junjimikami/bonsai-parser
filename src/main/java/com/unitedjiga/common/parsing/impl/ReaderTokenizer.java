@@ -19,7 +19,7 @@ class ReaderTokenizer extends AbstractTokenizer {
      * @param reader
      */
     ReaderTokenizer(Reader reader) {
-        Objects.requireNonNull(reader);
+        assert reader != null;
         this.reader = new PushbackReader(reader);
     }
 
@@ -54,14 +54,14 @@ class ReaderTokenizer extends AbstractTokenizer {
 
     @Override
     public boolean hasNext(String regex) {
-        Objects.requireNonNull(regex);
+        Objects.requireNonNull(regex, Message.NULL_PARAMETER.format());
         var pattern = Pattern.compile(regex);
         return hasNext(pattern);
     }
 
     @Override
     public boolean hasNext(Pattern pattern) {
-        Objects.requireNonNull(pattern);
+        Objects.requireNonNull(pattern, Message.NULL_PARAMETER.format());
         if (!hasNext()) {
             return false;
         }
@@ -81,14 +81,14 @@ class ReaderTokenizer extends AbstractTokenizer {
 
     @Override
     public Token next(String regex) {
-        Objects.requireNonNull(regex);
+        Objects.requireNonNull(regex, Message.NULL_PARAMETER.format());
         var pattern = Pattern.compile(regex);
         return next(pattern);
     }
 
     @Override
     public Token next(Pattern pattern) {
-        Objects.requireNonNull(pattern);
+        Objects.requireNonNull(pattern, Message.NULL_PARAMETER.format());
         var value = read();
         if (value == null) {
             throw new NoSuchElementException(Message.TOKEN_NOT_FOUND.format());

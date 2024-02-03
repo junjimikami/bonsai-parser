@@ -10,7 +10,7 @@ abstract class AbstractTokenizer implements Tokenizer {
 
     @Override
     public Tokenizer skip(String regex) {
-        Objects.requireNonNull(regex);
+        Objects.requireNonNull(regex, Message.NULL_PARAMETER.format());
         var pattern = Pattern.compile(regex);
         return skip(pattern);
     }

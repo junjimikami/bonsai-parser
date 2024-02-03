@@ -25,7 +25,6 @@ package com.unitedjiga.common.parsing.impl;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import com.unitedjiga.common.parsing.NonTerminal;
 import com.unitedjiga.common.parsing.Tree;
@@ -40,15 +39,15 @@ class DefaultNonTerminal implements NonTerminal {
     private final List<? extends Tree> list;
 
     DefaultNonTerminal(String symbol, List<? extends Tree> list) {
-        Objects.requireNonNull(symbol);
-        Objects.requireNonNull(list);
+        assert symbol != null;
+        assert list != null;
         this.symbol = symbol;
         this.list = list;
     }
 
     DefaultNonTerminal(String symbol, Tree s) {
-        Objects.requireNonNull(symbol);
-        Objects.requireNonNull(s);
+        assert symbol != null;
+        assert s != null;
         this.symbol = symbol;
         this.list = List.of(s);
     }

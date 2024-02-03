@@ -23,7 +23,6 @@
  */
 package com.unitedjiga.common.parsing.grammar.impl;
 
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 import com.unitedjiga.common.parsing.grammar.PatternRule;
@@ -38,12 +37,12 @@ class DefaultPatternRule extends AbstractRule implements PatternRule {
         private Pattern pattern;
 
         Builder(String regex) {
-            Objects.requireNonNull(regex);
+            assert regex != null;
             this.pattern = Pattern.compile(regex);
         }
 
         Builder(Pattern pattern) {
-            Objects.requireNonNull(pattern);
+            assert pattern != null;
             this.pattern = pattern;
         }
 

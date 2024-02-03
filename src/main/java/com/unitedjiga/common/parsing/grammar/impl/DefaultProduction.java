@@ -1,9 +1,7 @@
 package com.unitedjiga.common.parsing.grammar.impl;
 
-import java.util.Objects;
-
-import com.unitedjiga.common.parsing.grammar.Rule;
 import com.unitedjiga.common.parsing.grammar.Production;
+import com.unitedjiga.common.parsing.grammar.Rule;
 
 class DefaultProduction implements Production {
 
@@ -15,8 +13,8 @@ class DefaultProduction implements Production {
      * @param rule
      */
     DefaultProduction(String symbol, Rule rule) {
-        Objects.requireNonNull(symbol);
-        Objects.requireNonNull(rule);
+        assert symbol != null;
+        assert rule != null;
         this.symbol = symbol;
         this.rule = rule;
     }

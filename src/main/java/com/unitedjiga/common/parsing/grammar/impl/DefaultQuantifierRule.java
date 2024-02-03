@@ -23,13 +23,12 @@
  */
 package com.unitedjiga.common.parsing.grammar.impl;
 
-import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.stream.Stream;
 
-import com.unitedjiga.common.parsing.grammar.Rule;
 import com.unitedjiga.common.parsing.grammar.ProductionSet;
 import com.unitedjiga.common.parsing.grammar.QuantifierRule;
+import com.unitedjiga.common.parsing.grammar.Rule;
 
 /**
  * @author Mikami Junji
@@ -42,14 +41,14 @@ class DefaultQuantifierRule extends AbstractRule implements QuantifierRule {
         private final Integer to;
 
         Builder(Rule.Builder builder, int from) {
-            Objects.requireNonNull(builder);
+            assert builder != null;
             this.builder = builder;
             this.from = from;
             this.to = null;
         }
 
         Builder(Rule.Builder builder, int from, int to) {
-            Objects.requireNonNull(builder);
+            assert builder != null;
             this.builder = builder;
             this.from = from;
             this.to = to;
@@ -89,11 +88,7 @@ class DefaultQuantifierRule extends AbstractRule implements QuantifierRule {
 
     @Override
     public Stream<Rule> stream() {
-        var stream = Stream.generate(() -> rule);
-        if (maxCount.isPresent()) {
-            return stream.limit(maxCount.getAsInt());
-        }
-        return stream;
+        return Stream.generate(() -> rule);
     }
 
     @Override
