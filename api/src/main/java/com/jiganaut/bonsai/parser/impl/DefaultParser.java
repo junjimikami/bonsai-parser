@@ -21,7 +21,7 @@ class DefaultParser implements Parser {
 
     @Override
     public Tree parse() {
-        var tree = Interpreter.parse(context);
+        var tree = Derivation.derive(context);
         if (context.postCheck()) {
             throw new ParseException(Message.TOKENS_REMAINED.format());
         }

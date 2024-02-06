@@ -51,7 +51,7 @@ class DefaultTokenizer extends AbstractTokenizer {
         if (!context.preCheck()) {
             return null;
         }
-        nextToken = Interpreter.parse(context)
+        nextToken = Derivation.derive(context)
                 .accept(treeToString);
         return nextToken;
     }
