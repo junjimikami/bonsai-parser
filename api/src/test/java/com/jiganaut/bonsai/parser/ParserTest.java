@@ -37,8 +37,7 @@ class ParserTest {
         var factory = ParserFactory.newFactory(Stubs.DUMMY_GRAMMAR);
         var parser = factory.createParser(Stubs.closedReader());
 
-        assertThrows(UncheckedIOException.class, () -> method.accept(parser))
-                .printStackTrace();
+        assertThrows(UncheckedIOException.class, () -> method.accept(parser));
     }
 
     @DisplayName("[Ambiguous rule]")
@@ -55,8 +54,7 @@ class ParserTest {
         var factory = ParserFactory.newFactory(grammar);
         var parser = factory.createParser(new StringReader("1"));
 
-        assertThrows(ParseException.class, () -> method.accept(parser))
-                .printStackTrace();
+        assertThrows(ParseException.class, () -> method.accept(parser));
     }
 
     @DisplayName("[Occurrence count out of range]")
@@ -69,8 +67,7 @@ class ParserTest {
         var factory = ParserFactory.newFactory(grammar);
         var parser = factory.createParser(new StringReader("11"));
 
-        assertThrows(ParseException.class, () -> method.accept(parser))
-                .printStackTrace();
+        assertThrows(ParseException.class, () -> method.accept(parser));
     }
 
     @DisplayName("[Token not match pattern rule]")
@@ -83,8 +80,7 @@ class ParserTest {
         var factory = ParserFactory.newFactory(grammar);
         var parser = factory.createParser(new StringReader("1"));
 
-        assertThrows(ParseException.class, () -> method.accept(parser))
-                .printStackTrace();
+        assertThrows(ParseException.class, () -> method.accept(parser));
     }
 
     @DisplayName("[Token not match choice rule]")
@@ -98,8 +94,7 @@ class ParserTest {
         var factory = ParserFactory.newFactory(grammar);
         var parser = factory.createParser(new StringReader("1"));
 
-        assertThrows(ParseException.class, () -> method.accept(parser))
-                .printStackTrace();
+        assertThrows(ParseException.class, () -> method.accept(parser));
     }
 
     @DisplayName("[Token not match sequence rule]")
@@ -113,8 +108,7 @@ class ParserTest {
         var factory = ParserFactory.newFactory(grammar);
         var parser = factory.createParser(new StringReader("1"));
 
-        assertThrows(ParseException.class, () -> method.accept(parser))
-                .printStackTrace();
+        assertThrows(ParseException.class, () -> method.accept(parser));
     }
 
     @DisplayName("[Token not match empty rule]")
@@ -127,8 +121,7 @@ class ParserTest {
         var factory = ParserFactory.newFactory(grammar);
         var parser = factory.createParser(new StringReader("1"));
 
-        assertThrows(ParseException.class, () -> method.accept(parser))
-                .printStackTrace();
+        assertThrows(ParseException.class, () -> method.accept(parser));
     }
 
     @Test
@@ -140,8 +133,7 @@ class ParserTest {
         var factory = ParserFactory.newFactory(grammar);
         var parser = factory.createParser(new StringReader("11"));
 
-        assertThrows(ParseException.class, () -> parser.parse())
-                .printStackTrace();
+        assertThrows(ParseException.class, () -> parser.parse());
     }
 
     @Test

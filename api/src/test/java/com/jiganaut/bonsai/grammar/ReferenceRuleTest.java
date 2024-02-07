@@ -60,8 +60,7 @@ class ReferenceRuleTest implements RuleTest {
     @Test
     @DisplayName("builder(String) [Null parameter]")
     void builderInCaseNullParameter() throws Exception {
-        assertThrows(NullPointerException.class, () -> ReferenceRule.builder(null))
-                .printStackTrace();
+        assertThrows(NullPointerException.class, () -> ReferenceRule.builder(null));
     }
 
     @Test

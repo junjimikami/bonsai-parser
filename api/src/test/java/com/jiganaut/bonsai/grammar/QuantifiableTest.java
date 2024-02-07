@@ -17,8 +17,7 @@ interface QuantifiableTest {
     default void exactlyInCaseNegative() throws Exception {
         var builder = builder();
 
-        assertThrows(IllegalArgumentException.class, () -> builder.exactly(-1))
-                .printStackTrace();
+        assertThrows(IllegalArgumentException.class, () -> builder.exactly(-1));
     }
 
     @Test
@@ -26,8 +25,7 @@ interface QuantifiableTest {
     default void atLeastInCaseNegative() throws Exception {
         var builder = builder();
 
-        assertThrows(IllegalArgumentException.class, () -> builder.atLeast(-1))
-                .printStackTrace();
+        assertThrows(IllegalArgumentException.class, () -> builder.atLeast(-1));
     }
 
     @Test
@@ -35,8 +33,7 @@ interface QuantifiableTest {
     default void rangeInCaseNegative() throws Exception {
         var builder = builder();
 
-        assertThrows(IllegalArgumentException.class, () -> builder.range(-1, 0))
-                .printStackTrace();
+        assertThrows(IllegalArgumentException.class, () -> builder.range(-1, 0));
     }
 
     @ParameterizedTest
@@ -47,8 +44,7 @@ interface QuantifiableTest {
     default void rangeInCaseInvalidMaxCount(int min, int max) throws Exception {
         var builder = builder();
 
-        assertThrows(IllegalArgumentException.class, () -> builder.range(min, max))
-                .printStackTrace();
+        assertThrows(IllegalArgumentException.class, () -> builder.range(min, max));
     }
 
     @Test
@@ -117,8 +113,7 @@ interface QuantifiableTest {
         var builder = builder();
         builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
-        assertThrows(IllegalStateException.class, () -> builder.exactly(0))
-                .printStackTrace();
+        assertThrows(IllegalStateException.class, () -> builder.exactly(0));
     }
 
     @Test
@@ -127,8 +122,7 @@ interface QuantifiableTest {
         var builder = builder();
         builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
-        assertThrows(IllegalStateException.class, () -> builder.atLeast(0))
-                .printStackTrace();
+        assertThrows(IllegalStateException.class, () -> builder.atLeast(0));
     }
 
     @Test
@@ -137,8 +131,7 @@ interface QuantifiableTest {
         var builder = builder();
         builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
-        assertThrows(IllegalStateException.class, () -> builder.range(0, 0))
-                .printStackTrace();
+        assertThrows(IllegalStateException.class, () -> builder.range(0, 0));
     }
 
     @Test
@@ -147,8 +140,7 @@ interface QuantifiableTest {
         var builder = builder();
         builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
-        assertThrows(IllegalStateException.class, () -> builder.opt())
-                .printStackTrace();
+        assertThrows(IllegalStateException.class, () -> builder.opt());
     }
 
     @Test
@@ -157,8 +149,7 @@ interface QuantifiableTest {
         var builder = builder();
         builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
-        assertThrows(IllegalStateException.class, () -> builder.zeroOrMore())
-                .printStackTrace();
+        assertThrows(IllegalStateException.class, () -> builder.zeroOrMore());
     }
 
     @Test
@@ -167,8 +158,7 @@ interface QuantifiableTest {
         var builder = builder();
         builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
-        assertThrows(IllegalStateException.class, () -> builder.oneOrMore())
-                .printStackTrace();
+        assertThrows(IllegalStateException.class, () -> builder.oneOrMore());
     }
 
 }

@@ -16,8 +16,7 @@ class ParserFactoryTest {
     @Test
     @DisplayName("newFactory(Grammar) [Null parameter]")
     void newFactoryInCaseNullParameter() throws Exception {
-        assertThrows(NullPointerException.class, () -> ParserFactory.newFactory(null))
-                .printStackTrace();
+        assertThrows(NullPointerException.class, () -> ParserFactory.newFactory(null));
     }
 
     @Test

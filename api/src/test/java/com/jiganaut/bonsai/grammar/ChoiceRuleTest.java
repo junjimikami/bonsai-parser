@@ -35,8 +35,7 @@ class ChoiceRuleTest implements RuleTest {
         void buildPsInCaseNoElements() throws Exception {
             var builder = ChoiceRule.builder();
 
-            assertThrows(IllegalStateException.class, () -> builder.build(null))
-                    .printStackTrace();
+            assertThrows(IllegalStateException.class, () -> builder.build(null));
         }
 
         @Test
@@ -44,8 +43,7 @@ class ChoiceRuleTest implements RuleTest {
         void exactlyInCaseNoElements() throws Exception {
             var builder = ChoiceRule.builder();
 
-            assertThrows(IllegalStateException.class, () -> builder.exactly(0))
-                    .printStackTrace();
+            assertThrows(IllegalStateException.class, () -> builder.exactly(0));
         }
 
         @Test
@@ -53,8 +51,7 @@ class ChoiceRuleTest implements RuleTest {
         void atLeastInCaseNoElements() throws Exception {
             var builder = ChoiceRule.builder();
 
-            assertThrows(IllegalStateException.class, () -> builder.atLeast(0))
-                    .printStackTrace();
+            assertThrows(IllegalStateException.class, () -> builder.atLeast(0));
         }
 
         @Test
@@ -62,8 +59,7 @@ class ChoiceRuleTest implements RuleTest {
         void rangeInCaseNoElements() throws Exception {
             var builder = ChoiceRule.builder();
 
-            assertThrows(IllegalStateException.class, () -> builder.range(0, 0))
-                    .printStackTrace();
+            assertThrows(IllegalStateException.class, () -> builder.range(0, 0));
         }
 
         @Test
@@ -71,8 +67,7 @@ class ChoiceRuleTest implements RuleTest {
         void optInCaseNoElements() throws Exception {
             var builder = ChoiceRule.builder();
 
-            assertThrows(IllegalStateException.class, () -> builder.opt())
-                    .printStackTrace();
+            assertThrows(IllegalStateException.class, () -> builder.opt());
         }
 
         @Test
@@ -80,8 +75,7 @@ class ChoiceRuleTest implements RuleTest {
         void zeroOrMoreInCaseNoElements() throws Exception {
             var builder = ChoiceRule.builder();
 
-            assertThrows(IllegalStateException.class, () -> builder.zeroOrMore())
-                    .printStackTrace();
+            assertThrows(IllegalStateException.class, () -> builder.zeroOrMore());
         }
 
         @Test
@@ -89,8 +83,7 @@ class ChoiceRuleTest implements RuleTest {
         void oneOrMoreInCaseNoElements() throws Exception {
             var builder = ChoiceRule.builder();
 
-            assertThrows(IllegalStateException.class, () -> builder.oneOrMore())
-                    .printStackTrace();
+            assertThrows(IllegalStateException.class, () -> builder.oneOrMore());
         }
 
         @Test
@@ -98,8 +91,7 @@ class ChoiceRuleTest implements RuleTest {
         void addEbInCaseNullParameter() throws Exception {
             var builder = ChoiceRule.builder();
 
-            assertThrows(NullPointerException.class, () -> builder.add((Rule.Builder) null))
-                    .printStackTrace();
+            assertThrows(NullPointerException.class, () -> builder.add((Rule.Builder) null));
         }
 
         @Test
@@ -107,8 +99,7 @@ class ChoiceRuleTest implements RuleTest {
         void addStInCaseNullParameter() throws Exception {
             var builder = ChoiceRule.builder();
 
-            assertThrows(NullPointerException.class, () -> builder.add((String) null))
-                    .printStackTrace();
+            assertThrows(NullPointerException.class, () -> builder.add((String) null));
         }
 
         @Test
@@ -118,8 +109,7 @@ class ChoiceRuleTest implements RuleTest {
                     .addEmpty();
             builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
-            assertThrows(IllegalStateException.class, () -> builder.add((Rule.Builder) null))
-                    .printStackTrace();
+            assertThrows(IllegalStateException.class, () -> builder.add((Rule.Builder) null));
         }
 
         @Test
@@ -129,8 +119,7 @@ class ChoiceRuleTest implements RuleTest {
                     .addEmpty();
             builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
-            assertThrows(IllegalStateException.class, () -> builder.add((String) null))
-                    .printStackTrace();
+            assertThrows(IllegalStateException.class, () -> builder.add((String) null));
         }
 
         @Test

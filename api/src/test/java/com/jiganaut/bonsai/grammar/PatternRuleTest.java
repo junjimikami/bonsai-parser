@@ -65,22 +65,19 @@ class PatternRuleTest implements RuleTest {
     @Test
     @DisplayName("builder(st:String) [Null parameter]")
     void builderStInCaseNullParameter() throws Exception {
-        assertThrows(NullPointerException.class, () -> PatternRule.builder((String) null))
-                .printStackTrace();
+        assertThrows(NullPointerException.class, () -> PatternRule.builder((String) null));
     }
 
     @Test
     @DisplayName("builder(pa:Pattern) [Null parameter]")
     void builderPaInCaseNullParameter() throws Exception {
-        assertThrows(NullPointerException.class, () -> PatternRule.builder((Pattern) null))
-                .printStackTrace();
+        assertThrows(NullPointerException.class, () -> PatternRule.builder((Pattern) null));
     }
 
     @Test
     @DisplayName("builder(st:String) [Invalid regex]")
     void builderStInCaseInvalidRegex() throws Exception {
-        assertThrows(PatternSyntaxException.class, () -> PatternRule.builder("["))
-                .printStackTrace();
+        assertThrows(PatternSyntaxException.class, () -> PatternRule.builder("["));
     }
 
     @Test

@@ -30,8 +30,7 @@ class SequenceRuleTest implements RuleTest {
         void buildPsInCaseNoElements() throws Exception {
             var builder = SequenceRule.builder();
 
-            assertThrows(IllegalStateException.class, () -> builder.build(null))
-                    .printStackTrace();
+            assertThrows(IllegalStateException.class, () -> builder.build(null));
         }
 
         @Test
@@ -39,8 +38,7 @@ class SequenceRuleTest implements RuleTest {
         void exactlyInCaseNoElements() throws Exception {
             var builder = SequenceRule.builder();
 
-            assertThrows(IllegalStateException.class, () -> builder.exactly(0))
-                    .printStackTrace();
+            assertThrows(IllegalStateException.class, () -> builder.exactly(0));
         }
 
         @Test
@@ -48,8 +46,7 @@ class SequenceRuleTest implements RuleTest {
         void atLeastInCaseNoElements() throws Exception {
             var builder = SequenceRule.builder();
 
-            assertThrows(IllegalStateException.class, () -> builder.atLeast(0))
-                    .printStackTrace();
+            assertThrows(IllegalStateException.class, () -> builder.atLeast(0));
         }
 
         @Test
@@ -57,8 +54,7 @@ class SequenceRuleTest implements RuleTest {
         void rangeInCaseNoElements() throws Exception {
             var builder = SequenceRule.builder();
 
-            assertThrows(IllegalStateException.class, () -> builder.range(0, 0))
-                    .printStackTrace();
+            assertThrows(IllegalStateException.class, () -> builder.range(0, 0));
         }
 
         @Test
@@ -66,8 +62,7 @@ class SequenceRuleTest implements RuleTest {
         void optInCaseNoElements() throws Exception {
             var builder = SequenceRule.builder();
 
-            assertThrows(IllegalStateException.class, () -> builder.opt())
-                    .printStackTrace();
+            assertThrows(IllegalStateException.class, () -> builder.opt());
         }
 
         @Test
@@ -75,8 +70,7 @@ class SequenceRuleTest implements RuleTest {
         void zeroOrMoreInCaseNoElements() throws Exception {
             var builder = SequenceRule.builder();
 
-            assertThrows(IllegalStateException.class, () -> builder.zeroOrMore())
-                    .printStackTrace();
+            assertThrows(IllegalStateException.class, () -> builder.zeroOrMore());
         }
 
         @Test
@@ -84,8 +78,7 @@ class SequenceRuleTest implements RuleTest {
         void oneOrMoreInCaseNoElements() throws Exception {
             var builder = SequenceRule.builder();
 
-            assertThrows(IllegalStateException.class, () -> builder.oneOrMore())
-                    .printStackTrace();
+            assertThrows(IllegalStateException.class, () -> builder.oneOrMore());
         }
 
         @Test
@@ -93,8 +86,7 @@ class SequenceRuleTest implements RuleTest {
         void addEbNull() throws Exception {
             var builder = SequenceRule.builder();
 
-            assertThrows(NullPointerException.class, () -> builder.add((Rule.Builder) null))
-                    .printStackTrace();
+            assertThrows(NullPointerException.class, () -> builder.add((Rule.Builder) null));
         }
 
         @Test
@@ -102,8 +94,7 @@ class SequenceRuleTest implements RuleTest {
         void addStNull() throws Exception {
             var builder = SequenceRule.builder();
 
-            assertThrows(NullPointerException.class, () -> builder.add((String) null))
-                    .printStackTrace();
+            assertThrows(NullPointerException.class, () -> builder.add((String) null));
         }
 
         @Test
@@ -113,8 +104,7 @@ class SequenceRuleTest implements RuleTest {
                     .add(Stubs.DUMMY_RULE_BUILDER);
             builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
-            assertThrows(IllegalStateException.class, () -> builder.add((Rule.Builder) null))
-                    .printStackTrace();
+            assertThrows(IllegalStateException.class, () -> builder.add((Rule.Builder) null));
         }
 
         @Test
@@ -124,8 +114,7 @@ class SequenceRuleTest implements RuleTest {
                     .add(Stubs.DUMMY_RULE_BUILDER);
             builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
-            assertThrows(IllegalStateException.class, () -> builder.add((String) null))
-                    .printStackTrace();
+            assertThrows(IllegalStateException.class, () -> builder.add((String) null));
         }
 
         @Test

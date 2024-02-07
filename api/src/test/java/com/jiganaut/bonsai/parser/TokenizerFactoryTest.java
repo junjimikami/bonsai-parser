@@ -16,8 +16,7 @@ class TokenizerFactoryTest {
     @Test
     @DisplayName("newFactory(Grammar) [Null parameter]")
     void newFactoryInCaseNullParameter() throws Exception {
-        assertThrows(NullPointerException.class, () -> TokenizerFactory.newFactory(null))
-                .printStackTrace();
+        assertThrows(NullPointerException.class, () -> TokenizerFactory.newFactory(null));
     }
 
     @Test

@@ -153,8 +153,7 @@ class TokenizerTest {
                     .build();
             var factory = TokenizerFactory.newFactory(grammar);
             var tokenizer = factory.createTokenizer(new StringReader("0"));
-            assertThrows(ParseException.class, () -> tokenizer.hasNext())
-                    .printStackTrace();
+            assertThrows(ParseException.class, () -> tokenizer.hasNext());
         }
 
         @Test
@@ -177,8 +176,7 @@ class TokenizerTest {
                     .build();
             var factory = TokenizerFactory.newFactory(grammar);
             var tokenizer = factory.createTokenizer(new StringReader("000"));
-            assertThrows(ParseException.class, () -> tokenizer.next())
-                    .printStackTrace();
+            assertThrows(ParseException.class, () -> tokenizer.next());
         }
 
         @Test
@@ -189,8 +187,7 @@ class TokenizerTest {
                     .build();
             var factory = TokenizerFactory.newFactory(grammar);
             var tokenizer = factory.createTokenizer(new StringReader("0"));
-            assertThrows(ParseException.class, () -> tokenizer.hasNext())
-                    .printStackTrace();
+            assertThrows(ParseException.class, () -> tokenizer.hasNext());
         }
 
         @Test
@@ -225,8 +222,7 @@ class TokenizerTest {
                     .build();
             var factory = TokenizerFactory.newFactory(grammar);
             var tokenizer = factory.createTokenizer(new StringReader("0000"));
-            assertThrows(ParseException.class, () -> tokenizer.next())
-                    .printStackTrace();
+            assertThrows(ParseException.class, () -> tokenizer.next());
         }
 
         @Test
@@ -311,8 +307,7 @@ class TokenizerTest {
         var factory = TokenizerFactory.newFactory(Stubs.DUMMY_GRAMMAR);
         var tokenizer = factory.createTokenizer(Stubs.closedReader());
 
-        assertThrows(UncheckedIOException.class, () -> method.accept(tokenizer))
-                .printStackTrace();
+        assertThrows(UncheckedIOException.class, () -> method.accept(tokenizer));
     }
 
     @DisplayName("[Ambiguous rule]")
@@ -329,8 +324,7 @@ class TokenizerTest {
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
-        assertThrows(ParseException.class, () -> method.accept(tokenizer))
-                .printStackTrace();
+        assertThrows(ParseException.class, () -> method.accept(tokenizer));
     }
 
     @DisplayName("[Occurrence count out of range]")
@@ -343,8 +337,7 @@ class TokenizerTest {
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("11"));
 
-        assertThrows(ParseException.class, () -> method.accept(tokenizer))
-                .printStackTrace();
+        assertThrows(ParseException.class, () -> method.accept(tokenizer));
     }
 
     @DisplayName("[Token not match pattern rule]")
@@ -357,8 +350,7 @@ class TokenizerTest {
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
-        assertThrows(ParseException.class, () -> method.accept(tokenizer))
-                .printStackTrace();
+        assertThrows(ParseException.class, () -> method.accept(tokenizer));
     }
 
     @DisplayName("[Token not match choice rule]")
@@ -372,8 +364,7 @@ class TokenizerTest {
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
-        assertThrows(ParseException.class, () -> method.accept(tokenizer))
-                .printStackTrace();
+        assertThrows(ParseException.class, () -> method.accept(tokenizer));
     }
 
     @DisplayName("[Token not match sequence rule]")
@@ -387,8 +378,7 @@ class TokenizerTest {
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
-        assertThrows(ParseException.class, () -> method.accept(tokenizer))
-                .printStackTrace();
+        assertThrows(ParseException.class, () -> method.accept(tokenizer));
     }
 
     @DisplayName("[Token not match empty rule]")
@@ -401,8 +391,7 @@ class TokenizerTest {
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
-        assertThrows(ParseException.class, () -> method.accept(tokenizer))
-                .printStackTrace();
+        assertThrows(ParseException.class, () -> method.accept(tokenizer));
     }
 
     @Test
@@ -414,8 +403,7 @@ class TokenizerTest {
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
-        assertThrows(NullPointerException.class, () -> tokenizer.hasNext((String) null))
-                .printStackTrace();
+        assertThrows(NullPointerException.class, () -> tokenizer.hasNext((String) null));
     }
 
     @Test
@@ -427,8 +415,7 @@ class TokenizerTest {
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
-        assertThrows(NullPointerException.class, () -> tokenizer.hasNext((Pattern) null))
-                .printStackTrace();
+        assertThrows(NullPointerException.class, () -> tokenizer.hasNext((Pattern) null));
     }
 
     @Test
@@ -440,8 +427,7 @@ class TokenizerTest {
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
-        assertThrows(NullPointerException.class, () -> tokenizer.next((String) null))
-                .printStackTrace();
+        assertThrows(NullPointerException.class, () -> tokenizer.next((String) null));
     }
 
     @Test
@@ -453,8 +439,7 @@ class TokenizerTest {
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
-        assertThrows(NullPointerException.class, () -> tokenizer.next((Pattern) null))
-                .printStackTrace();
+        assertThrows(NullPointerException.class, () -> tokenizer.next((Pattern) null));
     }
 
     @Test
@@ -466,8 +451,7 @@ class TokenizerTest {
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
-        assertThrows(NullPointerException.class, () -> tokenizer.skip((String) null))
-                .printStackTrace();
+        assertThrows(NullPointerException.class, () -> tokenizer.skip((String) null));
     }
 
     @Test
@@ -479,8 +463,7 @@ class TokenizerTest {
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
-        assertThrows(NullPointerException.class, () -> tokenizer.skip((Pattern) null))
-                .printStackTrace();
+        assertThrows(NullPointerException.class, () -> tokenizer.skip((Pattern) null));
     }
 
     @Test
@@ -492,8 +475,7 @@ class TokenizerTest {
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
-        assertThrows(NoSuchElementException.class, () -> tokenizer.next("2"))
-                .printStackTrace();
+        assertThrows(NoSuchElementException.class, () -> tokenizer.next("2"));
     }
 
     @Test
@@ -506,8 +488,7 @@ class TokenizerTest {
         var tokenizer = factory.createTokenizer(new StringReader("1"));
         var pattern = Pattern.compile("2");
 
-        assertThrows(NoSuchElementException.class, () -> tokenizer.next(pattern))
-                .printStackTrace();
+        assertThrows(NoSuchElementException.class, () -> tokenizer.next(pattern));
     }
 
     @Test
@@ -630,8 +611,7 @@ class TokenizerTest {
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(Reader.nullReader());
 
-        assertThrows(NoSuchElementException.class, () -> tokenizer.next())
-                .printStackTrace();
+        assertThrows(NoSuchElementException.class, () -> tokenizer.next());
     }
 
     @Test
@@ -643,8 +623,7 @@ class TokenizerTest {
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(Reader.nullReader());
 
-        assertThrows(NoSuchElementException.class, () -> tokenizer.next(""))
-                .printStackTrace();
+        assertThrows(NoSuchElementException.class, () -> tokenizer.next(""));
     }
 
     @Test
@@ -657,8 +636,7 @@ class TokenizerTest {
         var tokenizer = factory.createTokenizer(Reader.nullReader());
         var pattern = Pattern.compile("");
 
-        assertThrows(NoSuchElementException.class, () -> tokenizer.next(pattern))
-                .printStackTrace();
+        assertThrows(NoSuchElementException.class, () -> tokenizer.next(pattern));
     }
 
     @Test
@@ -695,8 +673,7 @@ class TokenizerTest {
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
-        assertThrows(NoSuchElementException.class, () -> tokenizer.skip("2"))
-                .printStackTrace();
+        assertThrows(NoSuchElementException.class, () -> tokenizer.skip("2"));
     }
 
     @Test
@@ -709,8 +686,7 @@ class TokenizerTest {
         var tokenizer = factory.createTokenizer(new StringReader("1"));
         var pattern = Pattern.compile("2");
 
-        assertThrows(NoSuchElementException.class, () -> tokenizer.skip(pattern))
-                .printStackTrace();
+        assertThrows(NoSuchElementException.class, () -> tokenizer.skip(pattern));
     }
 
     @Test

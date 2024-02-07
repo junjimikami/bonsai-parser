@@ -24,8 +24,7 @@ interface RuleTest {
             var builder = builder();
             builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
-            assertThrows(IllegalStateException.class, () -> builder.build(null))
-                    .printStackTrace();
+            assertThrows(IllegalStateException.class, () -> builder.build(null));
         }
 
     }

@@ -15,8 +15,7 @@ interface ReferenceRelatedTest {
     default void buildPsInCaseNullProductionSet() throws Exception {
         var builder = builder();
 
-        assertThrows(NullPointerException.class, () -> builder.build(null))
-                .printStackTrace();
+        assertThrows(NullPointerException.class, () -> builder.build(null));
     }
 
     @Test
@@ -24,8 +23,7 @@ interface ReferenceRelatedTest {
     default void buildPsInCaseInvalidReference() throws Exception {
         var builder = builder();
 
-        assertThrows(NoSuchElementException.class, () -> builder.build(Stubs.EMPTY_PRODUCTION_SET))
-                .printStackTrace();
+        assertThrows(NoSuchElementException.class, () -> builder.build(Stubs.EMPTY_PRODUCTION_SET));
     }
 
 }

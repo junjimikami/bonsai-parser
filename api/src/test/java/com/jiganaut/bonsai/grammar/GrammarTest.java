@@ -26,8 +26,7 @@ class GrammarTest {
         void buildInCaseNoElements() throws Exception {
             var builder = Grammar.builder();
 
-            assertThrows(IllegalStateException.class, () -> builder.build())
-                    .printStackTrace();
+            assertThrows(IllegalStateException.class, () -> builder.build());
         }
 
         @Test
@@ -36,8 +35,7 @@ class GrammarTest {
             var builder = Grammar.builder();
             builder.add("A", "B");
 
-            assertThrows(NoSuchElementException.class, () -> builder.build())
-                    .printStackTrace();
+            assertThrows(NoSuchElementException.class, () -> builder.build());
         }
 
         @Test
@@ -47,8 +45,7 @@ class GrammarTest {
             builder.add("A", Stubs.DUMMY_RULE_BUILDER);
             builder.setStartSymbol("B");
 
-            assertThrows(NoSuchElementException.class, () -> builder.build())
-                    .printStackTrace();
+            assertThrows(NoSuchElementException.class, () -> builder.build());
         }
 
         @Test
@@ -57,8 +54,7 @@ class GrammarTest {
             var builder = Grammar.builder();
             builder.add("A", set -> null);
 
-            assertThrows(NullPointerException.class, () -> builder.build())
-                    .printStackTrace();
+            assertThrows(NullPointerException.class, () -> builder.build());
         }
 
         @Test
@@ -66,8 +62,7 @@ class GrammarTest {
         void addStEbInCaseStIsNull() throws Exception {
             var builder = Grammar.builder();
 
-            assertThrows(NullPointerException.class, () -> builder.add(null, Stubs.DUMMY_RULE_BUILDER))
-                    .printStackTrace();
+            assertThrows(NullPointerException.class, () -> builder.add(null, Stubs.DUMMY_RULE_BUILDER));
         }
 
         @Test
@@ -75,8 +70,7 @@ class GrammarTest {
         void addStSt2InCaseStIsNull() throws Exception {
             var builder = Grammar.builder();
 
-            assertThrows(NullPointerException.class, () -> builder.add(null, "B"))
-                    .printStackTrace();
+            assertThrows(NullPointerException.class, () -> builder.add(null, "B"));
         }
 
         @Test
@@ -84,8 +78,7 @@ class GrammarTest {
         void addStEbInCaseEbIsNull() throws Exception {
             var builder = Grammar.builder();
 
-            assertThrows(NullPointerException.class, () -> builder.add("A", (Rule.Builder) null))
-                    .printStackTrace();
+            assertThrows(NullPointerException.class, () -> builder.add("A", (Rule.Builder) null));
         }
 
         @Test
@@ -93,8 +86,7 @@ class GrammarTest {
         void addStSt2InCaseSt2IsNull() throws Exception {
             var builder = Grammar.builder();
 
-            assertThrows(NullPointerException.class, () -> builder.add("A", (String) null))
-                    .printStackTrace();
+            assertThrows(NullPointerException.class, () -> builder.add("A", (String) null));
         }
 
         @Test
@@ -102,8 +94,7 @@ class GrammarTest {
         void setSkipPatternStInCaseNullParameter() throws Exception {
             var builder = Grammar.builder();
 
-            assertThrows(NullPointerException.class, () -> builder.setSkipPattern((String) null))
-                    .printStackTrace();
+            assertThrows(NullPointerException.class, () -> builder.setSkipPattern((String) null));
         }
 
         @Test
@@ -111,8 +102,7 @@ class GrammarTest {
         void setSkipPatternPaInCaseNullParameter() throws Exception {
             var builder = Grammar.builder();
 
-            assertThrows(NullPointerException.class, () -> builder.setSkipPattern((Pattern) null))
-                    .printStackTrace();
+            assertThrows(NullPointerException.class, () -> builder.setSkipPattern((Pattern) null));
         }
 
         @Test
@@ -120,8 +110,7 @@ class GrammarTest {
         void setStartSymbolInCaseNullParameter() throws Exception {
             var builder = Grammar.builder();
 
-            assertThrows(NullPointerException.class, () -> builder.setStartSymbol(null))
-                    .printStackTrace();
+            assertThrows(NullPointerException.class, () -> builder.setStartSymbol(null));
         }
 
         @Test
@@ -131,8 +120,7 @@ class GrammarTest {
             builder.add("A", Stubs.DUMMY_RULE_BUILDER);
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.add("A", Stubs.DUMMY_RULE_BUILDER))
-                    .printStackTrace();
+            assertThrows(IllegalStateException.class, () -> builder.add("A", Stubs.DUMMY_RULE_BUILDER));
         }
 
         @Test
@@ -142,8 +130,7 @@ class GrammarTest {
             builder.add("A", Stubs.DUMMY_RULE_BUILDER);
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.add("A", "B"))
-                    .printStackTrace();
+            assertThrows(IllegalStateException.class, () -> builder.add("A", "B"));
         }
 
         @Test
@@ -153,8 +140,7 @@ class GrammarTest {
             builder.add("A", Stubs.DUMMY_RULE_BUILDER);
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.setSkipPattern(""))
-                    .printStackTrace();
+            assertThrows(IllegalStateException.class, () -> builder.setSkipPattern(""));
         }
 
         @Test
@@ -164,8 +150,7 @@ class GrammarTest {
             builder.add("A", Stubs.DUMMY_RULE_BUILDER);
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.setSkipPattern(Pattern.compile("")))
-                    .printStackTrace();
+            assertThrows(IllegalStateException.class, () -> builder.setSkipPattern(Pattern.compile("")));
         }
 
         @Test
@@ -175,8 +160,7 @@ class GrammarTest {
             builder.add("A", Stubs.DUMMY_RULE_BUILDER);
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.build())
-                    .printStackTrace();
+            assertThrows(IllegalStateException.class, () -> builder.build());
         }
 
         @Test
