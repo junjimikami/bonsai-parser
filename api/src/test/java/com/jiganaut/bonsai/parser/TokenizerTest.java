@@ -3,8 +3,11 @@ package com.jiganaut.bonsai.parser;
 import static com.jiganaut.bonsai.grammar.Rules.choiceBuilder;
 import static com.jiganaut.bonsai.grammar.Rules.pattern;
 import static com.jiganaut.bonsai.grammar.Rules.sequenceBuilder;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Named.named;
@@ -13,14 +16,16 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.UncheckedIOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -29,264 +34,6 @@ import com.jiganaut.bonsai.grammar.Grammar;
 import com.jiganaut.bonsai.grammar.Rule;
 
 class TokenizerTest {
-
-    @Nested
-    class MonkeyTest {
-        @Test
-        void test() {
-            var grammar = Grammar.builder()
-                    .add("A", pattern("0"))
-                    .build();
-            var factory = TokenizerFactory.newFactory(grammar);
-            var tokenizer = factory.createTokenizer(new StringReader("0"));
-            assertTrue(tokenizer.hasNext());
-            assertTrue(tokenizer.hasNext("0"));
-            assertFalse(tokenizer.hasNext("1"));
-            var token = tokenizer.next();
-            assertTrue(token.getKind().isTerminal());
-            assertEquals("0", token.getValue());
-            assertFalse(tokenizer.hasNext());
-        }
-
-        @Test
-        void test2() {
-            var grammar = Grammar.builder()
-                    .add("A", pattern("0|1"))
-                    .build();
-            var factory = TokenizerFactory.newFactory(grammar);
-            var tokenizer = factory.createTokenizer(new StringReader("0110"));
-            assertEquals("0", tokenizer.next().getValue());
-            assertEquals("1", tokenizer.next().getValue());
-            assertEquals("1", tokenizer.next().getValue());
-            assertEquals("0", tokenizer.next().getValue());
-            assertFalse(tokenizer.hasNext());
-        }
-
-        @Test
-        void test3() {
-            var grammar = Grammar.builder()
-                    .add("A", choiceBuilder()
-                            .add(pattern("0"))
-                            .add(pattern("1")))
-                    .build();
-            var factory = TokenizerFactory.newFactory(grammar);
-            var tokenizer = factory.createTokenizer(new StringReader("0110"));
-            assertEquals("0", tokenizer.next().getValue());
-            assertEquals("1", tokenizer.next().getValue());
-            assertEquals("1", tokenizer.next().getValue());
-            assertEquals("0", tokenizer.next().getValue());
-            assertFalse(tokenizer.hasNext());
-        }
-
-        @Test
-        void test4() {
-            var grammar = Grammar.builder()
-                    .add("A", choiceBuilder()
-                            .add("B")
-                            .add("C"))
-                    .add("B", pattern("0"))
-                    .add("C", pattern("1"))
-                    .build();
-            var factory = TokenizerFactory.newFactory(grammar);
-            var tokenizer = factory.createTokenizer(new StringReader("0110"));
-            assertEquals("0", tokenizer.next().getValue());
-            assertEquals("1", tokenizer.next().getValue());
-            assertEquals("1", tokenizer.next().getValue());
-            assertEquals("0", tokenizer.next().getValue());
-            assertFalse(tokenizer.hasNext());
-        }
-
-        @Test
-        void test5() {
-            var grammar = Grammar.builder()
-                    .add("A", sequenceBuilder()
-                            .add(pattern("0"))
-                            .add(pattern("1")))
-                    .build();
-            var factory = TokenizerFactory.newFactory(grammar);
-            var tokenizer = factory.createTokenizer(new StringReader("0101"));
-            assertEquals("01", tokenizer.next().getValue());
-            assertEquals("01", tokenizer.next().getValue());
-            assertFalse(tokenizer.hasNext());
-        }
-
-        @Test
-        void test6() {
-            var grammar = Grammar.builder()
-                    .add("A", pattern("0")
-                            .atLeast(2))
-                    .build();
-            var factory = TokenizerFactory.newFactory(grammar);
-            var tokenizer = factory.createTokenizer(new StringReader("0"));
-            assertThrows(ParseException.class, () -> tokenizer.hasNext());
-        }
-
-        @Test
-        void test7() {
-            var grammar = Grammar.builder()
-                    .add("A", pattern("0")
-                            .atLeast(2))
-                    .build();
-            var factory = TokenizerFactory.newFactory(grammar);
-            var tokenizer = factory.createTokenizer(new StringReader("00"));
-            assertEquals("00", tokenizer.next().getValue());
-            assertFalse(tokenizer.hasNext());
-        }
-
-        @Test
-        void test8() {
-            var grammar = Grammar.builder()
-                    .add("A", pattern("0")
-                            .atLeast(2))
-                    .build();
-            var factory = TokenizerFactory.newFactory(grammar);
-            var tokenizer = factory.createTokenizer(new StringReader("000"));
-            assertEquals("000", tokenizer.next().getValue());
-            assertFalse(tokenizer.hasNext());
-        }
-
-        @Test
-        void test9() {
-            var grammar = Grammar.builder()
-                    .add("A", pattern("0")
-                            .exactly(2))
-                    .build();
-            var factory = TokenizerFactory.newFactory(grammar);
-            var tokenizer = factory.createTokenizer(new StringReader("0"));
-            assertThrows(ParseException.class, () -> tokenizer.hasNext());
-        }
-
-        @Test
-        void test10() {
-            var grammar = Grammar.builder()
-                    .add("A", pattern("0")
-                            .exactly(2))
-                    .build();
-            var factory = TokenizerFactory.newFactory(grammar);
-            var tokenizer = factory.createTokenizer(new StringReader("00"));
-            assertEquals("00", tokenizer.next().getValue());
-            assertFalse(tokenizer.hasNext());
-        }
-
-        @Test
-        void test11() {
-            var grammar = Grammar.builder()
-                    .add("A", pattern("0")
-                            .exactly(2))
-                    .build();
-            var factory = TokenizerFactory.newFactory(grammar);
-            var tokenizer = factory.createTokenizer(new StringReader("000"));
-            assertThrows(ParseException.class, () -> tokenizer.next());
-        }
-
-        @Test
-        void test12() {
-            var grammar = Grammar.builder()
-                    .add("A", pattern("0")
-                            .range(2, 3))
-                    .build();
-            var factory = TokenizerFactory.newFactory(grammar);
-            var tokenizer = factory.createTokenizer(new StringReader("0"));
-            assertThrows(ParseException.class, () -> tokenizer.hasNext());
-        }
-
-        @Test
-        void test13() {
-            var grammar = Grammar.builder()
-                    .add("A", pattern("0")
-                            .range(2, 3))
-                    .build();
-            var factory = TokenizerFactory.newFactory(grammar);
-            var tokenizer = factory.createTokenizer(new StringReader("00"));
-            assertEquals("00", tokenizer.next().getValue());
-            assertFalse(tokenizer.hasNext());
-        }
-
-        @Test
-        void test14() {
-            var grammar = Grammar.builder()
-                    .add("A", pattern("0")
-                            .range(2, 3))
-                    .build();
-            var factory = TokenizerFactory.newFactory(grammar);
-            var tokenizer = factory.createTokenizer(new StringReader("000"));
-            assertEquals("000", tokenizer.next().getValue());
-            assertFalse(tokenizer.hasNext());
-        }
-
-        @Test
-        void test15() {
-            var grammar = Grammar.builder()
-                    .add("A", pattern("0")
-                            .range(2, 3))
-                    .build();
-            var factory = TokenizerFactory.newFactory(grammar);
-            var tokenizer = factory.createTokenizer(new StringReader("0000"));
-            assertThrows(ParseException.class, () -> tokenizer.next());
-        }
-
-        @Test
-        void test16() {
-            var grammar = Grammar.builder()
-                    .add("A", sequenceBuilder()
-                            .add("B")
-                            .add("C"))
-                    .add("B", pattern("0").opt())
-                    .add("C", pattern("1"))
-                    .build();
-            var factory = TokenizerFactory.newFactory(grammar);
-            var tokenizer = factory.createTokenizer(new StringReader("101"));
-            assertEquals("1", tokenizer.next().getValue());
-            assertEquals("01", tokenizer.next().getValue());
-            assertFalse(tokenizer.hasNext());
-        }
-
-        @Test
-        void test17() {
-            var grammar = Grammar.builder()
-                    .setSkipPattern("\\s")
-                    .add("A", sequenceBuilder()
-                            .add(pattern("1"))
-                            .add(choiceBuilder()
-                                    .add(pattern("0"))
-                                    .addEmpty()))
-                    .build();
-            var factory = TokenizerFactory.newFactory(grammar);
-            var tokenizer = factory.createTokenizer(new StringReader("10"));
-            assertTrue(tokenizer.hasNext());
-            assertEquals("10", tokenizer.next().getValue());
-            assertFalse(tokenizer.hasNext());
-        }
-
-        @Test
-        void test18() throws Exception {
-            var grammar = Grammar.builder()
-                    .add("A", sequenceBuilder()
-                            .add(pattern("1"))
-                            .add(set -> Rule.EMPTY))
-                    .build();
-            var factory = TokenizerFactory.newFactory(grammar);
-            var tokenizer = factory.createTokenizer(new StringReader("1"));
-            assertTrue(tokenizer.hasNext());
-            assertEquals("1", tokenizer.next().getValue());
-            assertFalse(tokenizer.hasNext());
-        }
-
-        @Test
-        void test19() throws Exception {
-            var grammar = Grammar.builder()
-                    .add("A", pattern("0"))
-                    .add("A", pattern("1"))
-                    .build();
-            var factory = TokenizerFactory.newFactory(grammar);
-            var tokenizer = factory.createTokenizer(new StringReader("1001"));
-            assertEquals("1", tokenizer.next().getValue());
-            assertEquals("0", tokenizer.next().getValue());
-            assertEquals("0", tokenizer.next().getValue());
-            assertEquals("1", tokenizer.next().getValue());
-            assertFalse(tokenizer.hasNext());
-        }
-    }
 
     static Stream<Arguments> allMethods() {
         return Stream.of(
@@ -799,5 +546,86 @@ class TokenizerTest {
 
         assertEquals(Tree.Kind.TERMINAL, token.getKind());
         assertEquals("1", token.getValue());
+    }
+
+    @DisplayName("Test various grammars.")
+    @ParameterizedTest
+    @MethodSource
+    void testVariousGrammar(Grammar grammar, String input, List<String> tokens) {
+        var factory = TokenizerFactory.newFactory(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader(input));
+
+        if (tokens != null) {
+            var actual = new ArrayList<String>();
+            while (tokenizer.hasNext()) {
+                actual.add(tokenizer.next().getValue());
+            }
+            assertIterableEquals(tokens, actual);
+        } else {
+            assertThrows(ParseException.class, () -> {
+                while (tokenizer.hasNext()) {
+                    tokenizer.next();
+                }
+            });
+        }
+    }
+
+    static Stream<Arguments> testVariousGrammar() {
+        var stream = Stream.<Arguments>of(
+                arguments(Grammar.builder()
+                        .add("A", pattern("0"))
+                        .build(), "0000", List.of("0", "0", "0", "0")),
+                arguments(Grammar.builder()
+                        .add("A", pattern("0"))
+                        .build(), "0001", null),
+                arguments(Grammar.builder()
+                        .add("A", pattern("."))
+                        .build(), "0123", List.of("0", "1", "2", "3")),
+                arguments(Grammar.builder()
+                        .add("A", pattern(Pattern.compile(".")))
+                        .build(), "0123", List.of("0", "1", "2", "3")),
+                arguments(Grammar.builder()
+                        .add("A", pattern(Pattern.compile(".", Pattern.LITERAL)))
+                        .build(), "....", List.of(".", ".", ".", ".")),
+                arguments(Grammar.builder()
+                        .add("A", pattern(Pattern.compile(".", Pattern.LITERAL)))
+                        .build(), "0123", null),
+                arguments(Grammar.builder()
+                        .add("A", pattern(""))
+                        .build(), "", List.of()),
+                arguments(Grammar.builder()
+                        .add("A", pattern(""))
+                        .build(), "0123", null));
+        stream = Stream.concat(stream, Stream.of(
+                arguments(Grammar.builder()
+                        .add("A", sequenceBuilder()
+                                .add(pattern("0")))
+                        .build(), "0000", List.of("0", "0", "0", "0")),
+                arguments(Grammar.builder()
+                        .add("A", sequenceBuilder()
+                                .add(pattern("0"))
+                                .add(pattern("0")))
+                        .build(), "0000", List.of("00", "00")),
+                arguments(Grammar.builder()
+                        .add("A", sequenceBuilder()
+                                .add(pattern("0"))
+                                .add(pattern("0")))
+                        .build(), "000", null)));
+        stream = Stream.concat(stream, Stream.of(
+                arguments(Grammar.builder()
+                        .add("A", choiceBuilder()
+                                .add(pattern("0")))
+                        .build(), "0000", List.of("0", "0", "0", "0")),
+                arguments(Grammar.builder()
+                        .add("A", choiceBuilder()
+                                .add(pattern("0"))
+                                .add(pattern("1")))
+                        .build(), "0110", List.of("0", "1", "1", "0")),
+                arguments(Grammar.builder()
+                        .add("A", choiceBuilder()
+                                .add(pattern("0"))
+                                .addEmpty())
+                        .build(), "000", List.of("0", "0", "0"))));
+        return stream;
     }
 }
