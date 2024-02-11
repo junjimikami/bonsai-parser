@@ -105,12 +105,6 @@ final class Derivation implements RuleVisitor<List<Tree>, Context> {
             var message = MessageSupport.tokenCountOutOfRange(quantfier, context, count);
             throw new ParseException(message);
         }
-        quantfier.getMaxCount().ifPresent(maxCount -> {
-            if (maxCount < count) {
-                var message = MessageSupport.tokenCountOutOfRange(quantfier, context, count);
-                throw new ParseException(message);
-            }
-        });
         return trees;
     }
 

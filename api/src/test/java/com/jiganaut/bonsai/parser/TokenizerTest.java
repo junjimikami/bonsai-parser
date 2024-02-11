@@ -4,11 +4,7 @@ import static com.jiganaut.bonsai.grammar.Rules.choiceBuilder;
 import static com.jiganaut.bonsai.grammar.Rules.pattern;
 import static com.jiganaut.bonsai.grammar.Rules.reference;
 import static com.jiganaut.bonsai.grammar.Rules.sequenceBuilder;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Named.named;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
@@ -546,7 +542,7 @@ class TokenizerTest {
         assertEquals("1", token.getValue());
     }
 
-    @DisplayName("Test various grammars.")
+    @DisplayName("Test various grammars")
     @ParameterizedTest
     @MethodSource
     void testVariousGrammars(Grammar grammar, String input, List<String> tokens) {
@@ -647,8 +643,7 @@ class TokenizerTest {
                 arguments(Grammar.builder()
                         .add("A", pattern("0"))
                         .add("A", pattern("1"))
-                        .build(), "0110", List.of("0", "1", "1", "0"))
-                ));
+                        .build(), "0110", List.of("0", "1", "1", "0"))));
         // + Reference
         stream = Stream.concat(stream, Stream.of(
                 arguments(Grammar.builder()
@@ -661,8 +656,7 @@ class TokenizerTest {
                                 .add(choiceBuilder()
                                         .addEmpty()
                                         .add(reference("A"))))
-                        .build(), "0000", List.of("0000"))
-                ));
+                        .build(), "0000", List.of("0000"))));
         // + Quantifier
         stream = Stream.concat(stream, Stream.of(
                 arguments(Grammar.builder()
@@ -727,8 +721,7 @@ class TokenizerTest {
                         .build(), "0000", null),
                 arguments(Grammar.builder()
                         .add("A", pattern("0").range(2, 3))
-                        .build(), "00000", List.of("000", "00"))
-                ));
+                        .build(), "00000", List.of("000", "00"))));
         // + More
         stream = Stream.concat(stream, Stream.of(
                 arguments(Grammar.builder()
@@ -736,9 +729,46 @@ class TokenizerTest {
                         .add("A", pattern("0"))
                         .build(), "0 00 0", List.of("0", "0", "0", "0")),
                 arguments(Grammar.builder()
-                        .add("A", pattern("[\\x{%X}-\\x{%X}]".formatted(Character.MIN_SUPPLEMENTARY_CODE_POINT, Character.MAX_CODE_POINT)))
-                        .build(), "🌟𝒜", List.of("🌟", "𝒜"))
-                ));
+                        .add("A",
+                                pattern("[\\x{%X}-\\x{%X}]".formatted(
+                                        Character.MIN_SUPPLEMENTARY_CODE_POINT,
+                                        Character.MAX_CODE_POINT)))
+                        .build(), "🌟𝒜", List.of("🌟", "𝒜")),
+                arguments(Grammar.builder()
+                        .add("A", pattern("."))
+                        .build(), String.valueOf("🌟".charAt(0)),
+                        List.of(String.valueOf("🌟".charAt(0)))),
+                arguments(Grammar.builder()
+                        .add("A", pattern("."))
+                        .build(), String.valueOf("🌟".charAt(0)) + "0",
+                        List.of(String.valueOf("🌟".charAt(0)), "0"))));
         return stream;
+    }
+
+    @Test
+    @DisplayName("Test decoration")
+    void testDecoration() throws Exception {
+        var grammar = Grammar.builder()
+                .setSkipPattern("\\s")
+                .add("A", pattern("0|1").exactly(2))
+                .build();
+        var tokenizer = TokenizerFactory.newFactory(grammar)
+                .createTokenizer(new StringReader("00 01 10 11"));
+
+        var grammar2 = Grammar.builder()
+                .add("A", pattern("0|1"))
+                .build();
+        var tokenizer2 = TokenizerFactory.newFactory(grammar2)
+                .createTokenizer(tokenizer);
+
+        assertEquals("0", tokenizer2.next().getValue());
+        assertEquals("0", tokenizer2.next().getValue());
+        assertEquals("0", tokenizer2.next().getValue());
+        assertEquals("1", tokenizer2.next().getValue());
+        assertEquals("1", tokenizer2.next().getValue());
+        assertEquals("0", tokenizer2.next().getValue());
+        assertEquals("1", tokenizer2.next().getValue());
+        assertEquals("1", tokenizer2.next().getValue());
+        assertFalse(tokenizer2.hasNext());
     }
 }

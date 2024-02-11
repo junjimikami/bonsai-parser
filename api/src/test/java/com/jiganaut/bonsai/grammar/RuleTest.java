@@ -66,8 +66,10 @@ interface RuleTest {
         var visitor = visitor();
         var expected = new Object[] { rule, null };
         var result = rule.accept(visitor);
+        var result2 = visitor.visit(rule);
 
         assertArrayEquals(expected, result);
+        assertArrayEquals(expected, result2);
     }
 
     @DisplayName("accept(ev:ElementVisitor, p:P)")
@@ -80,7 +82,9 @@ interface RuleTest {
         var visitor = visitor();
         var expected = new Object[] { rule, arg };
         var result = rule.accept(visitor, arg);
+        var result2 = visitor.visit(rule, arg);
 
         assertArrayEquals(expected, result);
+        assertArrayEquals(expected, result2);
     }
 }
