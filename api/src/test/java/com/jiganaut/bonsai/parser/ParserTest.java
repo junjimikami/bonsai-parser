@@ -5,6 +5,7 @@ import static com.jiganaut.bonsai.grammar.Rules.pattern;
 import static com.jiganaut.bonsai.grammar.Rules.reference;
 import static com.jiganaut.bonsai.grammar.Rules.sequenceBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Named.named;
@@ -148,6 +149,7 @@ class ParserTest {
 
         assertEquals(Kind.NON_TERMINAL, tree.getKind());
         assertTrue(tree.getKind().isNonTerminal());
+        assertFalse(tree.getKind().isTerminal());
     }
 
     @DisplayName("Test various grammars.")

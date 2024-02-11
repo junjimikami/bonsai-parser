@@ -41,7 +41,7 @@ class ReaderTokenizer extends AbstractTokenizer {
                 reader.unread(ch1);
                 return nextToken = String.valueOf((char) ch0);
             }
-            return new String(new char[] { (char) ch0, (char) ch1 });
+            return nextToken = new String(new char[] { (char) ch0, (char) ch1 });
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

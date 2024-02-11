@@ -480,6 +480,8 @@ class TokenizerTest {
         var token = tokenizer.next();
 
         assertEquals(Tree.Kind.TERMINAL, token.getKind());
+        assertTrue(token.getKind().isTerminal());
+        assertFalse(token.getKind().isNonTerminal());
         assertEquals("1", token.getValue());
     }
 
@@ -732,7 +734,10 @@ class TokenizerTest {
                 arguments(Grammar.builder()
                         .setSkipPattern("\\s")
                         .add("A", pattern("0"))
-                        .build(), "0 00 0", List.of("0", "0", "0", "0"))
+                        .build(), "0 00 0", List.of("0", "0", "0", "0")),
+                arguments(Grammar.builder()
+                        .add("A", pattern("[\\x{%X}-\\x{%X}]".formatted(Character.MIN_SUPPLEMENTARY_CODE_POINT, Character.MAX_CODE_POINT)))
+                        .build(), "🌟𝒜", List.of("🌟", "𝒜"))
                 ));
         return stream;
     }

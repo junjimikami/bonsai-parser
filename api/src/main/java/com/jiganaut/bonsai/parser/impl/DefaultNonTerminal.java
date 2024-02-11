@@ -22,17 +22,6 @@ class DefaultNonTerminal implements NonTerminal {
         this.list = list;
     }
 
-    DefaultNonTerminal(String symbol, Tree s) {
-        assert symbol != null;
-        assert s != null;
-        this.symbol = symbol;
-        this.list = List.of(s);
-    }
-
-    DefaultNonTerminal(String symbol) {
-        this(symbol, List.of());
-    }
-
     @Override
     public String getSymbol() {
         return symbol;
