@@ -1,9 +1,8 @@
-
-misc-test/.settings/org.eclipse.jdt.ui.prefs
-misc/doc/**
-misc/.settings/org.eclipse.jdt.ui.prefs
-/bin/
-/target/
-/.classpath
-/.project
-/.settings/
+api/target/
+api/.classpath
+api/.project
+api/.settings/
+sample/target/
+sample/.classpath
+sample/.project
+sample/.settings/
