@@ -25,13 +25,6 @@ class DefaultSequenceRule extends AbstractCompositeRule implements SequenceRule 
         }
 
         @Override
-        public Builder add(String reference) {
-            checkParameter(reference);
-            builders.add(new DefaultReferenceRule.Builder(reference));
-            return this;
-        }
-
-        @Override
         public SequenceRule build(ProductionSet set) {
             checkForBuild();
             var elements = builders.stream().map(e -> e.build(set)).toList();

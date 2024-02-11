@@ -26,16 +26,9 @@ class DefaultChoiceRule extends AbstractCompositeRule implements ChoiceRule {
         }
 
         @Override
-        public Builder add(String reference) {
-            checkParameter(reference);
-            builders.add(new DefaultReferenceRule.Builder(reference));
-            return this;
-        }
-
-        @Override
         public Builder addEmpty() {
             check();
-            builders.add(emptyBuilder);
+            builders.add(set -> Rule.EMPTY);
             return this;
         }
 
@@ -47,14 +40,6 @@ class DefaultChoiceRule extends AbstractCompositeRule implements ChoiceRule {
         }
 
     }
-
-    private static final Rule.Builder emptyBuilder = new Rule.Builder() {
-
-        @Override
-        public Rule build(ProductionSet set) {
-            return Rule.EMPTY;
-        }
-    };
 
     private DefaultChoiceRule(List<? extends Rule> elements) {
         super(elements);

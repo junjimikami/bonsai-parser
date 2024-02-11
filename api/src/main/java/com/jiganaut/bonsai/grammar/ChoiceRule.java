@@ -12,7 +12,6 @@ public interface ChoiceRule extends Rule {
 
     public static interface Builder extends Rule.Builder, Quantifiable {
         public ChoiceRule.Builder add(Rule.Builder builder);
-        public ChoiceRule.Builder add(String reference);
         public ChoiceRule.Builder addEmpty();
         @Override
         public ChoiceRule build(ProductionSet set);

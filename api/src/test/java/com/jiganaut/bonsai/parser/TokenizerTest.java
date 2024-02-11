@@ -2,9 +2,8 @@ package com.jiganaut.bonsai.parser;
 
 import static com.jiganaut.bonsai.grammar.Rules.choiceBuilder;
 import static com.jiganaut.bonsai.grammar.Rules.pattern;
+import static com.jiganaut.bonsai.grammar.Rules.reference;
 import static com.jiganaut.bonsai.grammar.Rules.sequenceBuilder;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
@@ -25,7 +24,6 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -63,10 +61,8 @@ class TokenizerTest {
     void ambiguousRule(Consumer<Tokenizer> method) throws Exception {
         var grammar = Grammar.builder()
                 .add("S", choiceBuilder()
-                        .add("A")
-                        .add("B"))
-                .add("A", pattern("1"))
-                .add("B", pattern("."))
+                        .add(pattern("1"))
+                        .add(pattern(".")))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -551,7 +547,7 @@ class TokenizerTest {
     @DisplayName("Test various grammars.")
     @ParameterizedTest
     @MethodSource
-    void testVariousGrammar(Grammar grammar, String input, List<String> tokens) {
+    void testVariousGrammars(Grammar grammar, String input, List<String> tokens) {
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader(input));
 
@@ -570,7 +566,8 @@ class TokenizerTest {
         }
     }
 
-    static Stream<Arguments> testVariousGrammar() {
+    static Stream<Arguments> testVariousGrammars() {
+        // Pattern
         var stream = Stream.<Arguments>of(
                 arguments(Grammar.builder()
                         .add("A", pattern("0"))
@@ -596,6 +593,7 @@ class TokenizerTest {
                 arguments(Grammar.builder()
                         .add("A", pattern(""))
                         .build(), "0123", null));
+        // + Sequence
         stream = Stream.concat(stream, Stream.of(
                 arguments(Grammar.builder()
                         .add("A", sequenceBuilder()
@@ -610,7 +608,13 @@ class TokenizerTest {
                         .add("A", sequenceBuilder()
                                 .add(pattern("0"))
                                 .add(pattern("0")))
-                        .build(), "000", null)));
+                        .build(), "000", null),
+                arguments(Grammar.builder()
+                        .add("A", sequenceBuilder()
+                                .add(pattern("0"))
+                                .add(pattern("1")))
+                        .build(), "0101", List.of("01", "01"))));
+        // + Choice
         stream = Stream.concat(stream, Stream.of(
                 arguments(Grammar.builder()
                         .add("A", choiceBuilder()
@@ -625,7 +629,111 @@ class TokenizerTest {
                         .add("A", choiceBuilder()
                                 .add(pattern("0"))
                                 .addEmpty())
-                        .build(), "000", List.of("0", "0", "0"))));
+                        .build(), "0000", List.of("0", "0", "0", "0")),
+                arguments(Grammar.builder()
+                        .add("A", choiceBuilder()
+                                .add(pattern("0"))
+                                .add(pattern("[^0]")))
+                        .build(), "0123", List.of("0", "1", "2", "3")),
+                arguments(Grammar.builder()
+                        .add("A", sequenceBuilder()
+                                .add(choiceBuilder()
+                                        .add(pattern("0"))
+                                        .addEmpty())
+                                .add(pattern("1")))
+                        .build(), "011101", List.of("01", "1", "1", "01")),
+                arguments(Grammar.builder()
+                        .add("A", pattern("0"))
+                        .add("A", pattern("1"))
+                        .build(), "0110", List.of("0", "1", "1", "0"))
+                ));
+        // + Reference
+        stream = Stream.concat(stream, Stream.of(
+                arguments(Grammar.builder()
+                        .add("A", reference("B"))
+                        .add("B", pattern("0"))
+                        .build(), "0000", List.of("0", "0", "0", "0")),
+                arguments(Grammar.builder()
+                        .add("A", sequenceBuilder()
+                                .add(pattern("0"))
+                                .add(choiceBuilder()
+                                        .addEmpty()
+                                        .add(reference("A"))))
+                        .build(), "0000", List.of("0000"))
+                ));
+        // + Quantifier
+        stream = Stream.concat(stream, Stream.of(
+                arguments(Grammar.builder()
+                        .add("A", pattern("0").opt())
+                        .build(), "", List.of()),
+                arguments(Grammar.builder()
+                        .add("A", pattern("0").opt())
+                        .build(), "0", List.of("0")),
+                arguments(Grammar.builder()
+                        .add("A", pattern("0").opt())
+                        .build(), "00", List.of("0", "0")),
+                arguments(Grammar.builder()
+                        .add("A", pattern("0").zeroOrMore())
+                        .build(), "", List.of()),
+                arguments(Grammar.builder()
+                        .add("A", pattern("0").zeroOrMore())
+                        .build(), "0", List.of("0")),
+                arguments(Grammar.builder()
+                        .add("A", pattern("0").zeroOrMore())
+                        .build(), "00", List.of("00")),
+                arguments(Grammar.builder()
+                        .add("A", pattern("0").oneOrMore())
+                        .build(), "1", null),
+                arguments(Grammar.builder()
+                        .add("A", pattern("0").oneOrMore())
+                        .build(), "0", List.of("0")),
+                arguments(Grammar.builder()
+                        .add("A", pattern("0").oneOrMore())
+                        .build(), "00", List.of("00")),
+                arguments(Grammar.builder()
+                        .add("A", pattern("0").atLeast(2))
+                        .build(), "0", null),
+                arguments(Grammar.builder()
+                        .add("A", pattern("0").atLeast(2))
+                        .build(), "00", List.of("00")),
+                arguments(Grammar.builder()
+                        .add("A", pattern("0").atLeast(2))
+                        .build(), "000", List.of("000")),
+                arguments(Grammar.builder()
+                        .add("A", pattern("0").exactly(2))
+                        .build(), "0", null),
+                arguments(Grammar.builder()
+                        .add("A", pattern("0").exactly(2))
+                        .build(), "00", List.of("00")),
+                arguments(Grammar.builder()
+                        .add("A", pattern("0").exactly(2))
+                        .build(), "000", null),
+                arguments(Grammar.builder()
+                        .add("A", pattern("0").exactly(2))
+                        .build(), "0000", List.of("00", "00")),
+                arguments(Grammar.builder()
+                        .add("A", pattern("0").range(2, 3))
+                        .build(), "0", null),
+                arguments(Grammar.builder()
+                        .add("A", pattern("0").range(2, 3))
+                        .build(), "00", List.of("00")),
+                arguments(Grammar.builder()
+                        .add("A", pattern("0").range(2, 3))
+                        .build(), "000", List.of("000")),
+                arguments(Grammar.builder()
+                        .add("A", pattern("0").range(2, 3))
+                        .build(), "0000", null),
+                arguments(Grammar.builder()
+                        .add("A", pattern("0").range(2, 3))
+                        .build(), "00000", List.of("000", "00"))
+                ));
+        // + More
+        stream = Stream.concat(stream, Stream.of(
+                arguments(Grammar.builder()
+                        .setSkipPattern("\\s")
+                        .add("A", pattern("0"))
+                        .build(), "0 00 0", List.of("0", "0", "0", "0"))
+                ));
         return stream;
     }
 }

@@ -2,6 +2,7 @@ package com.jiganaut.bonsai.parser;
 
 import static com.jiganaut.bonsai.grammar.Rules.choiceBuilder;
 import static com.jiganaut.bonsai.grammar.Rules.pattern;
+import static com.jiganaut.bonsai.grammar.Rules.reference;
 import static com.jiganaut.bonsai.grammar.Rules.sequenceBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -12,6 +13,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import java.io.StringReader;
 import java.io.UncheckedIOException;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
@@ -46,10 +48,8 @@ class ParserTest {
     void ambiguousRule(Consumer<Parser> method) throws Exception {
         var grammar = Grammar.builder()
                 .add("S", choiceBuilder()
-                        .add("A")
-                        .add("B"))
-                .add("A", pattern("1"))
-                .add("B", pattern("."))
+                        .add(pattern("1"))
+                        .add(pattern(".")))
                 .build();
         var factory = ParserFactory.newFactory(grammar);
         var parser = factory.createParser(new StringReader("1"));
@@ -150,4 +150,68 @@ class ParserTest {
         assertTrue(tree.getKind().isNonTerminal());
     }
 
+    @DisplayName("Test various grammars.")
+    @ParameterizedTest
+    @MethodSource
+    void testVariousGrammars(Grammar grammar, String input, String expected) {
+        var factory = ParserFactory.newFactory(grammar);
+        var parser = factory.createParser(new StringReader(input));
+
+        if (expected != null) {
+            var actual = parser.parse().accept(new TreeVisitor<String, Void>() {
+                @Override
+                public String visitNonTerminal(NonTerminal tree, Void p) {
+                    return tree.getSymbol() +
+                            tree.getSubTrees().stream()
+                                    .map(this::visit)
+                                    .collect(Collectors.joining(",", "(", ")"));
+                }
+
+                @Override
+                public String visitTerminal(Terminal tree, Void p) {
+                    return tree.getValue();
+                }
+            });
+            assertEquals(expected, actual);
+        } else {
+            assertThrows(ParseException.class, () -> parser.parse());
+        }
+    }
+
+    static Stream<Arguments> testVariousGrammars() {
+        var stream = Stream.<Arguments>of(
+                arguments(Grammar.builder()
+                        .add("A", pattern("0"))
+                        .build(), "0", "A(0)"),
+                arguments(Grammar.builder()
+                        .add("A", pattern("0"))
+                        .build(), "00", null),
+                arguments(Grammar.builder()
+                        .add("A", sequenceBuilder()
+                                .add(pattern("0"))
+                                .add(pattern("1")))
+                        .build(), "01", "A(0,1)"),
+                arguments(Grammar.builder()
+                        .add("A", sequenceBuilder()
+                                .add(choiceBuilder()
+                                        .add(pattern("0"))
+                                        .addEmpty())
+                                .add(pattern("1")))
+                        .build(), "01", "A(0,1)"),
+                arguments(Grammar.builder()
+                        .add("A", sequenceBuilder()
+                                .add(choiceBuilder()
+                                        .add(pattern("0"))
+                                        .addEmpty())
+                                .add(pattern("1")))
+                        .build(), "1", "A(1)"),
+                arguments(Grammar.builder()
+                        .add("A", pattern("0"))
+                        .add("A", sequenceBuilder()
+                                .add(pattern("1"))
+                                .add(reference("A")))
+                        .build(), "10", "A(1,A(0))")
+                );
+        return stream;
+    }
 }

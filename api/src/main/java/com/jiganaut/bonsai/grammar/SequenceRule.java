@@ -12,7 +12,6 @@ public interface SequenceRule extends Rule {
 
     public static interface Builder extends Rule.Builder, Quantifiable {
         public SequenceRule.Builder add(Rule.Builder builder);
-        public SequenceRule.Builder add(String reference);
         @Override
         public SequenceRule build(ProductionSet set);
     }

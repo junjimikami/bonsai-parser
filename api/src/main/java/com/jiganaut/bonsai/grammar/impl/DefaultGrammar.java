@@ -51,16 +51,6 @@ class DefaultGrammar implements Grammar {
         }
 
         @Override
-        public Builder add(String symbol, String reference) {
-            checkForAdd(symbol, reference);
-            var builder = new DefaultReferenceRule.Builder(reference);
-            builders.merge(symbol, builder, (b0, b1) -> new DefaultChoiceRule.Builder()
-                    .add(b0)
-                    .add(b1));
-            return this;
-        }
-
-        @Override
         public Builder setSkipPattern(String regex) {
             checkParameter(regex);
             var pattern = Pattern.compile(regex);
@@ -125,5 +115,10 @@ class DefaultGrammar implements Grammar {
     @Override
     public Production getStartProduction() {
         return set.get(startSymbol);
+    }
+
+    @Override
+    public String toString() {
+        return set.toString();
     }
 }

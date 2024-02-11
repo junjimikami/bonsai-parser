@@ -1,8 +1,7 @@
 package com.jiganaut.bonsai.parser.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -27,6 +26,7 @@ final class FirstSet implements RuleVisitor<Set<Rule>, Set<Rule>> {
     static Set<Rule> of(Rule rule, Set<Rule> followSet) {
         return instance.visit(rule, followSet);
     }
+
     static Set<Rule> of(List<? extends Rule> sequence, Set<Rule> followSet) {
         return instance.visit(sequence, followSet);
     }
@@ -40,13 +40,20 @@ final class FirstSet implements RuleVisitor<Set<Rule>, Set<Rule>> {
         if (sequence.isEmpty()) {
             return followSet;
         }
-        var list = new ArrayList<>(sequence);
-        Collections.reverse(list);
-        var set = followSet;
-        for (var p : list) {
-            set = visit(p, set);
+        var subRules = new LinkedList<>(sequence);
+        var rule = subRules.removeFirst();
+        Set<Rule> subFollowSet;
+        if (subRules.isEmpty()) {
+            subFollowSet = followSet;
+        } else {
+            subFollowSet = Set.of(new SequenceRule() {
+                @Override
+                public List<? extends Rule> getRules() {
+                    return subRules;
+                }
+            });
         }
-        return set;
+        return visit(rule, subFollowSet);
     }
 
     @Override

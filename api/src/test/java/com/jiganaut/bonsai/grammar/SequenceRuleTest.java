@@ -22,7 +22,7 @@ class SequenceRuleTest implements RuleTest {
 
         @Override
         public SequenceRule.Builder builder() {
-            return SequenceRule.builder().add("");
+            return SequenceRule.builder().add(ReferenceRule.builder(""));
         }
 
         @Test
@@ -90,14 +90,6 @@ class SequenceRuleTest implements RuleTest {
         }
 
         @Test
-        @DisplayName("add(String) [Null parameter]")
-        void addStNull() throws Exception {
-            var builder = SequenceRule.builder();
-
-            assertThrows(NullPointerException.class, () -> builder.add((String) null));
-        }
-
-        @Test
         @DisplayName("add(eb:Rule.Builder) [Post-build operation]")
         void addEbPostBuild() throws Exception {
             var builder = SequenceRule.builder()
@@ -108,29 +100,11 @@ class SequenceRuleTest implements RuleTest {
         }
 
         @Test
-        @DisplayName("add(st:String) [Post-build operation]")
-        void addStPostBuild() throws Exception {
-            var builder = SequenceRule.builder()
-                    .add(Stubs.DUMMY_RULE_BUILDER);
-            builder.build(Stubs.DUMMY_PRODUCTION_SET);
-
-            assertThrows(IllegalStateException.class, () -> builder.add((String) null));
-        }
-
-        @Test
         @DisplayName("add(eb:Rule.Builder)")
         void addEb() throws Exception {
             var builder = SequenceRule.builder();
 
             assertEquals(builder, builder.add(Stubs.DUMMY_RULE_BUILDER));
-        }
-
-        @Test
-        @DisplayName("add(st:String)")
-        void addSt() throws Exception {
-            var builder = SequenceRule.builder();
-
-            assertEquals(builder, builder.add("SYMBOL"));
         }
 
         @Nested
@@ -196,7 +170,7 @@ class SequenceRuleTest implements RuleTest {
     @DisplayName("getRules() [Containing references]")
     void getRulesInCaseContainingReference(List<String> list) throws Exception {
         var builder = SequenceRule.builder();
-        list.stream().forEach(builder::add);
+        list.stream().forEach(symbol -> builder.add(ReferenceRule.builder(symbol)));
         var sequence = builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
         assertIterableEquals(list, sequence.getRules().stream()

@@ -65,7 +65,11 @@ class DefaultQuantifierRule extends AbstractRule implements QuantifierRule {
 
     @Override
     public Stream<Rule> stream() {
-        return Stream.generate(() -> rule);
+        var stream = Stream.generate(() -> rule);
+        if (maxCount.isPresent()) {
+            return stream.limit(maxCount.getAsInt());
+        }
+        return stream;
     }
 
     @Override

@@ -33,7 +33,7 @@ class GrammarTest {
         @DisplayName("build() [Invalid reference]")
         void buildInCaseInvalidReference() throws Exception {
             var builder = Grammar.builder();
-            builder.add("A", "B");
+            builder.add("A", ReferenceRule.builder("B"));
 
             assertThrows(NoSuchElementException.class, () -> builder.build());
         }
@@ -66,27 +66,11 @@ class GrammarTest {
         }
 
         @Test
-        @DisplayName("add(st:String, st2:String) [st == null]")
-        void addStSt2InCaseStIsNull() throws Exception {
-            var builder = Grammar.builder();
-
-            assertThrows(NullPointerException.class, () -> builder.add(null, "B"));
-        }
-
-        @Test
         @DisplayName("add(st:String, eb:Rule.Builder) [eb == null]")
         void addStEbInCaseEbIsNull() throws Exception {
             var builder = Grammar.builder();
 
             assertThrows(NullPointerException.class, () -> builder.add("A", (Rule.Builder) null));
-        }
-
-        @Test
-        @DisplayName("add(st:String, st2:String) [st2 == null]")
-        void addStSt2InCaseSt2IsNull() throws Exception {
-            var builder = Grammar.builder();
-
-            assertThrows(NullPointerException.class, () -> builder.add("A", (String) null));
         }
 
         @Test
@@ -121,16 +105,6 @@ class GrammarTest {
             builder.build();
 
             assertThrows(IllegalStateException.class, () -> builder.add("A", Stubs.DUMMY_RULE_BUILDER));
-        }
-
-        @Test
-        @DisplayName("add(st:String, st2:String) [Post-build operation]")
-        void addStSt2InCasePostBuild() throws Exception {
-            var builder = Grammar.builder();
-            builder.add("A", Stubs.DUMMY_RULE_BUILDER);
-            builder.build();
-
-            assertThrows(IllegalStateException.class, () -> builder.add("A", "B"));
         }
 
         @Test

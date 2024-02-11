@@ -8,7 +8,6 @@ public interface Grammar {
 
     public static interface Builder {
         public Grammar.Builder add(String symbol, Rule.Builder builder);
-        public Grammar.Builder add(String symbol, String reference);
         public Grammar.Builder setSkipPattern(String regex);
         public Grammar.Builder setSkipPattern(Pattern pattern);
         public Grammar.Builder setStartSymbol(String symbol);

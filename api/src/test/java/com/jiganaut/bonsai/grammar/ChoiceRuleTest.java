@@ -27,7 +27,7 @@ class ChoiceRuleTest implements RuleTest {
 
         @Override
         public ChoiceRule.Builder builder() {
-            return ChoiceRule.builder().add("");
+            return ChoiceRule.builder().add(ReferenceRule.builder(""));
         }
 
         @Test
@@ -95,14 +95,6 @@ class ChoiceRuleTest implements RuleTest {
         }
 
         @Test
-        @DisplayName("add(String) [Null parameter]")
-        void addStInCaseNullParameter() throws Exception {
-            var builder = ChoiceRule.builder();
-
-            assertThrows(NullPointerException.class, () -> builder.add((String) null));
-        }
-
-        @Test
         @DisplayName("add(eb:Rule.Builder) [Post-build operation]")
         void addEbInCasePostBuild() throws Exception {
             var builder = ChoiceRule.builder()
@@ -113,29 +105,11 @@ class ChoiceRuleTest implements RuleTest {
         }
 
         @Test
-        @DisplayName("add(st:String) [Post-build operation]")
-        void addStInCasePostBuild() throws Exception {
-            var builder = ChoiceRule.builder()
-                    .addEmpty();
-            builder.build(Stubs.DUMMY_PRODUCTION_SET);
-
-            assertThrows(IllegalStateException.class, () -> builder.add((String) null));
-        }
-
-        @Test
         @DisplayName("add(eb:Rule.Builder)")
         void addEb() throws Exception {
             var builder = ChoiceRule.builder();
 
             assertEquals(builder, builder.add(Stubs.DUMMY_RULE_BUILDER));
-        }
-
-        @Test
-        @DisplayName("add(st:String)")
-        void addSt() throws Exception {
-            var builder = ChoiceRule.builder();
-
-            assertEquals(builder, builder.add("SYMBOL"));
         }
 
         @Test
@@ -220,7 +194,7 @@ class ChoiceRuleTest implements RuleTest {
     @DisplayName("getChoices() [Containing references]")
     void getChoicesInCaseContainingreferences(List<String> list) throws Exception {
         var builder = ChoiceRule.builder();
-        list.stream().forEach(builder::add);
+        list.stream().forEach(symbol -> builder.add(ReferenceRule.builder(symbol)));
         var choice = builder.build(Stubs.DUMMY_PRODUCTION_SET);
 
         assertIterableEquals(list, choice.getChoices().stream()
