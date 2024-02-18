@@ -6,6 +6,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import com.jiganaut.bonsai.grammar.ChoiceRule;
 import com.jiganaut.bonsai.grammar.Grammar;
 import com.jiganaut.bonsai.grammar.Production;
 import com.jiganaut.bonsai.grammar.ProductionSet;
@@ -44,9 +45,14 @@ class DefaultGrammar implements Grammar {
         @Override
         public Builder add(String symbol, Rule.Builder builder) {
             checkForAdd(symbol, builder);
-            builders.merge(symbol, builder, (b0, b1) -> new DefaultChoiceRule.Builder()
-                    .add(b0)
-                    .add(b1));
+            builders.merge(symbol, builder, (b0, b1) -> {
+                if (b0 instanceof ChoiceRule.Builder choice) {
+                    return choice.add(b1);
+                }
+                return new DefaultChoiceRule.Builder()
+                        .add(b0)
+                        .add(b1);
+            });
             return this;
         }
 
