@@ -1,8 +1,8 @@
 package com.jiganaut.bonsai.parser.impl;
 
 import java.util.Set;
-import java.util.regex.Pattern;
 
+import com.jiganaut.bonsai.grammar.Grammar;
 import com.jiganaut.bonsai.grammar.Production;
 import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.parser.Tokenizer;
@@ -11,24 +11,24 @@ import com.jiganaut.bonsai.parser.Tokenizer;
  * @author Junji Mikami
  *
  */
-record Context(Production production, Tokenizer tokenizer, Set<Rule> followSet, Pattern skipPattern) {
+record Context(Grammar grammar, Production production, Tokenizer tokenizer, Set<Rule> followSet) {
 
     Context withProduction(Production production) {
-        return new Context(production, this.tokenizer, this.followSet, this.skipPattern);
+        return new Context(this.grammar, production, this.tokenizer, this.followSet);
     }
 
     Context withFollowSet(Set<Rule> followSet) {
-        return new Context(this.production, this.tokenizer, followSet, this.skipPattern);
+        return new Context(this.grammar, this.production, this.tokenizer, followSet);
     }
 
     void skip() {
-        if (skipPattern == null) {
+        if (grammar.getSkipPattern() == null) {
             return;
         }
-        if (!tokenizer.hasNext(skipPattern)) {
+        if (!tokenizer.hasNext(grammar.getSkipPattern())) {
             return;
         }
-        tokenizer.skip(skipPattern);
+        tokenizer.skip(grammar.getSkipPattern());
     }
     boolean preCheck() {
         var rule = production().getRule();

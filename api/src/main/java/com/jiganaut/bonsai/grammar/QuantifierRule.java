@@ -26,5 +26,6 @@ public interface QuantifierRule extends Rule {
 
     public int getMinCount();
     public OptionalInt getMaxCount();
+    public Rule getRule();
     public Stream<Rule> stream();
 }

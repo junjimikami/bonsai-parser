@@ -15,15 +15,15 @@ class DefaultParser implements Parser {
         assert grammar != null;
         assert tokenizer != null;
         var production = grammar.getStartProduction();
-        var skipPattern = grammar.getSkipPattern();
-        context = new Context(production, tokenizer, Set.of(), skipPattern);
+        context = new Context(grammar, production, tokenizer, Set.of());
     }
 
     @Override
     public Tree parse() {
         var tree = Derivation.derive(context);
         if (context.postCheck()) {
-            throw new ParseException(Message.TOKENS_REMAINED.format());
+            var message = MessageSupport.tokensRemained(context);
+            throw new ParseException(message);
         }
         return tree;
     }

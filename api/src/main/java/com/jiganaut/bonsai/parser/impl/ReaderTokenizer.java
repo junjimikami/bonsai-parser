@@ -14,6 +14,9 @@ class ReaderTokenizer extends AbstractTokenizer {
 
     private final PushbackReader reader;
     private String nextToken;
+    private long lineNumber = 1;
+    private long index = 0;
+    private int lineIncrement = 0;
 
     /**
      * @param reader
@@ -23,33 +26,66 @@ class ReaderTokenizer extends AbstractTokenizer {
         this.reader = new PushbackReader(reader);
     }
 
-    private String read() {
+    private void read() {
         if (nextToken != null) {
-            return nextToken;
+            return;
         }
         try {
-            int ch0 = reader.read();
-            if (ch0 == -1) {
-                return null;
-            } else if (!Character.isHighSurrogate((char) ch0)) {
-                return nextToken = String.valueOf((char) ch0);
+            int ch = reader.read();
+            if (ch == -1) {
+                return;
             }
-            int ch1 = reader.read();
-            if (ch1 == -1) {
-                return nextToken = String.valueOf((char) ch0);
-            } else if (!Character.isLowSurrogate((char) ch1)) {
-                reader.unread(ch1);
-                return nextToken = String.valueOf((char) ch0);
+            final char ch0 = (char) ch;
+            if (Character.isHighSurrogate(ch0)) {
+                // Continue
+            } else if (ch0 == '\r') {
+                lineIncrement = 1;
+                // Continue
+            } else if (ch0 == '\n') {
+                lineIncrement = 1;
+                nextToken = String.valueOf(ch0);
+                return;
+            } else {
+                nextToken = String.valueOf(ch0);
+                return;
             }
-            return nextToken = new String(new char[] { (char) ch0, (char) ch1 });
+            ch = reader.read();
+            if (ch == -1) {
+                nextToken = String.valueOf(ch0);
+                return;
+            }
+            final char ch1 = (char) ch;
+            if (Character.isHighSurrogate(ch0) && Character.isLowSurrogate(ch1)) {
+                nextToken = new String(new char[] { ch0, ch1 });
+                return;
+            } else if (ch0 == '\r' && ch1 == '\n') {
+                lineIncrement = 0;
+            }
+            reader.unread(ch1);
+            nextToken = String.valueOf(ch0);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
+    private Token createToken() {
+        assert nextToken != null;
+        if (lineIncrement != 0) {
+            lineNumber += lineIncrement;
+            lineIncrement = 0;
+            index = 0;
+        } else {
+            index += nextToken.length();
+        }
+        var value = nextToken;
+        nextToken = null;
+        return new DefaultToken(value);
+    }
+
     @Override
     public boolean hasNext() {
-        return read() != null;
+        read();
+        return nextToken != null;
     }
 
     @Override
@@ -71,12 +107,11 @@ class ReaderTokenizer extends AbstractTokenizer {
 
     @Override
     public Token next() {
-        var value = read();
-        if (value == null) {
+        read();
+        if (nextToken == null) {
             throw new NoSuchElementException(Message.TOKEN_NOT_FOUND.format());
         }
-        nextToken = null;
-        return new DefaultToken(value);
+        return createToken();
     }
 
     @Override
@@ -89,15 +124,23 @@ class ReaderTokenizer extends AbstractTokenizer {
     @Override
     public Token next(Pattern pattern) {
         Objects.requireNonNull(pattern, Message.NULL_PARAMETER.format());
-        var value = read();
-        if (value == null) {
+        read();
+        if (nextToken == null) {
             throw new NoSuchElementException(Message.TOKEN_NOT_FOUND.format());
         }
-        var matcher = pattern.matcher(value);
+        var matcher = pattern.matcher(nextToken);
         if (!matcher.matches()) {
             throw new NoSuchElementException(Message.TOKEN_NOT_MATCH_PATTERN.format(pattern));
         }
-        nextToken = null;
-        return new DefaultToken(value);
+        return createToken();
+    }
+    
+    @Override
+    public long getLineNumber() {
+        return lineNumber;
+    }
+    @Override
+    public long getIndex() {
+        return index;
     }
 }

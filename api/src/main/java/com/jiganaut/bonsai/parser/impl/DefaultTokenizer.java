@@ -40,8 +40,7 @@ class DefaultTokenizer extends AbstractTokenizer {
         assert grammar != null;
         assert tokenizer != null;
         var production = grammar.getStartProduction();
-        var skipPattern = grammar.getSkipPattern();
-        context = new Context(production, tokenizer, Set.of(), skipPattern);
+        context = new Context(grammar, production, tokenizer, Set.of());
     }
 
     private String read() {
@@ -115,4 +114,13 @@ class DefaultTokenizer extends AbstractTokenizer {
         throw new NoSuchElementException(Message.TOKEN_NOT_MATCH_PATTERN.format(pattern));
     }
 
+    @Override
+    public long getLineNumber() {
+        return context.tokenizer().getLineNumber();
+    }
+
+    @Override
+    public long getIndex() {
+        return context.tokenizer().getIndex();
+    }
 }

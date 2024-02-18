@@ -17,4 +17,11 @@ public interface Tokenizer {
 
     public Tokenizer skip(String regex);
     public Tokenizer skip(Pattern pattern);
+    
+    public default long getLineNumber() {
+        throw new UnsupportedOperationException();
+    }
+    public default long getIndex() {
+        throw new UnsupportedOperationException();
+    }
 }

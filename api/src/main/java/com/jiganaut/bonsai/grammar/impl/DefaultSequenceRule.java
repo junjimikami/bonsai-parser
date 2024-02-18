@@ -46,6 +46,6 @@ class DefaultSequenceRule extends AbstractCompositeRule implements SequenceRule 
     public String toString() {
         return elements.stream()
                 .map(Rule::toString)
-                .collect(Collectors.joining(",", "(", ")"));
+                .collect(Collectors.joining(", ", "(", ")"));
     }
 }
