@@ -2,6 +2,7 @@ package com.jiganaut.bonsai.parser;
 
 import static com.jiganaut.bonsai.grammar.Rules.choiceBuilder;
 import static com.jiganaut.bonsai.grammar.Rules.pattern;
+import static com.jiganaut.bonsai.grammar.Rules.patternsOf;
 import static com.jiganaut.bonsai.grammar.Rules.reference;
 import static com.jiganaut.bonsai.grammar.Rules.referencesOf;
 import static com.jiganaut.bonsai.grammar.Rules.sequenceBuilder;
@@ -233,6 +234,34 @@ class ParserTest {
         });
 
         assertEquals("S(A(0),B(1))", string);
+    }
+    
+    @Test
+    @DisplayName("newParser(gr:Grammar, to:Tokenizer)")
+    void newParserGrTo() throws Exception {
+        var grammar0 = Grammar.builder()
+                .add("T", patternsOf("0", "1"))
+                .add("T", patternsOf("1", "0"))
+                .build();
+        var tokenizer = Tokenizer.newTokenizer(grammar0, new StringReader("0110"));
+        var grammar = Grammar.builder()
+                .add("S", referencesOf("A", "B"))
+                .add("A", pattern("01"))
+                .add("B", pattern("10"))
+                .build();
+        var parser = Parser.newParser(grammar, tokenizer);
+        var tree = parser.parse();
+        var string = tree.accept(new TreeToString<Void>() {
+            @Override
+            public String visitNonTerminal(NonTerminal tree, Void p) {
+                return tree.getSymbol() +
+                        tree.getSubTrees().stream()
+                        .map(this::visit)
+                        .collect(Collectors.joining(",", "(", ")"));
+            }
+        });
+        
+        assertEquals("S(A(01),B(10))", string);
     }
 
     private interface TreeToString<P> extends TreeVisitor<String, P> {
