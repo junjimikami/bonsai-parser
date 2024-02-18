@@ -3,7 +3,7 @@ package com.jiganaut.bonsai.parser;
 import java.io.Reader;
 
 import com.jiganaut.bonsai.grammar.Grammar;
-import com.jiganaut.bonsai.parser.impl.ParserFactoryProviders;
+import com.jiganaut.bonsai.parser.spi.ParserFactoryProvider;
 
 /**
  * @author Junji Mikami
@@ -12,15 +12,11 @@ import com.jiganaut.bonsai.parser.impl.ParserFactoryProviders;
 public interface ParserFactory {
 
     public static ParserFactory newFactory(Grammar grammar) {
-        return ParserFactoryProviders.provider().createFactory(grammar);
-    }
-
-    public static ParserFactory loadFactory(String factoryName, ClassLoader cl) {
-        return ParserFactoryProviders.loadFactory(factoryName, cl);
+        return ParserFactoryProvider.provider().createFactory(grammar);
     }
 
     public static ParserFactory loadFactory(String factoryName) {
-        return ParserFactoryProviders.loadFactory(factoryName, null);
+        return ParserFactoryProvider.provider().loadFactory(factoryName);
     }
 
     public Parser createParser(Tokenizer tokenizer);

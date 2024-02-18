@@ -41,18 +41,4 @@ class TokenizerFactoryTest {
     void loadFactoryStInCaseNoSuchFactory() throws Exception {
         assertThrows(NoSuchElementException.class, () -> TokenizerFactory.loadFactory(""));
     }
-
-    @Test
-    @DisplayName("loadFactory(st:String, cl:ClassLoader) [Null parameter]")
-    void loadFactoryStClInCaseNullParameter() throws Exception {
-        assertThrows(NoSuchElementException.class,
-                () -> TokenizerFactory.loadFactory(null, ClassLoader.getSystemClassLoader()));
-    }
-
-    @Test
-    @DisplayName("loadFactory(st:String, cl:ClassLoader) [No such factory]")
-    void loadFactoryStClInCaseNoSuchFactory() throws Exception {
-        assertThrows(NoSuchElementException.class,
-                () -> TokenizerFactory.loadFactory("", ClassLoader.getSystemClassLoader()));
-    }
 }

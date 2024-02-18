@@ -2,9 +2,14 @@ package com.jiganaut.bonsai.parser;
 
 import static com.jiganaut.bonsai.grammar.Rules.choiceBuilder;
 import static com.jiganaut.bonsai.grammar.Rules.pattern;
+import static com.jiganaut.bonsai.grammar.Rules.patternsOf;
 import static com.jiganaut.bonsai.grammar.Rules.reference;
 import static com.jiganaut.bonsai.grammar.Rules.sequenceBuilder;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Named.named;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
@@ -769,6 +774,41 @@ class TokenizerTest {
         assertEquals("0", tokenizer2.next().getValue());
         assertEquals("1", tokenizer2.next().getValue());
         assertEquals("1", tokenizer2.next().getValue());
+        assertFalse(tokenizer2.hasNext());
+    }
+
+    @Test
+    @DisplayName("newTokenizer(gr:Grammar, re:Reader)")
+    void newTokenizerGrRe() throws Exception {
+        var grammar = Grammar.builder()
+                .add("A", pattern("0"))
+                .add("A", pattern("1"))
+                .build();
+        var tokenizer = Tokenizer.newTokenizer(grammar, new StringReader("0110"));
+        
+        assertEquals("0", tokenizer.next().getValue());
+        assertEquals("1", tokenizer.next().getValue());
+        assertEquals("1", tokenizer.next().getValue());
+        assertEquals("0", tokenizer.next().getValue());
+        assertFalse(tokenizer.hasNext());
+    }
+
+    @Test
+    @DisplayName("newTokenizer(gr:Grammar, to:Tokenizer)")
+    void newTokenizerGrTo() throws Exception {
+        var grammar = Grammar.builder()
+                .add("A", pattern("0"))
+                .add("A", pattern("1"))
+                .build();
+        var tokenizer = Tokenizer.newTokenizer(grammar, new StringReader("0110"));
+        var grammar2 = Grammar.builder()
+                .add("A", patternsOf("0", "1"))
+                .add("A", patternsOf("1", "0"))
+                .build();
+        var tokenizer2 = Tokenizer.newTokenizer(grammar2, tokenizer);
+        
+        assertEquals("01", tokenizer2.next().getValue());
+        assertEquals("10", tokenizer2.next().getValue());
         assertFalse(tokenizer2.hasNext());
     }
 }

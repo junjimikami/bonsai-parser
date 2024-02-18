@@ -3,6 +3,7 @@ package com.jiganaut.bonsai.parser;
 import static com.jiganaut.bonsai.grammar.Rules.choiceBuilder;
 import static com.jiganaut.bonsai.grammar.Rules.pattern;
 import static com.jiganaut.bonsai.grammar.Rules.reference;
+import static com.jiganaut.bonsai.grammar.Rules.referencesOf;
 import static com.jiganaut.bonsai.grammar.Rules.sequenceBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -160,18 +161,13 @@ class ParserTest {
         var parser = factory.createParser(new StringReader(input));
 
         if (expected != null) {
-            var actual = parser.parse().accept(new TreeVisitor<String, Void>() {
+            var actual = parser.parse().accept(new TreeToString<Void>() {
                 @Override
                 public String visitNonTerminal(NonTerminal tree, Void p) {
                     return tree.getSymbol() +
                             tree.getSubTrees().stream()
                                     .map(this::visit)
                                     .collect(Collectors.joining(",", "(", ")"));
-                }
-
-                @Override
-                public String visitTerminal(Terminal tree, Void p) {
-                    return tree.getValue();
                 }
             });
             assertEquals(expected, actual);
@@ -212,8 +208,37 @@ class ParserTest {
                         .add("A", sequenceBuilder()
                                 .add(pattern("1"))
                                 .add(reference("A")))
-                        .build(), "10", "A(1,A(0))")
-                );
+                        .build(), "10", "A(1,A(0))"));
         return stream;
+    }
+
+    @Test
+    @DisplayName("newParser(gr:Grammar, re:Reader)")
+    void newParserGrRe() throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", referencesOf("A", "B"))
+                .add("A", pattern("0"))
+                .add("B", pattern("1"))
+                .build();
+        var parser = Parser.newParser(grammar, new StringReader("01"));
+        var tree = parser.parse();
+        var string = tree.accept(new TreeToString<Void>() {
+            @Override
+            public String visitNonTerminal(NonTerminal tree, Void p) {
+                return tree.getSymbol() +
+                        tree.getSubTrees().stream()
+                                .map(this::visit)
+                                .collect(Collectors.joining(",", "(", ")"));
+            }
+        });
+
+        assertEquals("S(A(0),B(1))", string);
+    }
+
+    private interface TreeToString<P> extends TreeVisitor<String, P> {
+        @Override
+        default String visitTerminal(Terminal tree, P p) {
+            return tree.getValue();
+        }
     }
 }
