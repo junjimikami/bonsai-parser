@@ -2,6 +2,7 @@ package com.jiganaut.bonsai.parser.impl;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.jiganaut.bonsai.parser.NonTerminal;
 import com.jiganaut.bonsai.parser.Tree;
@@ -30,5 +31,12 @@ class DefaultNonTerminal implements NonTerminal {
     @Override
     public List<? extends Tree> getSubTrees() {
         return Collections.unmodifiableList(list);
+    }
+
+    @Override
+    public String toString() {
+        return list.stream()
+                .map(Tree::toString)
+                .collect(Collectors.joining());
     }
 }

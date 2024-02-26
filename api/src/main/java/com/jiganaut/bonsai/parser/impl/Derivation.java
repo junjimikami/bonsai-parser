@@ -3,6 +3,7 @@ package com.jiganaut.bonsai.parser.impl;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import com.jiganaut.bonsai.grammar.ChoiceRule;
 import com.jiganaut.bonsai.grammar.PatternRule;
@@ -31,14 +32,6 @@ final class Derivation implements RuleVisitor<List<Tree>, Context> {
     }
 
     @Override
-    public List<Tree> visit(Rule rule, Context context) {
-        if (!AnyMatcher.scan(rule, context)) {
-            context.skip();
-        }
-        return RuleVisitor.super.visit(rule, context);
-    }
-
-    @Override
     public List<Tree> visitChoice(ChoiceRule choice, Context context) {
         var rules = choice.getChoices().stream()
                 .filter(e -> AnyMatcher.scan(e, context))
@@ -46,6 +39,16 @@ final class Derivation implements RuleVisitor<List<Tree>, Context> {
         if (rules.isEmpty()) {
             var message = MessageSupport.tokenNotMatchRule(choice, context);
             throw new ParseException(message);
+        }
+        if (rules.size() == 1) {
+            return visit(rules.get(0), context);
+        }
+        var subContext = context.withFollowSet(Set.of());
+        rules = rules.stream()
+                .filter(e -> AnyMatcher.scan(e, subContext))
+                .toList();
+        if (rules.isEmpty()) {
+            return List.of();
         }
         if (1 < rules.size()) {
             var message = MessageSupport.ambiguousChoice(choice, context);

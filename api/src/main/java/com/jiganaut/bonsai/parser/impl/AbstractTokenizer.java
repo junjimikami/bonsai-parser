@@ -20,7 +20,9 @@ abstract class AbstractTokenizer implements Tokenizer {
         if (!hasNext(pattern)) {
             throw new NoSuchElementException();
         }
-        next(pattern);
+        while (hasNext(pattern)) {
+            next(pattern);
+        }
         return this;
     }
 }

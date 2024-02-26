@@ -250,6 +250,7 @@ class GrammarTest {
         var grammar = Grammar.builder()
                 .add("S", set -> Stubs.rule("RULE0"))
                 .add("S", set -> Stubs.rule("RULE1"))
+                .add("S", set -> Stubs.rule("RULE2"))
                 .build();
         var productionSet = grammar.productionSet();
 
@@ -260,9 +261,10 @@ class GrammarTest {
         assertEquals(Kind.CHOICE, rule.getKind());
         rule.accept(new TestRuleVisitor<Void, Void>() {
             public Void visitChoice(ChoiceRule choice, Void p) {
-                assertEquals(2, choice.getChoices().size());
+                assertEquals(3, choice.getChoices().size());
                 assertEquals("RULE0", choice.getChoices().get(0).toString());
                 assertEquals("RULE1", choice.getChoices().get(1).toString());
+                assertEquals("RULE2", choice.getChoices().get(2).toString());
                 return null;
             };
         });

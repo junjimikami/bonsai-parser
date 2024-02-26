@@ -15,6 +15,10 @@ final class AnyMatcher implements SimpleRuleVisitor<Boolean, Context> {
     }
 
     static boolean scan(Rule rule, Context context) {
+        if (instance.visit(rule, context)) {
+            return true;
+        }
+        context.skip();
         return instance.visit(rule, context);
     }
 

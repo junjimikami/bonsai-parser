@@ -32,9 +32,7 @@ record Context(Grammar grammar, Production production, Tokenizer tokenizer, Set<
     }
     boolean preCheck() {
         var rule = production().getRule();
-        if (!AnyMatcher.scan(rule, this)) {
-            skip();
-        }
+        AnyMatcher.scan(rule, this);
         return tokenizer().hasNext();
     }
 
