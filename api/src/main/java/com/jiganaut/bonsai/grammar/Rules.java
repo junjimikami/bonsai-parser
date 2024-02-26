@@ -15,7 +15,7 @@ public final class Rules {
         return PatternRule.builder(pattern);
     }
 
-    public static SequenceRule.Builder patternsOf(String... regex) {
+    public static SequenceRule.Builder ofPatterns(String... regex) {
         var builder = SequenceRule.builder();
         for (var r : regex) {
             builder.add(PatternRule.builder(r));
@@ -35,7 +35,7 @@ public final class Rules {
         return SequenceRule.builder();
     }
 
-    public static SequenceRule.Builder sequenceOf(Rule.Builder... builders) {
+    public static SequenceRule.Builder of(Rule.Builder... builders) {
         var builder = SequenceRule.builder();
         for (var b : builders) {
             builder.add(b);
@@ -59,7 +59,7 @@ public final class Rules {
         return ReferenceRule.builder(reference);
     }
 
-    public static SequenceRule.Builder referencesOf(String... reference) {
+    public static SequenceRule.Builder ofReferences(String... reference) {
         var builder = SequenceRule.builder();
         for (var r : reference) {
             builder.add(ReferenceRule.builder(r));

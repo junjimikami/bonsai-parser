@@ -2,7 +2,7 @@ package com.jiganaut.bonsai.parser;
 
 import static com.jiganaut.bonsai.grammar.Rules.choiceBuilder;
 import static com.jiganaut.bonsai.grammar.Rules.pattern;
-import static com.jiganaut.bonsai.grammar.Rules.patternsOf;
+import static com.jiganaut.bonsai.grammar.Rules.ofPatterns;
 import static com.jiganaut.bonsai.grammar.Rules.reference;
 import static com.jiganaut.bonsai.grammar.Rules.sequenceBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -802,8 +802,8 @@ class TokenizerTest {
                 .build();
         var tokenizer = Tokenizer.newTokenizer(grammar, new StringReader("0110"));
         var grammar2 = Grammar.builder()
-                .add("A", patternsOf("0", "1"))
-                .add("A", patternsOf("1", "0"))
+                .add("A", ofPatterns("0", "1"))
+                .add("A", ofPatterns("1", "0"))
                 .build();
         var tokenizer2 = Tokenizer.newTokenizer(grammar2, tokenizer);
         

@@ -36,7 +36,7 @@ class RulesTest {
                 .add(PatternRule.builder("1"))
                 .add(PatternRule.builder("2"))
                 .add(PatternRule.builder("3"));
-        var actual = Rules.patternsOf("1", "2", "3");
+        var actual = Rules.ofPatterns("1", "2", "3");
 
         assertEquals(expected.build(Stubs.DUMMY_PRODUCTION_SET).getRules().toString(),
                 actual.build(Stubs.DUMMY_PRODUCTION_SET).getRules().toString());
@@ -78,7 +78,7 @@ class RulesTest {
                 .add(PatternRule.builder("1"))
                 .add(PatternRule.builder("2"))
                 .add(PatternRule.builder("3"));
-        var actual = Rules.sequenceOf(
+        var actual = Rules.of(
                 Rules.pattern("1"),
                 Rules.pattern("2"),
                 Rules.pattern("3"));
@@ -136,7 +136,7 @@ class RulesTest {
                 .add(ReferenceRule.builder("A"))
                 .add(ReferenceRule.builder("B"))
                 .add(ReferenceRule.builder("C"));
-        var actual = Rules.referencesOf("A", "B", "C");
+        var actual = Rules.ofReferences("A", "B", "C");
 
         assertEquals(expected.build(Stubs.DUMMY_PRODUCTION_SET).getRules().toString(),
                 actual.build(Stubs.DUMMY_PRODUCTION_SET).getRules().toString());

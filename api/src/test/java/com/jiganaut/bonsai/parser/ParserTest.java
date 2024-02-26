@@ -2,9 +2,9 @@ package com.jiganaut.bonsai.parser;
 
 import static com.jiganaut.bonsai.grammar.Rules.choiceBuilder;
 import static com.jiganaut.bonsai.grammar.Rules.pattern;
-import static com.jiganaut.bonsai.grammar.Rules.patternsOf;
+import static com.jiganaut.bonsai.grammar.Rules.ofPatterns;
 import static com.jiganaut.bonsai.grammar.Rules.reference;
-import static com.jiganaut.bonsai.grammar.Rules.referencesOf;
+import static com.jiganaut.bonsai.grammar.Rules.ofReferences;
 import static com.jiganaut.bonsai.grammar.Rules.sequenceBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -217,7 +217,7 @@ class ParserTest {
     @DisplayName("newParser(gr:Grammar, re:Reader)")
     void newParserGrRe() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", referencesOf("A", "B"))
+                .add("S", ofReferences("A", "B"))
                 .add("A", pattern("0"))
                 .add("B", pattern("1"))
                 .build();
@@ -240,12 +240,12 @@ class ParserTest {
     @DisplayName("newParser(gr:Grammar, to:Tokenizer)")
     void newParserGrTo() throws Exception {
         var grammar0 = Grammar.builder()
-                .add("T", patternsOf("0", "1"))
-                .add("T", patternsOf("1", "0"))
+                .add("T", ofPatterns("0", "1"))
+                .add("T", ofPatterns("1", "0"))
                 .build();
         var tokenizer = Tokenizer.newTokenizer(grammar0, new StringReader("0110"));
         var grammar = Grammar.builder()
-                .add("S", referencesOf("A", "B"))
+                .add("S", ofReferences("A", "B"))
                 .add("A", pattern("01"))
                 .add("B", pattern("10"))
                 .build();
