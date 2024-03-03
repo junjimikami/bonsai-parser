@@ -1,6 +1,6 @@
 package com.jiganaut.bonsai.grammar.impl;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -15,7 +15,7 @@ import com.jiganaut.bonsai.grammar.Rule;
 class DefaultGrammar implements Grammar {
 
     static class Builder extends BaseBuilder implements Grammar.Builder {
-        private final Map<String, Rule.Builder> builders = new HashMap<>();
+        private final Map<String, Rule.Builder> builders = new LinkedHashMap<>();
         private Pattern skipPattern;
         private String startSymbol;
 

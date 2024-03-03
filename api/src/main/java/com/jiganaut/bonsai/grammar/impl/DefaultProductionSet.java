@@ -1,6 +1,8 @@
 package com.jiganaut.bonsai.grammar.impl;
 
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -10,7 +12,7 @@ import com.jiganaut.bonsai.grammar.ProductionSet;
 import com.jiganaut.bonsai.grammar.Rule;
 
 class DefaultProductionSet implements ProductionSet {
-    private final Map<String, Production> map = new HashMap<>();
+    private final Map<String, Production> map = new LinkedHashMap<>();
 
     DefaultProductionSet(Set<String> keys) {
         keys.forEach(key -> map.put(key, null));
@@ -28,6 +30,11 @@ class DefaultProductionSet implements ProductionSet {
             throw new NoSuchElementException(Message.NO_SUCH_SYMBOL.format(symbol));
         }
         return p;
+    }
+
+    @Override
+    public Iterator<Production> iterator() {
+        return Collections.unmodifiableCollection(map.values()).iterator();
     }
 
     void add(String symbol, Rule rule) {

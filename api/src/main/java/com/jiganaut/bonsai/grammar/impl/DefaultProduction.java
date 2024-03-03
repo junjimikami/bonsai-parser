@@ -31,6 +31,6 @@ class DefaultProduction implements Production {
 
     @Override
     public String toString() {
-        return "%s::=%s".formatted(symbol, rule);
+        return "%s = %s ;".formatted(symbol, rule);
     }
 }

@@ -80,6 +80,18 @@ class DefaultQuantifierRule extends AbstractRule implements QuantifierRule {
     @Override
     public String toString() {
         var sb = new StringBuilder();
+        if (minCount == 0 && maxCount.orElse(0) == 1) {
+            sb.append("[");
+            sb.append(rule);
+            sb.append("]");
+            return sb.toString();
+        }
+        if (minCount == 0 && maxCount.isEmpty()) {
+            sb.append("{");
+            sb.append(rule);
+            sb.append("}");
+            return sb.toString();
+        }
         sb.append(minCount);
         if (maxCount.isEmpty()) {
             sb.append("*");

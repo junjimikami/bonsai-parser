@@ -1,5 +1,7 @@
 package com.jiganaut.bonsai.grammar;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 final class Stubs {
@@ -19,6 +21,11 @@ final class Stubs {
         public Production get(String symbol) {
             return productionOf(symbol);
         }
+
+        @Override
+        public Iterator<Production> iterator() {
+            return List.<Production>of().iterator();
+        }
     };
     static final ProductionSet EMPTY_PRODUCTION_SET = new ProductionSet() {
 
@@ -30,6 +37,11 @@ final class Stubs {
         @Override
         public Production get(String symbol) {
             throw new NoSuchElementException("TEST CODE");
+        }
+        
+        @Override
+        public Iterator<Production> iterator() {
+            return List.<Production>of().iterator();
         }
     };
 

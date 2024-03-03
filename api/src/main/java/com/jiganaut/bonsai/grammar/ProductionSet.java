@@ -1,6 +1,6 @@
 package com.jiganaut.bonsai.grammar;
 
-public interface ProductionSet {
+public interface ProductionSet extends Iterable<Production>{
 
     public boolean containsSymbol(String symbol);
 

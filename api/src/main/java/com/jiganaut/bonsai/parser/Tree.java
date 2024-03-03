@@ -42,4 +42,11 @@ public interface Tree {
     public default <R, P> R accept(TreeVisitor<R, P> v) {
         return accept(v, null);
     }
+    
+    public default NonTerminal asNonTerminal() {
+        return (NonTerminal) this;
+    }
+    public default Terminal asTerminal() {
+        return (Terminal) this;
+    }
 }

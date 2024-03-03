@@ -54,6 +54,6 @@ class DefaultChoiceRule extends AbstractCompositeRule implements ChoiceRule {
     public String toString() {
         return elements.stream()
                 .map(Rule::toString)
-                .collect(Collectors.joining(" | ", "(", ")"));
+                .collect(Collectors.joining(" | "));
     }
 }
