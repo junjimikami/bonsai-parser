@@ -50,7 +50,7 @@ final class Stubs {
 
             @Override
             public Kind getKind() {
-                throw new AssertionError();
+                return Kind.PATTERN;
             }
 
             @Override

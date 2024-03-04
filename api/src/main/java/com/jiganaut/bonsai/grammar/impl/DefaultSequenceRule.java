@@ -45,7 +45,12 @@ class DefaultSequenceRule extends AbstractCompositeRule implements SequenceRule 
     @Override
     public String toString() {
         return elements.stream()
-                .map(Rule::toString)
+                .map(e -> {
+                    if (e.getKind().isComposite()) {
+                        return "(%s)".formatted(e);
+                    }
+                    return e.toString();
+                })
                 .collect(Collectors.joining(", "));
     }
 }

@@ -734,10 +734,9 @@ class TokenizerTest {
                         .add("A", pattern("0"))
                         .build(), "0 00 0", List.of("0", "0", "0", "0")),
                 arguments(Grammar.builder()
-                        .add("A",
-                                pattern("[\\x{%X}-\\x{%X}]".formatted(
-                                        Character.MIN_SUPPLEMENTARY_CODE_POINT,
-                                        Character.MAX_CODE_POINT)))
+                        .add("A", pattern("[\\x{%X}-\\x{%X}]".formatted(
+                                Character.MIN_SUPPLEMENTARY_CODE_POINT,
+                                Character.MAX_CODE_POINT)))
                         .build(), "🌟𝒜", List.of("🌟", "𝒜")),
                 arguments(Grammar.builder()
                         .add("A", pattern("."))
@@ -746,7 +745,38 @@ class TokenizerTest {
                 arguments(Grammar.builder()
                         .add("A", pattern("."))
                         .build(), String.valueOf("🌟".charAt(0)) + "0",
-                        List.of(String.valueOf("🌟".charAt(0)), "0"))));
+                        List.of(String.valueOf("🌟".charAt(0)), "0")),
+                arguments(Grammar.builder()
+                        .add("A", sequenceBuilder()
+                                .add(sequenceBuilder()
+                                        .add(pattern("0"))
+                                        .add(pattern("0")))
+                                .add(pattern("0"))
+                                .add(pattern("1")))
+                        .build(), "00010001", List.of("0001", "0001")),
+                arguments(Grammar.builder()
+                        .add("A", sequenceBuilder()
+                                .add(choiceBuilder()
+                                        .add(pattern("0"))
+                                        .add(pattern("1")))
+                                .add(pattern("0"))
+                                .add(pattern("1")))
+                        .build(), "001101", List.of("001", "101")),
+                arguments(Grammar.builder()
+                        .add("A", choiceBuilder()
+                                .add(sequenceBuilder()
+                                        .add(pattern("0"))
+                                        .add(pattern("1")))
+                                .add(pattern("1")))
+                        .build(), "01101", List.of("01", "1", "01")),
+                arguments(Grammar.builder()
+                        .add("A", choiceBuilder()
+                                .add(choiceBuilder()
+                                        .add(pattern("0"))
+                                        .add(pattern("1")))
+                                .add(pattern("2")))
+                        .build(), "01201", List.of("0", "1", "2", "0", "1"))
+                ));
         return stream;
     }
 
@@ -785,7 +815,7 @@ class TokenizerTest {
                 .add("A", pattern("1"))
                 .build();
         var tokenizer = Tokenizer.newTokenizer(grammar, new StringReader("0110"));
-        
+
         assertEquals("0", tokenizer.next().getValue());
         assertEquals("1", tokenizer.next().getValue());
         assertEquals("1", tokenizer.next().getValue());
@@ -806,7 +836,7 @@ class TokenizerTest {
                 .add("A", ofPatterns("1", "0"))
                 .build();
         var tokenizer2 = Tokenizer.newTokenizer(grammar2, tokenizer);
-        
+
         assertEquals("01", tokenizer2.next().getValue());
         assertEquals("10", tokenizer2.next().getValue());
         assertFalse(tokenizer2.hasNext());

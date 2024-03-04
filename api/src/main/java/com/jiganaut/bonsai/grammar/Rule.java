@@ -7,7 +7,16 @@ package com.jiganaut.bonsai.grammar;
 public interface Rule {
 
     public static enum Kind {
-        PATTERN, SEQUENCE, CHOICE, REFERENCE, QUANTIFIER, EMPTY;
+        PATTERN,
+        SEQUENCE,
+        CHOICE,
+        REFERENCE,
+        QUANTIFIER,
+        EMPTY;
+
+        public boolean isComposite() {
+            return this == SEQUENCE || this == CHOICE;
+        }
     }
 
     @FunctionalInterface
@@ -26,7 +35,7 @@ public interface Rule {
         public <R, P> R accept(RuleVisitor<R, P> visitor, P p) {
             return visitor.visitEmpty(this, p);
         }
-        
+
         @Override
         public String toString() {
             return "empty";
@@ -34,6 +43,7 @@ public interface Rule {
     };
 
     public <R, P> R accept(RuleVisitor<R, P> visitor, P p);
+
     public default <R, P> R accept(RuleVisitor<R, P> visitor) {
         return accept(visitor, null);
     }
