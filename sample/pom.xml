@@ -29,5 +29,10 @@
       <version>5.10.1</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.jiganaut.bonsai</groupId>
+      <artifactId>bonsai-parser</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 </project>
