@@ -1,7 +1,10 @@
 package com.jiganaut.bonsai.parser.impl;
 
+import java.util.stream.Collectors;
+
 import com.jiganaut.bonsai.grammar.PatternRule;
 import com.jiganaut.bonsai.grammar.Rule;
+import com.jiganaut.bonsai.grammar.Rule.Kind;
 import com.jiganaut.bonsai.grammar.SimpleRuleVisitor;
 
 /**
@@ -34,6 +37,9 @@ final class AnyMatcher implements SimpleRuleVisitor<Boolean, Context> {
         if (firstSet.isEmpty()) {
             return !context.tokenizer().hasNext();
         }
-        return firstSet.stream().anyMatch(e -> visit(e, context));
+        var map = firstSet.stream()
+                .collect(Collectors.partitioningBy(e -> e.getKind() == Kind.PATTERN));
+        return map.get(true).stream().anyMatch(e -> visit(e, context)) ||
+                map.get(false).stream().anyMatch(e -> visit(e, context));
     }
 }
