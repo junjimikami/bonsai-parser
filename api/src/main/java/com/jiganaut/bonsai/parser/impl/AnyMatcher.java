@@ -12,17 +12,17 @@ import com.jiganaut.bonsai.grammar.SimpleRuleVisitor;
  *
  */
 final class AnyMatcher implements SimpleRuleVisitor<Boolean, Context> {
-    private static final AnyMatcher instance = new AnyMatcher();
+    private static final AnyMatcher INSTANCE = new AnyMatcher();
 
     private AnyMatcher() {
     }
 
     static boolean scan(Rule rule, Context context) {
-        if (instance.visit(rule, context)) {
+        if (INSTANCE.visit(rule, context)) {
             return true;
         }
         context.skip();
-        return instance.visit(rule, context);
+        return INSTANCE.visit(rule, context);
     }
 
     @Override

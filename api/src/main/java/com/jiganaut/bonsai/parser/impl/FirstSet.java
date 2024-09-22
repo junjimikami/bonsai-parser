@@ -19,17 +19,17 @@ import com.jiganaut.bonsai.grammar.SequenceRule;
  *
  */
 final class FirstSet implements RuleVisitor<Set<Rule>, Set<Rule>> {
-    private static final FirstSet instance = new FirstSet();
+    private static final FirstSet INSTANCE = new FirstSet();
 
     private FirstSet() {
     }
 
     static Set<Rule> of(Rule rule, Set<Rule> followSet) {
-        return instance.visit(rule, followSet);
+        return INSTANCE.visit(rule, followSet);
     }
 
     static Set<Rule> of(List<? extends Rule> sequence, Set<Rule> followSet) {
-        return instance.visit(sequence, followSet);
+        return INSTANCE.visit(sequence, followSet);
     }
 
     @Override

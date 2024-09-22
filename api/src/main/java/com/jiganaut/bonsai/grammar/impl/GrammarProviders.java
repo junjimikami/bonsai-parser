@@ -8,13 +8,13 @@ import com.jiganaut.bonsai.grammar.spi.GrammarProvider;
  *
  */
 public final class GrammarProviders {
-    private static final DefaultGrammarProvider provider = new DefaultGrammarProvider();
+    private static final DefaultGrammarProvider PROVIDER = new DefaultGrammarProvider();
 
     private GrammarProviders() {
     }
 
     public static GrammarProvider provider() {
-        return provider;
+        return PROVIDER;
     }
 
 }

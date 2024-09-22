@@ -20,14 +20,14 @@ import com.jiganaut.bonsai.parser.Tree;
  *
  */
 final class Derivation implements RuleVisitor<List<Tree>, Context> {
-    private static final Derivation instance = new Derivation();
+    private static final Derivation INSTANCE = new Derivation();
 
     private Derivation() {
     }
 
     static Tree derive(Context context) {
         var production = context.production();
-        var trees = instance.visit(production.getRule(), context);
+        var trees = INSTANCE.visit(production.getRule(), context);
         return new DefaultNonTerminal(production.getSymbol(), trees);
     }
 
