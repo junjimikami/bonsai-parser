@@ -23,7 +23,7 @@ import com.jiganaut.bonsai.grammar.Rule.Kind;
 class ChoiceRuleTest implements RuleTest {
 
     @Nested
-    class BuilderTest implements RuleTest.BulderTest, QuantifiableTest, ReferenceRelatedTest {
+    class BuilderTest implements RuleTest.BulderTest, QuantifiableTest {
 
         @Override
         public ChoiceRule.Builder builder() {
@@ -31,11 +31,11 @@ class ChoiceRuleTest implements RuleTest {
         }
 
         @Test
-        @DisplayName("build(ps:ProductionSet) [No elements]")
-        void buildPsInCaseNoElements() throws Exception {
+        @DisplayName("build() [No elements]")
+        void buildInCaseNoElements() throws Exception {
             var builder = ChoiceRule.builder();
 
-            assertThrows(IllegalStateException.class, () -> builder.build(null));
+            assertThrows(IllegalStateException.class, () -> builder.build());
         }
 
         @Test
@@ -99,7 +99,7 @@ class ChoiceRuleTest implements RuleTest {
         void addEbInCasePostBuild() throws Exception {
             var builder = ChoiceRule.builder()
                     .addEmpty();
-            builder.build(Stubs.DUMMY_PRODUCTION_SET);
+            builder.build();
 
             assertThrows(IllegalStateException.class, () -> builder.add((Rule.Builder) null));
         }
@@ -121,7 +121,7 @@ class ChoiceRuleTest implements RuleTest {
         }
 
         @Nested
-        class QuantifierBuilderTest implements QuantifierRuleTest.BuilderTest, ReferenceRelatedTest {
+        class QuantifierBuilderTest implements QuantifierRuleTest.BuilderTest {
             @Override
             public QuantifierRule.Builder builder() {
                 return ChoiceRuleTest.BuilderTest.this.builder().opt();
@@ -142,7 +142,7 @@ class ChoiceRuleTest implements RuleTest {
     public Rule build() {
         return ChoiceRule.builder()
                 .addEmpty()
-                .build(Stubs.DUMMY_PRODUCTION_SET);
+                .build();
     }
 
     @Override
@@ -165,7 +165,7 @@ class ChoiceRuleTest implements RuleTest {
     void getChoicesInCaseContainingEmpty() throws Exception {
         var choice = ChoiceRule.builder()
                 .addEmpty()
-                .build(Stubs.DUMMY_PRODUCTION_SET);
+                .build();
 
         assertIterableEquals(List.of(Rule.EMPTY), choice.getChoices());
     }
@@ -178,7 +178,7 @@ class ChoiceRuleTest implements RuleTest {
         list.stream()
                 .map(Stubs::builderOf)
                 .forEach(builder::add);
-        var choice = builder.build(Stubs.DUMMY_PRODUCTION_SET);
+        var choice = builder.build();
 
         assertIterableEquals(list, choice.getChoices());
     }
@@ -195,11 +195,11 @@ class ChoiceRuleTest implements RuleTest {
     void getChoicesInCaseContainingreferences(List<String> list) throws Exception {
         var builder = ChoiceRule.builder();
         list.stream().forEach(symbol -> builder.add(ReferenceRule.builder(symbol)));
-        var choice = builder.build(Stubs.DUMMY_PRODUCTION_SET);
+        var choice = builder.build();
 
         assertIterableEquals(list, choice.getChoices().stream()
                 .map(e -> (ReferenceRule) e)
-                .map(e -> e.getProduction().getSymbol())
+                .map(e -> e.getProduction(Stubs.DUMMY_PRODUCTION_SET).getSymbol())
                 .toList());
     }
 

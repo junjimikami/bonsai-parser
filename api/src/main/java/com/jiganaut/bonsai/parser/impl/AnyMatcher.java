@@ -33,7 +33,7 @@ final class AnyMatcher implements SimpleRuleVisitor<Boolean, Context> {
 
     @Override
     public Boolean defaultAction(Rule rule, Context context) {
-        var firstSet = FirstSet.of(rule, context.followSet());
+        var firstSet = FirstSet.of(rule, context);
         if (firstSet.isEmpty()) {
             return !context.tokenizer().hasNext();
         }

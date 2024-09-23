@@ -14,7 +14,7 @@ public interface ChoiceRule extends Rule {
         public ChoiceRule.Builder add(Rule.Builder builder);
         public ChoiceRule.Builder addEmpty();
         @Override
-        public ChoiceRule build(ProductionSet set);
+        public ChoiceRule build();
     }
 
     public static Builder builder() {

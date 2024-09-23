@@ -15,8 +15,8 @@ class RulesTest {
         var expected = PatternRule.builder("123");
         var actual = Rules.pattern("123");
 
-        assertEquals(expected.build(Stubs.DUMMY_PRODUCTION_SET).getPattern().pattern(),
-                actual.build(Stubs.DUMMY_PRODUCTION_SET).getPattern().pattern());
+        assertEquals(expected.build().getPattern().pattern(),
+                actual.build().getPattern().pattern());
     }
 
     @Test
@@ -25,8 +25,8 @@ class RulesTest {
         var expected = PatternRule.builder("123");
         var actual = Rules.pattern(Pattern.compile("123"));
 
-        assertEquals(expected.build(Stubs.DUMMY_PRODUCTION_SET).getPattern().pattern(),
-                actual.build(Stubs.DUMMY_PRODUCTION_SET).getPattern().pattern());
+        assertEquals(expected.build().getPattern().pattern(),
+                actual.build().getPattern().pattern());
     }
 
     @Test
@@ -38,8 +38,8 @@ class RulesTest {
                 .add(PatternRule.builder("3"));
         var actual = Rules.ofPatterns("1", "2", "3");
 
-        assertEquals(expected.build(Stubs.DUMMY_PRODUCTION_SET).getRules().toString(),
-                actual.build(Stubs.DUMMY_PRODUCTION_SET).getRules().toString());
+        assertEquals(expected.build().getRules().toString(),
+                actual.build().getRules().toString());
     }
 
     @Test
@@ -51,8 +51,8 @@ class RulesTest {
                 .add(PatternRule.builder("3"));
         var actual = Rules.oneOfPatterns("1", "2", "3");
 
-        assertEquals(expected.build(Stubs.DUMMY_PRODUCTION_SET).getChoices().toString(),
-                actual.build(Stubs.DUMMY_PRODUCTION_SET).getChoices().toString());
+        assertEquals(expected.build().getChoices().toString(),
+                actual.build().getChoices().toString());
     }
 
     @Test
@@ -67,8 +67,8 @@ class RulesTest {
                 .add(PatternRule.builder("2"))
                 .add(PatternRule.builder("3"));
 
-        assertEquals(expected.build(Stubs.DUMMY_PRODUCTION_SET).getRules().toString(),
-                actual.build(Stubs.DUMMY_PRODUCTION_SET).getRules().toString());
+        assertEquals(expected.build().getRules().toString(),
+                actual.build().getRules().toString());
     }
 
     @Test
@@ -83,8 +83,8 @@ class RulesTest {
                 Rules.pattern("2"),
                 Rules.pattern("3"));
 
-        assertEquals(expected.build(Stubs.DUMMY_PRODUCTION_SET).getRules().toString(),
-                actual.build(Stubs.DUMMY_PRODUCTION_SET).getRules().toString());
+        assertEquals(expected.build().getRules().toString(),
+                actual.build().getRules().toString());
     }
 
     @Test
@@ -99,8 +99,8 @@ class RulesTest {
                 .add(PatternRule.builder("2"))
                 .add(PatternRule.builder("3"));
 
-        assertEquals(expected.build(Stubs.DUMMY_PRODUCTION_SET).getChoices().toString(),
-                actual.build(Stubs.DUMMY_PRODUCTION_SET).getChoices().toString());
+        assertEquals(expected.build().getChoices().toString(),
+                actual.build().getChoices().toString());
     }
 
     @Test
@@ -115,8 +115,8 @@ class RulesTest {
                 Rules.pattern("2"),
                 Rules.pattern("3"));
 
-        assertEquals(expected.build(Stubs.DUMMY_PRODUCTION_SET).getChoices().toString(),
-                actual.build(Stubs.DUMMY_PRODUCTION_SET).getChoices().toString());
+        assertEquals(expected.build().getChoices().toString(),
+                actual.build().getChoices().toString());
     }
 
     @Test
@@ -125,8 +125,8 @@ class RulesTest {
         var expected = ReferenceRule.builder("A");
         var actual = Rules.reference("A");
 
-        assertEquals(expected.build(Stubs.DUMMY_PRODUCTION_SET).getProduction().getSymbol(),
-                actual.build(Stubs.DUMMY_PRODUCTION_SET).getProduction().getSymbol());
+        assertEquals(expected.build().getProduction(Stubs.DUMMY_PRODUCTION_SET).getSymbol(),
+                actual.build().getProduction(Stubs.DUMMY_PRODUCTION_SET).getSymbol());
     }
 
     @Test
@@ -138,8 +138,8 @@ class RulesTest {
                 .add(ReferenceRule.builder("C"));
         var actual = Rules.ofReferences("A", "B", "C");
 
-        assertEquals(expected.build(Stubs.DUMMY_PRODUCTION_SET).getRules().toString(),
-                actual.build(Stubs.DUMMY_PRODUCTION_SET).getRules().toString());
+        assertEquals(expected.build().getRules().toString(),
+                actual.build().getRules().toString());
     }
 
     @Test
@@ -151,8 +151,8 @@ class RulesTest {
                 .add(ReferenceRule.builder("C"));
         var actual = Rules.oneOfreferences("A", "B", "C");
 
-        assertEquals(expected.build(Stubs.DUMMY_PRODUCTION_SET).getChoices().toString(),
-                actual.build(Stubs.DUMMY_PRODUCTION_SET).getChoices().toString());
+        assertEquals(expected.build().getChoices().toString(),
+                actual.build().getChoices().toString());
     }
 
     @Test
@@ -161,7 +161,7 @@ class RulesTest {
         var expected = PatternRule.builder(Pattern.quote("***..."));
         var actual = Rules.quote("***...");
 
-        assertEquals(expected.build(Stubs.DUMMY_PRODUCTION_SET).getPattern().pattern(),
-                actual.build(Stubs.DUMMY_PRODUCTION_SET).getPattern().pattern());
+        assertEquals(expected.build().getPattern().pattern(),
+                actual.build().getPattern().pattern());
     }
 }

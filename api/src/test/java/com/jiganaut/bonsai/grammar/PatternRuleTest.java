@@ -44,7 +44,7 @@ class PatternRuleTest implements RuleTest {
 
     @Override
     public PatternRule build() {
-        return PatternRule.builder("").build(Stubs.DUMMY_PRODUCTION_SET);
+        return PatternRule.builder("").build();
     }
 
     @Override
@@ -97,7 +97,7 @@ class PatternRuleTest implements RuleTest {
     @ValueSource(strings = { "test", "[0-9]" })
     @DisplayName("getPattern()")
     void getPattern(String regex) throws Exception {
-        var pattern = PatternRule.builder(regex).build(Stubs.DUMMY_PRODUCTION_SET);
+        var pattern = PatternRule.builder(regex).build();
 
         assertEquals(regex, pattern.getPattern().pattern());
     }

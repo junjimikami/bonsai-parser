@@ -12,7 +12,7 @@ public interface PatternRule extends Rule {
 
     public static interface Builder extends Rule.Builder, Quantifiable {
         @Override
-        public PatternRule build(ProductionSet set);
+        public PatternRule build();
     }
 
     public static Builder builder(String regex) {

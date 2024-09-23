@@ -3,7 +3,6 @@ package com.jiganaut.bonsai.grammar.impl;
 import java.util.regex.Pattern;
 
 import com.jiganaut.bonsai.grammar.PatternRule;
-import com.jiganaut.bonsai.grammar.ProductionSet;
 
 /**
  *
@@ -24,7 +23,7 @@ class DefaultPatternRule extends AbstractRule implements PatternRule {
         }
 
         @Override
-        public PatternRule build(ProductionSet set) {
+        public PatternRule build() {
             checkForBuild();
             return new DefaultPatternRule(pattern);
         }

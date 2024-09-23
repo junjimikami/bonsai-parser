@@ -13,7 +13,7 @@ public interface SequenceRule extends Rule {
     public static interface Builder extends Rule.Builder, Quantifiable {
         public SequenceRule.Builder add(Rule.Builder builder);
         @Override
-        public SequenceRule build(ProductionSet set);
+        public SequenceRule build();
     }
 
     public static Builder builder() {

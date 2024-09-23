@@ -119,7 +119,7 @@ class ParserTest {
     @MethodSource("allMethods")
     void tokenNotMatchEmptyRule(Consumer<Parser> method) throws Exception {
         var grammar = Grammar.builder()
-                .add("S", set -> Rule.EMPTY)
+                .add("S", () -> Rule.EMPTY)
                 .build();
         var factory = ParserFactory.newFactory(grammar);
         var parser = factory.createParser(new StringReader("1"));

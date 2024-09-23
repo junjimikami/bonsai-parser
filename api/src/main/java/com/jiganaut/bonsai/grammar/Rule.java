@@ -21,7 +21,7 @@ public interface Rule {
 
     @FunctionalInterface
     public static interface Builder {
-        public Rule build(ProductionSet set);
+        public Rule build();
     }
 
     public static final Rule EMPTY = new Rule() {

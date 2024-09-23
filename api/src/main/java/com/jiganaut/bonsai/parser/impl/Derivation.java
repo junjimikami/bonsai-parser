@@ -67,7 +67,7 @@ final class Derivation implements RuleVisitor<List<Tree>, Context> {
         var rules = new LinkedList<>(sequence.getRules());
         while (!rules.isEmpty()) {
             var rule = rules.removeFirst();
-            var subFollowSet = FirstSet.of(rules, context.followSet());
+            var subFollowSet = FirstSet.of(rules, context);
             var subContext = context.withFollowSet(subFollowSet);
             trees.addAll(visit(rule, subContext));
         }
@@ -87,7 +87,8 @@ final class Derivation implements RuleVisitor<List<Tree>, Context> {
 
     @Override
     public List<Tree> visitReference(ReferenceRule reference, Context context) {
-        var production = reference.getProduction();
+        var productionSet = context.grammar().productionSet();
+        var production = reference.getProduction(productionSet);
         var subContext = context.withProduction(production);
         var tree = derive(subContext);
         return List.of(tree);

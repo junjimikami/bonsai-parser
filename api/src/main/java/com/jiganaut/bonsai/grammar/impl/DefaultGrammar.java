@@ -82,7 +82,7 @@ class DefaultGrammar implements Grammar {
             checkForBuild();
             var set = new DefaultProductionSet(builders.keySet());
             builders.forEach((symbol, builder) -> {
-                var rule = builder.build(set);
+                var rule = builder.build();
                 Objects.requireNonNull(rule, Message.NULL_BUILD_RESULT.format(symbol));
                 set.add(symbol, rule);
             });

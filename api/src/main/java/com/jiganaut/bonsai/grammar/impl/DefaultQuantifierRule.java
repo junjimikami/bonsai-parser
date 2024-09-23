@@ -3,7 +3,6 @@ package com.jiganaut.bonsai.grammar.impl;
 import java.util.OptionalInt;
 import java.util.stream.Stream;
 
-import com.jiganaut.bonsai.grammar.ProductionSet;
 import com.jiganaut.bonsai.grammar.QuantifierRule;
 import com.jiganaut.bonsai.grammar.Rule;
 
@@ -32,9 +31,9 @@ class DefaultQuantifierRule extends AbstractRule implements QuantifierRule {
         }
 
         @Override
-        public QuantifierRule build(ProductionSet set) {
+        public QuantifierRule build() {
             checkForBuild();
-            return new DefaultQuantifierRule(builder.build(set), from, to);
+            return new DefaultQuantifierRule(builder.build(), from, to);
         }
     }
 

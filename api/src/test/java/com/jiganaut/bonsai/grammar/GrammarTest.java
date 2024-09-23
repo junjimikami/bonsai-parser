@@ -30,15 +30,6 @@ class GrammarTest {
         }
 
         @Test
-        @DisplayName("build() [Invalid reference]")
-        void buildInCaseInvalidReference() throws Exception {
-            var builder = Grammar.builder();
-            builder.add("A", ReferenceRule.builder("B"));
-
-            assertThrows(NoSuchElementException.class, () -> builder.build());
-        }
-
-        @Test
         @DisplayName("build() [No such start symbol]")
         void buildInCaseNoSuchStartSymbol() throws Exception {
             var builder = Grammar.builder();
@@ -52,7 +43,7 @@ class GrammarTest {
         @DisplayName("build() [Builder returning null]")
         void buildInCaseBuilderReturningNull() throws Exception {
             var builder = Grammar.builder();
-            builder.add("A", set -> null);
+            builder.add("A", () -> null);
 
             assertThrows(NullPointerException.class, () -> builder.build());
         }
@@ -248,9 +239,9 @@ class GrammarTest {
     @DisplayName("productionSet() [Add multiple rules to one symbol]")
     void productionSetInCaseAddMultipleRulesToOneSymbol() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", set -> Stubs.rule("RULE0"))
-                .add("S", set -> Stubs.rule("RULE1"))
-                .add("S", set -> Stubs.rule("RULE2"))
+                .add("S", () -> Stubs.rule("RULE0"))
+                .add("S", () -> Stubs.rule("RULE1"))
+                .add("S", () -> Stubs.rule("RULE2"))
                 .build();
         var productionSet = grammar.productionSet();
 

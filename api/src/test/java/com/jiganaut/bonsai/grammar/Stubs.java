@@ -69,7 +69,7 @@ final class Stubs {
         return new Rule.Builder() {
 
             @Override
-            public Rule build(ProductionSet set) {
+            public Rule build() {
                 return rule;
             }
         };

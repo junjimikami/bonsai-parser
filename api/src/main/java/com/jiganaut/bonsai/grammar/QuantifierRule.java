@@ -11,7 +11,7 @@ public interface QuantifierRule extends Rule {
 
     public static interface Builder extends Rule.Builder {
         @Override
-        public QuantifierRule build(ProductionSet set);
+        public QuantifierRule build();
     }
 
     @Override

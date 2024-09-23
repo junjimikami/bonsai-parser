@@ -19,12 +19,12 @@ interface RuleTest {
         Rule.Builder builder();
 
         @Test
-        @DisplayName("build(ps:ProductionSet) [Post-build operation]")
-        default void buildPsInCasePostBuild() throws Exception {
+        @DisplayName("build() [Post-build operation]")
+        default void buildInCasePostBuild() throws Exception {
             var builder = builder();
-            builder.build(Stubs.DUMMY_PRODUCTION_SET);
+            builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.build(null));
+            assertThrows(IllegalStateException.class, () -> builder.build());
         }
 
     }

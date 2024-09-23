@@ -18,35 +18,36 @@ import com.jiganaut.bonsai.grammar.SequenceRule;
  * @author Junji Mikami
  *
  */
-final class FirstSet implements RuleVisitor<Set<Rule>, Set<Rule>> {
+final class FirstSet implements RuleVisitor<Set<Rule>, Context> {
     private static final FirstSet INSTANCE = new FirstSet();
 
     private FirstSet() {
     }
 
-    static Set<Rule> of(Rule rule, Set<Rule> followSet) {
-        return INSTANCE.visit(rule, followSet);
+    static Set<Rule> of(Rule rule, Context context) {
+        return INSTANCE.visit(rule, context);
     }
 
-    static Set<Rule> of(List<? extends Rule> sequence, Set<Rule> followSet) {
-        return INSTANCE.visit(sequence, followSet);
+    static Set<Rule> of(List<? extends Rule> sequence, Context context) {
+        return INSTANCE.visit(sequence, context);
     }
 
     @Override
     public Set<Rule> visit(Rule prd) {
-        return visit(prd, Set.of());
+        var context = new Context(null, null, null, Set.of());
+        return visit(prd, context);
     }
 
-    private Set<Rule> visit(List<? extends Rule> sequence, Set<Rule> followSet) {
+    private Set<Rule> visit(List<? extends Rule> sequence, Context context) {
         if (sequence.isEmpty()) {
-            return followSet;
+            return context.followSet();
         }
         var subRules = new LinkedList<>(sequence);
         var rule = subRules.removeFirst();
         var subFollowSet = Set.<Rule>of(new SequenceRule() {
             @Override
             public List<? extends Rule> getRules() {
-                var set = visit(subRules, followSet);
+                var set = visit(subRules, context);
                 return new ArrayList<>(set);
             }
 
@@ -55,39 +56,41 @@ final class FirstSet implements RuleVisitor<Set<Rule>, Set<Rule>> {
                 return subRules.toString();
             }
         });
-        return visit(rule, subFollowSet);
+        var subContext = context.withFollowSet(subFollowSet);
+        return visit(rule, subContext);
     }
 
     @Override
-    public Set<Rule> visitChoice(ChoiceRule alt, Set<Rule> followSet) {
+    public Set<Rule> visitChoice(ChoiceRule alt, Context context) {
         if (alt.getChoices().isEmpty()) {
-            return followSet;
+            return context.followSet();
         }
         var set = new HashSet<Rule>();
         for (var p : alt.getChoices()) {
-            set.addAll(visit(p, followSet));
+            set.addAll(visit(p, context));
         }
         return set;
     }
 
     @Override
-    public Set<Rule> visitSequence(SequenceRule seq, Set<Rule> followSet) {
-        return visit(seq.getRules(), followSet);
+    public Set<Rule> visitSequence(SequenceRule seq, Context context) {
+        return visit(seq.getRules(), context);
     }
 
     @Override
-    public Set<Rule> visitPattern(PatternRule p, Set<Rule> followSet) {
+    public Set<Rule> visitPattern(PatternRule p, Context context) {
         return Set.of(p);
     }
 
     @Override
-    public Set<Rule> visitReference(ReferenceRule ref, Set<Rule> followSet) {
-        var production = ref.getProduction();
-        return visit(production.getRule(), followSet);
+    public Set<Rule> visitReference(ReferenceRule ref, Context context) {
+        var productionSet = context.grammar().productionSet();
+        var production = ref.getProduction(productionSet);
+        return visit(production.getRule(), context);
     }
 
     @Override
-    public Set<Rule> visitQuantifier(QuantifierRule qt, Set<Rule> followSet) {
+    public Set<Rule> visitQuantifier(QuantifierRule qt, Context context) {
         var set = new HashSet<Rule>();
         var prd = qt.stream()
                 .limit(1)
@@ -96,13 +99,13 @@ final class FirstSet implements RuleVisitor<Set<Rule>, Set<Rule>> {
             set.addAll(visit(prd.get()));
         }
         if (qt.getMinCount() == 0) {
-            set.addAll(followSet);
+            set.addAll(context.followSet());
         }
         return set;
     }
 
     @Override
-    public Set<Rule> visitEmpty(Rule empty, Set<Rule> followSet) {
-        return followSet;
+    public Set<Rule> visitEmpty(Rule empty, Context context) {
+        return context.followSet();
     }
 }

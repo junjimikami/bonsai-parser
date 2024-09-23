@@ -20,7 +20,7 @@ interface QuantifierRuleTest extends RuleTest {
 
     @Override
     default Rule build() {
-        return builder().opt().build(Stubs.DUMMY_PRODUCTION_SET);
+        return builder().opt().build();
     }
 
     @Override
@@ -41,7 +41,7 @@ interface QuantifierRuleTest extends RuleTest {
     @Test
     @DisplayName("opt()")
     default void opt() throws Exception {
-        var quantifier = builder().opt().build(Stubs.DUMMY_PRODUCTION_SET);
+        var quantifier = builder().opt().build();
 
         assertEquals(0, quantifier.getMinCount());
         assertEquals(1, quantifier.getMaxCount().getAsInt());
@@ -50,7 +50,7 @@ interface QuantifierRuleTest extends RuleTest {
     @Test
     @DisplayName("zeroOrMore()")
     default void zeroOrMore() throws Exception {
-        var quantifier = builder().zeroOrMore().build(Stubs.DUMMY_PRODUCTION_SET);
+        var quantifier = builder().zeroOrMore().build();
 
         assertEquals(0, quantifier.getMinCount());
         assertEquals(true, quantifier.getMaxCount().isEmpty());
@@ -59,7 +59,7 @@ interface QuantifierRuleTest extends RuleTest {
     @Test
     @DisplayName("oneOrMore()")
     default void oneOrMore() throws Exception {
-        var quantifier = builder().oneOrMore().build(Stubs.DUMMY_PRODUCTION_SET);
+        var quantifier = builder().oneOrMore().build();
 
         assertEquals(1, quantifier.getMinCount());
         assertEquals(true, quantifier.getMaxCount().isEmpty());
@@ -68,7 +68,7 @@ interface QuantifierRuleTest extends RuleTest {
     @Test
     @DisplayName("exactly()")
     default void exactly() throws Exception {
-        var quantifier = builder().exactly(0).build(Stubs.DUMMY_PRODUCTION_SET);
+        var quantifier = builder().exactly(0).build();
 
         assertEquals(0, quantifier.getMinCount());
         assertEquals(0, quantifier.getMaxCount().getAsInt());
@@ -78,7 +78,7 @@ interface QuantifierRuleTest extends RuleTest {
     @ValueSource(ints = { 0, 1, 2 })
     @DisplayName("atLeast(int)")
     default void atLeast(int times) throws Exception {
-        var quantifier = builder().atLeast(times).build(Stubs.DUMMY_PRODUCTION_SET);
+        var quantifier = builder().atLeast(times).build();
 
         assertEquals(times, quantifier.getMinCount());
         assertEquals(true, quantifier.getMaxCount().isEmpty());
@@ -91,7 +91,7 @@ interface QuantifierRuleTest extends RuleTest {
     })
     @DisplayName("range()")
     default void range(int min, int max) throws Exception {
-        var quantifier = builder().range(min, max).build(Stubs.DUMMY_PRODUCTION_SET);
+        var quantifier = builder().range(min, max).build();
 
         assertEquals(min, quantifier.getMinCount());
         assertEquals(max, quantifier.getMaxCount().getAsInt());

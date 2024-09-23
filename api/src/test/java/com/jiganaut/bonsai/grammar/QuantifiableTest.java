@@ -111,7 +111,7 @@ interface QuantifiableTest {
     @DisplayName("exactly(int) [Post-build operation]")
     default void exactlyInCasePostBuild() throws Exception {
         var builder = builder();
-        builder.build(Stubs.DUMMY_PRODUCTION_SET);
+        builder.build();
 
         assertThrows(IllegalStateException.class, () -> builder.exactly(0));
     }
@@ -120,7 +120,7 @@ interface QuantifiableTest {
     @DisplayName("atLeast(int) [Post-build operation]")
     default void atLeastInCasePostBuild() throws Exception {
         var builder = builder();
-        builder.build(Stubs.DUMMY_PRODUCTION_SET);
+        builder.build();
 
         assertThrows(IllegalStateException.class, () -> builder.atLeast(0));
     }
@@ -129,7 +129,7 @@ interface QuantifiableTest {
     @DisplayName("range(int, int) [Post-build operation]")
     default void rangeInCasePostBuild() throws Exception {
         var builder = builder();
-        builder.build(Stubs.DUMMY_PRODUCTION_SET);
+        builder.build();
 
         assertThrows(IllegalStateException.class, () -> builder.range(0, 0));
     }
@@ -138,7 +138,7 @@ interface QuantifiableTest {
     @DisplayName("opt() [Post-build operation]")
     default void optInCasePostBuild() throws Exception {
         var builder = builder();
-        builder.build(Stubs.DUMMY_PRODUCTION_SET);
+        builder.build();
 
         assertThrows(IllegalStateException.class, () -> builder.opt());
     }
@@ -147,7 +147,7 @@ interface QuantifiableTest {
     @DisplayName("zeroOrMore() [Post-build operation]")
     default void zeroOrMoreInCasePostBuild() throws Exception {
         var builder = builder();
-        builder.build(Stubs.DUMMY_PRODUCTION_SET);
+        builder.build();
 
         assertThrows(IllegalStateException.class, () -> builder.zeroOrMore());
     }
@@ -156,7 +156,7 @@ interface QuantifiableTest {
     @DisplayName("oneOrMore() [Post-build operation]")
     default void oneOrMoreInCasePostBuild() throws Exception {
         var builder = builder();
-        builder.build(Stubs.DUMMY_PRODUCTION_SET);
+        builder.build();
 
         assertThrows(IllegalStateException.class, () -> builder.oneOrMore());
     }

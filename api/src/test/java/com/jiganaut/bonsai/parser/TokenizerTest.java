@@ -130,7 +130,7 @@ class TokenizerTest {
     @MethodSource("allMethods")
     void tokenNotMatchEmptyRule(Consumer<Tokenizer> method) throws Exception {
         var grammar = Grammar.builder()
-                .add("S", set -> Rule.EMPTY)
+                .add("S", () -> Rule.EMPTY)
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -276,7 +276,7 @@ class TokenizerTest {
     @DisplayName("hasNext() [No tokens remaining]")
     void hasNextInCaseNoTokensRemaining() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", set -> Rule.EMPTY)
+                .add("S", () -> Rule.EMPTY)
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(Reader.nullReader());
@@ -288,7 +288,7 @@ class TokenizerTest {
     @DisplayName("hasNext(st:String) [No tokens remaining]")
     void hasNextStInCaseNoTokensRemaining() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", set -> Rule.EMPTY)
+                .add("S", () -> Rule.EMPTY)
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(Reader.nullReader());
@@ -300,7 +300,7 @@ class TokenizerTest {
     @DisplayName("hasNext(pa:Pattern) [No tokens remaining]")
     void hasNextPaInCaseNoTokensRemaining() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", set -> Rule.EMPTY)
+                .add("S", () -> Rule.EMPTY)
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(Reader.nullReader());
@@ -350,7 +350,7 @@ class TokenizerTest {
     @DisplayName("next() [No tokens remaining]")
     void nextInCaseNoTokensRemaining() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", set -> Rule.EMPTY)
+                .add("S", () -> Rule.EMPTY)
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(Reader.nullReader());
@@ -362,7 +362,7 @@ class TokenizerTest {
     @DisplayName("next(st:String) [No tokens remaining]")
     void nextStInCaseNoTokensRemaining() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", set -> Rule.EMPTY)
+                .add("S", () -> Rule.EMPTY)
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(Reader.nullReader());
@@ -374,7 +374,7 @@ class TokenizerTest {
     @DisplayName("next(pa:Pattern) [No tokens remaining]")
     void nextPaInCaseNoTokensRemaining() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", set -> Rule.EMPTY)
+                .add("S", () -> Rule.EMPTY)
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(Reader.nullReader());

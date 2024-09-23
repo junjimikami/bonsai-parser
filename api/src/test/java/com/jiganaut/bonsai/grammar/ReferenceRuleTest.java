@@ -13,7 +13,7 @@ import com.jiganaut.bonsai.grammar.Rule.Kind;
 class ReferenceRuleTest implements RuleTest {
 
     @Nested
-    class BuilderTest implements RuleTest.BulderTest, QuantifiableTest, ReferenceRelatedTest {
+    class BuilderTest implements RuleTest.BulderTest, QuantifiableTest {
 
         @Override
         public ReferenceRule.Builder builder() {
@@ -21,7 +21,7 @@ class ReferenceRuleTest implements RuleTest {
         }
 
         @Nested
-        class QuantifierBuilderTest implements QuantifierRuleTest.BuilderTest, ReferenceRelatedTest {
+        class QuantifierBuilderTest implements QuantifierRuleTest.BuilderTest {
             @Override
             public QuantifierRule.Builder builder() {
                 return ReferenceRuleTest.BuilderTest.this.builder().opt();
@@ -39,7 +39,7 @@ class ReferenceRuleTest implements RuleTest {
 
     @Override
     public Rule build() {
-        return ReferenceRule.builder("").build(Stubs.DUMMY_PRODUCTION_SET);
+        return ReferenceRule.builder("").build();
     }
 
     @Override
@@ -73,8 +73,8 @@ class ReferenceRuleTest implements RuleTest {
     @DisplayName("builder(String)")
     void get() throws Exception {
         var symbol = "S";
-        var reference = ReferenceRule.builder(symbol).build(Stubs.DUMMY_PRODUCTION_SET);
-        var production = reference.getProduction();
+        var reference = ReferenceRule.builder(symbol).build();
+        var production = reference.getProduction(Stubs.DUMMY_PRODUCTION_SET);
 
         assertEquals(symbol, production.getSymbol());
     }

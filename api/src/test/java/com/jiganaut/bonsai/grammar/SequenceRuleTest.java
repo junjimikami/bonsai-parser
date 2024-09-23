@@ -18,7 +18,7 @@ import com.jiganaut.bonsai.grammar.Rule.Kind;
 class SequenceRuleTest implements RuleTest {
 
     @Nested
-    class BuilderTest implements RuleTest.BulderTest, QuantifiableTest, ReferenceRelatedTest {
+    class BuilderTest implements RuleTest.BulderTest, QuantifiableTest {
 
         @Override
         public SequenceRule.Builder builder() {
@@ -26,11 +26,11 @@ class SequenceRuleTest implements RuleTest {
         }
 
         @Test
-        @DisplayName("build(ps:ProductionSet) [No elements]")
-        void buildPsInCaseNoElements() throws Exception {
+        @DisplayName("build() [No elements]")
+        void buildInCaseNoElements() throws Exception {
             var builder = SequenceRule.builder();
 
-            assertThrows(IllegalStateException.class, () -> builder.build(null));
+            assertThrows(IllegalStateException.class, () -> builder.build());
         }
 
         @Test
@@ -94,7 +94,7 @@ class SequenceRuleTest implements RuleTest {
         void addEbPostBuild() throws Exception {
             var builder = SequenceRule.builder()
                     .add(Stubs.DUMMY_RULE_BUILDER);
-            builder.build(Stubs.DUMMY_PRODUCTION_SET);
+            builder.build();
 
             assertThrows(IllegalStateException.class, () -> builder.add((Rule.Builder) null));
         }
@@ -108,7 +108,7 @@ class SequenceRuleTest implements RuleTest {
         }
 
         @Nested
-        class QuantifierBuilderTest implements QuantifierRuleTest.BuilderTest, ReferenceRelatedTest {
+        class QuantifierBuilderTest implements QuantifierRuleTest.BuilderTest {
             @Override
             public QuantifierRule.Builder builder() {
                 return SequenceRuleTest.BuilderTest.this.builder().opt();
@@ -128,7 +128,7 @@ class SequenceRuleTest implements RuleTest {
     public Rule build() {
         return SequenceRule.builder()
                 .add(Stubs.DUMMY_RULE_BUILDER)
-                .build(Stubs.DUMMY_PRODUCTION_SET);
+                .build();
     }
 
     @Override
@@ -154,7 +154,7 @@ class SequenceRuleTest implements RuleTest {
         list.stream()
                 .map(Stubs::builderOf)
                 .forEach(builder::add);
-        var sequence = builder.build(Stubs.DUMMY_PRODUCTION_SET);
+        var sequence = builder.build();
 
         assertIterableEquals(list, sequence.getRules());
     }
@@ -171,11 +171,11 @@ class SequenceRuleTest implements RuleTest {
     void getRulesInCaseContainingReference(List<String> list) throws Exception {
         var builder = SequenceRule.builder();
         list.stream().forEach(symbol -> builder.add(ReferenceRule.builder(symbol)));
-        var sequence = builder.build(Stubs.DUMMY_PRODUCTION_SET);
+        var sequence = builder.build();
 
         assertIterableEquals(list, sequence.getRules().stream()
                 .map(e -> (ReferenceRule) e)
-                .map(e -> e.getProduction().getSymbol())
+                .map(e -> e.getProduction(Stubs.DUMMY_PRODUCTION_SET).getSymbol())
                 .toList());
     }
 
