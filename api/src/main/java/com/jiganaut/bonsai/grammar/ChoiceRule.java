@@ -22,6 +22,14 @@ public interface ChoiceRule extends Rule {
         return GrammarProviders.provider().createChoiceBuilder();
     }
 
+    public static ChoiceRule of(Rule... rules) {
+        var builder = builder();
+        for (var rule : rules) {
+            builder.add(rule);
+        }
+        return builder.build();
+    }
+
     @Override
     public default Kind getKind() {
     	return Kind.CHOICE;

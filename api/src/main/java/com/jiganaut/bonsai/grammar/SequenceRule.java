@@ -21,6 +21,14 @@ public interface SequenceRule extends Rule {
         return GrammarProviders.provider().createSequenceBuilder();
     }
 
+    public static SequenceRule of(Rule... rules) {
+        var builder = builder();
+        for (var rule : rules) {
+            builder.add(rule);
+        }
+        return builder.build();
+    }
+
     @Override
     public default Kind getKind() {
     	return Kind.SEQUENCE;
