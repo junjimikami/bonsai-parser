@@ -8,31 +8,10 @@ import com.jiganaut.bonsai.grammar.PatternRule;
  *
  * @author Junji Mikami
  */
-class DefaultPatternRule extends AbstractRule implements PatternRule {
-    static class Builder extends AbstractRule.QuantifiableBuilder implements PatternRule.Builder {
-        private Pattern pattern;
-
-        Builder(String regex) {
-            assert regex != null;
-            this.pattern = Pattern.compile(regex);
-        }
-
-        Builder(Pattern pattern) {
-            assert pattern != null;
-            this.pattern = pattern;
-        }
-
-        @Override
-        public PatternRule build() {
-            checkForBuild();
-            return new DefaultPatternRule(pattern);
-        }
-
-    }
-
+class DefaultPatternRule extends AbstractRule implements PatternRule, DefaultQuantifiableRule {
     private final Pattern pattern;
 
-    private DefaultPatternRule(Pattern pattern) {
+    DefaultPatternRule(Pattern pattern) {
         assert pattern != null;
         this.pattern = pattern;
     }

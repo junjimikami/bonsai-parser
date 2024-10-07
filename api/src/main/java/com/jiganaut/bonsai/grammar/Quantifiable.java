@@ -1,19 +1,19 @@
 package com.jiganaut.bonsai.grammar;
 
-public interface Quantifiable extends Rule.Builder {
+public interface Quantifiable {
 
-    public default QuantifierRule.Builder opt() {
+    public default QuantifierRule opt() {
         return range(0, 1);
     }
-    public default QuantifierRule.Builder zeroOrMore() {
+    public default QuantifierRule zeroOrMore() {
         return atLeast(0);
     }
-    public default QuantifierRule.Builder oneOrMore() {
+    public default QuantifierRule oneOrMore() {
         return atLeast(1);
     }
-    public default QuantifierRule.Builder exactly(int times) {
+    public default QuantifierRule exactly(int times) {
         return range(times, times);
     }
-    public QuantifierRule.Builder atLeast(int times);
-    public QuantifierRule.Builder range(int from, int to);
+    public QuantifierRule atLeast(int times);
+    public QuantifierRule range(int from, int to);
 }

@@ -5,12 +5,12 @@ import com.jiganaut.bonsai.grammar.Rule.Kind;
 class EmptyRuleTest implements RuleTest {
 
     @Override
-    public Rule build() {
+    public Rule createTarget() {
         return Rule.EMPTY;
     }
 
     @Override
-    public Kind kind() {
+    public Kind expectedKind() {
         return Kind.EMPTY;
     }
 

@@ -3,27 +3,41 @@ package com.jiganaut.bonsai.grammar.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.jiganaut.bonsai.grammar.Quantifiable;
+import com.jiganaut.bonsai.grammar.QuantifierRule;
 import com.jiganaut.bonsai.grammar.Rule;
 
 abstract class AbstractCompositeRule extends AbstractRule {
-    static abstract class Builder extends QuantifiableBuilder {
+    static abstract class Builder extends AbstractRule.Builder implements Quantifiable {
         protected final List<Rule.Builder> builders = new ArrayList<>();
 
         @Override
         protected void checkForBuild() {
-            super.checkForBuild();
             if (builders.isEmpty()) {
                 throw new IllegalStateException(Message.NO_ELELEMNTS.format());
             }
+            super.checkForBuild();
         }
 
         @Override
-        protected void checkForQuantifiable() {
-            super.checkForQuantifiable();
-            if (builders.isEmpty()) {
-                throw new IllegalStateException(Message.NO_ELELEMNTS.format());
+        public QuantifierRule atLeast(int times) {
+            if (times < 0) {
+                throw new IllegalArgumentException(Message.NEGATIVE_PARAMETER.format());
             }
+            return new DefaultQuantifierRule(build(), times);
         }
+
+        @Override
+        public QuantifierRule range(int from, int to) {
+            if (from < 0) {
+                throw new IllegalArgumentException(Message.NEGATIVE_PARAMETER.format());
+            }
+            if (to < from) {
+                throw new IllegalArgumentException(Message.INVALID_MAX_COUNT.format());
+            }
+            return new DefaultQuantifierRule(build(), from, to);
+        }
+
     }
 
     protected final List<? extends Rule> elements;

@@ -6,15 +6,10 @@ import com.jiganaut.bonsai.grammar.impl.GrammarProviders;
  * @author Junji Mikami
  *
  */
-public interface ReferenceRule extends Rule {
+public interface ReferenceRule extends Rule, Quantifiable {
 
-    public static interface Builder extends Rule.Builder, Quantifiable {
-        @Override
-        public ReferenceRule build();
-    }
-
-    public static Builder builder(String reference) {
-        return GrammarProviders.provider().createReferenceBuilder(reference);
+    public static ReferenceRule of(String reference) {
+        return GrammarProviders.provider().createReference(reference);
     }
 
     @Override

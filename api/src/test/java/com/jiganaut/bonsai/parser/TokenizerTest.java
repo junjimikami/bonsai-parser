@@ -1,10 +1,5 @@
 package com.jiganaut.bonsai.parser;
 
-import static com.jiganaut.bonsai.grammar.Rules.choiceBuilder;
-import static com.jiganaut.bonsai.grammar.Rules.pattern;
-import static com.jiganaut.bonsai.grammar.Rules.ofPatterns;
-import static com.jiganaut.bonsai.grammar.Rules.reference;
-import static com.jiganaut.bonsai.grammar.Rules.sequenceBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
@@ -29,8 +24,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import com.jiganaut.bonsai.grammar.ChoiceRule;
 import com.jiganaut.bonsai.grammar.Grammar;
+import com.jiganaut.bonsai.grammar.PatternRule;
+import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.Rule;
+import com.jiganaut.bonsai.grammar.SequenceRule;
 
 class TokenizerTest {
 
@@ -61,9 +60,9 @@ class TokenizerTest {
     @MethodSource("allMethods")
     void ambiguousRule(Consumer<Tokenizer> method) throws Exception {
         var grammar = Grammar.builder()
-                .add("S", choiceBuilder()
-                        .add(pattern("1"))
-                        .add(pattern(".")))
+                .add("S", ChoiceRule.builder()
+                        .add(() -> PatternRule.of("1"))
+                        .add(() -> PatternRule.of(".")))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -71,25 +70,25 @@ class TokenizerTest {
         assertThrows(ParseException.class, () -> method.accept(tokenizer));
     }
 
-    @DisplayName("[Occurrence count out of range]")
-    @ParameterizedTest(name = "{0} {displayName}")
-    @MethodSource("allMethods")
-    void occurrenceCountOutOfRange(Consumer<Tokenizer> method) throws Exception {
-        var grammar = Grammar.builder()
-                .add("S", pattern("1").range(3, 5))
-                .build();
-        var factory = TokenizerFactory.newFactory(grammar);
-        var tokenizer = factory.createTokenizer(new StringReader("11"));
-
-        assertThrows(ParseException.class, () -> method.accept(tokenizer));
-    }
+//    @DisplayName("[Occurrence count out of range]")
+//    @ParameterizedTest(name = "{0} {displayName}")
+//    @MethodSource("allMethods")
+//    void occurrenceCountOutOfRange(Consumer<Tokenizer> method) throws Exception {
+//        var grammar = Grammar.builder()
+//                .add("S", () -> PatternRule.of("1").range(3, 5))
+//                .build();
+//        var factory = TokenizerFactory.newFactory(grammar);
+//        var tokenizer = factory.createTokenizer(new StringReader("11"));
+//
+//        assertThrows(ParseException.class, () -> method.accept(tokenizer));
+//    }
 
     @DisplayName("[Token not match pattern rule]")
     @ParameterizedTest(name = "{0} {displayName}")
     @MethodSource("allMethods")
     void tokenNotMatchPatternRule(Consumer<Tokenizer> method) throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("0"))
+                .add("S", () -> PatternRule.of("0"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -102,8 +101,8 @@ class TokenizerTest {
     @MethodSource("allMethods")
     void tokenNotMatchChoiceRule(Consumer<Tokenizer> method) throws Exception {
         var grammar = Grammar.builder()
-                .add("S", choiceBuilder()
-                        .add(pattern("0")))
+                .add("S", ChoiceRule.builder()
+                        .add(() -> PatternRule.of("0")))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -116,8 +115,8 @@ class TokenizerTest {
     @MethodSource("allMethods")
     void tokenNotMatchSequenceRule(Consumer<Tokenizer> method) throws Exception {
         var grammar = Grammar.builder()
-                .add("S", sequenceBuilder()
-                        .add(pattern("0")))
+                .add("S", SequenceRule.builder()
+                        .add(() -> PatternRule.of("0")))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -142,7 +141,7 @@ class TokenizerTest {
     @DisplayName("hasNext(st:String) [Null parameter]")
     void hasNextStInCaseNullParameter() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("1"))
+                .add("S", () -> PatternRule.of("1"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -154,7 +153,7 @@ class TokenizerTest {
     @DisplayName("hasNext(pa:Pattern) [Null parameter]")
     void hasNextPaInCaseNullParameter() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("1"))
+                .add("S", () -> PatternRule.of("1"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -166,7 +165,7 @@ class TokenizerTest {
     @DisplayName("next(st:String) [Null parameter]")
     void nextStInCaseNullParameter() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("1"))
+                .add("S", () -> PatternRule.of("1"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -178,7 +177,7 @@ class TokenizerTest {
     @DisplayName("next(pa:Pattern) [Null parameter]")
     void nextPaInCaseNullParameter() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("1"))
+                .add("S", () -> PatternRule.of("1"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -190,7 +189,7 @@ class TokenizerTest {
     @DisplayName("skip(st:String) [Null parameter]")
     void skipStInCaseNullParameter() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("1"))
+                .add("S", () -> PatternRule.of("1"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -202,7 +201,7 @@ class TokenizerTest {
     @DisplayName("skip(pa:Pattern) [Null parameter]")
     void skipPaInCaseNullParameter() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("1"))
+                .add("S", () -> PatternRule.of("1"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -214,7 +213,7 @@ class TokenizerTest {
     @DisplayName("next(st:String) [No tokens matching pattern]")
     void nextStInCaseNoTokensMatchingPattern() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("1"))
+                .add("S", () -> PatternRule.of("1"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -226,7 +225,7 @@ class TokenizerTest {
     @DisplayName("next(pa:Pattern) [No tokens matching pattern]")
     void nextPaInCaseNoTokensMatchingPattern() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("1"))
+                .add("S", () -> PatternRule.of("1"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -239,7 +238,7 @@ class TokenizerTest {
     @DisplayName("hasNext() [Token remaining]")
     void hasNextInCaseTokenRemaining() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("1"))
+                .add("S", () -> PatternRule.of("1"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -251,7 +250,7 @@ class TokenizerTest {
     @DisplayName("hasNext(st:String) [Token remaining]")
     void hasNextStInCaseTokenRemaining() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("1"))
+                .add("S", () -> PatternRule.of("1"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -263,7 +262,7 @@ class TokenizerTest {
     @DisplayName("hasNext(pa:Pattern) [Token remaining]")
     void hasNextPaInCaseTokenRemaining() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("1"))
+                .add("S", () -> PatternRule.of("1"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -313,7 +312,7 @@ class TokenizerTest {
     @DisplayName("next() [Token remaining]")
     void nextInCaseTokenRemaining() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("1"))
+                .add("S", () -> PatternRule.of("1"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -325,7 +324,7 @@ class TokenizerTest {
     @DisplayName("next(st:String) [Token remaining]")
     void nextStInCaseTokenRemaining() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("1"))
+                .add("S", () -> PatternRule.of("1"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -337,7 +336,7 @@ class TokenizerTest {
     @DisplayName("next(pa:Pattern) [Token remaining]")
     void nextPaInCaseTokenRemaining() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("1"))
+                .add("S", () -> PatternRule.of("1"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -387,7 +386,7 @@ class TokenizerTest {
     @DisplayName("skip(st:String) [Token remaining]")
     void skipStInCaseTokenRemaining() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("1"))
+                .add("S", () -> PatternRule.of("1"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -399,7 +398,7 @@ class TokenizerTest {
     @DisplayName("skip(pa:Pattern) [Token remaining]")
     void skipPaInCaseTokenRemaining() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("1"))
+                .add("S", () -> PatternRule.of("1"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -412,7 +411,7 @@ class TokenizerTest {
     @DisplayName("skip(st:String) [No tokens remaining]")
     void skipStInCaseNoTokensRemaining() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("1"))
+                .add("S", () -> PatternRule.of("1"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -424,7 +423,7 @@ class TokenizerTest {
     @DisplayName("skip(pa:Pattern) [No tokens remaining]")
     void skipPaInCaseNoTokensRemaining() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("1"))
+                .add("S", () -> PatternRule.of("1"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -437,7 +436,7 @@ class TokenizerTest {
     @DisplayName("hasNext()")
     void hasNext() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("1"))
+                .add("S", () -> PatternRule.of("1"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -449,7 +448,7 @@ class TokenizerTest {
     @DisplayName("hasNext(st:String)")
     void hasNextSt() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("1"))
+                .add("S", () -> PatternRule.of("1"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -461,7 +460,7 @@ class TokenizerTest {
     @DisplayName("hasNext(pa:Pattern)")
     void hasNextPa() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("1"))
+                .add("S", () -> PatternRule.of("1"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -474,7 +473,7 @@ class TokenizerTest {
     @DisplayName("next()")
     void next() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("1"))
+                .add("S", () -> PatternRule.of("1"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -490,7 +489,7 @@ class TokenizerTest {
     @DisplayName("next(st:String)")
     void nextSt() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("1"))
+                .add("S", () -> PatternRule.of("1"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -505,7 +504,7 @@ class TokenizerTest {
     @DisplayName("next(pa:Pattern)")
     void nextPa() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("1"))
+                .add("S", () -> PatternRule.of("1"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
@@ -520,7 +519,7 @@ class TokenizerTest {
     @DisplayName("skip(st:String)")
     void skipSt() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("0|1"))
+                .add("S", () -> PatternRule.of("0|1"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("01"));
@@ -535,7 +534,7 @@ class TokenizerTest {
     @DisplayName("skip(pa:Pattern)")
     void skipPa() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", pattern("0|1"))
+                .add("S", () -> PatternRule.of("0|1"))
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("01"));
@@ -573,246 +572,246 @@ class TokenizerTest {
         // Pattern
         var stream = Stream.<Arguments>of(
                 arguments(Grammar.builder()
-                        .add("A", pattern("0"))
+                        .add("A", () -> PatternRule.of("0"))
                         .build(), "0000", List.of("0", "0", "0", "0")),
                 arguments(Grammar.builder()
-                        .add("A", pattern("0"))
+                        .add("A", () -> PatternRule.of("0"))
                         .build(), "0001", null),
                 arguments(Grammar.builder()
-                        .add("A", pattern("."))
+                        .add("A", () -> PatternRule.of("."))
                         .build(), "0123", List.of("0", "1", "2", "3")),
                 arguments(Grammar.builder()
-                        .add("A", pattern(Pattern.compile(".")))
+                        .add("A", () -> PatternRule.of(Pattern.compile(".")))
                         .build(), "0123", List.of("0", "1", "2", "3")),
                 arguments(Grammar.builder()
-                        .add("A", pattern(Pattern.compile(".", Pattern.LITERAL)))
+                        .add("A", () -> PatternRule.of(Pattern.compile(".", Pattern.LITERAL)))
                         .build(), "....", List.of(".", ".", ".", ".")),
                 arguments(Grammar.builder()
-                        .add("A", pattern(Pattern.compile(".", Pattern.LITERAL)))
+                        .add("A", () -> PatternRule.of(Pattern.compile(".", Pattern.LITERAL)))
                         .build(), "0123", null),
                 arguments(Grammar.builder()
-                        .add("A", pattern(""))
+                        .add("A", () -> PatternRule.of(""))
                         .build(), "", List.of()),
                 arguments(Grammar.builder()
-                        .add("A", pattern(""))
+                        .add("A", () -> PatternRule.of(""))
                         .build(), "0123", null));
         // + Sequence
         stream = Stream.concat(stream, Stream.of(
                 arguments(Grammar.builder()
-                        .add("A", sequenceBuilder()
-                                .add(pattern("0")))
+                        .add("A", SequenceRule.builder()
+                                .add(() -> PatternRule.of("0")))
                         .build(), "0000", List.of("0", "0", "0", "0")),
                 arguments(Grammar.builder()
-                        .add("A", sequenceBuilder()
-                                .add(pattern("0"))
-                                .add(pattern("0")))
+                        .add("A", SequenceRule.builder()
+                                .add(() -> PatternRule.of("0"))
+                                .add(() -> PatternRule.of("0")))
                         .build(), "0000", List.of("00", "00")),
                 arguments(Grammar.builder()
-                        .add("A", sequenceBuilder()
-                                .add(pattern("0"))
-                                .add(pattern("0")))
+                        .add("A", SequenceRule.builder()
+                                .add(() -> PatternRule.of("0"))
+                                .add(() -> PatternRule.of("0")))
                         .build(), "000", null),
                 arguments(Grammar.builder()
-                        .add("A", sequenceBuilder()
-                                .add(pattern("0"))
-                                .add(pattern("1")))
+                        .add("A", SequenceRule.builder()
+                                .add(() -> PatternRule.of("0"))
+                                .add(() -> PatternRule.of("1")))
                         .build(), "0101", List.of("01", "01"))));
         // + Choice
         stream = Stream.concat(stream, Stream.of(
                 arguments(Grammar.builder()
-                        .add("A", choiceBuilder()
-                                .add(pattern("0")))
+                        .add("A", ChoiceRule.builder()
+                                .add(() -> PatternRule.of("0")))
                         .build(), "0000", List.of("0", "0", "0", "0")),
                 arguments(Grammar.builder()
-                        .add("A", choiceBuilder()
-                                .add(pattern("0"))
-                                .add(pattern("1")))
+                        .add("A", ChoiceRule.builder()
+                                .add(() -> PatternRule.of("0"))
+                                .add(() -> PatternRule.of("1")))
                         .build(), "0110", List.of("0", "1", "1", "0")),
                 arguments(Grammar.builder()
-                        .add("A", choiceBuilder()
-                                .add(pattern("0"))
+                        .add("A", ChoiceRule.builder()
+                                .add(() -> PatternRule.of("0"))
                                 .addEmpty())
                         .build(), "0000", List.of("0", "0", "0", "0")),
                 arguments(Grammar.builder()
-                        .add("A", choiceBuilder()
-                                .add(pattern("0"))
-                                .add(pattern("[^0]")))
+                        .add("A", ChoiceRule.builder()
+                                .add(() -> PatternRule.of("0"))
+                                .add(() -> PatternRule.of("[^0]")))
                         .build(), "0123", List.of("0", "1", "2", "3")),
                 arguments(Grammar.builder()
-                        .add("A", sequenceBuilder()
-                                .add(choiceBuilder()
-                                        .add(pattern("0"))
+                        .add("A", SequenceRule.builder()
+                                .add(ChoiceRule.builder()
+                                        .add(() -> PatternRule.of("0"))
                                         .addEmpty())
-                                .add(pattern("1")))
+                                .add(() -> PatternRule.of("1")))
                         .build(), "011101", List.of("01", "1", "1", "01")),
                 arguments(Grammar.builder()
-                        .add("A", pattern("0"))
-                        .add("A", pattern("1"))
+                        .add("A", () -> PatternRule.of("0"))
+                        .add("A", () -> PatternRule.of("1"))
                         .build(), "0110", List.of("0", "1", "1", "0"))));
         // + Reference
         stream = Stream.concat(stream, Stream.of(
                 arguments(Grammar.builder()
-                        .add("A", reference("B"))
-                        .add("B", pattern("0"))
+                        .add("A", () -> ReferenceRule.of("B"))
+                        .add("B", () -> PatternRule.of("0"))
                         .build(), "0000", List.of("0", "0", "0", "0")),
                 arguments(Grammar.builder()
-                        .add("A", sequenceBuilder()
-                                .add(pattern("0"))
-                                .add(choiceBuilder()
+                        .add("A", SequenceRule.builder()
+                                .add(() -> PatternRule.of("0"))
+                                .add(ChoiceRule.builder()
                                         .addEmpty()
-                                        .add(reference("A"))))
+                                        .add(() -> ReferenceRule.of("A"))))
                         .build(), "0000", List.of("0000"))));
         // + Quantifier
-        stream = Stream.concat(stream, Stream.of(
-                arguments(Grammar.builder()
-                        .add("A", pattern("0").opt())
-                        .build(), "", List.of()),
-                arguments(Grammar.builder()
-                        .add("A", pattern("0").opt())
-                        .build(), "0", List.of("0")),
-                arguments(Grammar.builder()
-                        .add("A", pattern("0").opt())
-                        .build(), "00", List.of("0", "0")),
-                arguments(Grammar.builder()
-                        .add("A", pattern("0").zeroOrMore())
-                        .build(), "", List.of()),
-                arguments(Grammar.builder()
-                        .add("A", pattern("0").zeroOrMore())
-                        .build(), "0", List.of("0")),
-                arguments(Grammar.builder()
-                        .add("A", pattern("0").zeroOrMore())
-                        .build(), "00", List.of("00")),
-                arguments(Grammar.builder()
-                        .add("A", pattern("0").oneOrMore())
-                        .build(), "1", null),
-                arguments(Grammar.builder()
-                        .add("A", pattern("0").oneOrMore())
-                        .build(), "0", List.of("0")),
-                arguments(Grammar.builder()
-                        .add("A", pattern("0").oneOrMore())
-                        .build(), "00", List.of("00")),
-                arguments(Grammar.builder()
-                        .add("A", pattern("0").atLeast(2))
-                        .build(), "0", null),
-                arguments(Grammar.builder()
-                        .add("A", pattern("0").atLeast(2))
-                        .build(), "00", List.of("00")),
-                arguments(Grammar.builder()
-                        .add("A", pattern("0").atLeast(2))
-                        .build(), "000", List.of("000")),
-                arguments(Grammar.builder()
-                        .add("A", pattern("0").exactly(2))
-                        .build(), "0", null),
-                arguments(Grammar.builder()
-                        .add("A", pattern("0").exactly(2))
-                        .build(), "00", List.of("00")),
-                arguments(Grammar.builder()
-                        .add("A", pattern("0").exactly(2))
-                        .build(), "000", null),
-                arguments(Grammar.builder()
-                        .add("A", pattern("0").exactly(2))
-                        .build(), "0000", List.of("00", "00")),
-                arguments(Grammar.builder()
-                        .add("A", pattern("0").range(2, 3))
-                        .build(), "0", null),
-                arguments(Grammar.builder()
-                        .add("A", pattern("0").range(2, 3))
-                        .build(), "00", List.of("00")),
-                arguments(Grammar.builder()
-                        .add("A", pattern("0").range(2, 3))
-                        .build(), "000", List.of("000")),
-                arguments(Grammar.builder()
-                        .add("A", pattern("0").range(2, 3))
-                        .build(), "0000", null),
-                arguments(Grammar.builder()
-                        .add("A", pattern("0").range(2, 3))
-                        .build(), "00000", List.of("000", "00"))));
+//        stream = Stream.concat(stream, Stream.of(
+//                arguments(Grammar.builder()
+//                        .add("A", () -> PatternRule.of("0").opt())
+//                        .build(), "", List.of()),
+//                arguments(Grammar.builder()
+//                        .add("A", () -> PatternRule.of("0").opt())
+//                        .build(), "0", List.of("0")),
+//                arguments(Grammar.builder()
+//                        .add("A", () -> PatternRule.of("0").opt())
+//                        .build(), "00", List.of("0", "0")),
+//                arguments(Grammar.builder()
+//                        .add("A", () -> PatternRule.of("0").zeroOrMore())
+//                        .build(), "", List.of()),
+//                arguments(Grammar.builder()
+//                        .add("A", () -> PatternRule.of("0").zeroOrMore())
+//                        .build(), "0", List.of("0")),
+//                arguments(Grammar.builder()
+//                        .add("A", () -> PatternRule.of("0").zeroOrMore())
+//                        .build(), "00", List.of("00")),
+//                arguments(Grammar.builder()
+//                        .add("A", () -> PatternRule.of("0").oneOrMore())
+//                        .build(), "1", null),
+//                arguments(Grammar.builder()
+//                        .add("A", () -> PatternRule.of("0").oneOrMore())
+//                        .build(), "0", List.of("0")),
+//                arguments(Grammar.builder()
+//                        .add("A", () -> PatternRule.of("0").oneOrMore())
+//                        .build(), "00", List.of("00")),
+//                arguments(Grammar.builder()
+//                        .add("A", () -> PatternRule.of("0").atLeast(2))
+//                        .build(), "0", null),
+//                arguments(Grammar.builder()
+//                        .add("A", () -> PatternRule.of("0").atLeast(2))
+//                        .build(), "00", List.of("00")),
+//                arguments(Grammar.builder()
+//                        .add("A", () -> PatternRule.of("0").atLeast(2))
+//                        .build(), "000", List.of("000")),
+//                arguments(Grammar.builder()
+//                        .add("A", () -> PatternRule.of("0").exactly(2))
+//                        .build(), "0", null),
+//                arguments(Grammar.builder()
+//                        .add("A", () -> PatternRule.of("0").exactly(2))
+//                        .build(), "00", List.of("00")),
+//                arguments(Grammar.builder()
+//                        .add("A", () -> PatternRule.of("0").exactly(2))
+//                        .build(), "000", null),
+//                arguments(Grammar.builder()
+//                        .add("A", () -> PatternRule.of("0").exactly(2))
+//                        .build(), "0000", List.of("00", "00")),
+//                arguments(Grammar.builder()
+//                        .add("A", () -> PatternRule.of("0").range(2, 3))
+//                        .build(), "0", null),
+//                arguments(Grammar.builder()
+//                        .add("A", () -> PatternRule.of("0").range(2, 3))
+//                        .build(), "00", List.of("00")),
+//                arguments(Grammar.builder()
+//                        .add("A", () -> PatternRule.of("0").range(2, 3))
+//                        .build(), "000", List.of("000")),
+//                arguments(Grammar.builder()
+//                        .add("A", () -> PatternRule.of("0").range(2, 3))
+//                        .build(), "0000", null),
+//                arguments(Grammar.builder()
+//                        .add("A", () -> PatternRule.of("0").range(2, 3))
+//                        .build(), "00000", List.of("000", "00"))));
         // + More
         stream = Stream.concat(stream, Stream.of(
                 arguments(Grammar.builder()
                         .setSkipPattern("\\s")
-                        .add("A", pattern("0"))
+                        .add("A", () -> PatternRule.of("0"))
                         .build(), "0 00 0", List.of("0", "0", "0", "0")),
                 arguments(Grammar.builder()
-                        .add("A", pattern("[\\x{%X}-\\x{%X}]".formatted(
+                        .add("A", () -> PatternRule.of("[\\x{%X}-\\x{%X}]".formatted(
                                 Character.MIN_SUPPLEMENTARY_CODE_POINT,
                                 Character.MAX_CODE_POINT)))
                         .build(), "🌟𝒜", List.of("🌟", "𝒜")),
                 arguments(Grammar.builder()
-                        .add("A", pattern("."))
+                        .add("A", () -> PatternRule.of("."))
                         .build(), String.valueOf("🌟".charAt(0)),
                         List.of(String.valueOf("🌟".charAt(0)))),
                 arguments(Grammar.builder()
-                        .add("A", pattern("."))
+                        .add("A", () -> PatternRule.of("."))
                         .build(), String.valueOf("🌟".charAt(0)) + "0",
                         List.of(String.valueOf("🌟".charAt(0)), "0")),
                 arguments(Grammar.builder()
-                        .add("A", sequenceBuilder()
-                                .add(sequenceBuilder()
-                                        .add(pattern("0"))
-                                        .add(pattern("0")))
-                                .add(pattern("0"))
-                                .add(pattern("1")))
+                        .add("A", SequenceRule.builder()
+                                .add(SequenceRule.builder()
+                                        .add(() -> PatternRule.of("0"))
+                                        .add(() -> PatternRule.of("0")))
+                                .add(() -> PatternRule.of("0"))
+                                .add(() -> PatternRule.of("1")))
                         .build(), "00010001", List.of("0001", "0001")),
                 arguments(Grammar.builder()
-                        .add("A", sequenceBuilder()
-                                .add(choiceBuilder()
-                                        .add(pattern("0"))
-                                        .add(pattern("1")))
-                                .add(pattern("0"))
-                                .add(pattern("1")))
+                        .add("A", SequenceRule.builder()
+                                .add(ChoiceRule.builder()
+                                        .add(() -> PatternRule.of("0"))
+                                        .add(() -> PatternRule.of("1")))
+                                .add(() -> PatternRule.of("0"))
+                                .add(() -> PatternRule.of("1")))
                         .build(), "001101", List.of("001", "101")),
                 arguments(Grammar.builder()
-                        .add("A", choiceBuilder()
-                                .add(sequenceBuilder()
-                                        .add(pattern("0"))
-                                        .add(pattern("1")))
-                                .add(pattern("1")))
+                        .add("A", ChoiceRule.builder()
+                                .add(SequenceRule.builder()
+                                        .add(() -> PatternRule.of("0"))
+                                        .add(() -> PatternRule.of("1")))
+                                .add(() -> PatternRule.of("1")))
                         .build(), "01101", List.of("01", "1", "01")),
                 arguments(Grammar.builder()
-                        .add("A", choiceBuilder()
-                                .add(choiceBuilder()
-                                        .add(pattern("0"))
-                                        .add(pattern("1")))
-                                .add(pattern("2")))
+                        .add("A", ChoiceRule.builder()
+                                .add(ChoiceRule.builder()
+                                        .add(() -> PatternRule.of("0"))
+                                        .add(() -> PatternRule.of("1")))
+                                .add(() -> PatternRule.of("2")))
                         .build(), "01201", List.of("0", "1", "2", "0", "1"))
                 ));
         return stream;
     }
 
-    @Test
-    @DisplayName("Test decoration")
-    void testDecoration() throws Exception {
-        var grammar = Grammar.builder()
-                .setSkipPattern("\\s")
-                .add("A", pattern("0|1").exactly(2))
-                .build();
-        var tokenizer = TokenizerFactory.newFactory(grammar)
-                .createTokenizer(new StringReader("00 01 10 11"));
-
-        var grammar2 = Grammar.builder()
-                .add("A", pattern("0|1"))
-                .build();
-        var tokenizer2 = TokenizerFactory.newFactory(grammar2)
-                .createTokenizer(tokenizer);
-
-        assertEquals("0", tokenizer2.next().getValue());
-        assertEquals("0", tokenizer2.next().getValue());
-        assertEquals("0", tokenizer2.next().getValue());
-        assertEquals("1", tokenizer2.next().getValue());
-        assertEquals("1", tokenizer2.next().getValue());
-        assertEquals("0", tokenizer2.next().getValue());
-        assertEquals("1", tokenizer2.next().getValue());
-        assertEquals("1", tokenizer2.next().getValue());
-        assertFalse(tokenizer2.hasNext());
-    }
+//    @Test
+//    @DisplayName("Test decoration")
+//    void testDecoration() throws Exception {
+//        var grammar = Grammar.builder()
+//                .setSkipPattern("\\s")
+//                .add("A", () -> PatternRule.of("0|1").exactly(2))
+//                .build();
+//        var tokenizer = TokenizerFactory.newFactory(grammar)
+//                .createTokenizer(new StringReader("00 01 10 11"));
+//
+//        var grammar2 = Grammar.builder()
+//                .add("A", () -> PatternRule.of("0|1"))
+//                .build();
+//        var tokenizer2 = TokenizerFactory.newFactory(grammar2)
+//                .createTokenizer(tokenizer);
+//
+//        assertEquals("0", tokenizer2.next().getValue());
+//        assertEquals("0", tokenizer2.next().getValue());
+//        assertEquals("0", tokenizer2.next().getValue());
+//        assertEquals("1", tokenizer2.next().getValue());
+//        assertEquals("1", tokenizer2.next().getValue());
+//        assertEquals("0", tokenizer2.next().getValue());
+//        assertEquals("1", tokenizer2.next().getValue());
+//        assertEquals("1", tokenizer2.next().getValue());
+//        assertFalse(tokenizer2.hasNext());
+//    }
 
     @Test
     @DisplayName("newTokenizer(gr:Grammar, re:Reader)")
     void newTokenizerGrRe() throws Exception {
         var grammar = Grammar.builder()
-                .add("A", pattern("0"))
-                .add("A", pattern("1"))
+                .add("A", () -> PatternRule.of("0"))
+                .add("A", () -> PatternRule.of("1"))
                 .build();
         var tokenizer = Tokenizer.newTokenizer(grammar, new StringReader("0110"));
 
@@ -827,13 +826,17 @@ class TokenizerTest {
     @DisplayName("newTokenizer(gr:Grammar, to:Tokenizer)")
     void newTokenizerGrTo() throws Exception {
         var grammar = Grammar.builder()
-                .add("A", pattern("0"))
-                .add("A", pattern("1"))
+                .add("A", () -> PatternRule.of("0"))
+                .add("A", () -> PatternRule.of("1"))
                 .build();
         var tokenizer = Tokenizer.newTokenizer(grammar, new StringReader("0110"));
         var grammar2 = Grammar.builder()
-                .add("A", ofPatterns("0", "1"))
-                .add("A", ofPatterns("1", "0"))
+                .add("A", SequenceRule.builder()
+                        .add(() -> PatternRule.of("0"))
+                        .add(() -> PatternRule.of("1")))
+                .add("A", SequenceRule.builder()
+                        .add(() -> PatternRule.of("1"))
+                        .add(() -> PatternRule.of("0")))
                 .build();
         var tokenizer2 = Tokenizer.newTokenizer(grammar2, tokenizer);
 

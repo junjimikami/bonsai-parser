@@ -11,45 +11,23 @@ import com.jiganaut.bonsai.grammar.Rule;
  *
  */
 class DefaultQuantifierRule extends AbstractRule implements QuantifierRule {
-    static class Builder extends AbstractRule.Builder implements QuantifierRule.Builder {
-        private final Rule.Builder builder;
-        private final int from;
-        private final Integer to;
-
-        Builder(Rule.Builder builder, int from) {
-            assert builder != null;
-            this.builder = builder;
-            this.from = from;
-            this.to = null;
-        }
-
-        Builder(Rule.Builder builder, int from, int to) {
-            assert builder != null;
-            this.builder = builder;
-            this.from = from;
-            this.to = to;
-        }
-
-        @Override
-        public QuantifierRule build() {
-            checkForBuild();
-            return new DefaultQuantifierRule(builder.build(), from, to);
-        }
-    }
 
     private final Rule rule;
     private final int minCount;
     private final OptionalInt maxCount;
 
-    private DefaultQuantifierRule(Rule rule, int minCount, Integer maxCount) {
+    DefaultQuantifierRule(Rule rule, int minCount) {
+        assert rule != null;
+        assert minCount >= 0;
+        this.rule = rule;
+        this.minCount = minCount;
+        this.maxCount = OptionalInt.empty();
+    }
+    DefaultQuantifierRule(Rule rule, int minCount, int maxCount) {
         assert rule != null;
         this.rule = rule;
         this.minCount = minCount;
-        if (maxCount == null) {
-            this.maxCount = OptionalInt.empty();
-        } else {
-            this.maxCount = OptionalInt.of(maxCount);
-        }
+        this.maxCount = OptionalInt.of(maxCount);
     }
 
     @Override

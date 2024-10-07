@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import com.jiganaut.bonsai.grammar.ChoiceRule.Builder;
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
 /**
@@ -20,83 +21,31 @@ import com.jiganaut.bonsai.grammar.Rule.Kind;
  * @author Junji Mikami
  *
  */
-class ChoiceRuleTest implements RuleTest {
+class ChoiceRuleTest implements CompositeRuleTest {
 
     @Nested
-    class BuilderTest implements RuleTest.BulderTest, QuantifiableTest {
+    class BuilderTest implements CompositeRuleTest.BuilderTest<ChoiceRule.Builder> {
 
         @Override
-        public ChoiceRule.Builder builder() {
-            return ChoiceRule.builder().add(ReferenceRule.builder(""));
+        public Builder createEmptyBuilder() {
+            return ChoiceRule.builder();
+        }
+        @Override
+        public ChoiceRule.Builder createTarget() {
+            return ChoiceRule.builder().add(() -> ReferenceRule.of(""));
         }
 
         @Test
-        @DisplayName("build() [No elements]")
-        void buildInCaseNoElements() throws Exception {
-            var builder = ChoiceRule.builder();
-
-            assertThrows(IllegalStateException.class, () -> builder.build());
-        }
-
-        @Test
-        @DisplayName("exactly(int) [No elements]")
-        void exactlyInCaseNoElements() throws Exception {
-            var builder = ChoiceRule.builder();
-
-            assertThrows(IllegalStateException.class, () -> builder.exactly(0));
-        }
-
-        @Test
-        @DisplayName("atLeast(int) [No elements]")
-        void atLeastInCaseNoElements() throws Exception {
-            var builder = ChoiceRule.builder();
-
-            assertThrows(IllegalStateException.class, () -> builder.atLeast(0));
-        }
-
-        @Test
-        @DisplayName("range(int, int) [No elements]")
-        void rangeInCaseNoElements() throws Exception {
-            var builder = ChoiceRule.builder();
-
-            assertThrows(IllegalStateException.class, () -> builder.range(0, 0));
-        }
-
-        @Test
-        @DisplayName("opt() [No elements]")
-        void optInCaseNoElements() throws Exception {
-            var builder = ChoiceRule.builder();
-
-            assertThrows(IllegalStateException.class, () -> builder.opt());
-        }
-
-        @Test
-        @DisplayName("zeroOrMore() [No elements]")
-        void zeroOrMoreInCaseNoElements() throws Exception {
-            var builder = ChoiceRule.builder();
-
-            assertThrows(IllegalStateException.class, () -> builder.zeroOrMore());
-        }
-
-        @Test
-        @DisplayName("oneOrMore() [No elements]")
-        void oneOrMoreInCaseNoElements() throws Exception {
-            var builder = ChoiceRule.builder();
-
-            assertThrows(IllegalStateException.class, () -> builder.oneOrMore());
-        }
-
-        @Test
-        @DisplayName("add(Rule.Builder) [Null parameter]")
-        void addEbInCaseNullParameter() throws Exception {
+        @DisplayName("add(rb:Rule.Builder) [Null parameter]")
+        void addrbInCaseOfNullParameter() throws Exception {
             var builder = ChoiceRule.builder();
 
             assertThrows(NullPointerException.class, () -> builder.add((Rule.Builder) null));
         }
 
         @Test
-        @DisplayName("add(eb:Rule.Builder) [Post-build operation]")
-        void addEbInCasePostBuild() throws Exception {
+        @DisplayName("add(rb:Rule.Builder) [Post-build operation]")
+        void addrbInCaseOfPostBuild() throws Exception {
             var builder = ChoiceRule.builder()
                     .addEmpty();
             builder.build();
@@ -105,8 +54,8 @@ class ChoiceRuleTest implements RuleTest {
         }
 
         @Test
-        @DisplayName("add(eb:Rule.Builder)")
-        void addEb() throws Exception {
+        @DisplayName("add(rb:Rule.Builder)")
+        void addrb() throws Exception {
             var builder = ChoiceRule.builder();
 
             assertEquals(builder, builder.add(Stubs.DUMMY_RULE_BUILDER));
@@ -120,33 +69,17 @@ class ChoiceRuleTest implements RuleTest {
             assertEquals(builder, builder.addEmpty());
         }
 
-        @Nested
-        class QuantifierBuilderTest implements QuantifierRuleTest.BuilderTest {
-            @Override
-            public QuantifierRule.Builder builder() {
-                return ChoiceRuleTest.BuilderTest.this.builder().opt();
-            }
-        }
-
-        @Nested
-        class QuantifierTest implements QuantifierRuleTest {
-            @Override
-            public Quantifiable builder() {
-                return ChoiceRuleTest.BuilderTest.this.builder();
-            }
-        }
-
     }
 
     @Override
-    public Rule build() {
+    public Rule createTarget() {
         return ChoiceRule.builder()
                 .addEmpty()
                 .build();
     }
 
     @Override
-    public Kind kind() {
+    public Kind expectedKind() {
         return Kind.CHOICE;
     }
 
@@ -162,7 +95,7 @@ class ChoiceRuleTest implements RuleTest {
 
     @Test
     @DisplayName("getChoices() [Containing empty]")
-    void getChoicesInCaseContainingEmpty() throws Exception {
+    void getChoicesInCaseOfContainingEmpty() throws Exception {
         var choice = ChoiceRule.builder()
                 .addEmpty()
                 .build();
@@ -192,9 +125,9 @@ class ChoiceRuleTest implements RuleTest {
     @ParameterizedTest
     @MethodSource
     @DisplayName("getChoices() [Containing references]")
-    void getChoicesInCaseContainingreferences(List<String> list) throws Exception {
+    void getChoicesInCaseOfContainingreferences(List<String> list) throws Exception {
         var builder = ChoiceRule.builder();
-        list.stream().forEach(symbol -> builder.add(ReferenceRule.builder(symbol)));
+        list.stream().forEach(symbol -> builder.add(() -> ReferenceRule.of(symbol)));
         var choice = builder.build();
 
         assertIterableEquals(list, choice.getChoices().stream()
@@ -203,7 +136,7 @@ class ChoiceRuleTest implements RuleTest {
                 .toList());
     }
 
-    static Stream<List<String>> getChoicesInCaseContainingreferences() {
+    static Stream<List<String>> getChoicesInCaseOfContainingreferences() {
         return Stream.of(
                 List.of("A"),
                 List.of("A", "B"));

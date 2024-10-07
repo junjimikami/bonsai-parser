@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
@@ -15,40 +14,15 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
-class PatternRuleTest implements RuleTest {
+class PatternRuleTest implements RuleTest, QuantifiableTest {
 
-    @Nested
-    class BuilderTest implements RuleTest.BulderTest, QuantifiableTest {
-
-        @Override
-        public PatternRule.Builder builder() {
-            return PatternRule.builder("");
-        }
-
-        @Nested
-        class QuantifierBuilderTest implements QuantifierRuleTest.BuilderTest {
-            @Override
-            public QuantifierRule.Builder builder() {
-                return PatternRuleTest.BuilderTest.this.builder().opt();
-            }
-        }
-
-        @Nested
-        class QuantifierTest implements QuantifierRuleTest {
-            @Override
-            public Quantifiable builder() {
-                return PatternRuleTest.BuilderTest.this.builder();
-            }
-        }
+    @Override
+    public PatternRule createTarget() {
+        return PatternRule.of("");
     }
 
     @Override
-    public PatternRule build() {
-        return PatternRule.builder("").build();
-    }
-
-    @Override
-    public Kind kind() {
+    public Kind expectedKind() {
         return Kind.PATTERN;
     }
 
@@ -63,33 +37,33 @@ class PatternRuleTest implements RuleTest {
     }
 
     @Test
-    @DisplayName("builder(st:String) [Null parameter]")
-    void builderStInCaseNullParameter() throws Exception {
-        assertThrows(NullPointerException.class, () -> PatternRule.builder((String) null));
+    @DisplayName("of(st:String) [Null parameter]")
+    void ofStInCaseOfNullParameter() throws Exception {
+        assertThrows(NullPointerException.class, () -> PatternRule.of((String) null));
     }
 
     @Test
-    @DisplayName("builder(pa:Pattern) [Null parameter]")
-    void builderPaInCaseNullParameter() throws Exception {
-        assertThrows(NullPointerException.class, () -> PatternRule.builder((Pattern) null));
+    @DisplayName("of(pa:Pattern) [Null parameter]")
+    void ofPaInCaseOfNullParameter() throws Exception {
+        assertThrows(NullPointerException.class, () -> PatternRule.of((Pattern) null));
     }
 
     @Test
-    @DisplayName("builder(st:String) [Invalid regex]")
-    void builderStInCaseInvalidRegex() throws Exception {
-        assertThrows(PatternSyntaxException.class, () -> PatternRule.builder("["));
+    @DisplayName("of(st:String) [Invalid regex]")
+    void ofStInCaseOfInvalidRegex() throws Exception {
+        assertThrows(PatternSyntaxException.class, () -> PatternRule.of("["));
     }
 
     @Test
-    @DisplayName("builder(st:String)")
-    void builderSt() throws Exception {
-        PatternRule.builder("");
+    @DisplayName("of(st:String)")
+    void ofSt() throws Exception {
+        PatternRule.of("");
     }
 
     @Test
-    @DisplayName("builder(pa:Pattern)")
-    void builderPa() throws Exception {
-        PatternRule.builder(Pattern.compile(""));
+    @DisplayName("of(pa:Pattern)")
+    void ofPa() throws Exception {
+        PatternRule.of(Pattern.compile(""));
     }
 
     @ParameterizedTest
@@ -97,7 +71,7 @@ class PatternRuleTest implements RuleTest {
     @ValueSource(strings = { "test", "[0-9]" })
     @DisplayName("getPattern()")
     void getPattern(String regex) throws Exception {
-        var pattern = PatternRule.builder(regex).build();
+        var pattern = PatternRule.of(regex);
 
         assertEquals(regex, pattern.getPattern().pattern());
     }

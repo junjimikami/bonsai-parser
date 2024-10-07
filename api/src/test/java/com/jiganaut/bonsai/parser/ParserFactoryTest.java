@@ -9,7 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.jiganaut.bonsai.grammar.Grammar;
-import com.jiganaut.bonsai.grammar.Rules;
+import com.jiganaut.bonsai.grammar.PatternRule;
 
 class ParserFactoryTest {
 
@@ -23,7 +23,7 @@ class ParserFactoryTest {
     @DisplayName("newFactory(Grammar)")
     void newFactory() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", Rules.pattern(""))
+                .add("S", () -> PatternRule.of(""))
                 .build();
         var factory = ParserFactory.newFactory(grammar);
 

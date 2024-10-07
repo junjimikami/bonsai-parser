@@ -11,14 +11,14 @@ import com.jiganaut.bonsai.grammar.SequenceRule;
 public interface GrammarProvider {
     Grammar.Builder createGrammarBuilder();
 
-    PatternRule.Builder createPatternBuilder(String regex);
+    PatternRule createPattern(String regex);
 
-    PatternRule.Builder createPatternBuilder(Pattern pattern);
+    PatternRule createPattern(Pattern pattern);
 
     SequenceRule.Builder createSequenceBuilder();
 
     ChoiceRule.Builder createChoiceBuilder();
 
-    ReferenceRule.Builder createReferenceBuilder(String reference);
+    ReferenceRule createReference(String reference);
 
 }

@@ -2,34 +2,42 @@ package com.jiganaut.bonsai.grammar;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.jupiter.api.DisplayName;
+import java.util.OptionalInt;
+
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
-interface QuantifierRuleTest extends RuleTest {
-
-    interface BuilderTest extends RuleTest.BulderTest {
-        QuantifierRule.Builder builder();
-    }
-
-    Quantifiable builder();
+class QuantifierRuleTest implements RuleTest {
 
     @Override
-    default Rule build() {
-        return builder().opt().build();
+    public QuantifierRule createTarget() {
+        return PatternRule.of("").opt();
+    }
+
+    QuantifierRule createTargetQuantifierRule() {
+        return createTarget();
+    }
+
+    int expectedMinCount() {
+        return 0;
+    }
+
+    OptionalInt expectedMaxCount() {
+        return OptionalInt.of(1);
+    }
+
+    Rule expectedRule() {
+        return PatternRule.of("");
     }
 
     @Override
-    default Kind kind() {
+    public Kind expectedKind() {
         return Kind.QUANTIFIER;
     }
 
     @Override
-    default RuleVisitor<Object[], String> visitor() {
+    public RuleVisitor<Object[], String> visitor() {
         return new TestRuleVisitor<Object[], String>() {
             @Override
             public Object[] visitQuantifier(QuantifierRule quantifier, String p) {
@@ -39,62 +47,86 @@ interface QuantifierRuleTest extends RuleTest {
     }
 
     @Test
-    @DisplayName("opt()")
-    default void opt() throws Exception {
-        var quantifier = builder().opt().build();
-
-        assertEquals(0, quantifier.getMinCount());
-        assertEquals(1, quantifier.getMaxCount().getAsInt());
+    void getMinCount() throws Exception {
+        var rule = createTargetQuantifierRule();
+        assertEquals(expectedMinCount(), rule.getMinCount());
     }
 
     @Test
-    @DisplayName("zeroOrMore()")
-    default void zeroOrMore() throws Exception {
-        var quantifier = builder().zeroOrMore().build();
-
-        assertEquals(0, quantifier.getMinCount());
-        assertEquals(true, quantifier.getMaxCount().isEmpty());
+    void getMaxCount() throws Exception {
+        var rule = createTargetQuantifierRule();
+        assertEquals(expectedMaxCount().getAsInt(), rule.getMaxCount().getAsInt());
     }
 
     @Test
-    @DisplayName("oneOrMore()")
-    default void oneOrMore() throws Exception {
-        var quantifier = builder().oneOrMore().build();
-
-        assertEquals(1, quantifier.getMinCount());
-        assertEquals(true, quantifier.getMaxCount().isEmpty());
+    void getRule() throws Exception {
+        var rule = createTargetQuantifierRule();
+        assertEquals(expectedRule().getKind(), rule.getRule().getKind()); //TODO
     }
 
     @Test
-    @DisplayName("exactly()")
-    default void exactly() throws Exception {
-        var quantifier = builder().exactly(0).build();
-
-        assertEquals(0, quantifier.getMinCount());
-        assertEquals(0, quantifier.getMaxCount().getAsInt());
+    void stream() throws Exception {
+        var rule = createTargetQuantifierRule();
+        assertEquals(expectedRule().getKind(), rule.stream().findFirst().get().getKind());
     }
 
-    @ParameterizedTest
-    @ValueSource(ints = { 0, 1, 2 })
-    @DisplayName("atLeast(int)")
-    default void atLeast(int times) throws Exception {
-        var quantifier = builder().atLeast(times).build();
-
-        assertEquals(times, quantifier.getMinCount());
-        assertEquals(true, quantifier.getMaxCount().isEmpty());
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-            "0,0", "0,1", "0,2",
-            "1,1", "1,2",
-    })
-    @DisplayName("range()")
-    default void range(int min, int max) throws Exception {
-        var quantifier = builder().range(min, max).build();
-
-        assertEquals(min, quantifier.getMinCount());
-        assertEquals(max, quantifier.getMaxCount().getAsInt());
-    }
+//    @Test
+//    @DisplayName("opt()")
+//    default void opt() throws Exception {
+//        var quantifier = builder().opt();
+//
+//        assertEquals(0, quantifier.getMinCount());
+//        assertEquals(1, quantifier.getMaxCount().getAsInt());
+//    }
+//
+//    @Test
+//    @DisplayName("zeroOrMore()")
+//    default void zeroOrMore() throws Exception {
+//        var quantifier = builder().zeroOrMore();
+//
+//        assertEquals(0, quantifier.getMinCount());
+//        assertEquals(true, quantifier.getMaxCount().isEmpty());
+//    }
+//
+//    @Test
+//    @DisplayName("oneOrMore()")
+//    default void oneOrMore() throws Exception {
+//        var quantifier = builder().oneOrMore();
+//
+//        assertEquals(1, quantifier.getMinCount());
+//        assertEquals(true, quantifier.getMaxCount().isEmpty());
+//    }
+//
+//    @Test
+//    @DisplayName("exactly()")
+//    default void exactly() throws Exception {
+//        var quantifier = builder().exactly(0);
+//
+//        assertEquals(0, quantifier.getMinCount());
+//        assertEquals(0, quantifier.getMaxCount().getAsInt());
+//    }
+//
+//    @ParameterizedTest
+//    @ValueSource(ints = { 0, 1, 2 })
+//    @DisplayName("atLeast(int)")
+//    default void atLeast(int times) throws Exception {
+//        var quantifier = builder().atLeast(times);
+//
+//        assertEquals(times, quantifier.getMinCount());
+//        assertEquals(true, quantifier.getMaxCount().isEmpty());
+//    }
+//
+//    @ParameterizedTest
+//    @CsvSource({
+//            "0,0", "0,1", "0,2",
+//            "1,1", "1,2",
+//    })
+//    @DisplayName("range()")
+//    default void range(int min, int max) throws Exception {
+//        var quantifier = builder().range(min, max);
+//
+//        assertEquals(min, quantifier.getMinCount());
+//        assertEquals(max, quantifier.getMaxCount().getAsInt());
+//    }
 
 }

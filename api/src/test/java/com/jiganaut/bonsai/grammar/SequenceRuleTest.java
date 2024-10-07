@@ -15,83 +15,31 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
-class SequenceRuleTest implements RuleTest {
+class SequenceRuleTest implements CompositeRuleTest {
 
     @Nested
-    class BuilderTest implements RuleTest.BulderTest, QuantifiableTest {
+    class BuilderTest implements CompositeRuleTest.BuilderTest<SequenceRule.Builder> {
 
         @Override
-        public SequenceRule.Builder builder() {
-            return SequenceRule.builder().add(ReferenceRule.builder(""));
+        public SequenceRule.Builder createEmptyBuilder() {
+            return SequenceRule.builder();
+        }
+        @Override
+        public SequenceRule.Builder createTarget() {
+            return SequenceRule.builder().add(() -> ReferenceRule.of(""));
         }
 
         @Test
-        @DisplayName("build() [No elements]")
-        void buildInCaseNoElements() throws Exception {
-            var builder = SequenceRule.builder();
-
-            assertThrows(IllegalStateException.class, () -> builder.build());
-        }
-
-        @Test
-        @DisplayName("exactly(int) [No elements]")
-        void exactlyInCaseNoElements() throws Exception {
-            var builder = SequenceRule.builder();
-
-            assertThrows(IllegalStateException.class, () -> builder.exactly(0));
-        }
-
-        @Test
-        @DisplayName("atLeast(int) [No elements]")
-        void atLeastInCaseNoElements() throws Exception {
-            var builder = SequenceRule.builder();
-
-            assertThrows(IllegalStateException.class, () -> builder.atLeast(0));
-        }
-
-        @Test
-        @DisplayName("range(int, int) [No elements]")
-        void rangeInCaseNoElements() throws Exception {
-            var builder = SequenceRule.builder();
-
-            assertThrows(IllegalStateException.class, () -> builder.range(0, 0));
-        }
-
-        @Test
-        @DisplayName("opt() [No elements]")
-        void optInCaseNoElements() throws Exception {
-            var builder = SequenceRule.builder();
-
-            assertThrows(IllegalStateException.class, () -> builder.opt());
-        }
-
-        @Test
-        @DisplayName("zeroOrMore() [No elements]")
-        void zeroOrMoreInCaseNoElements() throws Exception {
-            var builder = SequenceRule.builder();
-
-            assertThrows(IllegalStateException.class, () -> builder.zeroOrMore());
-        }
-
-        @Test
-        @DisplayName("oneOrMore() [No elements]")
-        void oneOrMoreInCaseNoElements() throws Exception {
-            var builder = SequenceRule.builder();
-
-            assertThrows(IllegalStateException.class, () -> builder.oneOrMore());
-        }
-
-        @Test
-        @DisplayName("add(Rule.Builder) [Null parameter]")
-        void addEbNull() throws Exception {
+        @DisplayName("add(rb:Rule.Builder) [Null parameter]")
+        void addRbInCaseOfNullParameter() throws Exception {
             var builder = SequenceRule.builder();
 
             assertThrows(NullPointerException.class, () -> builder.add((Rule.Builder) null));
         }
 
         @Test
-        @DisplayName("add(eb:Rule.Builder) [Post-build operation]")
-        void addEbPostBuild() throws Exception {
+        @DisplayName("add(rb:Rule.Builder) [Post-build operation]")
+        void addRbInCaseOfPostBuild() throws Exception {
             var builder = SequenceRule.builder()
                     .add(Stubs.DUMMY_RULE_BUILDER);
             builder.build();
@@ -100,39 +48,24 @@ class SequenceRuleTest implements RuleTest {
         }
 
         @Test
-        @DisplayName("add(eb:Rule.Builder)")
-        void addEb() throws Exception {
+        @DisplayName("add(rb:Rule.Builder)")
+        void addRb() throws Exception {
             var builder = SequenceRule.builder();
 
             assertEquals(builder, builder.add(Stubs.DUMMY_RULE_BUILDER));
         }
 
-        @Nested
-        class QuantifierBuilderTest implements QuantifierRuleTest.BuilderTest {
-            @Override
-            public QuantifierRule.Builder builder() {
-                return SequenceRuleTest.BuilderTest.this.builder().opt();
-            }
-        }
-
-        @Nested
-        class QuantifierTest implements QuantifierRuleTest {
-            @Override
-            public Quantifiable builder() {
-                return SequenceRuleTest.BuilderTest.this.builder();
-            }
-        }
     }
 
     @Override
-    public Rule build() {
+    public Rule createTarget() {
         return SequenceRule.builder()
                 .add(Stubs.DUMMY_RULE_BUILDER)
                 .build();
     }
 
     @Override
-    public Kind kind() {
+    public Kind expectedKind() {
         return Kind.SEQUENCE;
     }
 
@@ -170,7 +103,7 @@ class SequenceRuleTest implements RuleTest {
     @DisplayName("getRules() [Containing references]")
     void getRulesInCaseContainingReference(List<String> list) throws Exception {
         var builder = SequenceRule.builder();
-        list.stream().forEach(symbol -> builder.add(ReferenceRule.builder(symbol)));
+        list.stream().forEach(symbol -> builder.add(() -> ReferenceRule.of(symbol)));
         var sequence = builder.build();
 
         assertIterableEquals(list, sequence.getRules().stream()

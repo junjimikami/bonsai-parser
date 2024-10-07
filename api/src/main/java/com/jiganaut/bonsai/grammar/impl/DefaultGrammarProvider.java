@@ -18,15 +18,15 @@ class DefaultGrammarProvider implements GrammarProvider {
     }
 
     @Override
-    public PatternRule.Builder createPatternBuilder(String regex) {
+    public PatternRule createPattern(String regex) {
         Objects.requireNonNull(regex, Message.NULL_PARAMETER.format());
-        return new DefaultPatternRule.Builder(regex);
+        return new DefaultPatternRule(Pattern.compile(regex));
     }
 
     @Override
-    public PatternRule.Builder createPatternBuilder(Pattern pattern) {
+    public PatternRule createPattern(Pattern pattern) {
         Objects.requireNonNull(pattern, Message.NULL_PARAMETER.format());
-        return new DefaultPatternRule.Builder(pattern);
+        return new DefaultPatternRule(pattern);
     }
 
     @Override
@@ -40,9 +40,9 @@ class DefaultGrammarProvider implements GrammarProvider {
     }
 
     @Override
-    public ReferenceRule.Builder createReferenceBuilder(String reference) {
+    public ReferenceRule createReference(String reference) {
         Objects.requireNonNull(reference, Message.NULL_PARAMETER.format());
-        return new DefaultReferenceRule.Builder(reference);
+        return new DefaultReferenceRule(reference);
     }
 
 }
