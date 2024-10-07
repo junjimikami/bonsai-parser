@@ -19,7 +19,6 @@ public interface Rule {
         }
     }
 
-    @FunctionalInterface
     public static interface Builder {
         public Rule build();
     }

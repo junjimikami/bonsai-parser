@@ -11,6 +11,7 @@ import com.jiganaut.bonsai.grammar.impl.GrammarProviders;
 public interface ChoiceRule extends Rule {
 
     public static interface Builder extends Rule.Builder, Quantifiable {
+        public ChoiceRule.Builder add(Rule rule);
         public ChoiceRule.Builder add(Rule.Builder builder);
         public ChoiceRule.Builder addEmpty();
         @Override

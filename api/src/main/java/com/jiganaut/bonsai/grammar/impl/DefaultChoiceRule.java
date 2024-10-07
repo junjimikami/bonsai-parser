@@ -18,9 +18,16 @@ class DefaultChoiceRule extends AbstractCompositeRule implements ChoiceRule {
         }
 
         @Override
+        public Builder add(Rule rule) {
+            checkParameter(rule);
+            builders.add(() -> rule);
+            return this;
+        }
+
+        @Override
         public Builder add(Rule.Builder builder) {
             checkParameter(builder);
-            builders.add(builder);
+            builders.add(builder::build);
             return this;
         }
 
@@ -34,7 +41,7 @@ class DefaultChoiceRule extends AbstractCompositeRule implements ChoiceRule {
         @Override
         public ChoiceRule build() {
             checkForBuild();
-            var elements = builders.stream().map(e -> e.build()).toList();
+            var elements = builders.stream().map(e -> e.get()).toList();
             return new DefaultChoiceRule(elements);
         }
 

@@ -17,22 +17,29 @@ class DefaultSequenceRule extends AbstractCompositeRule implements SequenceRule 
         }
 
         @Override
+        public Builder add(Rule rule) {
+            checkParameter(rule);
+            builders.add(() -> rule);
+            return this;
+        }
+
+        @Override
         public Builder add(Rule.Builder builder) {
             checkParameter(builder);
-            builders.add(builder);
+            builders.add(builder::build);
             return this;
         }
 
         @Override
         public SequenceRule build() {
             checkForBuild();
-            var elements = builders.stream().map(e -> e.build()).toList();
+            var elements = builders.stream().map(e -> e.get()).toList();
             return new DefaultSequenceRule(elements);
         }
 
     }
 
-    private DefaultSequenceRule(List<Rule> elements) {
+    private DefaultSequenceRule(List<? extends Rule> elements) {
         super(elements);
     }
 
