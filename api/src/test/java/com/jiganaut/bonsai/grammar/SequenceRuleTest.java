@@ -15,7 +15,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
-class SequenceRuleTest implements CompositeRuleTest {
+class SequenceRuleTest implements CompositeRuleTest<SequenceRule> {
 
     @Nested
     class BuilderTest implements CompositeRuleTest.BuilderTest<SequenceRule.Builder> {
@@ -58,7 +58,7 @@ class SequenceRuleTest implements CompositeRuleTest {
     }
 
     @Override
-    public Rule createTarget() {
+    public SequenceRule createTarget() {
         return SequenceRule.builder()
                 .add(Stubs.DUMMY_RULE_BUILDER)
                 .build();

@@ -8,7 +8,7 @@ import com.jiganaut.bonsai.grammar.impl.GrammarProviders;
  * @author Junji Mikami
  *
  */
-public interface SequenceRule extends Rule {
+public interface SequenceRule extends Rule, Quantifiable {
 
     public static interface Builder extends Rule.Builder, Quantifiable {
         public SequenceRule.Builder add(Rule rule);

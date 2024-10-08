@@ -21,7 +21,7 @@ import com.jiganaut.bonsai.grammar.Rule.Kind;
  * @author Junji Mikami
  *
  */
-class ChoiceRuleTest implements CompositeRuleTest {
+class ChoiceRuleTest implements CompositeRuleTest<ChoiceRule> {
 
     @Nested
     class BuilderTest implements CompositeRuleTest.BuilderTest<ChoiceRule.Builder> {
@@ -72,7 +72,7 @@ class ChoiceRuleTest implements CompositeRuleTest {
     }
 
     @Override
-    public Rule createTarget() {
+    public ChoiceRule createTarget() {
         return ChoiceRule.builder()
                 .addEmpty()
                 .build();

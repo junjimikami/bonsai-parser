@@ -9,7 +9,7 @@ import com.jiganaut.bonsai.grammar.Quantifiable;
 import com.jiganaut.bonsai.grammar.QuantifierRule;
 import com.jiganaut.bonsai.grammar.Rule;
 
-abstract class AbstractCompositeRule extends AbstractRule {
+abstract class AbstractCompositeRule extends AbstractRule implements DefaultQuantifiableRule {
     static abstract class Builder extends AbstractRule.Builder implements Quantifiable {
         protected final List<Supplier<? extends Rule>> builders = new ArrayList<>();
 

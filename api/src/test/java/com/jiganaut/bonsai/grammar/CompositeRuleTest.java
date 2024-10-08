@@ -6,7 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-interface CompositeRuleTest extends RuleTest {
+interface CompositeRuleTest<U extends Rule & Quantifiable> extends RuleTest, QuantifiableTest {
 
     @Nested
     interface BuilderTest<T extends Rule.Builder & Quantifiable> extends RuleTest.BulderTest, QuantifiableTest {
@@ -127,5 +127,8 @@ interface CompositeRuleTest extends RuleTest {
         }
 
     }
+
+    @Override
+    U createTarget();
 
 }

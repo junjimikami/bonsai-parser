@@ -8,7 +8,7 @@ import com.jiganaut.bonsai.grammar.impl.GrammarProviders;
  * @author Junji Mikami
  *
  */
-public interface ChoiceRule extends Rule {
+public interface ChoiceRule extends Rule, Quantifiable {
 
     public static interface Builder extends Rule.Builder, Quantifiable {
         public ChoiceRule.Builder add(Rule rule);

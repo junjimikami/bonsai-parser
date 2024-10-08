@@ -1,10 +1,11 @@
 package com.jiganaut.bonsai.parser.impl;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import com.jiganaut.bonsai.grammar.ChoiceRule;
 import com.jiganaut.bonsai.grammar.PatternRule;
@@ -38,26 +39,37 @@ final class FirstSet implements RuleVisitor<Set<Rule>, Context> {
         return visit(prd, context);
     }
 
+    @FunctionalInterface
+    private interface RuleSet extends Rule, Supplier<Set<Rule>> {
+        @Override
+        default Kind getKind() {
+            throw new AssertionError();
+        }
+        
+        @Override
+        default <R, P> R accept(RuleVisitor<R, P> visitor, P p) {
+            throw new AssertionError();
+        }
+    }
+
     private Set<Rule> visit(List<? extends Rule> sequence, Context context) {
         if (sequence.isEmpty()) {
             return context.followSet();
         }
         var subRules = new LinkedList<>(sequence);
         var rule = subRules.removeFirst();
-        var subFollowSet = Set.<Rule>of(new SequenceRule() {
-            @Override
-            public List<? extends Rule> getRules() {
-                var set = visit(subRules, context);
-                return new ArrayList<>(set);
-            }
-
-            @Override
-            public String toString() {
-                return subRules.toString();
-            }
-        });
+        var remaining = (RuleSet) () -> visit(subRules, context);
+        var subFollowSet = Set.<Rule>of(remaining);
         var subContext = context.withFollowSet(subFollowSet);
-        return visit(rule, subContext);
+        return visit(rule, subContext).stream()
+                .<Rule>mapMulti((r, c) -> {
+                    if (r instanceof RuleSet rs) {
+                        rs.get().forEach(c::accept);
+                    } else {
+                        c.accept(r);
+                    }
+                })
+                .collect(Collectors.toSet());
     }
 
     @Override
