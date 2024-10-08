@@ -47,7 +47,7 @@ class DefaultChoiceRule extends AbstractCompositeRule implements ChoiceRule {
 
     }
 
-    private DefaultChoiceRule(List<? extends Rule> elements) {
+    private DefaultChoiceRule(List<Rule> elements) {
         super(elements);
     }
 

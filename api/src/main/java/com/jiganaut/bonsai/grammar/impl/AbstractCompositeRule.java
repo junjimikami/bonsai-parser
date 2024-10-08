@@ -11,15 +11,7 @@ import com.jiganaut.bonsai.grammar.Rule;
 
 abstract class AbstractCompositeRule extends AbstractRule implements DefaultQuantifiableRule {
     static abstract class Builder extends AbstractRule.Builder implements Quantifiable {
-        protected final List<Supplier<? extends Rule>> builders = new ArrayList<>();
-
-        @Override
-        protected void checkForBuild() {
-            if (builders.isEmpty()) {
-                throw new IllegalStateException(Message.NO_ELELEMNTS.format());
-            }
-            super.checkForBuild();
-        }
+        protected final List<Supplier<Rule>> builders = new ArrayList<>();
 
         @Override
         public QuantifierRule atLeast(int times) {
@@ -42,9 +34,9 @@ abstract class AbstractCompositeRule extends AbstractRule implements DefaultQuan
 
     }
 
-    protected final List<? extends Rule> elements;
+    protected final List<Rule> elements;
 
-    AbstractCompositeRule(List<? extends Rule> elements) {
+    AbstractCompositeRule(List<Rule> elements) {
         this.elements = Collections.unmodifiableList(elements);
     }
 }

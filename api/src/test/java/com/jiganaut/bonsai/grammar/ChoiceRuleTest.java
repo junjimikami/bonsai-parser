@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import com.jiganaut.bonsai.grammar.ChoiceRule.Builder;
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
 /**
@@ -26,10 +25,6 @@ class ChoiceRuleTest implements CompositeRuleTest<ChoiceRule> {
     @Nested
     class BuilderTest implements CompositeRuleTest.BuilderTest<ChoiceRule.Builder> {
 
-        @Override
-        public Builder createEmptyBuilder() {
-            return ChoiceRule.builder();
-        }
         @Override
         public ChoiceRule.Builder createTarget() {
             return ChoiceRule.builder().add(() -> ReferenceRule.of(""));

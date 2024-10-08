@@ -21,10 +21,6 @@ class SequenceRuleTest implements CompositeRuleTest<SequenceRule> {
     class BuilderTest implements CompositeRuleTest.BuilderTest<SequenceRule.Builder> {
 
         @Override
-        public SequenceRule.Builder createEmptyBuilder() {
-            return SequenceRule.builder();
-        }
-        @Override
         public SequenceRule.Builder createTarget() {
             return SequenceRule.builder().add(() -> ReferenceRule.of(""));
         }

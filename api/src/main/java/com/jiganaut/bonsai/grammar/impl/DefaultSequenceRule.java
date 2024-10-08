@@ -39,7 +39,7 @@ class DefaultSequenceRule extends AbstractCompositeRule implements SequenceRule 
 
     }
 
-    private DefaultSequenceRule(List<? extends Rule> elements) {
+    private DefaultSequenceRule(List<Rule> elements) {
         super(elements);
     }
 
