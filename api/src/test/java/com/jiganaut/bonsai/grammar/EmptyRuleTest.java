@@ -15,7 +15,7 @@ class EmptyRuleTest implements RuleTest {
     }
 
     @Override
-    public RuleVisitor<Object[], String> visitor() {
+    public RuleVisitor<Object[], String> createVisitor() {
         return new TestRuleVisitor<Object[], String>() {
             @Override
             public Object[] visitEmpty(Rule empty, String p) {

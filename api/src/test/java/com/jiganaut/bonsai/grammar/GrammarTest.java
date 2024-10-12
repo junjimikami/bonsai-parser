@@ -3,12 +3,10 @@ package com.jiganaut.bonsai.grammar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.NoSuchElementException;
-import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -65,22 +63,6 @@ class GrammarTest {
         }
 
         @Test
-        @DisplayName("setSkipPattern(st:String) [st == null]")
-        void setSkipPatternStInCaseNullParameter() throws Exception {
-            var builder = Grammar.builder();
-
-            assertThrows(NullPointerException.class, () -> builder.setSkipPattern((String) null));
-        }
-
-        @Test
-        @DisplayName("setSkipPattern(pa:Pattern) [pa == null]")
-        void setSkipPatternPaInCaseNullParameter() throws Exception {
-            var builder = Grammar.builder();
-
-            assertThrows(NullPointerException.class, () -> builder.setSkipPattern((Pattern) null));
-        }
-
-        @Test
         @DisplayName("setStartSymbol(st:String) [st == null]")
         void setStartSymbolInCaseNullParameter() throws Exception {
             var builder = Grammar.builder();
@@ -96,26 +78,6 @@ class GrammarTest {
             builder.build();
 
             assertThrows(IllegalStateException.class, () -> builder.add("A", Stubs.DUMMY_RULE_BUILDER));
-        }
-
-        @Test
-        @DisplayName("setSkipPattern(st:String) [Post-build operation]")
-        void setSkipPatternStInCasePostBuild() throws Exception {
-            var builder = Grammar.builder();
-            builder.add("A", Stubs.DUMMY_RULE_BUILDER);
-            builder.build();
-
-            assertThrows(IllegalStateException.class, () -> builder.setSkipPattern(""));
-        }
-
-        @Test
-        @DisplayName("setSkipPattern(pa:Pattern) [Post-build operation]")
-        void setSkipPatternPaInCasePostBuild() throws Exception {
-            var builder = Grammar.builder();
-            builder.add("A", Stubs.DUMMY_RULE_BUILDER);
-            builder.build();
-
-            assertThrows(IllegalStateException.class, () -> builder.setSkipPattern(Pattern.compile("")));
         }
 
         @Test
@@ -191,27 +153,6 @@ class GrammarTest {
                 .build();
 
         assertEquals("A", grammar.getStartSymbol());
-    }
-
-    @Test
-    @DisplayName("getSkipPattern()")
-    void getSkipPattern() throws Exception {
-        var grammar = Grammar.builder()
-                .add("S", Stubs.DUMMY_RULE_BUILDER)
-                .build();
-
-        assertNull(grammar.getSkipPattern());
-    }
-
-    @Test
-    @DisplayName("getSkipPattern() [Skip pattern set]")
-    void getSkipPatternInCaseSkipPatternSet() throws Exception {
-        var grammar = Grammar.builder()
-                .add("S", Stubs.DUMMY_RULE_BUILDER)
-                .setSkipPattern("123")
-                .build();
-
-        assertEquals("123", grammar.getSkipPattern().pattern());
     }
 
     @Test

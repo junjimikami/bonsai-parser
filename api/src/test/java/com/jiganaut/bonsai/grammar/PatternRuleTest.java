@@ -14,7 +14,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
-class PatternRuleTest implements RuleTest, QuantifiableTest {
+class PatternRuleTest implements RuleTest, QuantifiableTest, SkippableTest {
 
     @Override
     public PatternRule createTarget() {
@@ -27,7 +27,7 @@ class PatternRuleTest implements RuleTest, QuantifiableTest {
     }
 
     @Override
-    public RuleVisitor<Object[], String> visitor() {
+    public RuleVisitor<Object[], String> createVisitor() {
         return new TestRuleVisitor<Object[], String>() {
             @Override
             public Object[] visitPattern(PatternRule pattern, String p) {

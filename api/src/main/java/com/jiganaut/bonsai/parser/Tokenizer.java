@@ -26,9 +26,6 @@ public interface Tokenizer {
     public Token next(String regex);
     public Token next(Pattern pattern);
 
-    public Tokenizer skip(String regex);
-    public Tokenizer skip(Pattern pattern);
-    
     public default long getLineNumber() {
         throw new UnsupportedOperationException();
     }

@@ -8,7 +8,7 @@ import com.jiganaut.bonsai.grammar.PatternRule;
  *
  * @author Junji Mikami
  */
-class DefaultPatternRule extends AbstractRule implements PatternRule, DefaultQuantifiableRule {
+class DefaultPatternRule extends AbstractRule implements PatternRule, DefaultQuantifiableRule, DefaultSkippableRule {
     private final Pattern pattern;
 
     DefaultPatternRule(Pattern pattern) {

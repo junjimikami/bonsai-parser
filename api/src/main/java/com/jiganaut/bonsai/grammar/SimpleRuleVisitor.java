@@ -32,6 +32,11 @@ public interface SimpleRuleVisitor<R, P> extends RuleVisitor<R, P> {
     }
 
     @Override
+    default R visitSkip(SkipRule skip, P p) {
+        return defaultAction(skip, p);
+    }
+
+    @Override
     public default R visitEmpty(Rule empty, P p) {
         return defaultAction(empty, p);
     }

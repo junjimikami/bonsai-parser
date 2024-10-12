@@ -14,6 +14,7 @@ import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.grammar.RuleVisitor;
 import com.jiganaut.bonsai.grammar.SequenceRule;
+import com.jiganaut.bonsai.grammar.SkipRule;
 
 /**
  * @author Junji Mikami
@@ -114,6 +115,11 @@ final class FirstSet implements RuleVisitor<Set<Rule>, Context> {
             set.addAll(context.followSet());
         }
         return set;
+    }
+
+    @Override
+    public Set<Rule> visitSkip(SkipRule skip, Context context) {
+        return visit(skip.getRule(), context);
     }
 
     @Override

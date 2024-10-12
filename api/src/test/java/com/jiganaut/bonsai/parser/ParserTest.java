@@ -58,18 +58,18 @@ class ParserTest {
         assertThrows(ParseException.class, () -> method.accept(parser));
     }
 
-//    @DisplayName("[Occurrence count out of range]")
-//    @ParameterizedTest(name = "{0} {displayName}")
-//    @MethodSource("allMethods")
-//    void occurrenceCountOutOfRange(Consumer<Parser> method) throws Exception {
-//        var grammar = Grammar.builder()
-//                .add("S", pattern("1").range(3, 5))
-//                .build();
-//        var factory = ParserFactory.newFactory(grammar);
-//        var parser = factory.createParser(new StringReader("11"));
-//
-//        assertThrows(ParseException.class, () -> method.accept(parser));
-//    }
+    @DisplayName("[Occurrence count out of range]")
+    @ParameterizedTest(name = "{0} {displayName}")
+    @MethodSource("allMethods")
+    void occurrenceCountOutOfRange(Consumer<Parser> method) throws Exception {
+        var grammar = Grammar.builder()
+                .add("S", () -> PatternRule.of("1").range(3, 5))
+                .build();
+        var factory = ParserFactory.newFactory(grammar);
+        var parser = factory.createParser(new StringReader("11"));
+
+        assertThrows(ParseException.class, () -> method.accept(parser));
+    }
 
     @DisplayName("[Token not match pattern rule]")
     @ParameterizedTest(name = "{0} {displayName}")

@@ -8,7 +8,7 @@ import com.jiganaut.bonsai.grammar.impl.GrammarProviders;
  * @author Junji Mikami
  *
  */
-public interface PatternRule extends Rule, Quantifiable {
+public interface PatternRule extends Rule, Quantifiable, Skippable {
 
     public static PatternRule of(String regex) {
         return GrammarProviders.provider().createPattern(regex);

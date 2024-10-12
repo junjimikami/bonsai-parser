@@ -15,7 +15,7 @@ import com.jiganaut.bonsai.grammar.Rule.Kind;
 
 interface RuleTest extends TestCase {
 
-    interface BulderTest extends TestCase {
+    interface BuilderTest extends TestCase {
         Rule.Builder createTarget();
  
         default Rule.Builder createTargetBuilder() {
@@ -41,7 +41,7 @@ interface RuleTest extends TestCase {
 
     Kind expectedKind();
 
-    RuleVisitor<Object[], String> visitor();
+    RuleVisitor<Object[], String> createVisitor();
 
     @Test
     @DisplayName("objectMethods()")
@@ -71,7 +71,7 @@ interface RuleTest extends TestCase {
     @DisplayName("accept(rv:RuleVisitor)")
     default void acceptRv() throws Exception {
         var rule = createTargetRule();
-        var visitor = visitor();
+        var visitor = createVisitor();
         var expected = new Object[] { rule, null };
         var result = rule.accept(visitor);
         var result2 = visitor.visit(rule);
@@ -87,7 +87,7 @@ interface RuleTest extends TestCase {
     @ValueSource(strings = { "test" })
     default void acceptRvP(String arg) throws Exception {
         var rule = createTargetRule();
-        var visitor = visitor();
+        var visitor = createVisitor();
         var expected = new Object[] { rule, arg };
         var result = rule.accept(visitor, arg);
         var result2 = visitor.visit(rule, arg);

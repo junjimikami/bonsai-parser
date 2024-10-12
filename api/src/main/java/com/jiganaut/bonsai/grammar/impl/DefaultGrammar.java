@@ -4,7 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 import com.jiganaut.bonsai.grammar.ChoiceRule;
 import com.jiganaut.bonsai.grammar.Grammar;
@@ -16,7 +15,6 @@ class DefaultGrammar implements Grammar {
 
     static class Builder extends BaseBuilder implements Grammar.Builder {
         private final Map<String, Rule.Builder> builders = new LinkedHashMap<>();
-        private Pattern skipPattern;
         private String startSymbol;
 
         Builder() {
@@ -57,20 +55,6 @@ class DefaultGrammar implements Grammar {
         }
 
         @Override
-        public Builder setSkipPattern(String regex) {
-            checkParameter(regex);
-            var pattern = Pattern.compile(regex);
-            return setSkipPattern(pattern);
-        }
-
-        @Override
-        public Builder setSkipPattern(Pattern pattern) {
-            checkParameter(pattern);
-            this.skipPattern = pattern;
-            return this;
-        }
-
-        @Override
         public Builder setStartSymbol(String symbol) {
             checkParameter(symbol);
             this.startSymbol = symbol;
@@ -87,30 +71,23 @@ class DefaultGrammar implements Grammar {
                 set.add(symbol, rule);
             });
             assert set.containsSymbol(startSymbol);
-            return new DefaultGrammar(set, startSymbol, skipPattern);
+            return new DefaultGrammar(set, startSymbol);
         }
     }
 
     private final ProductionSet set;
     private final String startSymbol;
-    private final Pattern skipPattern;
 
-    private DefaultGrammar(ProductionSet set, String startSymbol, Pattern skipPattern) {
+    private DefaultGrammar(ProductionSet set, String startSymbol) {
         assert set != null;
         assert startSymbol != null;
         this.set = set;
         this.startSymbol = startSymbol;
-        this.skipPattern = skipPattern;
     }
 
     @Override
     public String getStartSymbol() {
         return startSymbol;
-    }
-
-    @Override
-    public Pattern getSkipPattern() {
-        return skipPattern;
     }
 
     @Override

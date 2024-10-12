@@ -12,6 +12,7 @@ public interface Rule {
         CHOICE,
         REFERENCE,
         QUANTIFIER,
+        SKIP,
         EMPTY;
 
         public boolean isComposite() {

@@ -24,5 +24,7 @@ public interface RuleVisitor<R, P> {
 
     public R visitQuantifier(QuantifierRule quantifier, P p);
 
+    public R visitSkip(SkipRule skip, P p);
+
     public R visitEmpty(Rule rule, P p);
 }
