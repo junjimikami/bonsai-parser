@@ -1,34 +1,20 @@
 package com.jiganaut.bonsai.grammar.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 import com.jiganaut.bonsai.grammar.Rule;
 
-abstract class AbstractCompositeRule extends AbstractRule {
-    static abstract class Builder extends QuantifiableBuilder {
-        protected final List<Rule.Builder> builders = new ArrayList<>();
-
-        @Override
-        protected void checkForBuild() {
-            super.checkForBuild();
-            if (builders.isEmpty()) {
-                throw new IllegalStateException(Message.NO_ELELEMNTS.format());
-            }
-        }
-
-        @Override
-        protected void checkForQuantifiable() {
-            super.checkForQuantifiable();
-            if (builders.isEmpty()) {
-                throw new IllegalStateException(Message.NO_ELELEMNTS.format());
-            }
-        }
+abstract class AbstractCompositeRule extends AbstractRule implements DefaultQuantifiableRule {
+    static abstract class Builder extends AbstractRule.Builder implements DefaultQuantifiableRule.Builder {
+        protected final List<Supplier<Rule>> builders = new ArrayList<>();
     }
 
-    protected final List<? extends Rule> elements;
+    protected final List<Rule> elements;
 
-    AbstractCompositeRule(List<? extends Rule> elements) {
-        this.elements = elements;
+    AbstractCompositeRule(List<Rule> elements) {
+        this.elements = Collections.unmodifiableList(elements);
     }
 }

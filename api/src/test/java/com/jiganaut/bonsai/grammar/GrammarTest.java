@@ -3,12 +3,10 @@ package com.jiganaut.bonsai.grammar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.NoSuchElementException;
-import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -30,15 +28,6 @@ class GrammarTest {
         }
 
         @Test
-        @DisplayName("build() [Invalid reference]")
-        void buildInCaseInvalidReference() throws Exception {
-            var builder = Grammar.builder();
-            builder.add("A", ReferenceRule.builder("B"));
-
-            assertThrows(NoSuchElementException.class, () -> builder.build());
-        }
-
-        @Test
         @DisplayName("build() [No such start symbol]")
         void buildInCaseNoSuchStartSymbol() throws Exception {
             var builder = Grammar.builder();
@@ -52,7 +41,7 @@ class GrammarTest {
         @DisplayName("build() [Builder returning null]")
         void buildInCaseBuilderReturningNull() throws Exception {
             var builder = Grammar.builder();
-            builder.add("A", set -> null);
+            builder.add("A", () -> null);
 
             assertThrows(NullPointerException.class, () -> builder.build());
         }
@@ -74,22 +63,6 @@ class GrammarTest {
         }
 
         @Test
-        @DisplayName("setSkipPattern(st:String) [st == null]")
-        void setSkipPatternStInCaseNullParameter() throws Exception {
-            var builder = Grammar.builder();
-
-            assertThrows(NullPointerException.class, () -> builder.setSkipPattern((String) null));
-        }
-
-        @Test
-        @DisplayName("setSkipPattern(pa:Pattern) [pa == null]")
-        void setSkipPatternPaInCaseNullParameter() throws Exception {
-            var builder = Grammar.builder();
-
-            assertThrows(NullPointerException.class, () -> builder.setSkipPattern((Pattern) null));
-        }
-
-        @Test
         @DisplayName("setStartSymbol(st:String) [st == null]")
         void setStartSymbolInCaseNullParameter() throws Exception {
             var builder = Grammar.builder();
@@ -105,26 +78,6 @@ class GrammarTest {
             builder.build();
 
             assertThrows(IllegalStateException.class, () -> builder.add("A", Stubs.DUMMY_RULE_BUILDER));
-        }
-
-        @Test
-        @DisplayName("setSkipPattern(st:String) [Post-build operation]")
-        void setSkipPatternStInCasePostBuild() throws Exception {
-            var builder = Grammar.builder();
-            builder.add("A", Stubs.DUMMY_RULE_BUILDER);
-            builder.build();
-
-            assertThrows(IllegalStateException.class, () -> builder.setSkipPattern(""));
-        }
-
-        @Test
-        @DisplayName("setSkipPattern(pa:Pattern) [Post-build operation]")
-        void setSkipPatternPaInCasePostBuild() throws Exception {
-            var builder = Grammar.builder();
-            builder.add("A", Stubs.DUMMY_RULE_BUILDER);
-            builder.build();
-
-            assertThrows(IllegalStateException.class, () -> builder.setSkipPattern(Pattern.compile("")));
         }
 
         @Test
@@ -203,27 +156,6 @@ class GrammarTest {
     }
 
     @Test
-    @DisplayName("getSkipPattern()")
-    void getSkipPattern() throws Exception {
-        var grammar = Grammar.builder()
-                .add("S", Stubs.DUMMY_RULE_BUILDER)
-                .build();
-
-        assertNull(grammar.getSkipPattern());
-    }
-
-    @Test
-    @DisplayName("getSkipPattern() [Skip pattern set]")
-    void getSkipPatternInCaseSkipPatternSet() throws Exception {
-        var grammar = Grammar.builder()
-                .add("S", Stubs.DUMMY_RULE_BUILDER)
-                .setSkipPattern("123")
-                .build();
-
-        assertEquals("123", grammar.getSkipPattern().pattern());
-    }
-
-    @Test
     @DisplayName("productionSet()")
     void productionSet() throws Exception {
         var grammar = Grammar.builder()
@@ -248,9 +180,9 @@ class GrammarTest {
     @DisplayName("productionSet() [Add multiple rules to one symbol]")
     void productionSetInCaseAddMultipleRulesToOneSymbol() throws Exception {
         var grammar = Grammar.builder()
-                .add("S", set -> Stubs.rule("RULE0"))
-                .add("S", set -> Stubs.rule("RULE1"))
-                .add("S", set -> Stubs.rule("RULE2"))
+                .add("S", () -> Stubs.rule("RULE0"))
+                .add("S", () -> Stubs.rule("RULE1"))
+                .add("S", () -> Stubs.rule("RULE2"))
                 .build();
         var productionSet = grammar.productionSet();
 

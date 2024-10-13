@@ -20,93 +20,37 @@ import com.jiganaut.bonsai.grammar.Rule.Kind;
  * @author Junji Mikami
  *
  */
-class ChoiceRuleTest implements RuleTest {
+class ChoiceRuleTest implements CompositeRuleTest<ChoiceRule> {
 
     @Nested
-    class BuilderTest implements RuleTest.BulderTest, QuantifiableTest, ReferenceRelatedTest {
+    class BuilderTest implements CompositeRuleTest.BuilderTest<ChoiceRule.Builder> {
 
         @Override
-        public ChoiceRule.Builder builder() {
-            return ChoiceRule.builder().add(ReferenceRule.builder(""));
+        public ChoiceRule.Builder createTarget() {
+            return ChoiceRule.builder().add(() -> ReferenceRule.of(""));
         }
 
         @Test
-        @DisplayName("build(ps:ProductionSet) [No elements]")
-        void buildPsInCaseNoElements() throws Exception {
-            var builder = ChoiceRule.builder();
-
-            assertThrows(IllegalStateException.class, () -> builder.build(null));
-        }
-
-        @Test
-        @DisplayName("exactly(int) [No elements]")
-        void exactlyInCaseNoElements() throws Exception {
-            var builder = ChoiceRule.builder();
-
-            assertThrows(IllegalStateException.class, () -> builder.exactly(0));
-        }
-
-        @Test
-        @DisplayName("atLeast(int) [No elements]")
-        void atLeastInCaseNoElements() throws Exception {
-            var builder = ChoiceRule.builder();
-
-            assertThrows(IllegalStateException.class, () -> builder.atLeast(0));
-        }
-
-        @Test
-        @DisplayName("range(int, int) [No elements]")
-        void rangeInCaseNoElements() throws Exception {
-            var builder = ChoiceRule.builder();
-
-            assertThrows(IllegalStateException.class, () -> builder.range(0, 0));
-        }
-
-        @Test
-        @DisplayName("opt() [No elements]")
-        void optInCaseNoElements() throws Exception {
-            var builder = ChoiceRule.builder();
-
-            assertThrows(IllegalStateException.class, () -> builder.opt());
-        }
-
-        @Test
-        @DisplayName("zeroOrMore() [No elements]")
-        void zeroOrMoreInCaseNoElements() throws Exception {
-            var builder = ChoiceRule.builder();
-
-            assertThrows(IllegalStateException.class, () -> builder.zeroOrMore());
-        }
-
-        @Test
-        @DisplayName("oneOrMore() [No elements]")
-        void oneOrMoreInCaseNoElements() throws Exception {
-            var builder = ChoiceRule.builder();
-
-            assertThrows(IllegalStateException.class, () -> builder.oneOrMore());
-        }
-
-        @Test
-        @DisplayName("add(Rule.Builder) [Null parameter]")
-        void addEbInCaseNullParameter() throws Exception {
+        @DisplayName("add(rb:Rule.Builder) [Null parameter]")
+        void addrbInCaseOfNullParameter() throws Exception {
             var builder = ChoiceRule.builder();
 
             assertThrows(NullPointerException.class, () -> builder.add((Rule.Builder) null));
         }
 
         @Test
-        @DisplayName("add(eb:Rule.Builder) [Post-build operation]")
-        void addEbInCasePostBuild() throws Exception {
+        @DisplayName("add(rb:Rule.Builder) [Post-build operation]")
+        void addrbInCaseOfPostBuild() throws Exception {
             var builder = ChoiceRule.builder()
                     .addEmpty();
-            builder.build(Stubs.DUMMY_PRODUCTION_SET);
+            builder.build();
 
             assertThrows(IllegalStateException.class, () -> builder.add((Rule.Builder) null));
         }
 
         @Test
-        @DisplayName("add(eb:Rule.Builder)")
-        void addEb() throws Exception {
+        @DisplayName("add(rb:Rule.Builder)")
+        void addrb() throws Exception {
             var builder = ChoiceRule.builder();
 
             assertEquals(builder, builder.add(Stubs.DUMMY_RULE_BUILDER));
@@ -120,38 +64,22 @@ class ChoiceRuleTest implements RuleTest {
             assertEquals(builder, builder.addEmpty());
         }
 
-        @Nested
-        class QuantifierBuilderTest implements QuantifierRuleTest.BuilderTest, ReferenceRelatedTest {
-            @Override
-            public QuantifierRule.Builder builder() {
-                return ChoiceRuleTest.BuilderTest.this.builder().opt();
-            }
-        }
-
-        @Nested
-        class QuantifierTest implements QuantifierRuleTest {
-            @Override
-            public Quantifiable builder() {
-                return ChoiceRuleTest.BuilderTest.this.builder();
-            }
-        }
-
     }
 
     @Override
-    public Rule build() {
+    public ChoiceRule createTarget() {
         return ChoiceRule.builder()
                 .addEmpty()
-                .build(Stubs.DUMMY_PRODUCTION_SET);
+                .build();
     }
 
     @Override
-    public Kind kind() {
+    public Kind expectedKind() {
         return Kind.CHOICE;
     }
 
     @Override
-    public RuleVisitor<Object[], String> visitor() {
+    public RuleVisitor<Object[], String> createVisitor() {
         return new TestRuleVisitor<Object[], String>() {
             @Override
             public Object[] visitChoice(ChoiceRule choice, String p) {
@@ -162,10 +90,10 @@ class ChoiceRuleTest implements RuleTest {
 
     @Test
     @DisplayName("getChoices() [Containing empty]")
-    void getChoicesInCaseContainingEmpty() throws Exception {
+    void getChoicesInCaseOfContainingEmpty() throws Exception {
         var choice = ChoiceRule.builder()
                 .addEmpty()
-                .build(Stubs.DUMMY_PRODUCTION_SET);
+                .build();
 
         assertIterableEquals(List.of(Rule.EMPTY), choice.getChoices());
     }
@@ -178,7 +106,7 @@ class ChoiceRuleTest implements RuleTest {
         list.stream()
                 .map(Stubs::builderOf)
                 .forEach(builder::add);
-        var choice = builder.build(Stubs.DUMMY_PRODUCTION_SET);
+        var choice = builder.build();
 
         assertIterableEquals(list, choice.getChoices());
     }
@@ -192,18 +120,18 @@ class ChoiceRuleTest implements RuleTest {
     @ParameterizedTest
     @MethodSource
     @DisplayName("getChoices() [Containing references]")
-    void getChoicesInCaseContainingreferences(List<String> list) throws Exception {
+    void getChoicesInCaseOfContainingreferences(List<String> list) throws Exception {
         var builder = ChoiceRule.builder();
-        list.stream().forEach(symbol -> builder.add(ReferenceRule.builder(symbol)));
-        var choice = builder.build(Stubs.DUMMY_PRODUCTION_SET);
+        list.stream().forEach(symbol -> builder.add(() -> ReferenceRule.of(symbol)));
+        var choice = builder.build();
 
         assertIterableEquals(list, choice.getChoices().stream()
                 .map(e -> (ReferenceRule) e)
-                .map(e -> e.getProduction().getSymbol())
+                .map(e -> e.getProduction(Stubs.DUMMY_PRODUCTION_SET).getSymbol())
                 .toList());
     }
 
-    static Stream<List<String>> getChoicesInCaseContainingreferences() {
+    static Stream<List<String>> getChoicesInCaseOfContainingreferences() {
         return Stream.of(
                 List.of("A"),
                 List.of("A", "B"));

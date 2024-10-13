@@ -22,7 +22,7 @@ final class MessageSupport {
 
     static String ambiguousChoice(Rule rule, Context context) {
         var symbol = context.production().getSymbol();
-        var firsetSet = FirstSet.of(rule, context.followSet())
+        var firsetSet = FirstSet.of(rule, context)
                 .stream()
                 .map(Rule::toString)
                 .collect(Collectors.joining(", ", "[", "]"));

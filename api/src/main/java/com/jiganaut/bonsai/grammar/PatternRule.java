@@ -8,19 +8,14 @@ import com.jiganaut.bonsai.grammar.impl.GrammarProviders;
  * @author Junji Mikami
  *
  */
-public interface PatternRule extends Rule {
+public interface PatternRule extends Rule, Quantifiable, Skippable {
 
-    public static interface Builder extends Rule.Builder, Quantifiable {
-        @Override
-        public PatternRule build(ProductionSet set);
+    public static PatternRule of(String regex) {
+        return GrammarProviders.provider().createPattern(regex);
     }
 
-    public static Builder builder(String regex) {
-        return GrammarProviders.provider().createPatternBuilder(regex);
-    }
-
-    public static Builder builder(Pattern pattern) {
-        return GrammarProviders.provider().createPatternBuilder(pattern);
+    public static PatternRule of(Pattern pattern) {
+        return GrammarProviders.provider().createPattern(pattern);
     }
 
     @Override

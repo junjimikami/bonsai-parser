@@ -18,10 +18,6 @@ final class AnyMatcher implements SimpleRuleVisitor<Boolean, Context> {
     }
 
     static boolean scan(Rule rule, Context context) {
-        if (INSTANCE.visit(rule, context)) {
-            return true;
-        }
-        context.skip();
         return INSTANCE.visit(rule, context);
     }
 
@@ -33,7 +29,7 @@ final class AnyMatcher implements SimpleRuleVisitor<Boolean, Context> {
 
     @Override
     public Boolean defaultAction(Rule rule, Context context) {
-        var firstSet = FirstSet.of(rule, context.followSet());
+        var firstSet = FirstSet.of(rule, context);
         if (firstSet.isEmpty()) {
             return !context.tokenizer().hasNext();
         }

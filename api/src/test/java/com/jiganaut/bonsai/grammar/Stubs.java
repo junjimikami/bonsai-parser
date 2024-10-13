@@ -1,16 +1,32 @@
 package com.jiganaut.bonsai.grammar;
 
+import java.util.AbstractSet;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.regex.Pattern;
 
 final class Stubs {
+
+    private static abstract class AbstractProductionSet extends AbstractSet<Production> implements ProductionSet {
+
+        @Override
+        public int size() {
+            return 0;
+        }
+
+        @Override
+        public Iterator<Production> iterator() {
+            return Collections.emptyIterator();
+        }
+        
+    }
 
     static final Rule DUMMY_RULE = rule("DUMMY_RULE");
 
     static final Rule.Builder DUMMY_RULE_BUILDER = builderOf(DUMMY_RULE);
 
-    static final ProductionSet DUMMY_PRODUCTION_SET = new ProductionSet() {
+    static final ProductionSet DUMMY_PRODUCTION_SET = new AbstractProductionSet() {
 
         @Override
         public boolean containsSymbol(String symbol) {
@@ -24,10 +40,10 @@ final class Stubs {
 
         @Override
         public Iterator<Production> iterator() {
-            return List.<Production>of().iterator();
+            return Collections.emptyIterator();
         }
     };
-    static final ProductionSet EMPTY_PRODUCTION_SET = new ProductionSet() {
+    static final ProductionSet EMPTY_PRODUCTION_SET = new AbstractProductionSet() {
 
         @Override
         public boolean containsSymbol(String symbol) {
@@ -41,26 +57,36 @@ final class Stubs {
         
         @Override
         public Iterator<Production> iterator() {
-            return List.<Production>of().iterator();
+            return Collections.emptyIterator();
         }
     };
 
     static Rule rule(String s) {
-        return new Rule() {
-
-            @Override
-            public Kind getKind() {
-                return Kind.PATTERN;
-            }
-
-            @Override
-            public <R, P> R accept(RuleVisitor<R, P> visitor, P p) {
-                throw new AssertionError();
-            }
+        return new PatternRule() {
 
             @Override
             public String toString() {
                 return s;
+            }
+
+            @Override
+            public QuantifierRule atLeast(int times) {
+                throw new AssertionError();
+            }
+
+            @Override
+            public QuantifierRule range(int from, int to) {
+                throw new AssertionError();
+            }
+
+            @Override
+            public SkipRule skip() {
+                throw new AssertionError();
+            }
+
+            @Override
+            public Pattern getPattern() {
+                throw new AssertionError();
             }
         };
     }
@@ -69,7 +95,7 @@ final class Stubs {
         return new Rule.Builder() {
 
             @Override
-            public Rule build(ProductionSet set) {
+            public Rule build() {
                 return rule;
             }
         };

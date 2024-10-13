@@ -4,34 +4,16 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import com.jiganaut.bonsai.grammar.Grammar;
-import com.jiganaut.bonsai.parser.NonTerminal;
-import com.jiganaut.bonsai.parser.Terminal;
 import com.jiganaut.bonsai.parser.Token;
 import com.jiganaut.bonsai.parser.Tokenizer;
-import com.jiganaut.bonsai.parser.TreeVisitor;
 
 /**
  * @author Junji Mikami
  *
  */
 class DefaultTokenizer extends AbstractTokenizer {
-
-    private final TreeVisitor<String, Void> treeToString = new TreeVisitor<>() {
-        @Override
-        public String visitNonTerminal(NonTerminal s, Void p) {
-            return s.getSubTrees().stream()
-                    .map(this::visit)
-                    .collect(Collectors.joining());
-        }
-
-        @Override
-        public String visitTerminal(Terminal s, Void p) {
-            return s.getValue();
-        }
-    };
 
     private final Context context;
     private String nextToken;
@@ -47,11 +29,13 @@ class DefaultTokenizer extends AbstractTokenizer {
         if (nextToken != null) {
             return nextToken;
         }
-        if (!context.preCheck()) {
-            return null;
+        while (context.tokenizer().hasNext()) {
+            var token = Tokenization.run(context);
+            if (!token.isEmpty()) {
+                nextToken = token;
+                break;
+            }
         }
-        nextToken = Derivation.derive(context)
-                .accept(treeToString);
         return nextToken;
     }
 

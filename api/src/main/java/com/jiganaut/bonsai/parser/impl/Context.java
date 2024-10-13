@@ -21,24 +21,4 @@ record Context(Grammar grammar, Production production, Tokenizer tokenizer, Set<
         return new Context(this.grammar, this.production, this.tokenizer, followSet);
     }
 
-    void skip() {
-        if (grammar.getSkipPattern() == null) {
-            return;
-        }
-        if (!tokenizer.hasNext(grammar.getSkipPattern())) {
-            return;
-        }
-        tokenizer.skip(grammar.getSkipPattern());
-    }
-    boolean preCheck() {
-        var rule = production().getRule();
-        AnyMatcher.scan(rule, this);
-        return tokenizer().hasNext();
-    }
-
-    boolean postCheck() {
-        skip();
-        return tokenizer().hasNext();
-    }
-
 }

@@ -13,32 +13,40 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
-interface RuleTest {
+interface RuleTest extends TestCase {
 
-    interface BulderTest {
-        Rule.Builder builder();
+    interface BuilderTest extends TestCase {
+        Rule.Builder createTarget();
+ 
+        default Rule.Builder createTargetBuilder() {
+            return createTarget();
+        }
 
         @Test
-        @DisplayName("build(ps:ProductionSet) [Post-build operation]")
-        default void buildPsInCasePostBuild() throws Exception {
-            var builder = builder();
-            builder.build(Stubs.DUMMY_PRODUCTION_SET);
+        @DisplayName("build() [Post-build operation]")
+        default void buildInCaseOfPostBuild() throws Exception {
+            var builder = createTargetBuilder();
+            builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.build(null));
+            assertThrows(IllegalStateException.class, () -> builder.build());
         }
 
     }
 
-    Rule build();
+    Rule createTarget();
 
-    Kind kind();
+    default Rule createTargetRule() {
+        return createTarget();
+    }
 
-    RuleVisitor<Object[], String> visitor();
+    Kind expectedKind();
+
+    RuleVisitor<Object[], String> createVisitor();
 
     @Test
     @DisplayName("objectMethods()")
     default void objectMethods() throws Exception {
-        var rule = build();
+        var rule = createTargetRule();
 
         rule.toString();
     }
@@ -46,24 +54,24 @@ interface RuleTest {
     @Test
     @DisplayName("getKind()")
     default void getKind() throws Exception {
-        var rule = build();
+        var rule = createTargetRule();
 
-        assertEquals(kind(), rule.getKind());
+        assertEquals(expectedKind(), rule.getKind());
     }
 
     @Test
     @DisplayName("accept(ev:ElementVisitor) [Null parameter]")
-    default void acceptEvInCaseNullParameter() throws Exception {
-        var rule = build();
+    default void acceptEvInCaseOfNullParameter() throws Exception {
+        var rule = createTargetRule();
 
         assertThrows(NullPointerException.class, () -> rule.accept(null));
     }
 
     @Test
-    @DisplayName("accept(ev:ElementVisitor)")
-    default void acceptEv() throws Exception {
-        var rule = build();
-        var visitor = visitor();
+    @DisplayName("accept(rv:RuleVisitor)")
+    default void acceptRv() throws Exception {
+        var rule = createTargetRule();
+        var visitor = createVisitor();
         var expected = new Object[] { rule, null };
         var result = rule.accept(visitor);
         var result2 = visitor.visit(rule);
@@ -72,14 +80,14 @@ interface RuleTest {
         assertArrayEquals(expected, result2);
     }
 
-    @DisplayName("accept(ev:ElementVisitor, p:P)")
+    @DisplayName("accept(rv:RuleVisitor, p:P)")
     @ParameterizedTest
     @NullSource
     @EmptySource
     @ValueSource(strings = { "test" })
-    default void acceptEvP(String arg) throws Exception {
-        var rule = build();
-        var visitor = visitor();
+    default void acceptRvP(String arg) throws Exception {
+        var rule = createTargetRule();
+        var visitor = createVisitor();
         var expected = new Object[] { rule, arg };
         var result = rule.accept(visitor, arg);
         var result2 = visitor.visit(rule, arg);

@@ -9,11 +9,6 @@ import java.util.stream.Stream;
  */
 public interface QuantifierRule extends Rule {
 
-    public static interface Builder extends Rule.Builder {
-        @Override
-        public QuantifierRule build(ProductionSet set);
-    }
-
     @Override
     public default Kind getKind() {
         return Kind.QUANTIFIER;

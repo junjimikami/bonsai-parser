@@ -12,156 +12,72 @@ class RulesTest {
     @Test
     @DisplayName("pattern(st:String)")
     void patternSt() throws Exception {
-        var expected = PatternRule.builder("123");
+        var expected = PatternRule.of("123");
         var actual = Rules.pattern("123");
 
-        assertEquals(expected.build(Stubs.DUMMY_PRODUCTION_SET).getPattern().pattern(),
-                actual.build(Stubs.DUMMY_PRODUCTION_SET).getPattern().pattern());
+        assertEquals(expected.getPattern().pattern(),
+                actual.getPattern().pattern());
     }
 
     @Test
     @DisplayName("pattern(pa:Pattern)")
     void patternPa() throws Exception {
-        var expected = PatternRule.builder("123");
+        var expected = PatternRule.of("123");
         var actual = Rules.pattern(Pattern.compile("123"));
 
-        assertEquals(expected.build(Stubs.DUMMY_PRODUCTION_SET).getPattern().pattern(),
-                actual.build(Stubs.DUMMY_PRODUCTION_SET).getPattern().pattern());
-    }
-
-    @Test
-    @DisplayName("patternsOf(String[])")
-    void patternsOf() throws Exception {
-        var expected = SequenceRule.builder()
-                .add(PatternRule.builder("1"))
-                .add(PatternRule.builder("2"))
-                .add(PatternRule.builder("3"));
-        var actual = Rules.ofPatterns("1", "2", "3");
-
-        assertEquals(expected.build(Stubs.DUMMY_PRODUCTION_SET).getRules().toString(),
-                actual.build(Stubs.DUMMY_PRODUCTION_SET).getRules().toString());
-    }
-
-    @Test
-    @DisplayName("oneOfPatterns(String[])")
-    void oneOfPatterns() throws Exception {
-        var expected = ChoiceRule.builder()
-                .add(PatternRule.builder("1"))
-                .add(PatternRule.builder("2"))
-                .add(PatternRule.builder("3"));
-        var actual = Rules.oneOfPatterns("1", "2", "3");
-
-        assertEquals(expected.build(Stubs.DUMMY_PRODUCTION_SET).getChoices().toString(),
-                actual.build(Stubs.DUMMY_PRODUCTION_SET).getChoices().toString());
-    }
-
-    @Test
-    @DisplayName("sequenceBuilder()")
-    void sequenceBuilder() throws Exception {
-        var expected = SequenceRule.builder()
-                .add(PatternRule.builder("1"))
-                .add(PatternRule.builder("2"))
-                .add(PatternRule.builder("3"));
-        var actual = Rules.sequenceBuilder()
-                .add(PatternRule.builder("1"))
-                .add(PatternRule.builder("2"))
-                .add(PatternRule.builder("3"));
-
-        assertEquals(expected.build(Stubs.DUMMY_PRODUCTION_SET).getRules().toString(),
-                actual.build(Stubs.DUMMY_PRODUCTION_SET).getRules().toString());
+        assertEquals(expected.getPattern().pattern(),
+                actual.getPattern().pattern());
     }
 
     @Test
     @DisplayName("sequenceOf(String[])")
     void sequenceOf() throws Exception {
         var expected = SequenceRule.builder()
-                .add(PatternRule.builder("1"))
-                .add(PatternRule.builder("2"))
-                .add(PatternRule.builder("3"));
+                .add(PatternRule.of("1"))
+                .add(PatternRule.of("2"))
+                .add(PatternRule.of("3"));
         var actual = Rules.of(
                 Rules.pattern("1"),
                 Rules.pattern("2"),
                 Rules.pattern("3"));
 
-        assertEquals(expected.build(Stubs.DUMMY_PRODUCTION_SET).getRules().toString(),
-                actual.build(Stubs.DUMMY_PRODUCTION_SET).getRules().toString());
-    }
-
-    @Test
-    @DisplayName("choiceBuilder()")
-    void choiceBuilder() throws Exception {
-        var expected = ChoiceRule.builder()
-                .add(PatternRule.builder("1"))
-                .add(PatternRule.builder("2"))
-                .add(PatternRule.builder("3"));
-        var actual = Rules.choiceBuilder()
-                .add(PatternRule.builder("1"))
-                .add(PatternRule.builder("2"))
-                .add(PatternRule.builder("3"));
-
-        assertEquals(expected.build(Stubs.DUMMY_PRODUCTION_SET).getChoices().toString(),
-                actual.build(Stubs.DUMMY_PRODUCTION_SET).getChoices().toString());
+        assertEquals(expected.build().getRules().toString(),
+                actual.getRules().toString());
     }
 
     @Test
     @DisplayName("oneOf(String[])")
     void oneOf() throws Exception {
         var expected = ChoiceRule.builder()
-                .add(PatternRule.builder("1"))
-                .add(PatternRule.builder("2"))
-                .add(PatternRule.builder("3"));
+                .add(PatternRule.of("1"))
+                .add(PatternRule.of("2"))
+                .add(PatternRule.of("3"));
         var actual = Rules.oneOf(
                 Rules.pattern("1"),
                 Rules.pattern("2"),
                 Rules.pattern("3"));
 
-        assertEquals(expected.build(Stubs.DUMMY_PRODUCTION_SET).getChoices().toString(),
-                actual.build(Stubs.DUMMY_PRODUCTION_SET).getChoices().toString());
+        assertEquals(expected.build().getChoices().toString(),
+                actual.getChoices().toString());
     }
 
     @Test
     @DisplayName("reference(String)")
     void reference() throws Exception {
-        var expected = ReferenceRule.builder("A");
+        var expected = ReferenceRule.of("A");
         var actual = Rules.reference("A");
 
-        assertEquals(expected.build(Stubs.DUMMY_PRODUCTION_SET).getProduction().getSymbol(),
-                actual.build(Stubs.DUMMY_PRODUCTION_SET).getProduction().getSymbol());
-    }
-
-    @Test
-    @DisplayName("referencesOf(String[])")
-    void referencesOf() throws Exception {
-        var expected = SequenceRule.builder()
-                .add(ReferenceRule.builder("A"))
-                .add(ReferenceRule.builder("B"))
-                .add(ReferenceRule.builder("C"));
-        var actual = Rules.ofReferences("A", "B", "C");
-
-        assertEquals(expected.build(Stubs.DUMMY_PRODUCTION_SET).getRules().toString(),
-                actual.build(Stubs.DUMMY_PRODUCTION_SET).getRules().toString());
-    }
-
-    @Test
-    @DisplayName("oneOfreferences(String[])")
-    void oneOfreferences() throws Exception {
-        var expected = ChoiceRule.builder()
-                .add(ReferenceRule.builder("A"))
-                .add(ReferenceRule.builder("B"))
-                .add(ReferenceRule.builder("C"));
-        var actual = Rules.oneOfreferences("A", "B", "C");
-
-        assertEquals(expected.build(Stubs.DUMMY_PRODUCTION_SET).getChoices().toString(),
-                actual.build(Stubs.DUMMY_PRODUCTION_SET).getChoices().toString());
+        assertEquals(expected.getProduction(Stubs.DUMMY_PRODUCTION_SET).getSymbol(),
+                actual.getProduction(Stubs.DUMMY_PRODUCTION_SET).getSymbol());
     }
 
     @Test
     @DisplayName("quote(String)")
     void quote() throws Exception {
-        var expected = PatternRule.builder(Pattern.quote("***..."));
+        var expected = PatternRule.of(Pattern.quote("***..."));
         var actual = Rules.quote("***...");
 
-        assertEquals(expected.build(Stubs.DUMMY_PRODUCTION_SET).getPattern().pattern(),
-                actual.build(Stubs.DUMMY_PRODUCTION_SET).getPattern().pattern());
+        assertEquals(expected.getPattern().pattern(),
+                actual.getPattern().pattern());
     }
 }

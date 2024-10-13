@@ -12,6 +12,7 @@ public interface Rule {
         CHOICE,
         REFERENCE,
         QUANTIFIER,
+        SKIP,
         EMPTY;
 
         public boolean isComposite() {
@@ -19,9 +20,8 @@ public interface Rule {
         }
     }
 
-    @FunctionalInterface
     public static interface Builder {
-        public Rule build(ProductionSet set);
+        public Rule build();
     }
 
     public static final Rule EMPTY = new Rule() {

@@ -5,50 +5,24 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
-class ReferenceRuleTest implements RuleTest {
+class ReferenceRuleTest implements RuleTest, QuantifiableTest {
 
-    @Nested
-    class BuilderTest implements RuleTest.BulderTest, QuantifiableTest, ReferenceRelatedTest {
-
-        @Override
-        public ReferenceRule.Builder builder() {
-            return ReferenceRule.builder("");
-        }
-
-        @Nested
-        class QuantifierBuilderTest implements QuantifierRuleTest.BuilderTest, ReferenceRelatedTest {
-            @Override
-            public QuantifierRule.Builder builder() {
-                return ReferenceRuleTest.BuilderTest.this.builder().opt();
-            }
-        }
-
-        @Nested
-        class QuantifierTest implements QuantifierRuleTest {
-            @Override
-            public Quantifiable builder() {
-                return ReferenceRuleTest.BuilderTest.this.builder();
-            }
-        }
+    @Override
+    public ReferenceRule createTarget() {
+        return ReferenceRule.of("");
     }
 
     @Override
-    public Rule build() {
-        return ReferenceRule.builder("").build(Stubs.DUMMY_PRODUCTION_SET);
-    }
-
-    @Override
-    public Kind kind() {
+    public Kind expectedKind() {
         return Kind.REFERENCE;
     }
 
     @Override
-    public RuleVisitor<Object[], String> visitor() {
+    public RuleVisitor<Object[], String> createVisitor() {
         return new TestRuleVisitor<Object[], String>() {
             @Override
             public Object[] visitReference(ReferenceRule reference, String p) {
@@ -58,23 +32,23 @@ class ReferenceRuleTest implements RuleTest {
     }
 
     @Test
-    @DisplayName("builder(String) [Null parameter]")
-    void builderInCaseNullParameter() throws Exception {
-        assertThrows(NullPointerException.class, () -> ReferenceRule.builder(null));
+    @DisplayName("of(String) [Null parameter]")
+    void ofInCaseOfNullParameter() throws Exception {
+        assertThrows(NullPointerException.class, () -> ReferenceRule.of(null));
     }
 
     @Test
-    @DisplayName("builder(String)")
-    void builder() throws Exception {
-        assertNotNull(ReferenceRule.builder(""));
+    @DisplayName("of(String)")
+    void of() throws Exception {
+        assertNotNull(ReferenceRule.of(""));
     }
 
     @Test
-    @DisplayName("builder(String)")
-    void get() throws Exception {
+    @DisplayName("getSymbol")
+    void getSymbol() throws Exception {
         var symbol = "S";
-        var reference = ReferenceRule.builder(symbol).build(Stubs.DUMMY_PRODUCTION_SET);
-        var production = reference.getProduction();
+        var reference = ReferenceRule.of(symbol);
+        var production = reference.getProduction(Stubs.DUMMY_PRODUCTION_SET);
 
         assertEquals(symbol, production.getSymbol());
     }
