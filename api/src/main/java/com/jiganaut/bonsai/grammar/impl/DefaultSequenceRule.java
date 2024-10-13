@@ -1,6 +1,7 @@
 package com.jiganaut.bonsai.grammar.impl;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.jiganaut.bonsai.grammar.Rule;
@@ -26,14 +27,16 @@ class DefaultSequenceRule extends AbstractCompositeRule implements SequenceRule 
         @Override
         public Builder add(Rule.Builder builder) {
             checkParameter(builder);
-            builders.add(builder::build);
+            builders.add(() -> Objects.requireNonNull(builder.build(), Message.NULL_PARAMETER.format()));
             return this;
         }
 
         @Override
         public SequenceRule build() {
             checkForBuild();
-            var elements = builders.stream().map(e -> e.get()).toList();
+            var elements = builders.stream()
+                    .map(e -> e.get())
+                    .toList();
             return new DefaultSequenceRule(elements);
         }
 
