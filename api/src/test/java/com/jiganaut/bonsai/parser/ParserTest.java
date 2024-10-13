@@ -236,40 +236,6 @@ class ParserTest {
         assertEquals("S(A(0),B(1))", string);
     }
     
-    @Test
-    @DisplayName("newParser(gr:Grammar, to:Tokenizer)")
-    void newParserGrTo() throws Exception {
-        var grammar0 = Grammar.builder()
-                .add("T", SequenceRule.builder()
-                        .add(() -> PatternRule.of("0"))
-                        .add(() -> PatternRule.of("1")))
-                .add("T", SequenceRule.builder()
-                        .add(() -> PatternRule.of("1"))
-                        .add(() -> PatternRule.of("0")))
-                .build();
-        var tokenizer = Tokenizer.newTokenizer(grammar0, new StringReader("0110"));
-        var grammar = Grammar.builder()
-                .add("S", SequenceRule.builder()
-                        .add(() -> ReferenceRule.of("A"))
-                        .add(() -> ReferenceRule.of("B")))
-                .add("A", () -> PatternRule.of("01"))
-                .add("B", () -> PatternRule.of("10"))
-                .build();
-        var parser = Parser.newParser(grammar, tokenizer);
-        var tree = parser.parse();
-        var string = tree.accept(new TreeToString<Void>() {
-            @Override
-            public String visitNonTerminal(NonTerminal tree, Void p) {
-                return tree.getSymbol() +
-                        tree.getSubTrees().stream()
-                        .map(this::visit)
-                        .collect(Collectors.joining(",", "(", ")"));
-            }
-        });
-        
-        assertEquals("S(A(01),B(10))", string);
-    }
-
     private interface TreeToString<P> extends TreeVisitor<String, P> {
         @Override
         default String visitTerminal(Terminal tree, P p) {

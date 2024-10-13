@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import com.jiganaut.bonsai.grammar.Grammar;
+import com.jiganaut.bonsai.grammar.ProductionSet;
 import com.jiganaut.bonsai.parser.Token;
 import com.jiganaut.bonsai.parser.Tokenizer;
 
@@ -18,11 +18,10 @@ class DefaultTokenizer extends AbstractTokenizer {
     private final Context context;
     private String nextToken;
 
-    DefaultTokenizer(Grammar grammar, Tokenizer tokenizer) {
-        assert grammar != null;
+    DefaultTokenizer(ProductionSet productionSet, Tokenizer tokenizer) {
+        assert productionSet != null;
         assert tokenizer != null;
-        var production = grammar.getStartProduction();
-        context = new Context(grammar, production, tokenizer, Set.of());
+        context = new Context(productionSet, null, tokenizer, Set.of());
     }
 
     private String read() {

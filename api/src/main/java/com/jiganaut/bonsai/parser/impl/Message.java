@@ -24,6 +24,7 @@ enum Message {
             + "Found: {2} (Line: {3}, Index: {4})"),
 //    AMBIGUOUS_CHOICE("In production rule {0}, the choice rule {1} is ambiguous."),
     AMBIGUOUS_CHOICE("The choice of {0} in production rule {1} is ambiguous."),
+    AMBIGUOUS_PRODUCTION_SET("The production rule {0} is ambiguous."),
 //    TOKEN_COUNT_OUT_OF_RANGE("In production rule {0}, {1} was expected to occur {2} times, but it occurred {3} times."),
     /**
      * 0: Min count

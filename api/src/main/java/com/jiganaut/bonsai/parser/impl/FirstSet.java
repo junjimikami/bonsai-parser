@@ -97,7 +97,7 @@ final class FirstSet implements RuleVisitor<Set<Rule>, Context> {
 
     @Override
     public Set<Rule> visitReference(ReferenceRule ref, Context context) {
-        var productionSet = context.grammar().productionSet();
+        var productionSet = context.productionSet();
         var production = ref.getProduction(productionSet);
         return visit(production.getRule(), context);
     }

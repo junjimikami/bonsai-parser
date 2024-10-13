@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.jiganaut.bonsai.grammar.ChoiceRule;
 import com.jiganaut.bonsai.grammar.PatternRule;
+import com.jiganaut.bonsai.grammar.ProductionSet;
 import com.jiganaut.bonsai.grammar.QuantifierRule;
 import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.Rule;
@@ -25,8 +26,24 @@ final class Tokenization implements RuleVisitor<CharSequence, Context> {
     }
 
     static String run(Context context) {
-        var production = context.production();
-        return INSTANCE.visit(production.getRule(), context).toString();
+        return INSTANCE.visitProductionSet(context.productionSet(), context).toString();
+    }
+
+    private CharSequence visitProductionSet(ProductionSet productionSet, Context context) {
+        var productions = productionSet.stream()
+                .filter(e -> AnyMatcher.scan(e.getRule(), context))
+                .toList();
+        if (productions.isEmpty()) {
+            return context.tokenizer().next().getValue();
+        }
+        if (1 < productions.size()) {
+          var message = MessageSupport.ambiguousProductionSet(productions);
+          throw new ParseException(message);
+        }
+        var production = productions.get(0);
+        var rule = production.getRule();
+        var subContext = context.withProduction(production);
+        return visit(rule, subContext);
     }
 
     @Override
@@ -85,10 +102,10 @@ final class Tokenization implements RuleVisitor<CharSequence, Context> {
 
     @Override
     public CharSequence visitReference(ReferenceRule reference, Context context) {
-        var productionSet = context.grammar().productionSet();
+        var productionSet = context.productionSet();
         var production = reference.getProduction(productionSet);
         var subContext = context.withProduction(production);
-        return run(subContext);
+        return visit(production.getRule(), subContext);
     }
 
     @Override

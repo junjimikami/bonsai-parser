@@ -15,7 +15,7 @@ class DefaultParser implements Parser {
         assert grammar != null;
         assert tokenizer != null;
         var production = grammar.getStartProduction();
-        context = new Context(grammar, production, tokenizer, Set.of());
+        context = new Context(grammar.productionSet(), production, tokenizer, Set.of());
     }
 
     @Override

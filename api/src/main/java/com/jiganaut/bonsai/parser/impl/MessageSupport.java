@@ -1,7 +1,9 @@
 package com.jiganaut.bonsai.parser.impl;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
+import com.jiganaut.bonsai.grammar.Production;
 import com.jiganaut.bonsai.grammar.QuantifierRule;
 import com.jiganaut.bonsai.grammar.Rule;
 
@@ -27,6 +29,13 @@ final class MessageSupport {
                 .map(Rule::toString)
                 .collect(Collectors.joining(", ", "[", "]"));
         return Message.AMBIGUOUS_CHOICE.format(firsetSet, symbol);
+    }
+
+    static String ambiguousProductionSet(List<Production> list) {
+        var productions = list.stream()
+                .map(e -> e.toString())
+                .collect(Collectors.joining(", ", "[", "]"));
+        return Message.AMBIGUOUS_PRODUCTION_SET.format(productions);
     }
 
     static String tokenCountOutOfRange(QuantifierRule quantfier, Context context, long count) {
