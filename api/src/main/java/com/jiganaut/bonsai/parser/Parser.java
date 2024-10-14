@@ -1,6 +1,8 @@
 package com.jiganaut.bonsai.parser;
 
-public interface Parser {
+import java.io.Closeable;
+
+public interface Parser extends Closeable {
 
     public Tree parse();
 }

@@ -1,5 +1,6 @@
 package com.jiganaut.bonsai.parser.impl;
 
+import java.io.IOException;
 import java.util.Set;
 
 import com.jiganaut.bonsai.grammar.Grammar;
@@ -26,6 +27,11 @@ class DefaultParser implements Parser {
             throw new ParseException(message);
         }
         return tree;
+    }
+
+    @Override
+    public void close() throws IOException {
+        context.tokenizer().close();
     }
 
 }

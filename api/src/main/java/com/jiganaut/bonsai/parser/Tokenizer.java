@@ -1,12 +1,13 @@
 package com.jiganaut.bonsai.parser;
 
+import java.io.Closeable;
 import java.util.regex.Pattern;
 
 /**
  *
  * @author Junji Mikami
  */
-public interface Tokenizer {
+public interface Tokenizer extends Closeable {
 
     public boolean hasNext();
     public boolean hasNext(String regex);

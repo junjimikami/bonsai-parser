@@ -27,7 +27,7 @@ class ReaderTokenizer extends AbstractTokenizer {
         this.reader = new PushbackReader(reader);
     }
 
-    private void read() {
+    private void readNext() {
         if (nextToken != null) {
             return;
         }
@@ -69,7 +69,7 @@ class ReaderTokenizer extends AbstractTokenizer {
         }
     }
 
-    private void createToken() {
+    private void writeCurrent() {
         assert nextToken != null;
         if (lineIncrement != 0) {
             lineNumber += lineIncrement;
@@ -84,7 +84,7 @@ class ReaderTokenizer extends AbstractTokenizer {
 
     @Override
     public boolean hasNext() {
-        read();
+        readNext();
         return nextToken != null;
     }
 
@@ -107,11 +107,11 @@ class ReaderTokenizer extends AbstractTokenizer {
 
     @Override
     public String next() {
-        read();
+        readNext();
         if (nextToken == null) {
             throw new NoSuchElementException(Message.TOKEN_NOT_FOUND.format());
         }
-        createToken();
+        writeCurrent();
         return null;
     }
 
@@ -125,7 +125,7 @@ class ReaderTokenizer extends AbstractTokenizer {
     @Override
     public String next(Pattern pattern) {
         Objects.requireNonNull(pattern, Message.NULL_PARAMETER.format());
-        read();
+        readNext();
         if (nextToken == null) {
             throw new NoSuchElementException(Message.TOKEN_NOT_FOUND.format());
         }
@@ -133,7 +133,7 @@ class ReaderTokenizer extends AbstractTokenizer {
         if (!matcher.matches()) {
             throw new NoSuchElementException(Message.TOKEN_NOT_MATCH_PATTERN.format(pattern));
         }
-        createToken();
+        writeCurrent();
         return null;
     }
 
@@ -155,5 +155,10 @@ class ReaderTokenizer extends AbstractTokenizer {
     @Override
     public long getIndex() {
         return index;
+    }
+
+    @Override
+    public void close() throws IOException {
+        reader.close();
     }
 }

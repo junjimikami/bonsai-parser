@@ -1,5 +1,6 @@
 package com.jiganaut.bonsai.parser.impl;
 
+import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
@@ -25,7 +26,7 @@ class DefaultTokenizer extends AbstractTokenizer {
         context = new Context(productionSet, null, tokenizer, Set.of());
     }
 
-    private void read() {
+    private void readNext() {
         if (nextToken != null) {
             return;
         }
@@ -40,7 +41,7 @@ class DefaultTokenizer extends AbstractTokenizer {
 
     @Override
     public boolean hasNext() {
-        read();
+        readNext();
         return nextToken != null;
     }
 
@@ -63,7 +64,7 @@ class DefaultTokenizer extends AbstractTokenizer {
 
     @Override
     public String next() {
-        read();
+        readNext();
         if (nextToken == null) {
             throw new NoSuchElementException(Message.TOKEN_NOT_FOUND.format());
         }
@@ -82,7 +83,7 @@ class DefaultTokenizer extends AbstractTokenizer {
     @Override
     public String next(Pattern pattern) {
         Objects.requireNonNull(pattern, Message.NULL_PARAMETER.format());
-        read();
+        readNext();
         if (nextToken == null) {
             throw new NoSuchElementException(Message.TOKEN_NOT_FOUND.format());
         }
@@ -113,5 +114,10 @@ class DefaultTokenizer extends AbstractTokenizer {
     @Override
     public long getIndex() {
         return context.tokenizer().getIndex();
+    }
+
+    @Override
+    public void close() throws IOException {
+        context.tokenizer().close();
     }
 }
