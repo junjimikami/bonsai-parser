@@ -24,7 +24,7 @@ class DefaultNonTerminal implements NonTerminal {
     }
 
     @Override
-    public String getSymbol() {
+    public String getName() {
         return symbol;
     }
 

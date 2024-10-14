@@ -163,7 +163,7 @@ class ParserTest {
             var actual = parser.parse().accept(new TreeToString<Void>() {
                 @Override
                 public String visitNonTerminal(NonTerminal tree, Void p) {
-                    return tree.getSymbol() +
+                    return tree.getName() +
                             tree.getSubTrees().stream()
                                     .map(this::visit)
                                     .collect(Collectors.joining(",", "(", ")"));

@@ -18,14 +18,14 @@ public interface NonTerminal extends Tree {
         return v.visitNonTerminal(this, p);
     }
 
-    public String getSymbol();
+    public String getName();
     public List<? extends Tree> getSubTrees();
 
     public default List<NonTerminal> getNonTerminals(String symbol) {
         return getSubTrees().stream()
                 .filter(e -> e.getKind().isNonTerminal())
                 .map(e -> e.asNonTerminal())
-                .filter(e -> e.getSymbol().equals(symbol))
+                .filter(e -> e.getName().equals(symbol))
                 .toList();
     }
     public default NonTerminal getNonTerminal(String symbol, int index) {
