@@ -14,6 +14,7 @@ class ReaderTokenizer extends AbstractTokenizer {
 
     private final PushbackReader reader;
     private String nextToken;
+    private String currentToken;
     private long lineNumber = 1;
     private long index = 0;
     private int lineIncrement = 0;
@@ -68,7 +69,7 @@ class ReaderTokenizer extends AbstractTokenizer {
         }
     }
 
-    private Token createToken() {
+    private void createToken() {
         assert nextToken != null;
         if (lineIncrement != 0) {
             lineNumber += lineIncrement;
@@ -77,9 +78,8 @@ class ReaderTokenizer extends AbstractTokenizer {
         } else {
             index += nextToken.length();
         }
-        var value = nextToken;
+        currentToken = nextToken;
         nextToken = null;
-        return new DefaultToken(value);
     }
 
     @Override
@@ -106,23 +106,24 @@ class ReaderTokenizer extends AbstractTokenizer {
     }
 
     @Override
-    public Token next() {
+    public String next() {
         read();
         if (nextToken == null) {
             throw new NoSuchElementException(Message.TOKEN_NOT_FOUND.format());
         }
-        return createToken();
+        createToken();
+        return null;
     }
 
     @Override
-    public Token next(String regex) {
+    public String next(String regex) {
         Objects.requireNonNull(regex, Message.NULL_PARAMETER.format());
         var pattern = Pattern.compile(regex);
         return next(pattern);
     }
 
     @Override
-    public Token next(Pattern pattern) {
+    public String next(Pattern pattern) {
         Objects.requireNonNull(pattern, Message.NULL_PARAMETER.format());
         read();
         if (nextToken == null) {
@@ -132,13 +133,25 @@ class ReaderTokenizer extends AbstractTokenizer {
         if (!matcher.matches()) {
             throw new NoSuchElementException(Message.TOKEN_NOT_MATCH_PATTERN.format(pattern));
         }
-        return createToken();
+        createToken();
+        return null;
     }
-    
+
+    @Override
+    public Token getToken() {
+        return new DefaultToken(null, currentToken);
+    }
+
+    @Override
+    public String getValue() {
+        return currentToken;
+    }
+
     @Override
     public long getLineNumber() {
         return lineNumber;
     }
+
     @Override
     public long getIndex() {
         return index;

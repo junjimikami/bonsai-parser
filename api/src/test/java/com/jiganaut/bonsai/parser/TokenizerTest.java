@@ -291,7 +291,8 @@ class TokenizerTest {
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
-        assertEquals("1", tokenizer.next().getValue());
+        assertEquals("S", tokenizer.next());
+        assertEquals("1", tokenizer.getValue());
     }
 
     @Test
@@ -303,7 +304,8 @@ class TokenizerTest {
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
-        assertEquals("1", tokenizer.next("1").getValue());
+        assertEquals("S", tokenizer.next("1"));
+        assertEquals("1", tokenizer.getValue());
     }
 
     @Test
@@ -316,7 +318,8 @@ class TokenizerTest {
         var tokenizer = factory.createTokenizer(new StringReader("1"));
         var pattern = Pattern.compile("1");
 
-        assertEquals("1", tokenizer.next(pattern).getValue());
+        assertEquals("S", tokenizer.next(pattern));
+        assertEquals("1", tokenizer.getValue());
     }
 
     @Test
@@ -401,7 +404,8 @@ class TokenizerTest {
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
-        var token = tokenizer.next();
+        tokenizer.next();
+        var token = tokenizer.getToken();
 
         assertEquals(Tree.Kind.TERMINAL, token.getKind());
         assertTrue(token.getKind().isTerminal());
@@ -417,7 +421,8 @@ class TokenizerTest {
                 .build();
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
-        var token = tokenizer.next("1");
+        tokenizer.next("1");
+        var token = tokenizer.getToken();
 
         assertEquals(Tree.Kind.TERMINAL, token.getKind());
         assertEquals("1", token.getValue());
@@ -433,7 +438,8 @@ class TokenizerTest {
         var factory = TokenizerFactory.newFactory(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
         var pattern = Pattern.compile("1");
-        var token = tokenizer.next(pattern);
+        tokenizer.next(pattern);
+        var token = tokenizer.getToken();
 
         assertEquals(Tree.Kind.TERMINAL, token.getKind());
         assertEquals("1", token.getValue());
@@ -449,7 +455,8 @@ class TokenizerTest {
         if (tokens != null) {
             var actual = new ArrayList<String>();
             while (tokenizer.hasNext()) {
-                actual.add(tokenizer.next().getValue());
+                tokenizer.next();
+                actual.add(tokenizer.getValue());
             }
             assertIterableEquals(tokens, actual);
         } else {
@@ -684,19 +691,15 @@ class TokenizerTest {
                 .createTokenizer(new StringReader("00 01 10 11"));
 
         var grammar2 = ProductionSet.builder()
-                .add("A", () -> PatternRule.of("0|1"))
+                .add("A", () -> PatternRule.of("(0|1){2}").exactly(2))
                 .build();
         var tokenizer2 = TokenizerFactory.newFactory(grammar2)
                 .createTokenizer(tokenizer);
 
-        assertEquals("0", tokenizer2.next().getValue());
-        assertEquals("0", tokenizer2.next().getValue());
-        assertEquals("0", tokenizer2.next().getValue());
-        assertEquals("1", tokenizer2.next().getValue());
-        assertEquals("1", tokenizer2.next().getValue());
-        assertEquals("0", tokenizer2.next().getValue());
-        assertEquals("1", tokenizer2.next().getValue());
-        assertEquals("1", tokenizer2.next().getValue());
+        tokenizer2.next();
+        assertEquals("0001", tokenizer2.getValue());
+        tokenizer2.next();
+        assertEquals("1011", tokenizer2.getValue());
         assertFalse(tokenizer2.hasNext());
     }
 

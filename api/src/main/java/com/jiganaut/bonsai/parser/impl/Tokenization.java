@@ -13,6 +13,7 @@ import com.jiganaut.bonsai.grammar.RuleVisitor;
 import com.jiganaut.bonsai.grammar.SequenceRule;
 import com.jiganaut.bonsai.grammar.SkipRule;
 import com.jiganaut.bonsai.parser.ParseException;
+import com.jiganaut.bonsai.parser.Token;
 
 /**
  * @author Junji Mikami
@@ -25,25 +26,27 @@ final class Tokenization implements RuleVisitor<CharSequence, Context> {
     private Tokenization() {
     }
 
-    static String run(Context context) {
-        return INSTANCE.visitProductionSet(context.productionSet(), context).toString();
+    static Token run(Context context) {
+        return INSTANCE.visitProductionSet(context.productionSet(), context);
     }
 
-    private CharSequence visitProductionSet(ProductionSet productionSet, Context context) {
+    private Token visitProductionSet(ProductionSet productionSet, Context context) {
         var productions = productionSet.stream()
                 .filter(e -> AnyMatcher.scan(e.getRule(), context))
                 .toList();
         if (productions.isEmpty()) {
-            return context.tokenizer().next().getValue();
+            var tokenizer = context.tokenizer();
+            tokenizer.next();
+            return tokenizer.getToken();
         }
         if (1 < productions.size()) {
           var message = MessageSupport.ambiguousProductionSet(productions);
           throw new ParseException(message);
         }
         var production = productions.get(0);
-        var rule = production.getRule();
         var subContext = context.withProduction(production);
-        return visit(rule, subContext);
+        var value = visit(production.getRule(), subContext).toString();
+        return new DefaultToken(production.getSymbol(), value);
     }
 
     @Override
@@ -96,8 +99,8 @@ final class Tokenization implements RuleVisitor<CharSequence, Context> {
             throw new ParseException(message);
         }
         var tokenizer = context.tokenizer();
-        var token = tokenizer.next(pattern.getPattern());
-        return token.getValue();
+        tokenizer.next(pattern.getPattern());
+        return tokenizer.getValue();
     }
 
     @Override

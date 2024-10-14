@@ -82,7 +82,8 @@ final class Derivation implements RuleVisitor<List<Tree>, Context> {
             throw new ParseException(message);
         }
         var tokenizer = context.tokenizer();
-        var token = tokenizer.next(pattern.getPattern());
+        tokenizer.next(pattern.getPattern());
+        var token = tokenizer.getToken();
         return List.of(token);
     }
 

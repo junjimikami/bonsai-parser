@@ -16,7 +16,8 @@ import com.jiganaut.bonsai.parser.Tokenizer;
 class DefaultTokenizer extends AbstractTokenizer {
 
     private final Context context;
-    private String nextToken;
+    private Token nextToken;
+    private Token currentToken;
 
     DefaultTokenizer(ProductionSet productionSet, Tokenizer tokenizer) {
         assert productionSet != null;
@@ -24,23 +25,23 @@ class DefaultTokenizer extends AbstractTokenizer {
         context = new Context(productionSet, null, tokenizer, Set.of());
     }
 
-    private String read() {
+    private void read() {
         if (nextToken != null) {
-            return nextToken;
+            return;
         }
         while (context.tokenizer().hasNext()) {
             var token = Tokenization.run(context);
-            if (!token.isEmpty()) {
+            if (!token.getValue().isEmpty()) {
                 nextToken = token;
                 break;
             }
         }
-        return nextToken;
     }
 
     @Override
     public boolean hasNext() {
-        return read() != null;
+        read();
+        return nextToken != null;
     }
 
     @Override
@@ -56,45 +57,52 @@ class DefaultTokenizer extends AbstractTokenizer {
         if (!hasNext()) {
             return false;
         }
-        var matcher = pattern.matcher(nextToken);
-        return matcher.lookingAt();
+        var matcher = pattern.matcher(nextToken.getValue());
+        return matcher.matches();
     }
 
     @Override
-    public Token next() {
-        var value = read();
-        if (value == null) {
+    public String next() {
+        read();
+        if (nextToken == null) {
             throw new NoSuchElementException(Message.TOKEN_NOT_FOUND.format());
         }
+        currentToken = nextToken;
         nextToken = null;
-        return new DefaultToken(value);
+        return currentToken.getName();
     }
 
     @Override
-    public Token next(String regex) {
+    public String next(String regex) {
         Objects.requireNonNull(regex, Message.NULL_PARAMETER.format());
         var pattern = Pattern.compile(regex);
         return next(pattern);
     }
 
     @Override
-    public Token next(Pattern pattern) {
+    public String next(Pattern pattern) {
         Objects.requireNonNull(pattern, Message.NULL_PARAMETER.format());
-        var value = read();
-        if (value == null) {
+        read();
+        if (nextToken == null) {
             throw new NoSuchElementException(Message.TOKEN_NOT_FOUND.format());
         }
-        var matcher = pattern.matcher(value);
-        if (matcher.matches()) {
-            nextToken = null;
-            return new DefaultToken(value);
+        var matcher = pattern.matcher(nextToken.getValue());
+        if (!matcher.matches()) {
+            throw new NoSuchElementException(Message.TOKEN_NOT_MATCH_PATTERN.format(pattern));
         }
-        if (matcher.lookingAt()) {
-            value = matcher.group();
-            nextToken = nextToken.substring(matcher.end());
-            return new DefaultToken(value);
-        }
-        throw new NoSuchElementException(Message.TOKEN_NOT_MATCH_PATTERN.format(pattern));
+        currentToken = nextToken;
+        nextToken = null;
+        return currentToken.getName();
+    }
+
+    @Override
+    public Token getToken() {
+        return currentToken;
+    }
+
+    @Override
+    public String getValue() {
+        return currentToken.getValue();
     }
 
     @Override

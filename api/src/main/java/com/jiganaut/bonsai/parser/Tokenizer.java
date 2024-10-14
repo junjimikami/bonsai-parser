@@ -11,14 +11,14 @@ public interface Tokenizer {
     public boolean hasNext();
     public boolean hasNext(String regex);
     public boolean hasNext(Pattern pattern);
-    public Token next();
-    public Token next(String regex);
-    public Token next(Pattern pattern);
+    public String next();
+    public String next(String regex);
+    public String next(Pattern pattern);
 
-    public default long getLineNumber() {
-        throw new UnsupportedOperationException();
-    }
-    public default long getIndex() {
-        throw new UnsupportedOperationException();
-    }
+    public String getValue();
+    public Token getToken();
+
+    public long getLineNumber();
+    public long getIndex();
+
 }
