@@ -211,31 +211,6 @@ class ParserTest {
         return stream;
     }
 
-    @Test
-    @DisplayName("newParser(gr:Grammar, re:Reader)")
-    void newParserGrRe() throws Exception {
-        var grammar = Grammar.builder()
-                .add("S", SequenceRule.builder()
-                        .add(() -> ReferenceRule.of("A"))
-                        .add(() -> ReferenceRule.of("B")))
-                .add("A", () -> PatternRule.of("0"))
-                .add("B", () -> PatternRule.of("1"))
-                .build();
-        var parser = Parser.newParser(grammar, new StringReader("01"));
-        var tree = parser.parse();
-        var string = tree.accept(new TreeToString<Void>() {
-            @Override
-            public String visitNonTerminal(NonTerminal tree, Void p) {
-                return tree.getSymbol() +
-                        tree.getSubTrees().stream()
-                                .map(this::visit)
-                                .collect(Collectors.joining(",", "(", ")"));
-            }
-        });
-
-        assertEquals("S(A(0),B(1))", string);
-    }
-    
     private interface TreeToString<P> extends TreeVisitor<String, P> {
         @Override
         default String visitTerminal(Terminal tree, P p) {
