@@ -1,7 +1,9 @@
 package com.jiganaut.bonsai.parser.impl;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
+import com.jiganaut.bonsai.grammar.Production;
 import com.jiganaut.bonsai.grammar.QuantifierRule;
 import com.jiganaut.bonsai.grammar.Rule;
 
@@ -14,9 +16,11 @@ final class MessageSupport {
         var symbol = context.production().getSymbol();
         var line = context.tokenizer().getLineNumber();
         var index = context.tokenizer().getIndex();
-        var token = context.tokenizer().hasNext()
-                ? context.tokenizer().next().toString()
-                : "EOF";
+        var token = "EOF";
+        if (context.tokenizer().hasNext()) {
+            context.tokenizer().next();
+            token = context.tokenizer().getValue();
+        }
         return Message.TOKEN_NOT_MATCH_RULE.format(rule, symbol, token, line, index);
     }
 
@@ -29,15 +33,24 @@ final class MessageSupport {
         return Message.AMBIGUOUS_CHOICE.format(firsetSet, symbol);
     }
 
+    static String ambiguousProductionSet(List<Production> list) {
+        var productions = list.stream()
+                .map(e -> e.toString())
+                .collect(Collectors.joining(", ", "[", "]"));
+        return Message.AMBIGUOUS_PRODUCTION_SET.format(productions);
+    }
+
     static String tokenCountOutOfRange(QuantifierRule quantfier, Context context, long count) {
         var rule = quantfier.getRule();
         var symbol = context.production().getSymbol();
         var from = quantfier.getMinCount();
         var line = context.tokenizer().getLineNumber();
         var index = context.tokenizer().getIndex();
-        var token = context.tokenizer().hasNext()
-                ? context.tokenizer().next().toString()
-                : "EOF";
+        var token = "EOF";
+        if (context.tokenizer().hasNext()) {
+            context.tokenizer().next();
+            token = context.tokenizer().getValue();
+        }
         if (quantfier.getMaxCount().isEmpty()) {
             return Message.TOKEN_COUNT_OUT_OF_RANGE_WITHOUT_UPPER_LIMIT.format(from, null, rule, symbol, count, token,
                     line, index);
@@ -52,9 +65,11 @@ final class MessageSupport {
     static String tokensRemained(Context context) {
         var line = context.tokenizer().getLineNumber();
         var index = context.tokenizer().getIndex();
-        var token = context.tokenizer().hasNext()
-                ? context.tokenizer().next().toString()
-                : "EOF";
+        var token = "EOF";
+        if (context.tokenizer().hasNext()) {
+            context.tokenizer().next();
+            token = context.tokenizer().getValue();
+        }
         return Message.TOKEN_REMAINED.format(token, line, index);
     }
 }

@@ -6,6 +6,7 @@ package com.jiganaut.bonsai.parser;
  */
 public interface Token extends Terminal {
 
+    public String getName();
     public String getValue();
 
     @Override

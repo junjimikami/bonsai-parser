@@ -82,13 +82,14 @@ final class Derivation implements RuleVisitor<List<Tree>, Context> {
             throw new ParseException(message);
         }
         var tokenizer = context.tokenizer();
-        var token = tokenizer.next(pattern.getPattern());
+        tokenizer.next(pattern.getPattern());
+        var token = tokenizer.getToken();
         return List.of(token);
     }
 
     @Override
     public List<Tree> visitReference(ReferenceRule reference, Context context) {
-        var productionSet = context.grammar().productionSet();
+        var productionSet = context.productionSet();
         var production = reference.getProduction(productionSet);
         var subContext = context.withProduction(production);
         var tree = derive(subContext);

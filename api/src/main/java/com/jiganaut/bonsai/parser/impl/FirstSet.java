@@ -34,14 +34,8 @@ final class FirstSet implements RuleVisitor<Set<Rule>, Context> {
         return INSTANCE.visit(sequence, context);
     }
 
-    @Override
-    public Set<Rule> visit(Rule prd) {
-        var context = new Context(null, null, null, Set.of());
-        return visit(prd, context);
-    }
-
     @FunctionalInterface
-    private interface RuleSet extends Rule, Supplier<Set<Rule>> {
+    private interface TemporaryRule extends Rule, Supplier<Set<Rule>> {
         @Override
         default Kind getKind() {
             throw new AssertionError();
@@ -59,13 +53,13 @@ final class FirstSet implements RuleVisitor<Set<Rule>, Context> {
         }
         var subRules = new LinkedList<>(sequence);
         var rule = subRules.removeFirst();
-        var remaining = (RuleSet) () -> visit(subRules, context);
+        var remaining = (TemporaryRule) () -> visit(subRules, context);
         var subFollowSet = Set.<Rule>of(remaining);
         var subContext = context.withFollowSet(subFollowSet);
         return visit(rule, subContext).stream()
                 .<Rule>mapMulti((r, c) -> {
-                    if (r instanceof RuleSet rs) {
-                        rs.get().forEach(c::accept);
+                    if (r instanceof TemporaryRule tr) {
+                        tr.get().forEach(c::accept);
                     } else {
                         c.accept(r);
                     }
@@ -74,44 +68,45 @@ final class FirstSet implements RuleVisitor<Set<Rule>, Context> {
     }
 
     @Override
-    public Set<Rule> visitChoice(ChoiceRule alt, Context context) {
-        if (alt.getChoices().isEmpty()) {
+    public Set<Rule> visitChoice(ChoiceRule choice, Context context) {
+        if (choice.getChoices().isEmpty()) {
             return context.followSet();
         }
         var set = new HashSet<Rule>();
-        for (var p : alt.getChoices()) {
-            set.addAll(visit(p, context));
+        for (var rule : choice.getChoices()) {
+            set.addAll(visit(rule, context));
         }
         return set;
     }
 
     @Override
-    public Set<Rule> visitSequence(SequenceRule seq, Context context) {
-        return visit(seq.getRules(), context);
+    public Set<Rule> visitSequence(SequenceRule sequence, Context context) {
+        return visit(sequence.getRules(), context);
     }
 
     @Override
-    public Set<Rule> visitPattern(PatternRule p, Context context) {
-        return Set.of(p);
+    public Set<Rule> visitPattern(PatternRule pattern, Context context) {
+        return Set.of(pattern);
     }
 
     @Override
-    public Set<Rule> visitReference(ReferenceRule ref, Context context) {
-        var productionSet = context.grammar().productionSet();
-        var production = ref.getProduction(productionSet);
+    public Set<Rule> visitReference(ReferenceRule reference, Context context) {
+        var productionSet = context.productionSet();
+        var production = reference.getProduction(productionSet);
         return visit(production.getRule(), context);
     }
 
     @Override
-    public Set<Rule> visitQuantifier(QuantifierRule qt, Context context) {
+    public Set<Rule> visitQuantifier(QuantifierRule quantifier, Context context) {
         var set = new HashSet<Rule>();
-        var prd = qt.stream()
+        var rule = quantifier.stream()
                 .limit(1)
                 .findFirst();
-        if (prd.isPresent()) {
-            set.addAll(visit(prd.get()));
+        if (rule.isPresent()) {
+            var subContext = context.withFollowSet(Set.of());
+            set.addAll(visit(rule.get(), subContext));
         }
-        if (qt.getMinCount() == 0) {
+        if (quantifier.getMinCount() == 0) {
             set.addAll(context.followSet());
         }
         return set;

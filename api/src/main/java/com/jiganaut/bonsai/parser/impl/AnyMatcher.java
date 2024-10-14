@@ -1,10 +1,9 @@
 package com.jiganaut.bonsai.parser.impl;
 
-import java.util.stream.Collectors;
-
+import com.jiganaut.bonsai.grammar.ChoiceRule;
 import com.jiganaut.bonsai.grammar.PatternRule;
 import com.jiganaut.bonsai.grammar.Rule;
-import com.jiganaut.bonsai.grammar.Rule.Kind;
+import com.jiganaut.bonsai.grammar.SequenceRule;
 import com.jiganaut.bonsai.grammar.SimpleRuleVisitor;
 
 /**
@@ -28,14 +27,27 @@ final class AnyMatcher implements SimpleRuleVisitor<Boolean, Context> {
     }
 
     @Override
+    public Boolean visitChoice(ChoiceRule choice, Context p) {
+        if (choice.getChoices().isEmpty()) {
+            return false;
+        }
+        return SimpleRuleVisitor.super.visitChoice(choice, p);
+    }
+
+    @Override
+    public Boolean visitSequence(SequenceRule sequence, Context p) {
+        if (sequence.getRules().isEmpty()) {
+            return false;
+        }
+        return SimpleRuleVisitor.super.visitSequence(sequence, p);
+    }
+
+    @Override
     public Boolean defaultAction(Rule rule, Context context) {
         var firstSet = FirstSet.of(rule, context);
         if (firstSet.isEmpty()) {
             return !context.tokenizer().hasNext();
         }
-        var map = firstSet.stream()
-                .collect(Collectors.partitioningBy(e -> e.getKind() == Kind.PATTERN));
-        return map.get(true).stream().anyMatch(e -> visit(e, context)) ||
-                map.get(false).stream().anyMatch(e -> visit(e, context));
+        return firstSet.stream().anyMatch(e -> visit(e, context));
     }
 }

@@ -4,7 +4,7 @@ import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.ServiceLoader.Provider;
 
-import com.jiganaut.bonsai.grammar.Grammar;
+import com.jiganaut.bonsai.grammar.ProductionSet;
 import com.jiganaut.bonsai.parser.TokenizerFactory;
 import com.jiganaut.bonsai.parser.spi.TokenizerFactoryProvider;
 
@@ -19,9 +19,9 @@ public class DefaultTokenizerFactoryProvider implements TokenizerFactoryProvider
     }
 
     @Override
-    public TokenizerFactory createFactory(Grammar grammar) {
-        Objects.requireNonNull(grammar, Message.NULL_PARAMETER.format());
-        return new DefaultTokenizerFactory(grammar);
+    public TokenizerFactory createFactory(ProductionSet productionSet) {
+        Objects.requireNonNull(productionSet, Message.NULL_PARAMETER.format());
+        return new DefaultTokenizerFactory(productionSet);
     }
 
     @Override
