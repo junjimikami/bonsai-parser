@@ -5,7 +5,6 @@ import java.util.Set;
 
 import com.jiganaut.bonsai.grammar.ChoiceRule;
 import com.jiganaut.bonsai.grammar.PatternRule;
-import com.jiganaut.bonsai.grammar.ProductionSet;
 import com.jiganaut.bonsai.grammar.QuantifierRule;
 import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.Rule;
@@ -27,25 +26,21 @@ final class Tokenization implements RuleVisitor<CharSequence, Context> {
     }
 
     static Token run(Context context) {
-        return INSTANCE.visitProductionSet(context.productionSet(), context);
-    }
-
-    private Token visitProductionSet(ProductionSet productionSet, Context context) {
-        var productions = productionSet.stream()
+        var list = context.productionSet().scope()
                 .filter(e -> AnyMatcher.scan(e.getRule(), context))
                 .toList();
-        if (productions.isEmpty()) {
+        if (list.isEmpty()) {
             var tokenizer = context.tokenizer();
             tokenizer.next();
             return tokenizer.getToken();
         }
-        if (1 < productions.size()) {
-          var message = MessageSupport.ambiguousProductionSet(productions);
+        if (1 < list.size()) {
+          var message = MessageSupport.ambiguousProductionSet(list);
           throw new ParseException(message);
         }
-        var production = productions.get(0);
+        var production = list.get(0);
         var subContext = context.withProduction(production);
-        var value = visit(production.getRule(), subContext).toString();
+        var value = INSTANCE.visit(production.getRule(), subContext).toString();
         return new DefaultToken(production.getSymbol(), value);
     }
 

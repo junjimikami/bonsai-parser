@@ -26,7 +26,16 @@ final class Derivation implements RuleVisitor<List<Tree>, Context> {
     private Derivation() {
     }
 
-    static Tree derive(Context context) {
+    static Tree run(Context context) {
+        var tree = derive(context);
+        if (context.tokenizer().hasNext()) {
+            var message = MessageSupport.tokensRemained(context);
+            throw new ParseException(message);
+        }
+        return tree;
+    }
+
+    private static Tree derive(Context context) {
         var production = context.production();
         var trees = INSTANCE.visit(production.getRule(), context);
         return new DefaultNonTerminal(production.getSymbol(), trees);

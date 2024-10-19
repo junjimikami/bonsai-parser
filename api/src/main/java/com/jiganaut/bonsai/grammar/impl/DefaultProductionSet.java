@@ -54,7 +54,8 @@ class DefaultProductionSet extends AbstractSet<Production> implements Production
 
     private final Set<Production> productionSet;
 
-    private DefaultProductionSet(Set<Production> productionSet) {
+    DefaultProductionSet(Set<Production> productionSet) {
+        assert productionSet != null;
         this.productionSet = productionSet;
     }
 

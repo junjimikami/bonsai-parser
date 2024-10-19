@@ -8,20 +8,14 @@ import com.jiganaut.bonsai.grammar.Production;
 import com.jiganaut.bonsai.grammar.ProductionSet;
 import com.jiganaut.bonsai.grammar.Rule;
 
-class DefaultGrammar implements Grammar {
+class DefaultGrammar extends DefaultProductionSet implements Grammar {
 
-    static class Builder extends BaseBuilder implements Grammar.Builder {
-        private final ProductionSet.Builder psBuilder = ProductionSet.builder();
+    static class Builder extends DefaultProductionSet.Builder implements Grammar.Builder {
         private String startSymbol;
-
-        Builder() {
-        }
 
         @Override
         public Builder add(String symbol, Rule rule) {
-            checkParameter(symbol);
-            checkParameter(rule);
-            psBuilder.add(symbol, rule);
+            super.add(symbol, rule);
             if (startSymbol == null) {
                 startSymbol = symbol;
             }
@@ -30,9 +24,7 @@ class DefaultGrammar implements Grammar {
 
         @Override
         public Builder add(String symbol, Rule.Builder builder) {
-            checkParameter(symbol);
-            checkParameter(builder);
-            psBuilder.add(symbol, builder);
+            super.add(symbol, builder);
             if (startSymbol == null) {
                 startSymbol = symbol;
             }
@@ -48,8 +40,7 @@ class DefaultGrammar implements Grammar {
 
         @Override
         public Grammar build() {
-            checkForBuild();
-            var productionSet = psBuilder.build();
+            var productionSet = super.build();
             var match = productionSet.stream()
                     .map(e -> e.getSymbol())
                     .anyMatch(e -> Objects.equals(e, startSymbol));
@@ -60,33 +51,17 @@ class DefaultGrammar implements Grammar {
         }
     }
 
-    private final ProductionSet productionSet;
     private final String startSymbol;
 
     private DefaultGrammar(ProductionSet productionSet, String startSymbol) {
-        assert productionSet != null;
+        super(productionSet);
         assert startSymbol != null;
-        this.productionSet = productionSet;
         this.startSymbol = startSymbol;
     }
 
     @Override
-    public String getStartSymbol() {
-        return startSymbol;
-    }
-
-    @Override
-    public ProductionSet productionSet() {
-        return productionSet;
-    }
-
-    @Override
     public Production getStartProduction() {
-        return productionSet.getProduction(startSymbol);
+        return getProduction(startSymbol);
     }
 
-    @Override
-    public String toString() {
-        return productionSet.toString();
-    }
 }

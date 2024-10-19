@@ -1,6 +1,7 @@
 package com.jiganaut.bonsai.grammar;
 
 import java.util.Set;
+import java.util.stream.Stream;
 
 import com.jiganaut.bonsai.grammar.impl.GrammarProviders;
 
@@ -21,4 +22,8 @@ public interface ProductionSet extends Set<Production> {
     public boolean containsSymbol(String symbol);
 
     public Production getProduction(String symbol);
+
+    public default Stream<Production> scope() {
+        return stream();
+    }
 }

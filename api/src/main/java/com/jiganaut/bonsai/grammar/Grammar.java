@@ -1,10 +1,12 @@
 package com.jiganaut.bonsai.grammar;
 
+import java.util.stream.Stream;
+
 import com.jiganaut.bonsai.grammar.impl.GrammarProviders;
 
-public interface Grammar {
+public interface Grammar extends ProductionSet {
 
-    public static interface Builder {
+    public static interface Builder extends ProductionSet.Builder {
         public Grammar.Builder add(String symbol, Rule rule);
         public Grammar.Builder add(String symbol, Rule.Builder builder);
         public Grammar.Builder setStartSymbol(String symbol);
@@ -15,9 +17,11 @@ public interface Grammar {
         return GrammarProviders.provider().createGrammarBuilder();
     }
 
-    public String getStartSymbol();
-
-    public ProductionSet productionSet();
-
     public Production getStartProduction();
+
+    @Override
+    public default Stream<Production> scope() {
+        return Stream.of(getStartProduction());
+    }
+
 }

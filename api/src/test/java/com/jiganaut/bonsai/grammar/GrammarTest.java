@@ -133,36 +133,13 @@ class GrammarTest {
     }
 
     @Test
-    @DisplayName("getStartSymbol()")
-    void getStartSymbol() throws Exception {
-        var grammar = Grammar.builder()
-                .add("S", Stubs.DUMMY_RULE_BUILDER)
-                .add("A", Stubs.DUMMY_RULE_BUILDER)
-                .build();
-
-        assertEquals("S", grammar.getStartSymbol());
-    }
-
-    @Test
-    @DisplayName("getStartSymbol() [Start symbol changed]")
-    void getStartSymbolInCaseStartSymbolChanged() throws Exception {
-        var grammar = Grammar.builder()
-                .add("S", Stubs.DUMMY_RULE_BUILDER)
-                .add("A", Stubs.DUMMY_RULE_BUILDER)
-                .setStartSymbol("A")
-                .build();
-
-        assertEquals("A", grammar.getStartSymbol());
-    }
-
-    @Test
     @DisplayName("productionSet()")
     void productionSet() throws Exception {
         var grammar = Grammar.builder()
                 .add("S", Stubs.DUMMY_RULE_BUILDER)
                 .add("A", Stubs.DUMMY_RULE_BUILDER)
                 .build();
-        var productionSet = grammar.productionSet();
+        var productionSet = grammar;
 
         assertTrue(productionSet.containsSymbol("S"));
         assertEquals("S", productionSet.getProduction("S").getSymbol());
@@ -184,7 +161,7 @@ class GrammarTest {
                 .add("S", () -> Stubs.rule("RULE1"))
                 .add("S", () -> Stubs.rule("RULE2"))
                 .build();
-        var productionSet = grammar.productionSet();
+        var productionSet = grammar;
 
         assertTrue(productionSet.containsSymbol("S"));
         assertEquals("S", productionSet.getProduction("S").getSymbol());
