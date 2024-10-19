@@ -127,7 +127,7 @@ class ChoiceRuleTest implements CompositeRuleTest<ChoiceRule> {
 
         assertIterableEquals(list, choice.getChoices().stream()
                 .map(e -> (ReferenceRule) e)
-                .map(e -> e.getProduction(Stubs.DUMMY_PRODUCTION_SET).getSymbol())
+                .map(e -> e.lookup(Stubs.DUMMY_PRODUCTION_SET).getSymbol())
                 .toList());
     }
 

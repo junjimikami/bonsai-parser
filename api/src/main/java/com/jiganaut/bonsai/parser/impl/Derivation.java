@@ -90,7 +90,7 @@ final class Derivation implements RuleVisitor<List<Tree>, Context> {
     @Override
     public List<Tree> visitReference(ReferenceRule reference, Context context) {
         var productionSet = context.productionSet();
-        var production = reference.getProduction(productionSet);
+        var production = reference.lookup(productionSet);
         var subContext = context.withProduction(production);
         var tree = derive(subContext);
         return List.of(tree);

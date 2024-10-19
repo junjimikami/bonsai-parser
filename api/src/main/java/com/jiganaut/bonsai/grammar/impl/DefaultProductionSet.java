@@ -66,7 +66,7 @@ class DefaultProductionSet extends AbstractSet<Production> implements Production
     }
 
     @Override
-    public Production get(String symbol) {
+    public Production getProduction(String symbol) {
         var ps = productionSet.stream()
                 .filter(e -> Objects.equals(e.getSymbol(), symbol))
                 .toList();

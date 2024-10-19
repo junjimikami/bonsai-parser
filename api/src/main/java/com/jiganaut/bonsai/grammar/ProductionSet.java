@@ -20,5 +20,5 @@ public interface ProductionSet extends Set<Production> {
 
     public boolean containsSymbol(String symbol);
 
-    public Production get(String symbol);
+    public Production getProduction(String symbol);
 }

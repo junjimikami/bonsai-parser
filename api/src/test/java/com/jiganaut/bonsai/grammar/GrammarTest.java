@@ -165,15 +165,15 @@ class GrammarTest {
         var productionSet = grammar.productionSet();
 
         assertTrue(productionSet.containsSymbol("S"));
-        assertEquals("S", productionSet.get("S").getSymbol());
-        assertEquals(Stubs.DUMMY_RULE, productionSet.get("S").getRule());
+        assertEquals("S", productionSet.getProduction("S").getSymbol());
+        assertEquals(Stubs.DUMMY_RULE, productionSet.getProduction("S").getRule());
 
         assertTrue(productionSet.containsSymbol("A"));
-        assertEquals("A", productionSet.get("A").getSymbol());
-        assertEquals(Stubs.DUMMY_RULE, productionSet.get("A").getRule());
+        assertEquals("A", productionSet.getProduction("A").getSymbol());
+        assertEquals(Stubs.DUMMY_RULE, productionSet.getProduction("A").getRule());
 
         assertFalse(productionSet.containsSymbol("B"));
-        assertThrows(NoSuchElementException.class, () -> productionSet.get("B"));
+        assertThrows(NoSuchElementException.class, () -> productionSet.getProduction("B"));
     }
 
     @Test
@@ -187,8 +187,8 @@ class GrammarTest {
         var productionSet = grammar.productionSet();
 
         assertTrue(productionSet.containsSymbol("S"));
-        assertEquals("S", productionSet.get("S").getSymbol());
-        var rule = productionSet.get("S").getRule();
+        assertEquals("S", productionSet.getProduction("S").getSymbol());
+        var rule = productionSet.getProduction("S").getRule();
         assertInstanceOf(ChoiceRule.class, rule);
         assertEquals(Kind.CHOICE, rule.getKind());
         rule.accept(new TestRuleVisitor<Void, Void>() {

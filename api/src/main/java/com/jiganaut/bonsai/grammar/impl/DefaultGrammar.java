@@ -82,7 +82,7 @@ class DefaultGrammar implements Grammar {
 
     @Override
     public Production getStartProduction() {
-        return productionSet.get(startSymbol);
+        return productionSet.getProduction(startSymbol);
     }
 
     @Override

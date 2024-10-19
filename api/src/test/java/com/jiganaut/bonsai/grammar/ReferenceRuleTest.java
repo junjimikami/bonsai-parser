@@ -48,7 +48,7 @@ class ReferenceRuleTest implements RuleTest, QuantifiableTest {
     void getSymbol() throws Exception {
         var symbol = "S";
         var reference = ReferenceRule.of(symbol);
-        var production = reference.getProduction(Stubs.DUMMY_PRODUCTION_SET);
+        var production = reference.lookup(Stubs.DUMMY_PRODUCTION_SET);
 
         assertEquals(symbol, production.getSymbol());
     }

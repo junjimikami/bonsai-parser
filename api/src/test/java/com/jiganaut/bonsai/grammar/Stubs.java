@@ -34,7 +34,7 @@ final class Stubs {
         }
 
         @Override
-        public Production get(String symbol) {
+        public Production getProduction(String symbol) {
             return productionOf(symbol);
         }
 
@@ -51,7 +51,7 @@ final class Stubs {
         }
 
         @Override
-        public Production get(String symbol) {
+        public Production getProduction(String symbol) {
             throw new NoSuchElementException("TEST CODE");
         }
         

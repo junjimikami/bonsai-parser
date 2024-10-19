@@ -67,8 +67,8 @@ class RulesTest {
         var expected = ReferenceRule.of("A");
         var actual = Rules.reference("A");
 
-        assertEquals(expected.getProduction(Stubs.DUMMY_PRODUCTION_SET).getSymbol(),
-                actual.getProduction(Stubs.DUMMY_PRODUCTION_SET).getSymbol());
+        assertEquals(expected.lookup(Stubs.DUMMY_PRODUCTION_SET).getSymbol(),
+                actual.lookup(Stubs.DUMMY_PRODUCTION_SET).getSymbol());
     }
 
     @Test

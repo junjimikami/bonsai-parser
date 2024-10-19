@@ -106,7 +106,7 @@ final class Tokenization implements RuleVisitor<CharSequence, Context> {
     @Override
     public CharSequence visitReference(ReferenceRule reference, Context context) {
         var productionSet = context.productionSet();
-        var production = reference.getProduction(productionSet);
+        var production = reference.lookup(productionSet);
         var subContext = context.withProduction(production);
         return visit(production.getRule(), subContext);
     }
