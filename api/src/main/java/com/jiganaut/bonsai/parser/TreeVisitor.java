@@ -17,7 +17,7 @@ public interface TreeVisitor<R, P> {
         return tree.accept(this, p);
     }
 
-    public R visitTerminal(Terminal tree, P p);
+    public R visitTerminal(TerminalNode tree, P p);
 
-    public R visitNonTerminal(NonTerminal tree, P p);
+    public R visitNonTerminal(NonTerminalNode tree, P p);
 }

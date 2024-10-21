@@ -6,7 +6,7 @@ import java.util.List;
  *
  * @author Junji Mikami
  */
-public interface NonTerminal extends Tree {
+public interface NonTerminalNode extends Tree {
 
     @Override
     public default Kind getKind() {
@@ -21,20 +21,20 @@ public interface NonTerminal extends Tree {
     public String getName();
     public List<? extends Tree> getSubTrees();
 
-    public default List<NonTerminal> getNonTerminals(String symbol) {
+    public default List<NonTerminalNode> getNonTerminals(String symbol) {
         return getSubTrees().stream()
                 .filter(e -> e.getKind().isNonTerminal())
                 .map(e -> e.asNonTerminal())
                 .filter(e -> e.getName().equals(symbol))
                 .toList();
     }
-    public default NonTerminal getNonTerminal(String symbol, int index) {
+    public default NonTerminalNode getNonTerminal(String symbol, int index) {
         return getNonTerminals(symbol).get(index);
     }
-    public default NonTerminal getNonTerminal(int index) {
+    public default NonTerminalNode getNonTerminal(int index) {
         return getSubTrees().get(index).asNonTerminal();
     }
-    public default Terminal getTerminal(int index) {
+    public default TerminalNode getTerminal(int index) {
         return getSubTrees().get(index).asTerminal();
     }
 }

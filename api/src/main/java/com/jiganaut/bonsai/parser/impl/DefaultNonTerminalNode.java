@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.jiganaut.bonsai.parser.NonTerminal;
+import com.jiganaut.bonsai.parser.NonTerminalNode;
 import com.jiganaut.bonsai.parser.Tree;
 
 /**
@@ -12,11 +12,11 @@ import com.jiganaut.bonsai.parser.Tree;
  * @author Junji Mikami
  *
  */
-class DefaultNonTerminal implements NonTerminal {
+class DefaultNonTerminalNode implements NonTerminalNode {
     private final String symbol;
     private final List<? extends Tree> list;
 
-    DefaultNonTerminal(String symbol, List<? extends Tree> list) {
+    DefaultNonTerminalNode(String symbol, List<? extends Tree> list) {
         assert symbol != null;
         assert list != null;
         this.symbol = symbol;

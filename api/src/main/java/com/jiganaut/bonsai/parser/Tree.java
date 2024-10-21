@@ -43,10 +43,10 @@ public interface Tree {
         return accept(v, null);
     }
     
-    public default NonTerminal asNonTerminal() {
-        return (NonTerminal) this;
+    public default NonTerminalNode asNonTerminal() {
+        return (NonTerminalNode) this;
     }
-    public default Terminal asTerminal() {
-        return (Terminal) this;
+    public default TerminalNode asTerminal() {
+        return (TerminalNode) this;
     }
 }

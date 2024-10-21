@@ -38,7 +38,7 @@ final class Derivation implements RuleVisitor<List<Tree>, Context> {
     private static Tree derive(Context context) {
         var production = context.production();
         var trees = INSTANCE.visit(production.getRule(), context);
-        return new DefaultNonTerminal(production.getSymbol(), trees);
+        return new DefaultNonTerminalNode(production.getSymbol(), trees);
     }
 
     @Override

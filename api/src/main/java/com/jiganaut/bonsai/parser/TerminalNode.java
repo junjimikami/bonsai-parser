@@ -4,7 +4,7 @@ package com.jiganaut.bonsai.parser;
  *
  * @author Junji Mikami
  */
-public interface Terminal extends Tree {
+public interface TerminalNode extends Tree {
 
     @Override
     public default Kind getKind() {

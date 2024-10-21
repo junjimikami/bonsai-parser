@@ -162,7 +162,7 @@ class ParserTest {
         if (expected != null) {
             var actual = parser.parse().accept(new TreeToString<Void>() {
                 @Override
-                public String visitNonTerminal(NonTerminal tree, Void p) {
+                public String visitNonTerminal(NonTerminalNode tree, Void p) {
                     return tree.getName() +
                             tree.getSubTrees().stream()
                                     .map(this::visit)
@@ -213,7 +213,7 @@ class ParserTest {
 
     private interface TreeToString<P> extends TreeVisitor<String, P> {
         @Override
-        default String visitTerminal(Terminal tree, P p) {
+        default String visitTerminal(TerminalNode tree, P p) {
             return tree.getValue();
         }
     }
