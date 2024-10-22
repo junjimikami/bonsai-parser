@@ -1,12 +1,41 @@
 package com.jiganaut.bonsai.parser;
 
-import java.util.List;
+import com.jiganaut.bonsai.parser.spi.TreeProvider;
 
 /**
  *
  * @author Junji Mikami
  */
 public interface NonTerminalNode extends Tree {
+
+    public static interface Builder extends Tree.Builder {
+
+        @Override
+        public NonTerminalNode.Builder setName(String name);
+
+        @Override
+        public NonTerminalNode.Builder setValue(String name);
+
+        @Override
+        public NonTerminalNode build();
+
+        public NonTerminalNode.Builder add(Tree tree);
+
+    }
+
+    public static NonTerminalNode.Builder builder() {
+        return TreeProvider.provider().createNonTerminalBuilder();
+    }
+
+    public static NonTerminalNode of(String name, String value, Tree... trees) {
+        var builder = builder()
+                .setName(name)
+                .setValue(name);
+        for (var tree : trees) {
+            builder.add(tree);
+        }
+        return builder.build();
+    }
 
     @Override
     public default Kind getKind() {
@@ -18,23 +47,4 @@ public interface NonTerminalNode extends Tree {
         return v.visitNonTerminal(this, p);
     }
 
-    public String getName();
-    public List<? extends Tree> getSubTrees();
-
-    public default List<NonTerminalNode> getNonTerminals(String symbol) {
-        return getSubTrees().stream()
-                .filter(e -> e.getKind().isNonTerminal())
-                .map(e -> e.asNonTerminal())
-                .filter(e -> e.getName().equals(symbol))
-                .toList();
-    }
-    public default NonTerminalNode getNonTerminal(String symbol, int index) {
-        return getNonTerminals(symbol).get(index);
-    }
-    public default NonTerminalNode getNonTerminal(int index) {
-        return getSubTrees().get(index).asNonTerminal();
-    }
-    public default TerminalNode getTerminal(int index) {
-        return getSubTrees().get(index).asTerminal();
-    }
 }

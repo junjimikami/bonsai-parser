@@ -1,5 +1,7 @@
 package com.jiganaut.bonsai.parser;
 
+import java.util.List;
+
 /**
  *
  * @author Junji Mikami
@@ -24,11 +26,25 @@ public interface Tree {
         }
     }
 
+    public static interface Builder {
+        public Tree.Builder setName(String name);
+
+        public Tree.Builder setValue(String value);
+
+        public Tree build();
+    }
+
     /**
      * 
      * @return
      */
     public Kind getKind();
+
+    public String getName();
+
+    public String getValue();
+
+    public List<? extends Tree> getSubTrees();
 
     /**
      * 
@@ -39,14 +55,9 @@ public interface Tree {
      * @return
      */
     public <R, P> R accept(TreeVisitor<R, P> v, P p);
+
     public default <R, P> R accept(TreeVisitor<R, P> v) {
         return accept(v, null);
     }
-    
-    public default NonTerminalNode asNonTerminal() {
-        return (NonTerminalNode) this;
-    }
-    public default TerminalNode asTerminal() {
-        return (TerminalNode) this;
-    }
+
 }
