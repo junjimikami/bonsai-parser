@@ -15,10 +15,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
-class SequenceRuleTest implements CompositeRuleTest<SequenceRule> {
+class SequenceRuleTestCase implements CompositeRuleTestCase<SequenceRule> {
 
     @Nested
-    class BuilderTest implements CompositeRuleTest.BuilderTest<SequenceRule.Builder> {
+    class BuilderTest implements CompositeRuleTestCase.BuilderTest<SequenceRule.Builder> {
 
         @Override
         public SequenceRule.Builder createTarget() {

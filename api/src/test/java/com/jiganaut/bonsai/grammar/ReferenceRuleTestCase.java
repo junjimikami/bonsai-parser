@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
-class ReferenceRuleTest implements RuleTest, QuantifiableTest {
+class ReferenceRuleTestCase implements RuleTestCase, QuantifiableTestCase {
 
     @Override
     public ReferenceRule createTarget() {

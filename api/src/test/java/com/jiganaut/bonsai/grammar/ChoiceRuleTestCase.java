@@ -20,10 +20,10 @@ import com.jiganaut.bonsai.grammar.Rule.Kind;
  * @author Junji Mikami
  *
  */
-class ChoiceRuleTest implements CompositeRuleTest<ChoiceRule> {
+class ChoiceRuleTestCase implements CompositeRuleTestCase<ChoiceRule> {
 
     @Nested
-    class BuilderTest implements CompositeRuleTest.BuilderTest<ChoiceRule.Builder> {
+    class BuilderTest implements CompositeRuleTestCase.BuilderTest<ChoiceRule.Builder> {
 
         @Override
         public ChoiceRule.Builder createTarget() {

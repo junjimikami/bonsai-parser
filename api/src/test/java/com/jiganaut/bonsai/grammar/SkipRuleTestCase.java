@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
-class SkipRuleTest implements RuleTest {
+class SkipRuleTestCase implements RuleTestCase {
 
     @Override
     public SkipRule createTarget() {

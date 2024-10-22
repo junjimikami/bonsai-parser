@@ -14,7 +14,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
-class PatternRuleTest implements RuleTest, QuantifiableTest, SkippableTest {
+class PatternRuleTestCase implements RuleTestCase, QuantifiableTestCase, SkippableTestCase {
 
     @Override
     public PatternRule createTarget() {

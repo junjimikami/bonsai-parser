@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
-class QuantifierRuleTest implements RuleTest {
+class QuantifierRuleTestCase implements RuleTestCase {
 
     @Override
     public QuantifierRule createTarget() {

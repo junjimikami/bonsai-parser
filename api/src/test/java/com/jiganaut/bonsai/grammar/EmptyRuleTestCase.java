@@ -2,7 +2,7 @@ package com.jiganaut.bonsai.grammar;
 
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
-class EmptyRuleTest implements RuleTest {
+class EmptyRuleTestCase implements RuleTestCase {
 
     @Override
     public Rule createTarget() {

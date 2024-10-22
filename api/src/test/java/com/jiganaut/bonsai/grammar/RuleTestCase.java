@@ -13,7 +13,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
-interface RuleTest extends TestCase {
+interface RuleTestCase extends TestCase {
 
     interface BuilderTest extends TestCase {
         Rule.Builder createTarget();

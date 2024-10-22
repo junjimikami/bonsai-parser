@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-interface SkippableTest extends TestCase {
+interface SkippableTestCase extends TestCase {
     Skippable createTarget();
 
     default Skippable createTargetSkippable() {
