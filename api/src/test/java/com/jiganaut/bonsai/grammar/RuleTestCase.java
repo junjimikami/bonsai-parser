@@ -15,38 +15,82 @@ import com.jiganaut.bonsai.grammar.Rule.Kind;
 
 interface RuleTestCase extends TestCase {
 
-    interface BuilderTest extends TestCase {
+    interface BuilderTestCase extends TestCase {
         Rule.Builder createTarget();
- 
-        default Rule.Builder createTargetBuilder() {
-            return createTarget();
-        }
+
+        Rule expectedRule();
 
         @Test
         @DisplayName("build() [Post-build operation]")
         default void buildInCaseOfPostBuild() throws Exception {
-            var builder = createTargetBuilder();
+            var builder = createTarget();
             builder.build();
 
             assertThrows(IllegalStateException.class, () -> builder.build());
         }
 
+        void build() throws Exception;
+
     }
 
     Rule createTarget();
 
-    default Rule createTargetRule() {
-        return createTarget();
-    }
-
     Kind expectedKind();
 
-    RuleVisitor<Object[], String> createVisitor();
+    RuleVisitor<Object[], String> testVisitor = new SimpleRuleVisitor<>() {
+
+        @Override
+        public Object[] visitChoice(ChoiceRule choice, String p) {
+            assertEquals(Rule.Kind.CHOICE, choice.getKind());
+            return SimpleRuleVisitor.super.visitChoice(choice, p);
+        }
+
+        @Override
+        public Object[] visitSequence(SequenceRule sequence, String p) {
+            assertEquals(Rule.Kind.SEQUENCE, sequence.getKind());
+            return SimpleRuleVisitor.super.visitSequence(sequence, p);
+        }
+
+        @Override
+        public Object[] visitPattern(PatternRule pattern, String p) {
+            assertEquals(Rule.Kind.PATTERN, pattern.getKind());
+            return SimpleRuleVisitor.super.visitPattern(pattern, p);
+        }
+
+        @Override
+        public Object[] visitReference(ReferenceRule reference, String p) {
+            assertEquals(Rule.Kind.REFERENCE, reference.getKind());
+            return SimpleRuleVisitor.super.visitReference(reference, p);
+        }
+
+        @Override
+        public Object[] visitQuantifier(QuantifierRule quantifier, String p) {
+            assertEquals(Rule.Kind.QUANTIFIER, quantifier.getKind());
+            return SimpleRuleVisitor.super.visitQuantifier(quantifier, p);
+        }
+
+        @Override
+        public Object[] visitSkip(SkipRule skip, String p) {
+            assertEquals(Rule.Kind.SKIP, skip.getKind());
+            return SimpleRuleVisitor.super.visitSkip(skip, p);
+        }
+
+        @Override
+        public Object[] visitEmpty(Rule empty, String p) {
+            assertEquals(Rule.Kind.EMPTY, empty.getKind());
+            return SimpleRuleVisitor.super.visitEmpty(empty, p);
+        }
+
+        @Override
+        public Object[] defaultAction(Rule rule, String p) {
+            return new Object[] { rule, p };
+        }
+    };
 
     @Test
     @DisplayName("objectMethods()")
     default void objectMethods() throws Exception {
-        var rule = createTargetRule();
+        var rule = createTarget();
 
         rule.toString();
     }
@@ -54,7 +98,7 @@ interface RuleTestCase extends TestCase {
     @Test
     @DisplayName("getKind()")
     default void getKind() throws Exception {
-        var rule = createTargetRule();
+        var rule = createTarget();
 
         assertEquals(expectedKind(), rule.getKind());
     }
@@ -62,7 +106,7 @@ interface RuleTestCase extends TestCase {
     @Test
     @DisplayName("accept(ev:ElementVisitor) [Null parameter]")
     default void acceptEvInCaseOfNullParameter() throws Exception {
-        var rule = createTargetRule();
+        var rule = createTarget();
 
         assertThrows(NullPointerException.class, () -> rule.accept(null));
     }
@@ -70,8 +114,8 @@ interface RuleTestCase extends TestCase {
     @Test
     @DisplayName("accept(rv:RuleVisitor)")
     default void acceptRv() throws Exception {
-        var rule = createTargetRule();
-        var visitor = createVisitor();
+        var rule = createTarget();
+        var visitor = testVisitor;
         var expected = new Object[] { rule, null };
         var result = rule.accept(visitor);
         var result2 = visitor.visit(rule);
@@ -86,8 +130,8 @@ interface RuleTestCase extends TestCase {
     @EmptySource
     @ValueSource(strings = { "test" })
     default void acceptRvP(String arg) throws Exception {
-        var rule = createTargetRule();
-        var visitor = createVisitor();
+        var rule = createTarget();
+        var visitor = testVisitor;
         var expected = new Object[] { rule, arg };
         var result = rule.accept(visitor, arg);
         var result2 = visitor.visit(rule, arg);

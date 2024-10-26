@@ -9,20 +9,15 @@ import org.junit.jupiter.api.Test;
 interface CompositeRuleTestCase<U extends Rule & Quantifiable> extends RuleTestCase, QuantifiableTestCase {
 
     @Nested
-    interface BuilderTest<T extends Rule.Builder & Quantifiable> extends RuleTestCase.BuilderTest, QuantifiableTestCase {
+    interface BuilderTestCase<T extends Rule.Builder & Quantifiable> extends RuleTestCase.BuilderTestCase, QuantifiableTestCase {
 
         @Override
         T createTarget();
 
-        @Override
-        default T createTargetBuilder() {
-            return createTarget();
-        }
-
         @Test
         @DisplayName("exactly(int) [Post-build operation]")
         default void exactlyInCaseOfPostBuild() throws Exception {
-            var builder = createTargetBuilder();
+            var builder = createTarget();
             builder.build();
 
             assertThrows(IllegalStateException.class, () -> builder.exactly(0));
@@ -31,7 +26,7 @@ interface CompositeRuleTestCase<U extends Rule & Quantifiable> extends RuleTestC
         @Test
         @DisplayName("atLeast(int) [Post-build operation]")
         default void atLeastInCaseOfPostBuild() throws Exception {
-            var builder = createTargetBuilder();
+            var builder = createTarget();
             builder.build();
 
             assertThrows(IllegalStateException.class, () -> builder.atLeast(0));
@@ -40,7 +35,7 @@ interface CompositeRuleTestCase<U extends Rule & Quantifiable> extends RuleTestC
         @Test
         @DisplayName("range(int, int) [Post-build operation]")
         default void rangeInCaseOfPostBuild() throws Exception {
-            var builder = createTargetBuilder();
+            var builder = createTarget();
             builder.build();
 
             assertThrows(IllegalStateException.class, () -> builder.range(0, 0));
@@ -49,7 +44,7 @@ interface CompositeRuleTestCase<U extends Rule & Quantifiable> extends RuleTestC
         @Test
         @DisplayName("opt() [Post-build operation]")
         default void optInCaseOfPostBuild() throws Exception {
-            var builder = createTargetBuilder();
+            var builder = createTarget();
             builder.build();
 
             assertThrows(IllegalStateException.class, () -> builder.opt());
@@ -58,7 +53,7 @@ interface CompositeRuleTestCase<U extends Rule & Quantifiable> extends RuleTestC
         @Test
         @DisplayName("zeroOrMore() [Post-build operation]")
         default void zeroOrMoreInCaseOfPostBuild() throws Exception {
-            var builder = createTargetBuilder();
+            var builder = createTarget();
             builder.build();
 
             assertThrows(IllegalStateException.class, () -> builder.zeroOrMore());
@@ -67,7 +62,7 @@ interface CompositeRuleTestCase<U extends Rule & Quantifiable> extends RuleTestC
         @Test
         @DisplayName("oneOrMore() [Post-build operation]")
         default void oneOrMoreInCaseOfPostBuild() throws Exception {
-            var builder = createTargetBuilder();
+            var builder = createTarget();
             builder.build();
 
             assertThrows(IllegalStateException.class, () -> builder.oneOrMore());

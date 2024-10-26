@@ -3,130 +3,69 @@ package com.jiganaut.bonsai.grammar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.OptionalInt;
+import java.util.stream.Stream;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
-class QuantifierRuleTestCase implements RuleTestCase {
+interface QuantifierRuleTestCase extends RuleTestCase {
 
     @Override
-    public QuantifierRule createTarget() {
-        return PatternRule.of("").opt();
-    }
-
-    QuantifierRule createTargetQuantifierRule() {
-        return createTarget();
-    }
-
-    int expectedMinCount() {
-        return 0;
-    }
-
-    OptionalInt expectedMaxCount() {
-        return OptionalInt.of(1);
-    }
-
-    Rule expectedRule() {
-        return PatternRule.of("");
-    }
+    QuantifierRule createTarget();
 
     @Override
-    public Kind expectedKind() {
+    default Kind expectedKind() {
         return Kind.QUANTIFIER;
     }
 
-    @Override
-    public RuleVisitor<Object[], String> createVisitor() {
-        return new TestRuleVisitor<Object[], String>() {
-            @Override
-            public Object[] visitQuantifier(QuantifierRule quantifier, String p) {
-                return new Object[] { quantifier, p };
-            }
-        };
+    int expectedMinCount();
+
+    OptionalInt expectedMaxCount();
+
+    Rule expectedRule();
+
+    @Test
+    @DisplayName("getMinCount()")
+    default void getMinCount() throws Exception {
+        var target = createTarget();
+
+        assertEquals(expectedMinCount(), target.getMinCount());
     }
 
     @Test
-    void getMinCount() throws Exception {
-        var rule = createTargetQuantifierRule();
-        assertEquals(expectedMinCount(), rule.getMinCount());
+    @DisplayName("getMaxCount()")
+    default void getMaxCount() throws Exception {
+        var target = createTarget();
+
+        assertEquals(expectedMaxCount().isEmpty(), target.getMaxCount().isEmpty());
+        if (expectedMaxCount().isPresent()) {
+            assertEquals(expectedMaxCount().getAsInt(), target.getMaxCount().getAsInt());
+        }
     }
 
     @Test
-    void getMaxCount() throws Exception {
-        var rule = createTargetQuantifierRule();
-        assertEquals(expectedMaxCount().getAsInt(), rule.getMaxCount().getAsInt());
+    @DisplayName("getRule()")
+    default void getRule() throws Exception {
+        var target = createTarget();
+
+        assertEquals(expectedRule(), target.getRule());
     }
 
     @Test
-    void getRule() throws Exception {
-        var rule = createTargetQuantifierRule();
-        assertEquals(expectedRule().getKind(), rule.getRule().getKind()); //TODO
-    }
+    @DisplayName("stream()")
+    default void stream() throws Exception {
+        var target = createTarget();
 
-    @Test
-    void stream() throws Exception {
-        var rule = createTargetQuantifierRule();
-        assertEquals(expectedRule().getKind(), rule.stream().findFirst().get().getKind());
+        var expected = Stream.generate(this::expectedRule)
+                .limit(expectedMaxCount().orElse(9))
+                .limit(9)
+                .toList();
+        var actual = target.stream()
+                .limit(9)
+                .toList();
+        assertEquals(expected, actual);
     }
-
-//    @Test
-//    @DisplayName("opt()")
-//    default void opt() throws Exception {
-//        var quantifier = builder().opt();
-//
-//        assertEquals(0, quantifier.getMinCount());
-//        assertEquals(1, quantifier.getMaxCount().getAsInt());
-//    }
-//
-//    @Test
-//    @DisplayName("zeroOrMore()")
-//    default void zeroOrMore() throws Exception {
-//        var quantifier = builder().zeroOrMore();
-//
-//        assertEquals(0, quantifier.getMinCount());
-//        assertEquals(true, quantifier.getMaxCount().isEmpty());
-//    }
-//
-//    @Test
-//    @DisplayName("oneOrMore()")
-//    default void oneOrMore() throws Exception {
-//        var quantifier = builder().oneOrMore();
-//
-//        assertEquals(1, quantifier.getMinCount());
-//        assertEquals(true, quantifier.getMaxCount().isEmpty());
-//    }
-//
-//    @Test
-//    @DisplayName("exactly()")
-//    default void exactly() throws Exception {
-//        var quantifier = builder().exactly(0);
-//
-//        assertEquals(0, quantifier.getMinCount());
-//        assertEquals(0, quantifier.getMaxCount().getAsInt());
-//    }
-//
-//    @ParameterizedTest
-//    @ValueSource(ints = { 0, 1, 2 })
-//    @DisplayName("atLeast(int)")
-//    default void atLeast(int times) throws Exception {
-//        var quantifier = builder().atLeast(times);
-//
-//        assertEquals(times, quantifier.getMinCount());
-//        assertEquals(true, quantifier.getMaxCount().isEmpty());
-//    }
-//
-//    @ParameterizedTest
-//    @CsvSource({
-//            "0,0", "0,1", "0,2",
-//            "1,1", "1,2",
-//    })
-//    @DisplayName("range()")
-//    default void range(int min, int max) throws Exception {
-//        var quantifier = builder().range(min, max);
-//
-//        assertEquals(min, quantifier.getMinCount());
-//        assertEquals(max, quantifier.getMaxCount().getAsInt());
-//    }
 
 }

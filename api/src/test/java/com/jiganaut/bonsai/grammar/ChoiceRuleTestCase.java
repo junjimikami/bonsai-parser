@@ -2,16 +2,15 @@ package com.jiganaut.bonsai.grammar;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
@@ -20,120 +19,103 @@ import com.jiganaut.bonsai.grammar.Rule.Kind;
  * @author Junji Mikami
  *
  */
-class ChoiceRuleTestCase implements CompositeRuleTestCase<ChoiceRule> {
+interface ChoiceRuleTestCase extends CompositeRuleTestCase<ChoiceRule> {
 
     @Nested
-    class BuilderTest implements CompositeRuleTestCase.BuilderTest<ChoiceRule.Builder> {
+    interface BuilderTestCase extends CompositeRuleTestCase.BuilderTestCase<ChoiceRule.Builder> {
 
         @Override
-        public ChoiceRule.Builder createTarget() {
-            return ChoiceRule.builder().add(() -> ReferenceRule.of(""));
+        ChoiceRule.Builder createTarget();
+
+        @Override
+        ChoiceRule expectedRule();
+
+        @Test
+        @DisplayName("add(r:Rule) [Null parameter]")
+        default void addRInCaseOfNullParameter() throws Exception {
+            var builder = createTarget();
+
+            assertThrows(NullPointerException.class, () -> builder.add((Rule) null));
         }
 
         @Test
         @DisplayName("add(rb:Rule.Builder) [Null parameter]")
-        void addrbInCaseOfNullParameter() throws Exception {
-            var builder = ChoiceRule.builder();
+        default void addRbInCaseOfNullParameter() throws Exception {
+            var builder = createTarget();
 
             assertThrows(NullPointerException.class, () -> builder.add((Rule.Builder) null));
         }
 
         @Test
+        @DisplayName("add(r:Rule) [Post-build operation]")
+        default void addRInCaseOfPostBuild() throws Exception {
+            var builder = createTarget();
+            builder.build();
+
+            assertThrows(IllegalStateException.class, () -> builder.add((Rule) null));
+        }
+
+        @Test
         @DisplayName("add(rb:Rule.Builder) [Post-build operation]")
-        void addrbInCaseOfPostBuild() throws Exception {
-            var builder = ChoiceRule.builder()
-                    .addEmpty();
+        default void addRbInCaseOfPostBuild() throws Exception {
+            var builder = createTarget();
             builder.build();
 
             assertThrows(IllegalStateException.class, () -> builder.add((Rule.Builder) null));
         }
 
         @Test
-        @DisplayName("add(rb:Rule.Builder)")
-        void addrb() throws Exception {
-            var builder = ChoiceRule.builder();
+        @DisplayName("add(r:Rule)")
+        default void addR() throws Exception {
+            var builder = createTarget();
 
-            assertEquals(builder, builder.add(Stubs.DUMMY_RULE_BUILDER));
+            assertEquals(builder, builder.add(mock(Rule.class)));
+        }
+
+        @Test
+        @DisplayName("add(rb:Rule.Builder)")
+        default void addRb() throws Exception {
+            var builder = createTarget();
+
+            assertEquals(builder, builder.add(mock(Rule.Builder.class)));
         }
 
         @Test
         @DisplayName("addEmpty()")
-        void addEmpty() throws Exception {
-            var builder = ChoiceRule.builder();
+        default void addEmpty() throws Exception {
+            var builder = createTarget();
 
             assertEquals(builder, builder.addEmpty());
         }
 
+        @Test
+        @DisplayName("build()")
+        @Override
+        default void build() throws Exception {
+            var builder = createTarget();
+            var rule = builder.build();
+
+            assertNotNull(rule);
+            assertIterableEquals(expectedRule().getChoices(), rule.getChoices());
+        }
     }
 
     @Override
-    public ChoiceRule createTarget() {
-        return ChoiceRule.builder()
-                .addEmpty()
-                .build();
-    }
+    ChoiceRule createTarget();
 
     @Override
-    public Kind expectedKind() {
+    default Kind expectedKind() {
         return Kind.CHOICE;
     }
 
-    @Override
-    public RuleVisitor<Object[], String> createVisitor() {
-        return new TestRuleVisitor<Object[], String>() {
-            @Override
-            public Object[] visitChoice(ChoiceRule choice, String p) {
-                return new Object[] { choice, p };
-            }
-        };
-    }
+    List<? extends Rule> expectedChoices();
 
     @Test
-    @DisplayName("getChoices() [Containing empty]")
-    void getChoicesInCaseOfContainingEmpty() throws Exception {
-        var choice = ChoiceRule.builder()
-                .addEmpty()
-                .build();
-
-        assertIterableEquals(List.of(Rule.EMPTY), choice.getChoices());
-    }
-
-    @ParameterizedTest
-    @MethodSource
     @DisplayName("getChoices()")
-    void getChoices(List<Rule> list) throws Exception {
-        var builder = ChoiceRule.builder();
-        list.stream()
-                .map(Stubs::builderOf)
-                .forEach(builder::add);
-        var choice = builder.build();
+    default void getChoices() throws Exception {
+        var target = createTarget();
 
-        assertIterableEquals(list, choice.getChoices());
+        assertIterableEquals(expectedChoices(), target.getChoices());
     }
 
-    static Stream<List<Rule>> getChoices() {
-        return Stream.of(
-                List.of(Stubs.rule("A")),
-                List.of(Stubs.rule("A"), Stubs.rule("B")));
-    }
-
-    @ParameterizedTest
-    @MethodSource
-    @DisplayName("getChoices() [Containing references]")
-    void getChoicesInCaseOfContainingreferences(List<String> list) throws Exception {
-        var builder = ChoiceRule.builder();
-        list.stream().forEach(symbol -> builder.add(() -> ReferenceRule.of(symbol)));
-        var choice = builder.build();
-
-        assertIterableEquals(list, choice.getChoices().stream()
-                .map(e -> (ReferenceRule) e)
-                .map(e -> e.lookup(Stubs.DUMMY_PRODUCTION_SET).getSymbol())
-                .toList());
-    }
-
-    static Stream<List<String>> getChoicesInCaseOfContainingreferences() {
-        return Stream.of(
-                List.of("A"),
-                List.of("A", "B"));
-    }
 }

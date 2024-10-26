@@ -8,16 +8,13 @@ import org.junit.jupiter.api.Test;
 interface SkippableTestCase extends TestCase {
     Skippable createTarget();
 
-    default Skippable createTargetSkippable() {
-        return createTarget();
-    }
-
     @Test
     @DisplayName("skip()")
     default void skip() throws Exception {
-        var target = createTargetSkippable();
+        var target = createTarget();
         var skip = target.skip();
 
+        assertEquals(Rule.Kind.SKIP, skip.getKind());
         assertEquals(target, skip.getRule());
     }
 

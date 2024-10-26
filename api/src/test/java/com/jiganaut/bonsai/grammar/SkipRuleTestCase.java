@@ -7,41 +7,24 @@ import org.junit.jupiter.api.Test;
 
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
-class SkipRuleTestCase implements RuleTestCase {
+interface SkipRuleTestCase extends RuleTestCase {
 
     @Override
-    public SkipRule createTarget() {
-        return expectedRule().skip();
-    }
+    SkipRule createTarget();
 
     @Override
-    public Kind expectedKind() {
+    default Kind expectedKind() {
         return Kind.SKIP;
     }
 
-    @Override
-    public RuleVisitor<Object[], String> createVisitor() {
-        return new TestRuleVisitor<Object[], String>() {
-            @Override
-            public Object[] visitSkip(SkipRule skip, String p) {
-                return new Object[] { skip, p };
-            }
-        };
-    }
-
-    Skippable expectedRule() {
-        return PatternRule.of("0");
-    }
+    Skippable expectedRule();
 
     @Test
     @DisplayName("getRule()")
-    void getRule() throws Exception {
-        var rule = createTarget();
+    default void getRule() throws Exception {
+        var target = createTarget();
 
-        var expected = (PatternRule) expectedRule();
-        var actual = (PatternRule) rule.getRule();
-        assertEquals(expected.getKind(), actual.getKind());
-        assertEquals(expected.getPattern().pattern(), actual.getPattern().pattern());
+        assertEquals(expectedRule(), target.getRule());
     }
 
 }

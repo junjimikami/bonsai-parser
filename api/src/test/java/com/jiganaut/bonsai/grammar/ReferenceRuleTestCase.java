@@ -1,56 +1,50 @@
 package com.jiganaut.bonsai.grammar;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
-class ReferenceRuleTestCase implements RuleTestCase, QuantifiableTestCase {
+interface ReferenceRuleTestCase extends RuleTestCase, QuantifiableTestCase {
 
     @Override
-    public ReferenceRule createTarget() {
-        return ReferenceRule.of("");
-    }
+    ReferenceRule createTarget();
 
     @Override
-    public Kind expectedKind() {
+    default Kind expectedKind() {
         return Kind.REFERENCE;
     }
 
-    @Override
-    public RuleVisitor<Object[], String> createVisitor() {
-        return new TestRuleVisitor<Object[], String>() {
-            @Override
-            public Object[] visitReference(ReferenceRule reference, String p) {
-                return new Object[] { reference, p };
-            }
-        };
-    }
-
-    @Test
-    @DisplayName("of(String) [Null parameter]")
-    void ofInCaseOfNullParameter() throws Exception {
-        assertThrows(NullPointerException.class, () -> ReferenceRule.of(null));
-    }
-
-    @Test
-    @DisplayName("of(String)")
-    void of() throws Exception {
-        assertNotNull(ReferenceRule.of(""));
-    }
+    String expectedSymbol();
 
     @Test
     @DisplayName("getSymbol")
-    void getSymbol() throws Exception {
-        var symbol = "S";
-        var reference = ReferenceRule.of(symbol);
-        var production = reference.lookup(Stubs.DUMMY_PRODUCTION_SET);
+    default void getSymbol() throws Exception {
+        var target = createTarget();
 
-        assertEquals(symbol, production.getSymbol());
+        assertEquals(expectedSymbol(), target.getSymbol());
+    }
+
+    @Test
+    @DisplayName("lookup")
+    default void lookup() throws Exception {
+        var target = createTarget();
+
+        var productionSet = mock(ProductionSet.class);
+        when(productionSet.getProduction(expectedSymbol())).then(invocation -> {
+            var production = mock(Production.class);
+            when(production.getSymbol()).thenReturn(expectedSymbol());
+            return production;
+        });
+        var production = target.lookup(productionSet);
+        verify(productionSet).getProduction(expectedSymbol());
+
+        assertEquals(expectedSymbol(), production.getSymbol());
     }
 
 }

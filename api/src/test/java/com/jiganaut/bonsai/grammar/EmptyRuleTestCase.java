@@ -14,13 +14,4 @@ class EmptyRuleTestCase implements RuleTestCase {
         return Kind.EMPTY;
     }
 
-    @Override
-    public RuleVisitor<Object[], String> createVisitor() {
-        return new TestRuleVisitor<Object[], String>() {
-            @Override
-            public Object[] visitEmpty(Rule empty, String p) {
-                return new Object[] { empty, p };
-            }
-        };
-    }
 }
