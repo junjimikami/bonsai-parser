@@ -55,11 +55,30 @@ class DefaultSequenceRule extends AbstractCompositeRule implements SequenceRule 
     public String toString() {
         return elements.stream()
                 .map(e -> {
-                    if (e.getKind().isComposite()) {
-                        return "(%s)".formatted(e);
+                    try {
+                        if (e.getKind().isComposite()) {
+                            return "(%s)".formatted(e);
+                        }
+                        return e.toString();
+                    } catch (Exception ex) {
+                        return "?";
                     }
-                    return e.toString();
                 })
                 .collect(Collectors.joining(", "));
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof SequenceRule r) {
+            return this.getKind() == r.getKind()
+                    && this.elements.equals(r.getRules());
+        }
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getKind(), elements);
+    }
+
 }

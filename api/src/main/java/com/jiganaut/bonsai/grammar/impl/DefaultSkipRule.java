@@ -1,5 +1,7 @@
 package com.jiganaut.bonsai.grammar.impl;
 
+import java.util.Objects;
+
 import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.grammar.SkipRule;
 
@@ -25,4 +27,19 @@ class DefaultSkipRule extends AbstractRule implements SkipRule {
     public String toString() {
         return "skip " + rule.toString();
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof SkipRule r) {
+            return this.getKind() == r.getKind()
+                    && this.rule.equals(r.getRule());
+        }
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getKind(), rule);
+    }
+
 }

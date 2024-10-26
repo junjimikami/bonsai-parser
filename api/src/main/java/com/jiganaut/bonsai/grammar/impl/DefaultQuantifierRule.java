@@ -1,5 +1,6 @@
 package com.jiganaut.bonsai.grammar.impl;
 
+import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.stream.Stream;
 
@@ -23,8 +24,11 @@ class DefaultQuantifierRule extends AbstractRule implements QuantifierRule {
         this.minCount = minCount;
         this.maxCount = OptionalInt.empty();
     }
+
     DefaultQuantifierRule(Rule rule, int minCount, int maxCount) {
         assert rule != null;
+        assert minCount >= 0;
+        assert minCount <= maxCount;
         this.rule = rule;
         this.minCount = minCount;
         this.maxCount = OptionalInt.of(maxCount);
@@ -79,4 +83,21 @@ class DefaultQuantifierRule extends AbstractRule implements QuantifierRule {
         sb.append(rule);
         return sb.toString();
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof QuantifierRule r) {
+            return this.getKind() == r.getKind()
+                    && this.rule.equals(r.getRule())
+                    && this.minCount == r.getMinCount()
+                    && this.maxCount.equals(r.getMaxCount());
+        }
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getKind(), rule, minCount, maxCount);
+    }
+
 }

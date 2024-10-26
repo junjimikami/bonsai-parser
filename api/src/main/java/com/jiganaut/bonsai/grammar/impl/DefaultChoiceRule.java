@@ -15,9 +15,6 @@ import com.jiganaut.bonsai.grammar.Rule;
 class DefaultChoiceRule extends AbstractCompositeRule implements ChoiceRule {
     static class Builder extends AbstractCompositeRule.Builder implements ChoiceRule.Builder {
 
-        Builder() {
-        }
-
         @Override
         public Builder add(Rule rule) {
             checkParameter(rule);
@@ -63,11 +60,30 @@ class DefaultChoiceRule extends AbstractCompositeRule implements ChoiceRule {
     public String toString() {
         return elements.stream()
                 .map(e -> {
-                    if (e.getKind().isComposite()) {
-                        return "(%s)".formatted(e);
+                    try {
+                        if (e.getKind().isComposite()) {
+                            return "(%s)".formatted(e);
+                        }
+                        return e.toString();
+                    } catch (Exception ex) {
+                        return "?";
                     }
-                    return e.toString();
                 })
                 .collect(Collectors.joining(" | "));
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ChoiceRule r) {
+            return this.getKind() == r.getKind()
+                    && this.elements.equals(r.getChoices());
+        }
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getKind(), elements);
+    }
+
 }

@@ -1,5 +1,7 @@
 package com.jiganaut.bonsai.grammar.impl;
 
+import java.util.Objects;
+
 import com.jiganaut.bonsai.grammar.Production;
 import com.jiganaut.bonsai.grammar.Rule;
 
@@ -33,4 +35,19 @@ class DefaultProduction implements Production {
     public String toString() {
         return "%s = %s ;".formatted(symbol, rule);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Production p) {
+            return this.getSymbol().equals(p.getSymbol())
+                    && this.getRule().equals(p.getRule());
+        }
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(symbol, rule);
+    }
+
 }

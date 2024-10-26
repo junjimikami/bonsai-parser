@@ -1,6 +1,7 @@
 package com.jiganaut.bonsai.grammar.impl;
 
 import java.util.AbstractSet;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.NoSuchElementException;
@@ -45,8 +46,9 @@ class DefaultProductionSet extends AbstractSet<Production> implements Production
             }
             var productionSet = set.stream()
                     .map(e -> e.get())
-                    .collect(() -> new LinkedHashSet<Production>(), Set::add, Set::addAll);
+                    .collect(LinkedHashSet<Production>::new, Set::add, Set::addAll);
             ReferenceCheck.run(productionSet);
+            CompositeCheck.run(productionSet);
             return new DefaultProductionSet(productionSet);
         }
 
@@ -56,7 +58,7 @@ class DefaultProductionSet extends AbstractSet<Production> implements Production
 
     DefaultProductionSet(Set<Production> productionSet) {
         assert productionSet != null;
-        this.productionSet = productionSet;
+        this.productionSet = Collections.unmodifiableSet(productionSet);
     }
 
     @Override
