@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import com.jiganaut.bonsai.TestCase;
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
 interface RuleTestCase extends TestCase {

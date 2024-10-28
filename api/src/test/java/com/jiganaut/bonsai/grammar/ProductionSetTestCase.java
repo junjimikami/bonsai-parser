@@ -19,6 +19,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import com.jiganaut.bonsai.TestCase;
+
 /**
  * 
  * @author Junji Mikami
