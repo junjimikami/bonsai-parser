@@ -15,7 +15,7 @@ public final class Rules {
         return PatternRule.of(pattern);
     }
 
-    public static SequenceRule of(Rule... rules) {
+    public static SequenceRule concat(Rule... rules) {
         return SequenceRule.of(rules);
     }
 
