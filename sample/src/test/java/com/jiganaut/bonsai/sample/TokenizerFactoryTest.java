@@ -24,7 +24,8 @@ class TokenizerFactoryTest {
 
         var sb = new StringBuilder();
         while (tokenizer.hasNext()) {
-            var token = tokenizer.next().getValue();
+            tokenizer.next();
+            var token = tokenizer.getValue();
             if (token.startsWith("\"")) {
                 sb.append(token);
                 System.out.print("[" + token + "]");
@@ -42,7 +43,8 @@ class TokenizerFactoryTest {
 
         var sb = new StringBuilder();
         while (tokenizer.hasNext()) {
-            var token = tokenizer.next().getValue();
+            tokenizer.next();
+            var token = tokenizer.getValue();
             sb.append(token);
             System.out.print("[" + token + "]");
         }
@@ -56,7 +58,8 @@ class TokenizerFactoryTest {
         
         var sb = new StringBuilder();
         while (tokenizer.hasNext()) {
-            var token = tokenizer.next().getValue();
+            tokenizer.next();
+            var token = tokenizer.getValue();
             sb.append(token);
             System.out.print("[" + token + "]");
         }
@@ -79,7 +82,8 @@ class TokenizerFactoryTest {
 
         var sb = new StringBuilder();
         while (tokenizer.hasNext()) {
-            var token = tokenizer.next().getValue();
+            tokenizer.next();
+            var token = tokenizer.getValue();
             sb.append(token);
             System.out.print("[" + token + "]");
         }
