@@ -3,6 +3,7 @@ package com.jiganaut.bonsai.parser.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.jiganaut.bonsai.parser.NonTerminalNode;
@@ -27,8 +28,9 @@ class DefaultNonTerminalNode extends AbstractTree implements NonTerminalNode {
         }
 
         @Override
-        public NonTerminalNode.Builder setValue(String name) {
-            super.setValue(name);
+        public NonTerminalNode.Builder setValue(String value) {
+            check();
+            super.setValue(value);
             return this;
         }
 
@@ -85,4 +87,21 @@ class DefaultNonTerminalNode extends AbstractTree implements NonTerminalNode {
                 .map(Tree::toString)
                 .collect(Collectors.joining());
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof NonTerminalNode nt) {
+            return this.getKind() == nt.getKind()
+                    && this.getName().equals(nt.getName())
+                    && Objects.equals(this.getValue(), nt.getValue())
+                    && this.getSubTrees().equals(nt.getSubTrees());
+        }
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getKind(), getName(), getValue(), getSubTrees());
+    }
+
 }

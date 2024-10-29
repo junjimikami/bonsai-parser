@@ -16,7 +16,7 @@ public interface TerminalNode extends Tree {
         public TerminalNode.Builder setName(String name);
 
         @Override
-        public TerminalNode.Builder setValue(String name);
+        public TerminalNode.Builder setValue(String value);
 
         @Override
         public TerminalNode build();
@@ -24,13 +24,13 @@ public interface TerminalNode extends Tree {
     }
 
     public static TerminalNode.Builder builder() {
-        return TreeProvider.provider().createTerminalBuilder();
+        return TreeProvider.load().createTerminalBuilder();
     }
 
     public static TerminalNode of(String name, String value) {
         return builder()
                 .setName(name)
-                .setValue(name)
+                .setValue(value)
                 .build();
     }
 

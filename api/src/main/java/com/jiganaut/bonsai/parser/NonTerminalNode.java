@@ -14,7 +14,7 @@ public interface NonTerminalNode extends Tree {
         public NonTerminalNode.Builder setName(String name);
 
         @Override
-        public NonTerminalNode.Builder setValue(String name);
+        public NonTerminalNode.Builder setValue(String value);
 
         @Override
         public NonTerminalNode build();
@@ -24,13 +24,13 @@ public interface NonTerminalNode extends Tree {
     }
 
     public static NonTerminalNode.Builder builder() {
-        return TreeProvider.provider().createNonTerminalBuilder();
+        return TreeProvider.load().createNonTerminalBuilder();
     }
 
     public static NonTerminalNode of(String name, String value, Tree... trees) {
         var builder = builder()
                 .setName(name)
-                .setValue(name);
+                .setValue(value);
         for (var tree : trees) {
             builder.add(tree);
         }

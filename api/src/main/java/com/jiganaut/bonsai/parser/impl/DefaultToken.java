@@ -1,5 +1,7 @@
 package com.jiganaut.bonsai.parser.impl;
 
+import java.util.Objects;
+
 import com.jiganaut.bonsai.parser.TerminalNode;
 import com.jiganaut.bonsai.parser.Token;
 
@@ -8,6 +10,7 @@ class DefaultToken extends AbstractTree implements Token {
     static class Builder extends AbstractTree.Builder implements TerminalNode.Builder {
         @Override
         public DefaultToken.Builder setName(String name) {
+            check();
             super.setName(name);
             return this;
         }
@@ -53,4 +56,21 @@ class DefaultToken extends AbstractTree implements Token {
     public String toString() {
         return value;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof TerminalNode t) {
+            return this.getKind() == t.getKind()
+                    && Objects.equals(this.getName(), t.getName())
+                    && this.getValue().equals(t.getValue())
+                    && this.getSubTrees().equals(t.getSubTrees());
+        }
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getKind(), getName(), getValue(), getSubTrees());
+    }
+
 }
