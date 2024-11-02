@@ -20,6 +20,10 @@ public interface TokenizerFactory {
         return TokenizerFactoryProvider.provider().loadFactory(factoryName);
     }
 
+    public static TokenizerFactory load(Class<?> factoryClass) {
+        return load(factoryClass.getName());
+    }
+
     public Tokenizer createTokenizer(Reader reader);
     public Tokenizer createTokenizer(Tokenizer tokenizer);
 }

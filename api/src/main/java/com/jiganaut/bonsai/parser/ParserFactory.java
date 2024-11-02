@@ -19,6 +19,10 @@ public interface ParserFactory {
         return ParserFactoryProvider.provider().loadFactory(factoryName);
     }
 
+    public static ParserFactory load(Class<?> factoryClass) {
+        return load(factoryClass.getName());
+    }
+
     public Parser createParser(Tokenizer tokenizer);
 
     public Parser createParser(Reader reader);

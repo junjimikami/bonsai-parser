@@ -28,7 +28,7 @@ public class DefaultTokenizerFactoryProvider implements TokenizerFactoryProvider
     @Override
     public TokenizerFactory loadFactory(String factoryName) {
         return ServiceLoader.load(TokenizerFactory.class).stream()
-                .filter(p -> p.type().getCanonicalName().equals(factoryName))
+                .filter(p -> p.type().getName().equals(factoryName))
                 .map(Provider::get)
                 .findFirst()
                 .orElseThrow();

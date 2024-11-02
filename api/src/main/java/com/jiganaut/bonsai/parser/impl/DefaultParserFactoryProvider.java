@@ -28,7 +28,7 @@ public class DefaultParserFactoryProvider implements ParserFactoryProvider {
     @Override
     public ParserFactory loadFactory(String factoryName) {
         return ServiceLoader.load(ParserFactory.class).stream()
-                .filter(p -> p.type().getCanonicalName().equals(factoryName))
+                .filter(p -> p.type().getName().equals(factoryName))
                 .map(Provider::get)
                 .findFirst()
                 .get();

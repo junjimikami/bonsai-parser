@@ -33,7 +33,7 @@ class ParserFactoryTest {
     @Test
     @DisplayName("loadFactory(st:String) [Null parameter]")
     void loadFactoryStInCaseNullParameter() throws Exception {
-        assertThrows(NoSuchElementException.class, () -> ParserFactory.load(null));
+        assertThrows(NoSuchElementException.class, () -> ParserFactory.load((String) null));
     }
 
     @Test

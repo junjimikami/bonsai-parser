@@ -33,7 +33,7 @@ class TokenizerFactoryTest {
     @Test
     @DisplayName("loadFactory(st:String) [Null parameter]")
     void loadFactoryStInCaseNullParameter() throws Exception {
-        assertThrows(NoSuchElementException.class, () -> TokenizerFactory.load(null));
+        assertThrows(NoSuchElementException.class, () -> TokenizerFactory.load((String) null));
     }
 
     @Test
