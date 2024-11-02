@@ -1,5 +1,6 @@
 package com.jiganaut.bonsai.parser.impl;
 
+import com.jiganaut.bonsai.impl.BaseBuilder;
 import com.jiganaut.bonsai.parser.Tree;
 
 abstract class AbstractTree implements Tree {

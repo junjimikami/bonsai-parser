@@ -35,7 +35,7 @@ interface TreeTestCase extends TestCase {
             var builder = createTarget();
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.setName(null));
+            assertThrows(IllegalStateException.class, () -> builder.setName(""));
         }
 
         @Test
@@ -46,7 +46,7 @@ interface TreeTestCase extends TestCase {
             var builder = createTarget();
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.setValue(null));
+            assertThrows(IllegalStateException.class, () -> builder.setValue(""));
         }
 
         @Test
