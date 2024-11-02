@@ -8,6 +8,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import com.jiganaut.bonsai.impl.Message;
 import com.jiganaut.bonsai.parser.Token;
 
 class ReaderTokenizer extends AbstractTokenizer {

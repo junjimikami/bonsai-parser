@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import com.jiganaut.bonsai.grammar.ProductionSet;
+import com.jiganaut.bonsai.impl.Message;
 import com.jiganaut.bonsai.parser.Token;
 import com.jiganaut.bonsai.parser.Tokenizer;
 

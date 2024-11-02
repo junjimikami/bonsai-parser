@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import com.jiganaut.bonsai.grammar.Production;
 import com.jiganaut.bonsai.grammar.QuantifierRule;
 import com.jiganaut.bonsai.grammar.Rule;
+import com.jiganaut.bonsai.impl.Message;
 
 final class MessageSupport {
 

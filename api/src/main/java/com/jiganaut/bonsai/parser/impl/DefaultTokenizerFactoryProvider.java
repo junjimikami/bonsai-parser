@@ -5,6 +5,7 @@ import java.util.ServiceLoader;
 import java.util.ServiceLoader.Provider;
 
 import com.jiganaut.bonsai.grammar.ProductionSet;
+import com.jiganaut.bonsai.impl.Message;
 import com.jiganaut.bonsai.parser.TokenizerFactory;
 import com.jiganaut.bonsai.parser.spi.TokenizerFactoryProvider;
 
