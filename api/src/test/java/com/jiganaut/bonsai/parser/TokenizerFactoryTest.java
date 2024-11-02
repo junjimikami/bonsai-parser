@@ -16,7 +16,7 @@ class TokenizerFactoryTest {
     @Test
     @DisplayName("newFactory(Grammar) [Null parameter]")
     void newFactoryInCaseNullParameter() throws Exception {
-        assertThrows(NullPointerException.class, () -> TokenizerFactory.newFactory(null));
+        assertThrows(NullPointerException.class, () -> TokenizerFactory.of(null));
     }
 
     @Test
@@ -25,7 +25,7 @@ class TokenizerFactoryTest {
         var grammar = ProductionSet.builder()
                 .add("S", () -> PatternRule.of(""))
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
 
         assertNotNull(factory);
     }
@@ -33,12 +33,12 @@ class TokenizerFactoryTest {
     @Test
     @DisplayName("loadFactory(st:String) [Null parameter]")
     void loadFactoryStInCaseNullParameter() throws Exception {
-        assertThrows(NoSuchElementException.class, () -> TokenizerFactory.loadFactory(null));
+        assertThrows(NoSuchElementException.class, () -> TokenizerFactory.load(null));
     }
 
     @Test
     @DisplayName("loadFactory(st:String) [No such factory]")
     void loadFactoryStInCaseNoSuchFactory() throws Exception {
-        assertThrows(NoSuchElementException.class, () -> TokenizerFactory.loadFactory(""));
+        assertThrows(NoSuchElementException.class, () -> TokenizerFactory.load(""));
     }
 }

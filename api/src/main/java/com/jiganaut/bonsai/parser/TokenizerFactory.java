@@ -12,11 +12,11 @@ import com.jiganaut.bonsai.parser.spi.TokenizerFactoryProvider;
  */
 public interface TokenizerFactory {
 
-    public static TokenizerFactory newFactory(ProductionSet productionSet) {
+    public static TokenizerFactory of(ProductionSet productionSet) {
         return TokenizerFactoryProvider.provider().createFactory(productionSet);
     }
 
-    public static TokenizerFactory loadFactory(String factoryName) {
+    public static TokenizerFactory load(String factoryName) {
         return TokenizerFactoryProvider.provider().loadFactory(factoryName);
     }
 

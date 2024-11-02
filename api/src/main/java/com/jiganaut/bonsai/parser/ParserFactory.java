@@ -11,11 +11,11 @@ import com.jiganaut.bonsai.parser.spi.ParserFactoryProvider;
  */
 public interface ParserFactory {
 
-    public static ParserFactory newFactory(Grammar grammar) {
+    public static ParserFactory of(Grammar grammar) {
         return ParserFactoryProvider.provider().createFactory(grammar);
     }
 
-    public static ParserFactory loadFactory(String factoryName) {
+    public static ParserFactory load(String factoryName) {
         return ParserFactoryProvider.provider().loadFactory(factoryName);
     }
 

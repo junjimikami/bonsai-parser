@@ -16,7 +16,7 @@ class ParserFactoryTest {
     @Test
     @DisplayName("newFactory(Grammar) [Null parameter]")
     void newFactoryInCaseNullParameter() throws Exception {
-        assertThrows(NullPointerException.class, () -> ParserFactory.newFactory(null));
+        assertThrows(NullPointerException.class, () -> ParserFactory.of(null));
     }
 
     @Test
@@ -25,7 +25,7 @@ class ParserFactoryTest {
         var grammar = Grammar.builder()
                 .add("S", () -> PatternRule.of(""))
                 .build();
-        var factory = ParserFactory.newFactory(grammar);
+        var factory = ParserFactory.of(grammar);
 
         assertNotNull(factory);
     }
@@ -33,12 +33,12 @@ class ParserFactoryTest {
     @Test
     @DisplayName("loadFactory(st:String) [Null parameter]")
     void loadFactoryStInCaseNullParameter() throws Exception {
-        assertThrows(NoSuchElementException.class, () -> ParserFactory.loadFactory(null));
+        assertThrows(NoSuchElementException.class, () -> ParserFactory.load(null));
     }
 
     @Test
     @DisplayName("loadFactory(st:String) [No such factory]")
     void loadFactoryStInCaseNoSuchFactory() throws Exception {
-        assertThrows(NoSuchElementException.class, () -> ParserFactory.loadFactory(""));
+        assertThrows(NoSuchElementException.class, () -> ParserFactory.load(""));
     }
 }

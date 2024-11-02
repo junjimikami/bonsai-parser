@@ -37,7 +37,7 @@ class ParserTest {
     @ParameterizedTest(name = "{0} {displayName}")
     @MethodSource("allMethods")
     void streamClosed(Consumer<Parser> method) throws Exception {
-        var factory = ParserFactory.newFactory(Stubs.DUMMY_GRAMMAR);
+        var factory = ParserFactory.of(Stubs.DUMMY_GRAMMAR);
         var parser = factory.createParser(Stubs.closedReader());
 
         assertThrows(UncheckedIOException.class, () -> method.accept(parser));
@@ -52,7 +52,7 @@ class ParserTest {
                         .add(() -> PatternRule.of("1"))
                         .add(() -> PatternRule.of(".")))
                 .build();
-        var factory = ParserFactory.newFactory(grammar);
+        var factory = ParserFactory.of(grammar);
         var parser = factory.createParser(new StringReader("1"));
 
         assertThrows(ParseException.class, () -> method.accept(parser));
@@ -65,7 +65,7 @@ class ParserTest {
         var grammar = Grammar.builder()
                 .add("S", () -> PatternRule.of("1").range(3, 5))
                 .build();
-        var factory = ParserFactory.newFactory(grammar);
+        var factory = ParserFactory.of(grammar);
         var parser = factory.createParser(new StringReader("11"));
 
         assertThrows(ParseException.class, () -> method.accept(parser));
@@ -78,7 +78,7 @@ class ParserTest {
         var grammar = Grammar.builder()
                 .add("S", () -> PatternRule.of("0"))
                 .build();
-        var factory = ParserFactory.newFactory(grammar);
+        var factory = ParserFactory.of(grammar);
         var parser = factory.createParser(new StringReader("1"));
 
         assertThrows(ParseException.class, () -> method.accept(parser));
@@ -92,7 +92,7 @@ class ParserTest {
                 .add("S", ChoiceRule.builder()
                         .add(() -> PatternRule.of("0")))
                 .build();
-        var factory = ParserFactory.newFactory(grammar);
+        var factory = ParserFactory.of(grammar);
         var parser = factory.createParser(new StringReader("1"));
 
         assertThrows(ParseException.class, () -> method.accept(parser));
@@ -106,7 +106,7 @@ class ParserTest {
                 .add("S", SequenceRule.builder()
                         .add(() -> PatternRule.of("0")))
                 .build();
-        var factory = ParserFactory.newFactory(grammar);
+        var factory = ParserFactory.of(grammar);
         var parser = factory.createParser(new StringReader("1"));
 
         assertThrows(ParseException.class, () -> method.accept(parser));
@@ -119,7 +119,7 @@ class ParserTest {
         var grammar = Grammar.builder()
                 .add("S", () -> Rule.EMPTY)
                 .build();
-        var factory = ParserFactory.newFactory(grammar);
+        var factory = ParserFactory.of(grammar);
         var parser = factory.createParser(new StringReader("1"));
 
         assertThrows(ParseException.class, () -> method.accept(parser));
@@ -131,7 +131,7 @@ class ParserTest {
         var grammar = Grammar.builder()
                 .add("S", () -> PatternRule.of("1"))
                 .build();
-        var factory = ParserFactory.newFactory(grammar);
+        var factory = ParserFactory.of(grammar);
         var parser = factory.createParser(new StringReader("11"));
 
         assertThrows(ParseException.class, () -> parser.parse());
@@ -143,7 +143,7 @@ class ParserTest {
         var grammar = Grammar.builder()
                 .add("S", () -> PatternRule.of("1"))
                 .build();
-        var factory = ParserFactory.newFactory(grammar);
+        var factory = ParserFactory.of(grammar);
         var parser = factory.createParser(new StringReader("1"));
         var tree = parser.parse();
 
@@ -156,7 +156,7 @@ class ParserTest {
     @ParameterizedTest
     @MethodSource
     void testVariousGrammars(Grammar grammar, String input, String expected) {
-        var factory = ParserFactory.newFactory(grammar);
+        var factory = ParserFactory.of(grammar);
         var parser = factory.createParser(new StringReader(input));
 
         if (expected != null) {

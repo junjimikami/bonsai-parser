@@ -47,7 +47,7 @@ class TokenizerTest {
     @ParameterizedTest(name = "{0} {displayName}")
     @MethodSource("allMethods")
     void streamClosed(Consumer<Tokenizer> method) throws Exception {
-        var factory = TokenizerFactory.newFactory(Stubs.DUMMY_PRODUCTION_SET);
+        var factory = TokenizerFactory.of(Stubs.DUMMY_PRODUCTION_SET);
         var tokenizer = factory.createTokenizer(Stubs.closedReader());
 
         assertThrows(UncheckedIOException.class, () -> method.accept(tokenizer));
@@ -62,7 +62,7 @@ class TokenizerTest {
                         .add(() -> PatternRule.of("1"))
                         .add(() -> PatternRule.of(".")))
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
         assertThrows(ParseException.class, () -> method.accept(tokenizer));
@@ -75,7 +75,7 @@ class TokenizerTest {
         var grammar = ProductionSet.builder()
                 .add("S", () -> PatternRule.of("1").range(3, 5))
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("11"));
 
         assertThrows(ParseException.class, () -> method.accept(tokenizer));
@@ -88,7 +88,7 @@ class TokenizerTest {
 //        var grammar = ProductionSet.builder()
 //                .add("S", () -> PatternRule.of("0"))
 //                .build();
-//        var factory = TokenizerFactory.newFactory(grammar);
+//        var factory = TokenizerFactory.of(grammar);
 //        var tokenizer = factory.createTokenizer(new StringReader("1"));
 //
 //        assertThrows(ParseException.class, () -> method.accept(tokenizer));
@@ -102,7 +102,7 @@ class TokenizerTest {
 //                .add("S", ChoiceRule.builder()
 //                        .add(() -> PatternRule.of("0")))
 //                .build();
-//        var factory = TokenizerFactory.newFactory(grammar);
+//        var factory = TokenizerFactory.of(grammar);
 //        var tokenizer = factory.createTokenizer(new StringReader("1"));
 //
 //        assertThrows(ParseException.class, () -> method.accept(tokenizer));
@@ -116,7 +116,7 @@ class TokenizerTest {
 //                .add("S", SequenceRule.builder()
 //                        .add(() -> PatternRule.of("0")))
 //                .build();
-//        var factory = TokenizerFactory.newFactory(grammar);
+//        var factory = TokenizerFactory.of(grammar);
 //        var tokenizer = factory.createTokenizer(new StringReader("1"));
 //
 //        assertThrows(ParseException.class, () -> method.accept(tokenizer));
@@ -129,7 +129,7 @@ class TokenizerTest {
 //        var grammar = ProductionSet.builder()
 //                .add("S", () -> Rule.EMPTY)
 //                .build();
-//        var factory = TokenizerFactory.newFactory(grammar);
+//        var factory = TokenizerFactory.of(grammar);
 //        var tokenizer = factory.createTokenizer(new StringReader("1"));
 //
 //        assertThrows(ParseException.class, () -> method.accept(tokenizer));
@@ -141,7 +141,7 @@ class TokenizerTest {
         var grammar = ProductionSet.builder()
                 .add("S", () -> PatternRule.of("1"))
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
         assertThrows(NullPointerException.class, () -> tokenizer.hasNext((String) null));
@@ -153,7 +153,7 @@ class TokenizerTest {
         var grammar = ProductionSet.builder()
                 .add("S", () -> PatternRule.of("1"))
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
         assertThrows(NullPointerException.class, () -> tokenizer.hasNext((Pattern) null));
@@ -165,7 +165,7 @@ class TokenizerTest {
         var grammar = ProductionSet.builder()
                 .add("S", () -> PatternRule.of("1"))
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
         assertThrows(NullPointerException.class, () -> tokenizer.next((String) null));
@@ -177,7 +177,7 @@ class TokenizerTest {
         var grammar = ProductionSet.builder()
                 .add("S", () -> PatternRule.of("1"))
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
         assertThrows(NullPointerException.class, () -> tokenizer.next((Pattern) null));
@@ -189,7 +189,7 @@ class TokenizerTest {
         var grammar = ProductionSet.builder()
                 .add("S", () -> PatternRule.of("1"))
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
         assertThrows(NoSuchElementException.class, () -> tokenizer.next("2"));
@@ -201,7 +201,7 @@ class TokenizerTest {
         var grammar = ProductionSet.builder()
                 .add("S", () -> PatternRule.of("1"))
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
         var pattern = Pattern.compile("2");
 
@@ -214,7 +214,7 @@ class TokenizerTest {
         var grammar = ProductionSet.builder()
                 .add("S", () -> PatternRule.of("1"))
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
         assertTrue(tokenizer.hasNext());
@@ -226,7 +226,7 @@ class TokenizerTest {
         var grammar = ProductionSet.builder()
                 .add("S", () -> PatternRule.of("1"))
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
         assertTrue(tokenizer.hasNext("1"));
@@ -238,7 +238,7 @@ class TokenizerTest {
         var grammar = ProductionSet.builder()
                 .add("S", () -> PatternRule.of("1"))
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
         var pattern = Pattern.compile("1");
 
@@ -251,7 +251,7 @@ class TokenizerTest {
         var grammar = ProductionSet.builder()
                 .add("S", () -> Rule.EMPTY)
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(Reader.nullReader());
 
         assertFalse(tokenizer.hasNext());
@@ -263,7 +263,7 @@ class TokenizerTest {
         var grammar = ProductionSet.builder()
                 .add("S", () -> Rule.EMPTY)
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(Reader.nullReader());
 
         assertFalse(tokenizer.hasNext(""));
@@ -275,7 +275,7 @@ class TokenizerTest {
         var grammar = ProductionSet.builder()
                 .add("S", () -> Rule.EMPTY)
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(Reader.nullReader());
         var pattern = Pattern.compile("");
 
@@ -288,7 +288,7 @@ class TokenizerTest {
         var grammar = ProductionSet.builder()
                 .add("S", () -> PatternRule.of("1"))
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
         assertEquals("S", tokenizer.next());
@@ -301,7 +301,7 @@ class TokenizerTest {
         var grammar = ProductionSet.builder()
                 .add("S", () -> PatternRule.of("1"))
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
         assertEquals("S", tokenizer.next("1"));
@@ -314,7 +314,7 @@ class TokenizerTest {
         var grammar = ProductionSet.builder()
                 .add("S", () -> PatternRule.of("1"))
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
         var pattern = Pattern.compile("1");
 
@@ -328,7 +328,7 @@ class TokenizerTest {
         var grammar = ProductionSet.builder()
                 .add("S", () -> Rule.EMPTY)
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(Reader.nullReader());
 
         assertThrows(NoSuchElementException.class, () -> tokenizer.next());
@@ -340,7 +340,7 @@ class TokenizerTest {
         var grammar = ProductionSet.builder()
                 .add("S", () -> Rule.EMPTY)
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(Reader.nullReader());
 
         assertThrows(NoSuchElementException.class, () -> tokenizer.next(""));
@@ -352,7 +352,7 @@ class TokenizerTest {
         var grammar = ProductionSet.builder()
                 .add("S", () -> Rule.EMPTY)
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(Reader.nullReader());
         var pattern = Pattern.compile("");
 
@@ -365,7 +365,7 @@ class TokenizerTest {
         var grammar = ProductionSet.builder()
                 .add("S", () -> PatternRule.of("1"))
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
         assertTrue(tokenizer.hasNext());
@@ -377,7 +377,7 @@ class TokenizerTest {
         var grammar = ProductionSet.builder()
                 .add("S", () -> PatternRule.of("1"))
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
 
         assertTrue(tokenizer.hasNext("1"));
@@ -389,7 +389,7 @@ class TokenizerTest {
         var grammar = ProductionSet.builder()
                 .add("S", () -> PatternRule.of("1"))
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
         var pattern = Pattern.compile("1");
 
@@ -402,7 +402,7 @@ class TokenizerTest {
         var grammar = ProductionSet.builder()
                 .add("S", () -> PatternRule.of("1"))
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
         tokenizer.next();
         var token = tokenizer.getToken();
@@ -419,7 +419,7 @@ class TokenizerTest {
         var grammar = ProductionSet.builder()
                 .add("S", () -> PatternRule.of("1"))
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
         tokenizer.next("1");
         var token = tokenizer.getToken();
@@ -435,7 +435,7 @@ class TokenizerTest {
         var grammar = ProductionSet.builder()
                 .add("S", () -> PatternRule.of("1"))
                 .build();
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(new StringReader("1"));
         var pattern = Pattern.compile("1");
         tokenizer.next(pattern);
@@ -449,7 +449,7 @@ class TokenizerTest {
     @ParameterizedTest
     @MethodSource
     void testVariousGrammars(ProductionSet grammar, String input, List<String> tokens) {
-        var factory = TokenizerFactory.newFactory(grammar);
+        var factory = TokenizerFactory.of(grammar);
         var tokenizer = factory.createTokenizer(new StringReader(input));
 
         if (tokens != null) {
@@ -687,13 +687,13 @@ class TokenizerTest {
                 .add("A", () -> PatternRule.of("0|1").exactly(2))
                 .add("A", () -> PatternRule.of("\\s").skip())
                 .build();
-        var tokenizer = TokenizerFactory.newFactory(grammar)
+        var tokenizer = TokenizerFactory.of(grammar)
                 .createTokenizer(new StringReader("00 01 10 11"));
 
         var grammar2 = ProductionSet.builder()
                 .add("A", () -> PatternRule.of("(0|1){2}").exactly(2))
                 .build();
-        var tokenizer2 = TokenizerFactory.newFactory(grammar2)
+        var tokenizer2 = TokenizerFactory.of(grammar2)
                 .createTokenizer(tokenizer);
 
         tokenizer2.next();
