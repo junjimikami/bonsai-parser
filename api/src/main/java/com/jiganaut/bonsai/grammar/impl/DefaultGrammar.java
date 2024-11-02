@@ -7,6 +7,7 @@ import com.jiganaut.bonsai.grammar.Grammar;
 import com.jiganaut.bonsai.grammar.Production;
 import com.jiganaut.bonsai.grammar.ProductionSet;
 import com.jiganaut.bonsai.grammar.Rule;
+import com.jiganaut.bonsai.impl.Message;
 
 class DefaultGrammar extends DefaultProductionSet implements Grammar {
 

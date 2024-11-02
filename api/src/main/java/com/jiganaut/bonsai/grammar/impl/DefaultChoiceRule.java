@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import com.jiganaut.bonsai.grammar.ChoiceRule;
 import com.jiganaut.bonsai.grammar.Rule;
+import com.jiganaut.bonsai.impl.Message;
 
 /**
  * 

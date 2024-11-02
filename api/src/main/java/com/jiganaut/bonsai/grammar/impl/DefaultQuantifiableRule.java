@@ -3,6 +3,7 @@ package com.jiganaut.bonsai.grammar.impl;
 import com.jiganaut.bonsai.grammar.Quantifiable;
 import com.jiganaut.bonsai.grammar.QuantifierRule;
 import com.jiganaut.bonsai.grammar.Rule;
+import com.jiganaut.bonsai.impl.Message;
 
 /**
  *

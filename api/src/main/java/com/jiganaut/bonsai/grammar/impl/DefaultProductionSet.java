@@ -13,6 +13,8 @@ import com.jiganaut.bonsai.grammar.ChoiceRule;
 import com.jiganaut.bonsai.grammar.Production;
 import com.jiganaut.bonsai.grammar.ProductionSet;
 import com.jiganaut.bonsai.grammar.Rule;
+import com.jiganaut.bonsai.impl.BaseBuilder;
+import com.jiganaut.bonsai.impl.Message;
 
 class DefaultProductionSet extends AbstractSet<Production> implements ProductionSet {
 

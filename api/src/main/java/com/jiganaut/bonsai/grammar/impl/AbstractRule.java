@@ -1,6 +1,7 @@
 package com.jiganaut.bonsai.grammar.impl;
 
 import com.jiganaut.bonsai.grammar.Rule;
+import com.jiganaut.bonsai.impl.BaseBuilder;
 
 /**
  *

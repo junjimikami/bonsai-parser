@@ -1,8 +1,8 @@
-package com.jiganaut.bonsai.grammar.impl;
+package com.jiganaut.bonsai.impl;
 
 import java.util.Objects;
 
-abstract class BaseBuilder {
+public abstract class BaseBuilder {
     private boolean isBuilt;
 
     protected void check() {

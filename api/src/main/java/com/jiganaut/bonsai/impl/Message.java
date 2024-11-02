@@ -1,4 +1,4 @@
-package com.jiganaut.bonsai.grammar.impl;
+package com.jiganaut.bonsai.impl;
 
 import java.text.MessageFormat;
 
@@ -6,7 +6,7 @@ import java.text.MessageFormat;
  * @author Junji Mikami
  *
  */
-enum Message {
+public enum Message {
 
     NULL_PARAMETER("Null was passed to the parameter."),
     ALREADY_BUILT("The builder has already built."),
@@ -23,7 +23,7 @@ enum Message {
         this.msg = new MessageFormat(message);
     }
 
-    String format(Object... args) {
+    public String format(Object... args) {
         return msg.format(args);
     }
 

@@ -10,6 +10,7 @@ import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.SequenceRule;
 import com.jiganaut.bonsai.grammar.ProductionSet.Builder;
 import com.jiganaut.bonsai.grammar.spi.GrammarProvider;
+import com.jiganaut.bonsai.impl.Message;
 
 class DefaultGrammarProvider implements GrammarProvider {
 
