@@ -124,7 +124,7 @@ interface ProductionSetTestCase extends TestCase {
             var builder = createTarget();
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.add(null, (Rule) null));
+            assertThrows(IllegalStateException.class, () -> builder.add("", mock(Rule.class)));
         }
 
         @Test
@@ -135,7 +135,7 @@ interface ProductionSetTestCase extends TestCase {
             var builder = createTarget();
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.add(null, (Rule.Builder) null));
+            assertThrows(IllegalStateException.class, () -> builder.add("", mock(Rule.Builder.class)));
         }
 
         @Test

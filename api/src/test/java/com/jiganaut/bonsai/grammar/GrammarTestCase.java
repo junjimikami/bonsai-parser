@@ -58,7 +58,7 @@ interface GrammarTestCase extends ProductionSetTestCase {
             var builder = createTarget();
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.setStartSymbol(null));
+            assertThrows(IllegalStateException.class, () -> builder.setStartSymbol(""));
         }
 
         @ParameterizedTest

@@ -23,16 +23,14 @@ class DefaultProductionSet extends AbstractSet<Production> implements Production
 
         @Override
         public ProductionSet.Builder add(String symbol, Rule rule) {
-            checkParameter(symbol);
-            checkParameter(rule);
+            checkParameter(symbol, rule);
             set.add(() -> new DefaultProduction(symbol, rule));
             return this;
         }
 
         @Override
         public ProductionSet.Builder add(String symbol, Rule.Builder builder) {
-            checkParameter(symbol);
-            checkParameter(builder);
+            checkParameter(symbol, builder);
             set.add(() -> {
                 var rule = Objects.requireNonNull(builder.build(), Message.NULL_PARAMETER.format());
                 return new DefaultProduction(symbol, rule);

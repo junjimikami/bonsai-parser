@@ -11,9 +11,11 @@ public abstract class BaseBuilder {
         }
     }
 
-    protected void checkParameter(Object o) {
+    protected void checkParameter(Object... args) {
+        for (var o : args) {
+            Objects.requireNonNull(o, Message.NULL_PARAMETER.format());
+        }
         check();
-        Objects.requireNonNull(o, Message.NULL_PARAMETER.format());
     }
 
     protected void checkForBuild() {

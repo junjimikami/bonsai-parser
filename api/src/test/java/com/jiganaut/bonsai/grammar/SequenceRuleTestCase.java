@@ -45,7 +45,7 @@ interface SequenceRuleTestCase extends CompositeRuleTestCase<SequenceRule> {
             var builder = createTarget();
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.add((Rule) null));
+            assertThrows(IllegalStateException.class, () -> builder.add(mock(Rule.class)));
         }
 
         @Test
@@ -54,7 +54,7 @@ interface SequenceRuleTestCase extends CompositeRuleTestCase<SequenceRule> {
             var builder = createTarget();
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.add((Rule.Builder) null));
+            assertThrows(IllegalStateException.class, () -> builder.add(mock(Rule.Builder.class)));
         }
 
         @Test
