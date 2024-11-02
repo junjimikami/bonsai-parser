@@ -140,4 +140,15 @@ class RulesTest {
 
         assertEquals(expected, actual);
     }
+
+    @Test
+    @DisplayName("empty()")
+    void empty() throws Exception {
+        var expected = Rule.EMPTY;
+        var actual = Rules.empty();
+
+        assertEquals(expected, actual);
+        assertEquals(Rule.Kind.EMPTY, actual.getKind());
+    }
+
 }

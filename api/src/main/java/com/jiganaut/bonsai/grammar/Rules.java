@@ -31,4 +31,8 @@ public final class Rules {
         return PatternRule.of(Pattern.quote(str));
     }
 
+    public static Rule empty() {
+        return Rule.EMPTY;
+    }
+
 }
