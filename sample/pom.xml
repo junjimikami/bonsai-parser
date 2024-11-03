@@ -5,6 +5,7 @@
   <groupId>com.jiganaut.bonsai</groupId>
   <artifactId>bonsai-sample</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
 
   <properties>
     <maven.compiler.target>17</maven.compiler.target>
@@ -35,4 +36,7 @@
       <version>0.0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
+  <modules>
+    <module>json-parser</module>
+  </modules>
 </project>
