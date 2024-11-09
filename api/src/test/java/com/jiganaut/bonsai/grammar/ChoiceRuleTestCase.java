@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
-import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -108,14 +108,14 @@ interface ChoiceRuleTestCase extends CompositeRuleTestCase<ChoiceRule> {
         return Kind.CHOICE;
     }
 
-    List<? extends Rule> expectedChoices();
+    Set<? extends Rule> expectedChoices();
 
     @Test
     @DisplayName("getChoices()")
     default void getChoices() throws Exception {
         var target = createTarget();
 
-        assertIterableEquals(expectedChoices(), target.getChoices());
+        assertEquals(expectedChoices(), target.getChoices());
     }
 
 }

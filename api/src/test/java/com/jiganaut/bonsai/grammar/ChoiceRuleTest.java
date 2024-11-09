@@ -1,11 +1,11 @@
 package com.jiganaut.bonsai.grammar;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
@@ -25,18 +25,18 @@ class ChoiceRuleTest {
     @ParameterizedTest
     @MethodSource
     @DisplayName("of(Rule...)")
-    void of(List<Rule> choices) throws Exception {
+    void of(Set<Rule> choices) throws Exception {
         var rule = ChoiceRule.of(choices.toArray(Rule[]::new));
 
         assertEquals(Rule.Kind.CHOICE, rule.getKind());
-        assertIterableEquals(choices, rule.getChoices());
+        assertEquals(choices, rule.getChoices());
     }
 
-    static Stream<List<Rule>> of() {
+    static Stream<Set<Rule>> of() {
         return Stream.of(
-                List.of(),
-                List.of(mock(Rule.class)),
-                List.of(mock(Rule.class), mock(Rule.class)));
+                Set.of(),
+                Set.of(mock(Rule.class)),
+                Set.of(mock(Rule.class), mock(Rule.class)));
     }
 
     @Nested
@@ -48,8 +48,8 @@ class ChoiceRuleTest {
         }
 
         @Override
-        public List<? extends Rule> expectedChoices() {
-            return List.of();
+        public Set<? extends Rule> expectedChoices() {
+            return Set.of();
         }
 
     }
@@ -57,7 +57,7 @@ class ChoiceRuleTest {
     @Nested
     class TestCase2 implements ChoiceRuleTestCase {
 
-        List<Rule> testData = List.of(mock(Rule.class));
+        Set<Rule> testData = Set.of(mock(Rule.class));
 
         @Override
         public ChoiceRule createTarget() {
@@ -65,7 +65,7 @@ class ChoiceRuleTest {
         }
 
         @Override
-        public List<? extends Rule> expectedChoices() {
+        public Set<? extends Rule> expectedChoices() {
             return testData;
         }
 
@@ -74,7 +74,7 @@ class ChoiceRuleTest {
     @Nested
     class TestCase3 implements ChoiceRuleTestCase {
 
-        List<Rule> testData = List.of(mock(Rule.class), mock(Rule.class));
+        Set<Rule> testData = Set.of(mock(Rule.class), mock(Rule.class));
 
         @Override
         public ChoiceRule createTarget() {
@@ -82,7 +82,7 @@ class ChoiceRuleTest {
         }
 
         @Override
-        public List<? extends Rule> expectedChoices() {
+        public Set<? extends Rule> expectedChoices() {
             return testData;
         }
 

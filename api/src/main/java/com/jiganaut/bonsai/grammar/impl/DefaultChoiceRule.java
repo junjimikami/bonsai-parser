@@ -1,7 +1,7 @@
 package com.jiganaut.bonsai.grammar.impl;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.jiganaut.bonsai.grammar.ChoiceRule;
@@ -13,7 +13,7 @@ import com.jiganaut.bonsai.impl.Message;
  * @author Junji Mikami
  *
  */
-class DefaultChoiceRule extends AbstractCompositeRule implements ChoiceRule {
+class DefaultChoiceRule extends AbstractCompositeRule<Set<Rule>> implements ChoiceRule {
     static class Builder extends AbstractCompositeRule.Builder implements ChoiceRule.Builder {
 
         @Override
@@ -42,18 +42,18 @@ class DefaultChoiceRule extends AbstractCompositeRule implements ChoiceRule {
             checkForBuild();
             var elements = builders.stream()
                     .map(e -> e.get())
-                    .toList();
+                    .collect(Collectors.toUnmodifiableSet());
             return new DefaultChoiceRule(elements);
         }
 
     }
 
-    private DefaultChoiceRule(List<Rule> elements) {
+    private DefaultChoiceRule(Set<Rule> elements) {
         super(elements);
     }
 
     @Override
-    public List<? extends Rule> getChoices() {
+    public Set<? extends Rule> getChoices() {
         return elements;
     }
 

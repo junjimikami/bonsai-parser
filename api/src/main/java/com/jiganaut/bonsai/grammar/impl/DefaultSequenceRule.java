@@ -12,7 +12,7 @@ import com.jiganaut.bonsai.impl.Message;
  *
  * @author Junji Mikami
  */
-class DefaultSequenceRule extends AbstractCompositeRule implements SequenceRule {
+class DefaultSequenceRule extends AbstractCompositeRule<List<Rule>> implements SequenceRule {
     static class Builder extends AbstractCompositeRule.Builder implements SequenceRule.Builder {
 
         Builder() {

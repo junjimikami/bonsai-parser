@@ -1,6 +1,6 @@
 package com.jiganaut.bonsai.grammar;
 
-import java.util.List;
+import java.util.Set;
 
 import com.jiganaut.bonsai.grammar.impl.GrammarProviders;
 
@@ -40,5 +40,5 @@ public interface ChoiceRule extends Rule, Quantifiable {
         return visitor.visitChoice(this, p);
     }
 
-    public List<? extends Rule> getChoices();
+    public Set<? extends Rule> getChoices();
 }
