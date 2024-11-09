@@ -1,6 +1,6 @@
 package com.jiganaut.bonsai.sample.json;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.StringReader;
 
@@ -46,4 +46,5 @@ class JsonParsesrFactoryTest {
         }
 
     }
+
 }
