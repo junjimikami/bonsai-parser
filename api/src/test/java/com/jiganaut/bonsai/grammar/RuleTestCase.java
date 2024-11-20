@@ -83,6 +83,12 @@ interface RuleTestCase extends TestCase {
         }
 
         @Override
+        public Object[] visitShortCircuitChoice(ShortCircuitChoiceRule choice, String p) {
+            assertEquals(Rule.Kind.SHORT_CIRCUIT_CHOICE, choice.getKind());
+            return defaultAction(choice, p);
+        }
+
+        @Override
         public Object[] defaultAction(Rule rule, String p) {
             return new Object[] { rule, p };
         }
@@ -125,7 +131,7 @@ interface RuleTestCase extends TestCase {
         assertArrayEquals(expected, result2);
     }
 
-    @DisplayName("accept(rv:RuleVisitor, p:P)")
+    @DisplayName("accept(rv:RuleVisitor, pos:P)")
     @ParameterizedTest
     @NullSource
     @EmptySource

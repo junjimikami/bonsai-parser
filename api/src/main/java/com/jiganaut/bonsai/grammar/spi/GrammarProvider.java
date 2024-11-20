@@ -8,20 +8,31 @@ import com.jiganaut.bonsai.grammar.PatternRule;
 import com.jiganaut.bonsai.grammar.ProductionSet;
 import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.SequenceRule;
+import com.jiganaut.bonsai.grammar.ShortCircuitChoiceRule;
+import com.jiganaut.bonsai.grammar.impl.DefaultGrammarProvider;
 
-public interface GrammarProvider {
-    Grammar.Builder createGrammarBuilder();
+public abstract class GrammarProvider {
 
-    ProductionSet.Builder createProductionSetBuilder();
+    private static final GrammarProvider DEFAULT_PROVIDER = new DefaultGrammarProvider();
 
-    PatternRule createPattern(String regex);
+    public static GrammarProvider load() {
+        return DEFAULT_PROVIDER;
+    }
 
-    PatternRule createPattern(Pattern pattern);
+    public abstract Grammar.Builder createGrammarBuilder();
 
-    SequenceRule.Builder createSequenceBuilder();
+    public abstract ProductionSet.Builder createProductionSetBuilder();
 
-    ChoiceRule.Builder createChoiceBuilder();
+    public abstract PatternRule createPattern(String regex);
 
-    ReferenceRule createReference(String reference);
+    public abstract PatternRule createPattern(Pattern pattern);
+
+    public abstract SequenceRule.Builder createSequenceBuilder();
+
+    public abstract ChoiceRule.Builder createChoiceBuilder();
+
+    public abstract ReferenceRule createReference(String reference);
+
+    public abstract ShortCircuitChoiceRule.Builder createShortCircuitChoiceBuilder();
 
 }

@@ -2,7 +2,6 @@ package com.jiganaut.bonsai.grammar;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -267,8 +266,8 @@ interface ProductionSetTestCase extends TestCase {
                 assertEquals(Rule.Kind.CHOICE, actualRule.getKind());
                 var exptectedChoices = list.stream()
                         .map(e -> e.getRule())
-                        .toList();
-                assertIterableEquals(exptectedChoices, actualRule.getChoices());
+                        .collect(Collectors.toSet());
+                assertEquals(exptectedChoices, actualRule.getChoices());
             } else {
                 throw new AssertionError();
             }

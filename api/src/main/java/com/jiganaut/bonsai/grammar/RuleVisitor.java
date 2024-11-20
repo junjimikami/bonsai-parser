@@ -16,6 +16,10 @@ public interface RuleVisitor<R, P> {
 
     public R visitChoice(ChoiceRule choice, P p);
 
+    default public R visitShortCircuitChoice(ShortCircuitChoiceRule choice, P p) {
+        return visitChoice(choice, p);
+    }
+
     public R visitSequence(SequenceRule sequence, P p);
 
     public R visitPattern(PatternRule pattern, P p);

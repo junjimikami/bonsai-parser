@@ -12,7 +12,7 @@ import com.jiganaut.bonsai.grammar.ProductionSet.Builder;
 import com.jiganaut.bonsai.grammar.spi.GrammarProvider;
 import com.jiganaut.bonsai.impl.Message;
 
-class DefaultGrammarProvider implements GrammarProvider {
+public class DefaultGrammarProvider extends GrammarProvider {
 
     @Override
     public Grammar.Builder createGrammarBuilder() {
@@ -50,6 +50,11 @@ class DefaultGrammarProvider implements GrammarProvider {
     public ReferenceRule createReference(String reference) {
         Objects.requireNonNull(reference, Message.NULL_PARAMETER.format());
         return new DefaultReferenceRule(reference);
+    }
+
+    @Override
+    public com.jiganaut.bonsai.grammar.ShortCircuitChoiceRule.Builder createShortCircuitChoiceBuilder() {
+        return new DefaultShortCircuitChoiceRule.Builder();
     }
 
 }
