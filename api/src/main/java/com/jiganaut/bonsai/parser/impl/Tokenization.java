@@ -28,7 +28,7 @@ final class Tokenization implements RuleVisitor<CharSequence, Context> {
 
     static Token run(Context context) {
         var list = context.productionSet().scope()
-                .filter(e -> AnyMatcher.scan(e.getRule(), context))
+                .filter(e -> FirstSetMatcher.scan(e.getRule(), context))
                 .toList();
         if (list.isEmpty()) {
             context.next();
@@ -47,7 +47,7 @@ final class Tokenization implements RuleVisitor<CharSequence, Context> {
     @Override
     public CharSequence visitChoice(ChoiceRule choice, Context context) {
         var rules = choice.getChoices().stream()
-                .filter(e -> AnyMatcher.scan(e, context))
+                .filter(e -> FirstSetMatcher.scan(e, context))
                 .toList();
         if (rules.isEmpty()) {
             var message = MessageSupport.tokenNotMatchRule(choice, context);
@@ -58,7 +58,7 @@ final class Tokenization implements RuleVisitor<CharSequence, Context> {
         }
         var subContext = context.withFollowSet(Set.of());
         rules = rules.stream()
-                .filter(e -> AnyMatcher.scan(e, subContext))
+                .filter(e -> FirstSetMatcher.scan(e, subContext))
                 .toList();
         if (rules.isEmpty()) {
             return EMPTY_STRING;
@@ -87,7 +87,7 @@ final class Tokenization implements RuleVisitor<CharSequence, Context> {
 
     @Override
     public CharSequence visitSequence(SequenceRule sequence, Context context) {
-        if (!AnyMatcher.scan(sequence, context)) {
+        if (!FirstSetMatcher.scan(sequence, context)) {
             var message = MessageSupport.tokenNotMatchRule(sequence, context);
             throw new ParseException(message);
         }
@@ -104,7 +104,7 @@ final class Tokenization implements RuleVisitor<CharSequence, Context> {
 
     @Override
     public CharSequence visitPattern(PatternRule pattern, Context context) {
-        if (!AnyMatcher.scan(pattern, context)) {
+        if (!FirstSetMatcher.scan(pattern, context)) {
             var message = MessageSupport.tokenNotMatchRule(pattern, context);
             throw new ParseException(message);
         }
@@ -125,7 +125,7 @@ final class Tokenization implements RuleVisitor<CharSequence, Context> {
         var builder = new StringBuilder();
         long count = quantfier.stream()
                 .takeWhile(e -> {
-                    if (!AnyMatcher.scan(e, context)) {
+                    if (!FirstSetMatcher.scan(e, context)) {
                         return false;
                     }
                     builder.append(visit(e, context));
@@ -147,7 +147,7 @@ final class Tokenization implements RuleVisitor<CharSequence, Context> {
 
     @Override
     public CharSequence visitEmpty(Rule empty, Context context) {
-        if (!AnyMatcher.scan(empty, context)) {
+        if (!FirstSetMatcher.scan(empty, context)) {
             var message = MessageSupport.tokenNotMatchRule(empty, context);
             throw new ParseException(message);
         }

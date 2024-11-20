@@ -30,7 +30,7 @@ final class FullLengthMatcher implements RuleVisitor<Boolean, Context> {
     @Override
     public Boolean visitChoice(ChoiceRule choice, Context context) {
         var rules = choice.getChoices().stream()
-                .filter(e -> AnyMatcher.scan(e, context))
+                .filter(e -> FirstSetMatcher.scan(e, context))
                 .toList();
         if (rules.isEmpty()) {
             return false;
@@ -40,7 +40,7 @@ final class FullLengthMatcher implements RuleVisitor<Boolean, Context> {
         }
         var subContext = context.withFollowSet(Set.of());
         rules = rules.stream()
-                .filter(e -> AnyMatcher.scan(e, subContext))
+                .filter(e -> FirstSetMatcher.scan(e, subContext))
                 .toList();
         if (rules.isEmpty()) {
             return false;
@@ -115,7 +115,7 @@ final class FullLengthMatcher implements RuleVisitor<Boolean, Context> {
         if (firstSet.isEmpty()) {
             return !context.hasNext();
         }
-        return firstSet.stream().anyMatch(e -> AnyMatcher.scan(e, context));
+        return firstSet.stream().anyMatch(e -> FirstSetMatcher.scan(e, context));
     }
 
 }

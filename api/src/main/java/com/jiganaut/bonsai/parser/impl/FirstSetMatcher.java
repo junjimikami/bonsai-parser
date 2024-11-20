@@ -10,10 +10,10 @@ import com.jiganaut.bonsai.grammar.SimpleRuleVisitor;
  * @author Junji Mikami
  *
  */
-final class AnyMatcher implements SimpleRuleVisitor<Boolean, Context> {
-    private static final AnyMatcher INSTANCE = new AnyMatcher();
+final class FirstSetMatcher implements SimpleRuleVisitor<Boolean, Context> {
+    private static final FirstSetMatcher INSTANCE = new FirstSetMatcher();
 
-    private AnyMatcher() {
+    private FirstSetMatcher() {
     }
 
     static boolean scan(Rule rule, Context context) {
