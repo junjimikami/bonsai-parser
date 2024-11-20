@@ -22,8 +22,7 @@ final class AnyMatcher implements SimpleRuleVisitor<Boolean, Context> {
 
     @Override
     public Boolean visitPattern(PatternRule pattern, Context context) {
-        var tokenizer = context.tokenizer();
-        return tokenizer.hasNext(pattern.getPattern());
+        return context.hasNext(pattern.getPattern());
     }
 
     @Override
@@ -46,7 +45,7 @@ final class AnyMatcher implements SimpleRuleVisitor<Boolean, Context> {
     public Boolean defaultAction(Rule rule, Context context) {
         var firstSet = FirstSet.of(rule, context);
         if (firstSet.isEmpty()) {
-            return !context.tokenizer().hasNext();
+            return !context.hasNext();
         }
         return firstSet.stream().anyMatch(e -> visit(e, context));
     }

@@ -31,7 +31,7 @@ class DefaultTokenizer extends AbstractTokenizer {
         if (nextToken != null) {
             return;
         }
-        while (context.tokenizer().hasNext()) {
+        while (context.hasNext()) {
             var token = Tokenization.run(context);
             if (!token.getValue().isEmpty()) {
                 nextToken = token;
@@ -109,16 +109,16 @@ class DefaultTokenizer extends AbstractTokenizer {
 
     @Override
     public long getLineNumber() {
-        return context.tokenizer().getLineNumber();
+        return context.getLineNumber();
     }
 
     @Override
     public long getIndex() {
-        return context.tokenizer().getIndex();
+        return context.getIndex();
     }
 
     @Override
     public void close() throws IOException {
-        context.tokenizer().close();
+        context.close();
     }
 }

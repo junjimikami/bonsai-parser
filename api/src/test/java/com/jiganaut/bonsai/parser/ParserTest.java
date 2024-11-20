@@ -25,6 +25,7 @@ import com.jiganaut.bonsai.grammar.PatternRule;
 import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.grammar.SequenceRule;
+import com.jiganaut.bonsai.grammar.ShortCircuitChoiceRule;
 import com.jiganaut.bonsai.parser.Tree.Kind;
 
 class ParserTest {
@@ -207,7 +208,15 @@ class ParserTest {
                         .add("A", SequenceRule.builder()
                                 .add(() -> PatternRule.of("1"))
                                 .add(() -> ReferenceRule.of("A")))
-                        .build(), "10", "A(1,A(0))"));
+                        .build(), "10", "A(1,A(0))"),
+                arguments(Grammar.builder()
+                        .add("A", ShortCircuitChoiceRule.builder()
+                                .add(ReferenceRule.of("B"))
+                                .add(ReferenceRule.of("C")))
+                        .add("B", SequenceRule.of(PatternRule.of("1"), PatternRule.of("2")))
+                        .add("C", SequenceRule.of(PatternRule.of("1"), PatternRule.of("3")))
+                        .build(), "13", "A(C(1,3))")
+                );
         return stream;
     }
 

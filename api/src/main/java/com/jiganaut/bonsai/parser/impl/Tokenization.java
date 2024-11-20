@@ -10,6 +10,7 @@ import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.grammar.RuleVisitor;
 import com.jiganaut.bonsai.grammar.SequenceRule;
+import com.jiganaut.bonsai.grammar.ShortCircuitChoiceRule;
 import com.jiganaut.bonsai.grammar.SkipRule;
 import com.jiganaut.bonsai.parser.ParseException;
 import com.jiganaut.bonsai.parser.Token;
@@ -30,13 +31,12 @@ final class Tokenization implements RuleVisitor<CharSequence, Context> {
                 .filter(e -> AnyMatcher.scan(e.getRule(), context))
                 .toList();
         if (list.isEmpty()) {
-            var tokenizer = context.tokenizer();
-            tokenizer.next();
-            return tokenizer.getToken();
+            context.next();
+            return context.getToken();
         }
         if (1 < list.size()) {
-          var message = MessageSupport.ambiguousProductionSet(list);
-          throw new ParseException(message);
+            var message = MessageSupport.ambiguousProductionSet(list);
+            throw new ParseException(message);
         }
         var production = list.get(0);
         var subContext = context.withProduction(production);
@@ -71,6 +71,21 @@ final class Tokenization implements RuleVisitor<CharSequence, Context> {
     }
 
     @Override
+    public CharSequence visitShortCircuitChoice(ShortCircuitChoiceRule choice, Context context) {
+        int position = context.mark();
+        for (var rule : choice.getChoices()) {
+            if (FullLengthMatcher.scan(rule, context)) {
+                context.reset(position);
+                context.clear();
+                return visit(rule, context);
+            }
+            context.reset(position);
+        }
+        var message = MessageSupport.tokenNotMatchRule(choice, context);
+        throw new ParseException(message);
+    }
+
+    @Override
     public CharSequence visitSequence(SequenceRule sequence, Context context) {
         if (!AnyMatcher.scan(sequence, context)) {
             var message = MessageSupport.tokenNotMatchRule(sequence, context);
@@ -93,9 +108,8 @@ final class Tokenization implements RuleVisitor<CharSequence, Context> {
             var message = MessageSupport.tokenNotMatchRule(pattern, context);
             throw new ParseException(message);
         }
-        var tokenizer = context.tokenizer();
-        tokenizer.next(pattern.getPattern());
-        return tokenizer.getValue();
+        context.next();
+        return context.getValue();
     }
 
     @Override

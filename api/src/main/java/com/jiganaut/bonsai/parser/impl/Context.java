@@ -1,24 +1,231 @@
 package com.jiganaut.bonsai.parser.impl;
 
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import com.jiganaut.bonsai.grammar.Production;
 import com.jiganaut.bonsai.grammar.ProductionSet;
 import com.jiganaut.bonsai.grammar.Rule;
+import com.jiganaut.bonsai.parser.Token;
 import com.jiganaut.bonsai.parser.Tokenizer;
 
 /**
  * @author Junji Mikami
  *
  */
-record Context(ProductionSet productionSet, Production production, Tokenizer tokenizer, Set<Rule> followSet) {
+class Context implements Tokenizer {
+
+    private static record Cache(long lineNumber, long index, String name, String value) {
+    }
+
+    private static class Position {
+        int pos;
+        int count;
+
+        void set(int p) {
+            this.pos = p;
+        }
+
+        int get() {
+            return pos;
+        }
+
+        int getAndIncrement() {
+            return pos++;
+        }
+
+        int decrementAndGet() {
+            assert 0 < pos;
+            return --pos;
+        }
+
+        boolean hasRemaining(List<?> list) {
+            return pos < list.size();
+        }
+
+        boolean hasPrevious() {
+            return 0 < pos;
+        }
+
+        void mark(boolean flag) {
+            if (flag) {
+                count++;
+            } else if (0 < count) {
+                count--;
+            }
+        }
+
+        boolean isMarked() {
+            return 0 < count;
+        }
+    }
+
+    private final ProductionSet productionSet;
+    private final Production production;
+    private final Tokenizer tokenizer;
+    private final Set<Rule> followSet;
+
+    private final List<Cache> cacheList;
+    private final Position position;
+
+    Context(ProductionSet productionSet, Production production, Tokenizer tokenizer, Set<Rule> followSet) {
+        this(productionSet, production, tokenizer, followSet, new LinkedList<>(), new Position());
+    }
+
+    private Context(
+            ProductionSet productionSet,
+            Production production,
+            Tokenizer tokenizer,
+            Set<Rule> followSet,
+            List<Cache> cacheList,
+            Position position) {
+        assert productionSet != null;
+        assert tokenizer != null;
+        assert followSet != null;
+        this.productionSet = productionSet;
+        this.production = production;
+        this.tokenizer = tokenizer;
+        this.followSet = followSet;
+        this.cacheList = cacheList;
+        this.position = position;
+    }
 
     Context withProduction(Production production) {
-        return new Context(this.productionSet, production, this.tokenizer, this.followSet);
+        return new Context(
+                this.productionSet,
+                production,
+                this.tokenizer,
+                this.followSet,
+                this.cacheList,
+                this.position);
     }
 
     Context withFollowSet(Set<Rule> followSet) {
-        return new Context(this.productionSet, this.production, this.tokenizer, followSet);
+        return new Context(
+                this.productionSet,
+                this.production,
+                this.tokenizer,
+                followSet,
+                this.cacheList,
+                this.position);
     }
 
+    ProductionSet productionSet() {
+        return productionSet;
+    }
+
+    Production production() {
+        return production;
+    }
+
+    Set<Rule> followSet() {
+        return followSet;
+    }
+
+    @Override
+    public boolean hasNext() {
+        return position.hasRemaining(cacheList) || tokenizer.hasNext();
+    }
+
+    @Override
+    public boolean hasNext(Pattern pattern) {
+        if (position.hasRemaining(cacheList)) {
+            var next = cacheList.get(position.get());
+            return pattern.matcher(next.value()).matches();
+        }
+        return tokenizer.hasNext(pattern);
+    }
+
+    @Override
+    public boolean hasNext(String regex) {
+        return hasNext(Pattern.compile(regex));
+    }
+
+    @Override
+    public String next() {
+        if (!position.isMarked() && position.hasPrevious()) {
+            cacheList.remove(position.decrementAndGet());
+        }
+        if (position.hasRemaining(cacheList)) {
+            var next = cacheList.get(position.getAndIncrement());
+            return next.value();
+        }
+        var name = tokenizer.next();
+        if (position.isMarked()) {
+            var cache = new Cache(
+                    tokenizer.getLineNumber(),
+                    tokenizer.getIndex(),
+                    name,
+                    tokenizer.getValue());
+            cacheList.add(position.getAndIncrement(), cache);
+        }
+        return tokenizer.getValue();
+    }
+
+    @Override
+    public String next(Pattern pattern) {
+        throw new AssertionError();
+    }
+
+    @Override
+    public String next(String regex) {
+        throw new AssertionError();
+    }
+
+    @Override
+    public String getValue() {
+        if (position.hasPrevious()) {
+            var previous = cacheList.get(position.get() - 1);
+            return previous.value();
+        }
+        return tokenizer.getValue();
+    }
+
+    @Override
+    public Token getToken() {
+        if (position.hasPrevious()) {
+            var previous = cacheList.get(position.get() - 1);
+            return new DefaultToken(previous.name(), previous.value());
+        }
+        return tokenizer.getToken();
+    }
+
+    @Override
+    public long getLineNumber() {
+        if (position.hasPrevious()) {
+            var previous = cacheList.get(position.get() - 1);
+            return previous.lineNumber();
+        }
+        return tokenizer.getLineNumber();
+    }
+
+    @Override
+    public long getIndex() {
+        if (position.hasPrevious()) {
+            var previous = cacheList.get(position.get() - 1);
+            return previous.index();
+        }
+        return tokenizer.getIndex();
+    }
+
+    @Override
+    public void close() throws IOException {
+        tokenizer.close();
+    }
+
+    int mark() {
+        position.mark(true);
+        return position.get();
+    }
+
+    void reset(int position) {
+        this.position.set(position);
+    }
+
+    void clear() {
+        position.mark(false);
+    }
 }

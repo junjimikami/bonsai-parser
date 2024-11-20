@@ -25,7 +25,7 @@ class DefaultParser implements Parser {
 
     @Override
     public void close() throws IOException {
-        context.tokenizer().close();
+        context.close();
     }
 
 }

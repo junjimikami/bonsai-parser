@@ -12,6 +12,7 @@ import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.grammar.RuleVisitor;
 import com.jiganaut.bonsai.grammar.SequenceRule;
+import com.jiganaut.bonsai.grammar.ShortCircuitChoiceRule;
 import com.jiganaut.bonsai.grammar.SkipRule;
 import com.jiganaut.bonsai.parser.ParseException;
 import com.jiganaut.bonsai.parser.Tree;
@@ -28,7 +29,7 @@ final class Derivation implements RuleVisitor<List<Tree>, Context> {
 
     static Tree run(Context context) {
         var tree = derive(context);
-        if (context.tokenizer().hasNext()) {
+        if (context.hasNext()) {
             var message = MessageSupport.tokensRemained(context);
             throw new ParseException(message);
         }
@@ -68,6 +69,21 @@ final class Derivation implements RuleVisitor<List<Tree>, Context> {
     }
 
     @Override
+    public List<Tree> visitShortCircuitChoice(ShortCircuitChoiceRule choice, Context context) {
+        int position = context.mark();
+        for (var rule : choice.getChoices()) {
+            if (FullLengthMatcher.scan(rule, context)) {
+                context.reset(position);
+                context.clear();
+                return visit(rule, context);
+            }
+            context.reset(position);
+        }
+        var message = MessageSupport.tokenNotMatchRule(choice, context);
+        throw new ParseException(message);
+    }
+
+    @Override
     public List<Tree> visitSequence(SequenceRule sequence, Context context) {
         if (!AnyMatcher.scan(sequence, context)) {
             var message = MessageSupport.tokenNotMatchRule(sequence, context);
@@ -90,9 +106,8 @@ final class Derivation implements RuleVisitor<List<Tree>, Context> {
             var message = MessageSupport.tokenNotMatchRule(pattern, context);
             throw new ParseException(message);
         }
-        var tokenizer = context.tokenizer();
-        tokenizer.next(pattern.getPattern());
-        var token = tokenizer.getToken();
+        context.next();
+        var token = context.getToken();
         return List.of(token);
     }
 
