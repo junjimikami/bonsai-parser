@@ -2,7 +2,7 @@ package com.jiganaut.bonsai.grammar;
 
 import java.util.stream.Stream;
 
-import com.jiganaut.bonsai.grammar.impl.GrammarProviders;
+import com.jiganaut.bonsai.grammar.spi.GrammarProvider;
 
 public interface SingleOriginGrammar extends Grammar {
 
@@ -17,7 +17,7 @@ public interface SingleOriginGrammar extends Grammar {
     }
 
     public static Builder builder() {
-        return GrammarProviders.provider().createSingleOriginGrammarBuilder();
+        return GrammarProvider.load().createSingleOriginGrammarBuilder();
     }
 
     public Production getStartProduction();

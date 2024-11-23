@@ -1,6 +1,6 @@
 package com.jiganaut.bonsai.grammar;
 
-import com.jiganaut.bonsai.grammar.impl.GrammarProviders;
+import com.jiganaut.bonsai.grammar.spi.GrammarProvider;
 
 public interface ShortCircuitChoiceGrammar extends ChoiceGrammar {
 
@@ -13,7 +13,7 @@ public interface ShortCircuitChoiceGrammar extends ChoiceGrammar {
     }
 
     public static Builder builder() {
-        return GrammarProviders.provider().createShortCircuitChoiceGrammarBuilder();
+        return GrammarProvider.load().createShortCircuitChoiceGrammarBuilder();
     }
 
     @Override

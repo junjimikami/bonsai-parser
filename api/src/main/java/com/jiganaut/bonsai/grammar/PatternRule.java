@@ -2,7 +2,7 @@ package com.jiganaut.bonsai.grammar;
 
 import java.util.regex.Pattern;
 
-import com.jiganaut.bonsai.grammar.impl.GrammarProviders;
+import com.jiganaut.bonsai.grammar.spi.GrammarProvider;
 
 /**
  * @author Junji Mikami
@@ -11,11 +11,11 @@ import com.jiganaut.bonsai.grammar.impl.GrammarProviders;
 public interface PatternRule extends Rule, Quantifiable, Skippable {
 
     public static PatternRule of(String regex) {
-        return GrammarProviders.provider().createPattern(regex);
+        return GrammarProvider.load().createPattern(regex);
     }
 
     public static PatternRule of(Pattern pattern) {
-        return GrammarProviders.provider().createPattern(pattern);
+        return GrammarProvider.load().createPattern(pattern);
     }
 
     @Override

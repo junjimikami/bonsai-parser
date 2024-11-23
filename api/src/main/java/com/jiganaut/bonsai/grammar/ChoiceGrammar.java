@@ -1,6 +1,6 @@
 package com.jiganaut.bonsai.grammar;
 
-import com.jiganaut.bonsai.grammar.impl.GrammarProviders;
+import com.jiganaut.bonsai.grammar.spi.GrammarProvider;
 
 public interface ChoiceGrammar extends Grammar {
 
@@ -13,7 +13,7 @@ public interface ChoiceGrammar extends Grammar {
     }
 
     public static Builder builder() {
-        return GrammarProviders.provider().createChoiceGrammarBuilder();
+        return GrammarProvider.load().createChoiceGrammarBuilder();
     }
 
     @Override

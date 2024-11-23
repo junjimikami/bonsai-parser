@@ -2,7 +2,7 @@ package com.jiganaut.bonsai.grammar;
 
 import java.util.Set;
 
-import com.jiganaut.bonsai.grammar.impl.GrammarProviders;
+import com.jiganaut.bonsai.grammar.spi.GrammarProvider;
 
 /**
  * @author Junji Mikami
@@ -19,7 +19,7 @@ public interface ChoiceRule extends Rule, Quantifiable {
     }
 
     public static Builder builder() {
-        return GrammarProviders.provider().createChoiceBuilder();
+        return GrammarProvider.load().createChoiceBuilder();
     }
 
     public static ChoiceRule of(Rule... rules) {

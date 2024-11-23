@@ -1,6 +1,6 @@
 package com.jiganaut.bonsai.grammar;
 
-import com.jiganaut.bonsai.grammar.impl.GrammarProviders;
+import com.jiganaut.bonsai.grammar.spi.GrammarProvider;
 
 /**
  * @author Junji Mikami
@@ -9,7 +9,7 @@ import com.jiganaut.bonsai.grammar.impl.GrammarProviders;
 public interface ReferenceRule extends Rule, Quantifiable {
 
     public static ReferenceRule of(String reference) {
-        return GrammarProviders.provider().createReference(reference);
+        return GrammarProvider.load().createReference(reference);
     }
 
     @Override

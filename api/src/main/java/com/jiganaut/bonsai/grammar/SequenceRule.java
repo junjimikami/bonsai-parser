@@ -2,7 +2,7 @@ package com.jiganaut.bonsai.grammar;
 
 import java.util.List;
 
-import com.jiganaut.bonsai.grammar.impl.GrammarProviders;
+import com.jiganaut.bonsai.grammar.spi.GrammarProvider;
 
 /**
  * @author Junji Mikami
@@ -18,7 +18,7 @@ public interface SequenceRule extends Rule, Quantifiable {
     }
 
     public static Builder builder() {
-        return GrammarProviders.provider().createSequenceBuilder();
+        return GrammarProvider.load().createSequenceBuilder();
     }
 
     public static SequenceRule of(Rule... rules) {
