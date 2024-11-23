@@ -3,6 +3,7 @@ package com.jiganaut.bonsai.parser.impl;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -131,21 +132,72 @@ class Context implements Tokenizer {
     }
 
     @Override
-    public boolean hasNext(Pattern pattern) {
+    public boolean hasNextName(String name) {
+        if (position.hasRemaining(cacheList)) {
+            var next = cacheList.get(position.get());
+            return Objects.equals(name, next.name());
+        }
+        return tokenizer.hasNextName(name);
+    }
+
+    @Override
+    public boolean hasNextValue(Pattern pattern) {
         if (position.hasRemaining(cacheList)) {
             var next = cacheList.get(position.get());
             return pattern.matcher(next.value()).matches();
         }
-        return tokenizer.hasNext(pattern);
+        return tokenizer.hasNextValue(pattern);
     }
 
     @Override
-    public boolean hasNext(String regex) {
-        return hasNext(Pattern.compile(regex));
+    public boolean hasNextValue(String regex) {
+        return hasNextValue(Pattern.compile(regex));
     }
 
     @Override
-    public String next() {
+    public Token next() {
+        if (!position.isMarked() && position.hasPrevious()) {
+            cacheList.remove(position.decrementAndGet());
+        }
+        if (position.hasRemaining(cacheList)) {
+            var next = cacheList.get(position.getAndIncrement());
+            return new DefaultToken(next.name(), next.value());
+        }
+        var token = tokenizer.next();
+        if (position.isMarked()) {
+            var cache = new Cache(
+                    tokenizer.getLineNumber(),
+                    tokenizer.getIndex(),
+                    tokenizer.getName(),
+                    tokenizer.getValue());
+            cacheList.add(position.getAndIncrement(), cache);
+        }
+        return token;
+    }
+
+    @Override
+    public String nextName() {
+        if (!position.isMarked() && position.hasPrevious()) {
+            cacheList.remove(position.decrementAndGet());
+        }
+        if (position.hasRemaining(cacheList)) {
+            var next = cacheList.get(position.getAndIncrement());
+            return next.name();
+        }
+        var name = tokenizer.nextName();
+        if (position.isMarked()) {
+            var cache = new Cache(
+                    tokenizer.getLineNumber(),
+                    tokenizer.getIndex(),
+                    tokenizer.getName(),
+                    tokenizer.getValue());
+            cacheList.add(position.getAndIncrement(), cache);
+        }
+        return name;
+    }
+
+    @Override
+    public String nextValue() {
         if (!position.isMarked() && position.hasPrevious()) {
             cacheList.remove(position.decrementAndGet());
         }
@@ -153,26 +205,25 @@ class Context implements Tokenizer {
             var next = cacheList.get(position.getAndIncrement());
             return next.value();
         }
-        var name = tokenizer.next();
+        var value = tokenizer.nextValue();
         if (position.isMarked()) {
             var cache = new Cache(
                     tokenizer.getLineNumber(),
                     tokenizer.getIndex(),
-                    name,
+                    tokenizer.getName(),
                     tokenizer.getValue());
             cacheList.add(position.getAndIncrement(), cache);
         }
-        return tokenizer.getValue();
+        return value;
     }
 
     @Override
-    public String next(Pattern pattern) {
-        throw new AssertionError();
-    }
-
-    @Override
-    public String next(String regex) {
-        throw new AssertionError();
+    public String getName() {
+        if (position.hasPrevious()) {
+            var previous = cacheList.get(position.get() - 1);
+            return previous.name();
+        }
+        return tokenizer.getName();
     }
 
     @Override
@@ -182,15 +233,6 @@ class Context implements Tokenizer {
             return previous.value();
         }
         return tokenizer.getValue();
-    }
-
-    @Override
-    public Token getToken() {
-        if (position.hasPrevious()) {
-            var previous = cacheList.get(position.get() - 1);
-            return new DefaultToken(previous.name(), previous.value());
-        }
-        return tokenizer.getToken();
     }
 
     @Override

@@ -18,8 +18,10 @@ class DefaultTokenizer extends AbstractTokenizer {
 
     private final Context context;
     private final Tokenization tokenization;
-    private Token nextToken;
-    private Token currentToken;
+    private String nextTokenName;
+    private String nextTokenValue;
+    private String currentTokenName;
+    private String currentTokenValue;
 
     DefaultTokenizer(Grammar grammar, Tokenizer tokenizer) {
         assert grammar != null;
@@ -29,83 +31,85 @@ class DefaultTokenizer extends AbstractTokenizer {
     }
 
     private void readNext() {
-        if (nextToken != null) {
+        if (nextTokenValue != null) {
             return;
         }
         while (context.hasNext()) {
-            var token = tokenization.process(context);
-            if (!token.getValue().isEmpty()) {
-                nextToken = token;
+            nextTokenName = tokenization.process(context);
+            if (!tokenization.getValue().isEmpty()) {
+                nextTokenValue = tokenization.getValue();
                 break;
             }
         }
     }
 
+    private void writeCurrent() {
+        if (nextTokenValue == null) {
+            throw new NoSuchElementException(Message.TOKEN_NOT_FOUND.format());
+        }
+        currentTokenName = nextTokenName;
+        currentTokenValue = nextTokenValue;
+        nextTokenName = null;
+        nextTokenValue = null;
+    }
+
     @Override
     public boolean hasNext() {
         readNext();
-        return nextToken != null;
+        return nextTokenValue != null;
     }
 
     @Override
-    public boolean hasNext(String regex) {
+    public boolean hasNextName(String name) {
+        return Objects.equals(name, nextTokenName);
+    }
+
+    @Override
+    public boolean hasNextValue(String regex) {
         Objects.requireNonNull(regex, Message.NULL_PARAMETER.format());
         var pattern = Pattern.compile(regex);
-        return hasNext(pattern);
+        return hasNextValue(pattern);
     }
 
     @Override
-    public boolean hasNext(Pattern pattern) {
+    public boolean hasNextValue(Pattern pattern) {
         Objects.requireNonNull(pattern, Message.NULL_PARAMETER.format());
         if (!hasNext()) {
             return false;
         }
-        var matcher = pattern.matcher(nextToken.getValue());
+        var matcher = pattern.matcher(nextTokenValue);
         return matcher.matches();
     }
 
     @Override
-    public String next() {
+    public Token next() {
         readNext();
-        if (nextToken == null) {
-            throw new NoSuchElementException(Message.TOKEN_NOT_FOUND.format());
-        }
-        currentToken = nextToken;
-        nextToken = null;
-        return currentToken.getName();
+        writeCurrent();
+        return new DefaultToken(currentTokenName, currentTokenValue);
     }
 
     @Override
-    public String next(String regex) {
-        Objects.requireNonNull(regex, Message.NULL_PARAMETER.format());
-        var pattern = Pattern.compile(regex);
-        return next(pattern);
-    }
-
-    @Override
-    public String next(Pattern pattern) {
-        Objects.requireNonNull(pattern, Message.NULL_PARAMETER.format());
+    public String nextName() {
         readNext();
-        if (nextToken == null) {
-            throw new NoSuchElementException(Message.TOKEN_NOT_FOUND.format());
-        }
-        var matcher = pattern.matcher(nextToken.getValue());
-        if (!matcher.matches()) {
-            throw new NoSuchElementException(Message.TOKEN_NOT_MATCH_PATTERN.format(pattern));
-        }
-        currentToken = nextToken;
-        nextToken = null;
-        return currentToken.getName();
+        writeCurrent();
+        return currentTokenName;
     }
 
     @Override
-    public Token getToken() {
-        return currentToken;
+    public String nextValue() {
+        readNext();
+        writeCurrent();
+        return currentTokenValue;
+    }
+
+    @Override
+    public String getName() {
+        return currentTokenName;
     }
 
     @Override
     public String getValue() {
-        return currentToken.getValue();
+        return currentTokenValue;
     }
 
     @Override

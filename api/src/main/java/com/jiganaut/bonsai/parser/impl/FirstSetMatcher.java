@@ -22,7 +22,7 @@ final class FirstSetMatcher implements SimpleRuleVisitor<Boolean, Context> {
 
     @Override
     public Boolean visitPattern(PatternRule pattern, Context context) {
-        return context.hasNext(pattern.getPattern());
+        return context.hasNextValue(pattern.getPattern());
     }
 
     @Override

@@ -10,14 +10,15 @@ import java.util.regex.Pattern;
 public interface Tokenizer extends Closeable {
 
     public boolean hasNext();
-    public boolean hasNext(String regex);
-    public boolean hasNext(Pattern pattern);
-    public String next();
-    public String next(String regex);
-    public String next(Pattern pattern);
+    public boolean hasNextName(String name);
+    public boolean hasNextValue(String regex);
+    public boolean hasNextValue(Pattern pattern);
+    public Token next();
+    public String nextName();
+    public String nextValue();
 
+    public String getName();
     public String getValue();
-    public Token getToken();
 
     public long getLineNumber();
     public long getIndex();

@@ -83,7 +83,7 @@ final class FullLengthMatcher implements RuleVisitor<Boolean, Context> {
 
     @Override
     public Boolean visitPattern(PatternRule pattern, Context context) {
-        if (!context.hasNext(pattern.getPattern())) {
+        if (!context.hasNextValue(pattern.getPattern())) {
             return false;
         }
         context.next();

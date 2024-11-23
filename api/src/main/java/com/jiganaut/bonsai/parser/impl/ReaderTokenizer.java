@@ -90,14 +90,19 @@ class ReaderTokenizer extends AbstractTokenizer {
     }
 
     @Override
-    public boolean hasNext(String regex) {
-        Objects.requireNonNull(regex, Message.NULL_PARAMETER.format());
-        var pattern = Pattern.compile(regex);
-        return hasNext(pattern);
+    public boolean hasNextName(String name) {
+        return false;
     }
 
     @Override
-    public boolean hasNext(Pattern pattern) {
+    public boolean hasNextValue(String regex) {
+        Objects.requireNonNull(regex, Message.NULL_PARAMETER.format());
+        var pattern = Pattern.compile(regex);
+        return hasNextValue(pattern);
+    }
+
+    @Override
+    public boolean hasNextValue(Pattern pattern) {
         Objects.requireNonNull(pattern, Message.NULL_PARAMETER.format());
         if (!hasNext()) {
             return false;
@@ -107,40 +112,38 @@ class ReaderTokenizer extends AbstractTokenizer {
     }
 
     @Override
-    public String next() {
+    public Token next() {
         readNext();
         if (nextToken == null) {
             throw new NoSuchElementException(Message.TOKEN_NOT_FOUND.format());
         }
         writeCurrent();
-        return null;
-    }
-
-    @Override
-    public String next(String regex) {
-        Objects.requireNonNull(regex, Message.NULL_PARAMETER.format());
-        var pattern = Pattern.compile(regex);
-        return next(pattern);
-    }
-
-    @Override
-    public String next(Pattern pattern) {
-        Objects.requireNonNull(pattern, Message.NULL_PARAMETER.format());
-        readNext();
-        if (nextToken == null) {
-            throw new NoSuchElementException(Message.TOKEN_NOT_FOUND.format());
-        }
-        var matcher = pattern.matcher(nextToken);
-        if (!matcher.matches()) {
-            throw new NoSuchElementException(Message.TOKEN_NOT_MATCH_PATTERN.format(pattern));
-        }
-        writeCurrent();
-        return null;
-    }
-
-    @Override
-    public Token getToken() {
         return new DefaultToken(null, currentToken);
+    }
+
+    @Override
+    public String nextName() {
+        readNext();
+        if (nextToken == null) {
+            throw new NoSuchElementException(Message.TOKEN_NOT_FOUND.format());
+        }
+        writeCurrent();
+        return null;
+    }
+
+    @Override
+    public String nextValue() {
+        readNext();
+        if (nextToken == null) {
+            throw new NoSuchElementException(Message.TOKEN_NOT_FOUND.format());
+        }
+        writeCurrent();
+        return currentToken;
+    }
+
+    @Override
+    public String getName() {
+        return null;
     }
 
     @Override

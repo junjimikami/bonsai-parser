@@ -130,8 +130,7 @@ final class Derivation implements GrammarVisitor<Tree, Context>, RuleVisitor<Lis
             var message = MessageSupport.tokenNotMatchRule(pattern, context);
             throw new ParseException(message);
         }
-        context.next();
-        var token = context.getToken();
+        var token = context.next();
         return List.of(token);
     }
 

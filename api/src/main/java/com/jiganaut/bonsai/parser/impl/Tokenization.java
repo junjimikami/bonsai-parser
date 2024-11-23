@@ -17,27 +17,31 @@ import com.jiganaut.bonsai.grammar.ShortCircuitChoiceRule;
 import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
 import com.jiganaut.bonsai.grammar.SkipRule;
 import com.jiganaut.bonsai.parser.ParseException;
-import com.jiganaut.bonsai.parser.Token;
 
 /**
  * @author Junji Mikami
  *
  */
-final class Tokenization implements GrammarVisitor<Token, Context>, RuleVisitor<CharSequence, Context> {
+final class Tokenization implements GrammarVisitor<String, Context>, RuleVisitor<CharSequence, Context> {
     private static final String EMPTY_STRING = "";
+    private String value;
 
-    Token process(Context context) {
+    String process(Context context) {
         return visit(context.grammar(), context);
     }
 
-    private Token tokenize(Production production, Context context) {
+    String getValue() {
+        return value;
+    }
+
+    private String tokenize(Production production, Context context) {
         var subContext = context.withProduction(production);
-        var value = visit(production.getRule(), subContext).toString();
-        return new DefaultToken(production.getSymbol(), value);
+        value = visit(production.getRule(), subContext).toString();
+        return production.getSymbol();
     }
 
     @Override
-    public Token visitSingleOrigin(SingleOriginGrammar grammar, Context context) {
+    public String visitSingleOrigin(SingleOriginGrammar grammar, Context context) {
         var origin = grammar.scope().findFirst();
         if (origin.isEmpty()) {
             throw new ParseException();
@@ -46,7 +50,7 @@ final class Tokenization implements GrammarVisitor<Token, Context>, RuleVisitor<
     }
 
     @Override
-    public Token visitChoice(ChoiceGrammar grammar, Context context) {
+    public String visitChoice(ChoiceGrammar grammar, Context context) {
         var list = grammar.scope()
                 .filter(e -> FirstSetMatcher.scan(e.getRule(), context))
                 .toList();
