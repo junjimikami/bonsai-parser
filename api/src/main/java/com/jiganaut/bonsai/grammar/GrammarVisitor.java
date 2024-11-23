@@ -12,5 +12,9 @@ public interface GrammarVisitor<R, P> {
 
     public R visitChoice(ChoiceGrammar grammar, P p);
 
+    public default R visitShortCircuitChoice(ShortCircuitChoiceGrammar grammar, P p) {
+        return visitChoice(grammar, p);
+    }
+
     public R visitSingleOrigin(SingleOriginGrammar grammar, P p);
 }

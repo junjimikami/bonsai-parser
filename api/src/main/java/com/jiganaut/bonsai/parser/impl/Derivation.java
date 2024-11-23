@@ -15,6 +15,7 @@ import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.grammar.RuleVisitor;
 import com.jiganaut.bonsai.grammar.SequenceRule;
+import com.jiganaut.bonsai.grammar.ShortCircuitChoiceGrammar;
 import com.jiganaut.bonsai.grammar.ShortCircuitChoiceRule;
 import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
 import com.jiganaut.bonsai.grammar.SkipRule;
@@ -64,6 +65,20 @@ final class Derivation implements GrammarVisitor<Tree, Context>, RuleVisitor<Lis
             throw new ParseException(message);
         }
         return derive(list.get(0), context);
+    }
+
+    @Override
+    public Tree visitShortCircuitChoice(ShortCircuitChoiceGrammar grammar, Context context) {
+        int position = context.mark();
+        for (var production : grammar.scope().toList()) {
+            if (FullLengthMatcher.scan(production.getRule(), context)) {
+                context.reset(position);
+                context.clear();
+                return derive(production, context);
+            }
+            context.reset(position);
+        }
+        throw new ParseException();
     }
 
     @Override

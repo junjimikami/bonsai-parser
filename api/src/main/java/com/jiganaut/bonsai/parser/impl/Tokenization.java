@@ -13,6 +13,7 @@ import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.grammar.RuleVisitor;
 import com.jiganaut.bonsai.grammar.SequenceRule;
+import com.jiganaut.bonsai.grammar.ShortCircuitChoiceGrammar;
 import com.jiganaut.bonsai.grammar.ShortCircuitChoiceRule;
 import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
 import com.jiganaut.bonsai.grammar.SkipRule;
@@ -62,6 +63,20 @@ final class Tokenization implements GrammarVisitor<String, Context>, RuleVisitor
             throw new ParseException(message);
         }
         return tokenize(list.get(0), context);
+    }
+
+    @Override
+    public String visitShortCircuitChoice(ShortCircuitChoiceGrammar grammar, Context context) {
+        int position = context.mark();
+        for (var production : grammar.scope().toList()) {
+            if (FullLengthMatcher.scan(production.getRule(), context)) {
+                context.reset(position);
+                context.clear();
+                return tokenize(production, context);
+            }
+            context.reset(position);
+        }
+        throw new ParseException();
     }
 
     @Override

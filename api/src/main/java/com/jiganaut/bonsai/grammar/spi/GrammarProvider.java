@@ -7,6 +7,7 @@ import com.jiganaut.bonsai.grammar.ChoiceRule;
 import com.jiganaut.bonsai.grammar.PatternRule;
 import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.SequenceRule;
+import com.jiganaut.bonsai.grammar.ShortCircuitChoiceGrammar;
 import com.jiganaut.bonsai.grammar.ShortCircuitChoiceRule;
 import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
 import com.jiganaut.bonsai.grammar.impl.DefaultGrammarProvider;
@@ -22,6 +23,8 @@ public abstract class GrammarProvider {
     public abstract SingleOriginGrammar.Builder createSingleOriginGrammarBuilder();
 
     public abstract ChoiceGrammar.Builder createChoiceGrammarBuilder();
+
+    public abstract ShortCircuitChoiceGrammar.Builder createShortCircuitChoiceGrammarBuilder();
 
     public abstract PatternRule createPattern(String regex);
 
