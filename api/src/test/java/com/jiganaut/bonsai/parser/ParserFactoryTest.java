@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.jiganaut.bonsai.grammar.Grammar;
+import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
 import com.jiganaut.bonsai.grammar.PatternRule;
 
 class ParserFactoryTest {
@@ -22,7 +22,7 @@ class ParserFactoryTest {
     @Test
     @DisplayName("newFactory(Grammar)")
     void newFactory() throws Exception {
-        var grammar = Grammar.builder()
+        var grammar = SingleOriginGrammar.builder()
                 .add("S", () -> PatternRule.of(""))
                 .build();
         var factory = ParserFactory.of(grammar);

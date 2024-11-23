@@ -10,12 +10,12 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 
-import com.jiganaut.bonsai.grammar.Grammar.Builder;
+import com.jiganaut.bonsai.grammar.SingleOriginGrammar.Builder;
 
-class GrammarTest {
+class SingleOriginGrammarTest {
 
     @Nested
-    class TestCase1 implements GrammarTestCase {
+    class TestCase1 implements SingleOriginGrammarTestCase {
 
         Set<Production> testData;
 
@@ -28,8 +28,8 @@ class GrammarTest {
         }
 
         @Override
-        public Grammar createTarget() {
-            var builder = Grammar.builder();
+        public SingleOriginGrammar createTarget() {
+            var builder = SingleOriginGrammar.builder();
             testData.forEach(e -> builder.add(e.getSymbol(), e.getRule()));
             return builder.build();
         }
@@ -47,7 +47,7 @@ class GrammarTest {
     }
 
     @Nested
-    class TestCase2 implements GrammarTestCase {
+    class TestCase2 implements SingleOriginGrammarTestCase {
 
         Set<Production> testData;
 
@@ -64,8 +64,8 @@ class GrammarTest {
         }
 
         @Override
-        public Grammar createTarget() {
-            var builder = Grammar.builder();
+        public SingleOriginGrammar createTarget() {
+            var builder = SingleOriginGrammar.builder();
             testData.forEach(e -> builder.add(e.getSymbol(), e.getRule()));
             return builder.build();
         }
@@ -83,7 +83,7 @@ class GrammarTest {
     }
 
     @Nested
-    class TestCase3 implements GrammarTestCase {
+    class TestCase3 implements SingleOriginGrammarTestCase {
 
         Set<Production> testData;
 
@@ -103,8 +103,8 @@ class GrammarTest {
         }
 
         @Override
-        public Grammar createTarget() {
-            var builder = Grammar.builder();
+        public SingleOriginGrammar createTarget() {
+            var builder = SingleOriginGrammar.builder();
             testData.forEach(e -> builder.add(e.getSymbol(), e.getRule()));
             return builder.build();
         }
@@ -122,7 +122,7 @@ class GrammarTest {
     }
 
     @Nested
-    class TestCase4 implements GrammarTestCase {
+    class TestCase4 implements SingleOriginGrammarTestCase {
 
         Set<Production> testData;
 
@@ -139,8 +139,8 @@ class GrammarTest {
         }
 
         @Override
-        public Grammar createTarget() {
-            var builder = Grammar.builder();
+        public SingleOriginGrammar createTarget() {
+            var builder = SingleOriginGrammar.builder();
             testData.forEach(e -> builder.add(e.getSymbol(), e.getRule()));
             builder.setStartSymbol("2");
             return builder.build();
@@ -159,11 +159,11 @@ class GrammarTest {
     }
 
     @Nested
-    class BuilderTestCase1 implements GrammarTestCase.BuilderTestCase {
+    class BuilderTestCase1 implements SingleOriginGrammarTestCase.BuilderTestCase {
 
         @Override
         public Builder createTarget() {
-            return Grammar.builder();
+            return SingleOriginGrammar.builder();
         }
 
         @Override
@@ -178,7 +178,7 @@ class GrammarTest {
     }
 
     @Nested
-    class BuilderTestCase2 implements GrammarTestCase.BuilderTestCase {
+    class BuilderTestCase2 implements SingleOriginGrammarTestCase.BuilderTestCase {
 
         Set<Production> testData;
 
@@ -192,7 +192,7 @@ class GrammarTest {
 
         @Override
         public Builder createTarget() {
-            var builder = Grammar.builder();
+            var builder = SingleOriginGrammar.builder();
             testData.forEach(e -> builder.add(e.getSymbol(), e.getRule()));
             return builder;
         }
@@ -209,7 +209,7 @@ class GrammarTest {
     }
 
     @Nested
-    class BuilderTestCase3 implements GrammarTestCase.BuilderTestCase {
+    class BuilderTestCase3 implements SingleOriginGrammarTestCase.BuilderTestCase {
 
         Set<Production> testData;
 
@@ -227,7 +227,7 @@ class GrammarTest {
 
         @Override
         public Builder createTarget() {
-            var builder = Grammar.builder();
+            var builder = SingleOriginGrammar.builder();
             testData.forEach(e -> builder.add(e.getSymbol(), e.getRule()));
             return builder;
         }
@@ -244,7 +244,7 @@ class GrammarTest {
     }
 
     @Nested
-    class BuilderTestCase4 implements GrammarTestCase.BuilderTestCase {
+    class BuilderTestCase4 implements SingleOriginGrammarTestCase.BuilderTestCase {
 
         Set<Production> testData;
 
@@ -262,7 +262,7 @@ class GrammarTest {
 
         @Override
         public Builder createTarget() {
-            var builder = Grammar.builder();
+            var builder = SingleOriginGrammar.builder();
             testData.forEach(e -> builder.add(e.getSymbol(), e.getRule()));
             return builder;
         }
@@ -279,7 +279,7 @@ class GrammarTest {
     }
 
     @Nested
-    class BuilderTestCase5 implements GrammarTestCase.BuilderTestCase {
+    class BuilderTestCase5 implements SingleOriginGrammarTestCase.BuilderTestCase {
 
         Set<Production> testData;
 
@@ -297,7 +297,7 @@ class GrammarTest {
 
         @Override
         public Builder createTarget() {
-            var builder = Grammar.builder();
+            var builder = SingleOriginGrammar.builder();
             testData.stream()
                     .filter(e -> e.getSymbol().equals("1"))
                     .forEach(e -> builder.add(e.getSymbol(), e.getRule()));
@@ -319,7 +319,7 @@ class GrammarTest {
     }
 
     @Nested
-    class BuilderTestCase6 implements GrammarTestCase.BuilderTestCase {
+    class BuilderTestCase6 implements SingleOriginGrammarTestCase.BuilderTestCase {
 
         Set<Production> testData;
 
@@ -337,7 +337,7 @@ class GrammarTest {
 
         @Override
         public Builder createTarget() {
-            var builder = Grammar.builder();
+            var builder = SingleOriginGrammar.builder();
             testData.stream()
                     .filter(e -> e.getSymbol().equals("1"))
                     .forEach(e -> builder.add(e.getSymbol(), e.getRule()));
@@ -359,7 +359,7 @@ class GrammarTest {
     }
 
     @Nested
-    class BuilderTestCase7 implements GrammarTestCase.BuilderTestCase {
+    class BuilderTestCase7 implements SingleOriginGrammarTestCase.BuilderTestCase {
 
         Set<Production> testData;
 
@@ -377,7 +377,7 @@ class GrammarTest {
 
         @Override
         public Builder createTarget() {
-            var builder = Grammar.builder();
+            var builder = SingleOriginGrammar.builder();
             testData.stream()
                     .filter(e -> e.getSymbol().equals("1"))
                     .forEach(e -> builder.add(e.getSymbol(), e.getRule()));
@@ -399,7 +399,7 @@ class GrammarTest {
     }
 
     @Nested
-    class BuilderTestCase8 implements GrammarTestCase.BuilderTestCase {
+    class BuilderTestCase8 implements SingleOriginGrammarTestCase.BuilderTestCase {
 
         Set<Production> testData;
 
@@ -417,7 +417,7 @@ class GrammarTest {
 
         @Override
         public Builder createTarget() {
-            var builder = Grammar.builder();
+            var builder = SingleOriginGrammar.builder();
             testData.forEach(e -> builder.add(e.getSymbol(), e.getRule()));
             builder.setStartSymbol("2");
             return builder;
@@ -435,7 +435,7 @@ class GrammarTest {
     }
 
     @Nested
-    class BuilderTestCase9 implements GrammarTestCase.BuilderTestCase {
+    class BuilderTestCase9 implements SingleOriginGrammarTestCase.BuilderTestCase {
 
         Set<Production> testData;
 
@@ -453,7 +453,7 @@ class GrammarTest {
 
         @Override
         public Builder createTarget() {
-            var builder = Grammar.builder();
+            var builder = SingleOriginGrammar.builder();
             testData.forEach(e -> builder.add(e.getSymbol(), e.getRule()));
             builder.setStartSymbol("3");
             return builder;

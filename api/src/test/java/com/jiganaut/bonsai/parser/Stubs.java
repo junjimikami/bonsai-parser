@@ -3,17 +3,18 @@ package com.jiganaut.bonsai.parser;
 import java.io.Reader;
 import java.io.StringReader;
 
-import com.jiganaut.bonsai.grammar.Grammar;
+import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
 import com.jiganaut.bonsai.grammar.PatternRule;
-import com.jiganaut.bonsai.grammar.ProductionSet;
+import com.jiganaut.bonsai.grammar.ChoiceGrammar;
+import com.jiganaut.bonsai.grammar.Grammar;
 
 final class Stubs {
 
-    static final Grammar DUMMY_GRAMMAR = Grammar.builder()
+    static final SingleOriginGrammar DUMMY_GRAMMAR = SingleOriginGrammar.builder()
             .add("", () -> PatternRule.of(""))
             .build();
 
-    static final ProductionSet DUMMY_PRODUCTION_SET = ProductionSet.builder()
+    static final Grammar DUMMY_PRODUCTION_SET = ChoiceGrammar.builder()
             .add("", () -> PatternRule.of(""))
             .build();
 

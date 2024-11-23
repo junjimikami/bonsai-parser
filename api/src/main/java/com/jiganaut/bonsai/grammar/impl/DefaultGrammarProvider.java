@@ -3,25 +3,25 @@ package com.jiganaut.bonsai.grammar.impl;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import com.jiganaut.bonsai.grammar.ChoiceGrammar;
 import com.jiganaut.bonsai.grammar.ChoiceRule;
-import com.jiganaut.bonsai.grammar.Grammar;
 import com.jiganaut.bonsai.grammar.PatternRule;
 import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.SequenceRule;
-import com.jiganaut.bonsai.grammar.ProductionSet.Builder;
+import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
 import com.jiganaut.bonsai.grammar.spi.GrammarProvider;
 import com.jiganaut.bonsai.impl.Message;
 
 public class DefaultGrammarProvider extends GrammarProvider {
 
     @Override
-    public Grammar.Builder createGrammarBuilder() {
-        return new DefaultGrammar.Builder();
+    public SingleOriginGrammar.Builder createSingleOriginGrammarBuilder() {
+        return new DefaultSingleOriginGrammar.Builder();
     }
 
     @Override
-    public Builder createProductionSetBuilder() {
-        return new DefaultProductionSet.Builder();
+    public ChoiceGrammar.Builder createChoiceGrammarBuilder() {
+        return new DefaultChoiceGrammar.Builder();
     }
 
     @Override

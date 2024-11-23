@@ -8,8 +8,8 @@ import java.util.NoSuchElementException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import com.jiganaut.bonsai.grammar.ChoiceGrammar;
 import com.jiganaut.bonsai.grammar.PatternRule;
-import com.jiganaut.bonsai.grammar.ProductionSet;
 
 class TokenizerFactoryTest {
 
@@ -22,7 +22,7 @@ class TokenizerFactoryTest {
     @Test
     @DisplayName("newFactory(Grammar)")
     void newFactory() throws Exception {
-        var grammar = ProductionSet.builder()
+        var grammar = ChoiceGrammar.builder()
                 .add("S", () -> PatternRule.of(""))
                 .build();
         var factory = TokenizerFactory.of(grammar);

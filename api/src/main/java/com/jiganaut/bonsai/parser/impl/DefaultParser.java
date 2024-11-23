@@ -1,7 +1,6 @@
 package com.jiganaut.bonsai.parser.impl;
 
 import java.io.IOException;
-import java.util.Set;
 
 import com.jiganaut.bonsai.grammar.Grammar;
 import com.jiganaut.bonsai.parser.Parser;
@@ -14,13 +13,13 @@ class DefaultParser implements Parser {
     DefaultParser(Grammar grammar, Tokenizer tokenizer) {
         assert grammar != null;
         assert tokenizer != null;
-        var production = grammar.getStartProduction();
-        context = new Context(grammar, production, tokenizer, Set.of());
+        context = new Context(grammar, tokenizer);
     }
 
     @Override
     public Tree parse() {
-        return Derivation.run(context);
+        var derivation = new Derivation();
+        return derivation.process(context);
     }
 
     @Override

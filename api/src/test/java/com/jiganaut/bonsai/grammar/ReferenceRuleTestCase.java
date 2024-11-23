@@ -35,7 +35,7 @@ interface ReferenceRuleTestCase extends RuleTestCase, QuantifiableTestCase {
     default void lookup() throws Exception {
         var target = createTarget();
 
-        var productionSet = mock(ProductionSet.class);
+        var productionSet = mock(Grammar.class);
         when(productionSet.getProduction(expectedSymbol())).then(invocation -> {
             var production = mock(Production.class);
             when(production.getSymbol()).thenReturn(expectedSymbol());

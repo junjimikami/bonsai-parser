@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import com.jiganaut.bonsai.grammar.Production;
-import com.jiganaut.bonsai.grammar.ProductionSet;
+import com.jiganaut.bonsai.grammar.Grammar;
 import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.parser.Token;
 import com.jiganaut.bonsai.parser.Tokenizer;
@@ -63,7 +63,7 @@ class Context implements Tokenizer {
         }
     }
 
-    private final ProductionSet productionSet;
+    private final Grammar grammar;
     private final Production production;
     private final Tokenizer tokenizer;
     private final Set<Rule> followSet;
@@ -71,21 +71,21 @@ class Context implements Tokenizer {
     private final List<Cache> cacheList;
     private final Position position;
 
-    Context(ProductionSet productionSet, Production production, Tokenizer tokenizer, Set<Rule> followSet) {
-        this(productionSet, production, tokenizer, followSet, new LinkedList<>(), new Position());
+    Context(Grammar grammar, Tokenizer tokenizer) {
+        this(grammar, null, tokenizer, Set.of(), new LinkedList<>(), new Position());
     }
 
     private Context(
-            ProductionSet productionSet,
+            Grammar grammar,
             Production production,
             Tokenizer tokenizer,
             Set<Rule> followSet,
             List<Cache> cacheList,
             Position position) {
-        assert productionSet != null;
+        assert grammar != null;
         assert tokenizer != null;
         assert followSet != null;
-        this.productionSet = productionSet;
+        this.grammar = grammar;
         this.production = production;
         this.tokenizer = tokenizer;
         this.followSet = followSet;
@@ -95,7 +95,7 @@ class Context implements Tokenizer {
 
     Context withProduction(Production production) {
         return new Context(
-                this.productionSet,
+                this.grammar,
                 production,
                 this.tokenizer,
                 this.followSet,
@@ -105,7 +105,7 @@ class Context implements Tokenizer {
 
     Context withFollowSet(Set<Rule> followSet) {
         return new Context(
-                this.productionSet,
+                this.grammar,
                 this.production,
                 this.tokenizer,
                 followSet,
@@ -113,8 +113,8 @@ class Context implements Tokenizer {
                 this.position);
     }
 
-    ProductionSet productionSet() {
-        return productionSet;
+    Grammar grammar() {
+        return grammar;
     }
 
     Production production() {

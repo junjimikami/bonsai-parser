@@ -21,6 +21,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import com.jiganaut.bonsai.grammar.ChoiceRule;
 import com.jiganaut.bonsai.grammar.Grammar;
+import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
 import com.jiganaut.bonsai.grammar.PatternRule;
 import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.Rule;
@@ -48,7 +49,7 @@ class ParserTest {
     @ParameterizedTest(name = "{0} {displayName}")
     @MethodSource("allMethods")
     void ambiguousRule(Consumer<Parser> method) throws Exception {
-        var grammar = Grammar.builder()
+        var grammar = SingleOriginGrammar.builder()
                 .add("S", ChoiceRule.builder()
                         .add(() -> PatternRule.of("1"))
                         .add(() -> PatternRule.of(".")))
@@ -63,7 +64,7 @@ class ParserTest {
     @ParameterizedTest(name = "{0} {displayName}")
     @MethodSource("allMethods")
     void occurrenceCountOutOfRange(Consumer<Parser> method) throws Exception {
-        var grammar = Grammar.builder()
+        var grammar = SingleOriginGrammar.builder()
                 .add("S", () -> PatternRule.of("1").range(3, 5))
                 .build();
         var factory = ParserFactory.of(grammar);
@@ -76,7 +77,7 @@ class ParserTest {
     @ParameterizedTest(name = "{0} {displayName}")
     @MethodSource("allMethods")
     void tokenNotMatchPatternRule(Consumer<Parser> method) throws Exception {
-        var grammar = Grammar.builder()
+        var grammar = SingleOriginGrammar.builder()
                 .add("S", () -> PatternRule.of("0"))
                 .build();
         var factory = ParserFactory.of(grammar);
@@ -89,7 +90,7 @@ class ParserTest {
     @ParameterizedTest(name = "{0} {displayName}")
     @MethodSource("allMethods")
     void tokenNotMatchChoiceRule(Consumer<Parser> method) throws Exception {
-        var grammar = Grammar.builder()
+        var grammar = SingleOriginGrammar.builder()
                 .add("S", ChoiceRule.builder()
                         .add(() -> PatternRule.of("0")))
                 .build();
@@ -103,7 +104,7 @@ class ParserTest {
     @ParameterizedTest(name = "{0} {displayName}")
     @MethodSource("allMethods")
     void tokenNotMatchSequenceRule(Consumer<Parser> method) throws Exception {
-        var grammar = Grammar.builder()
+        var grammar = SingleOriginGrammar.builder()
                 .add("S", SequenceRule.builder()
                         .add(() -> PatternRule.of("0")))
                 .build();
@@ -117,7 +118,7 @@ class ParserTest {
     @ParameterizedTest(name = "{0} {displayName}")
     @MethodSource("allMethods")
     void tokenNotMatchEmptyRule(Consumer<Parser> method) throws Exception {
-        var grammar = Grammar.builder()
+        var grammar = SingleOriginGrammar.builder()
                 .add("S", () -> Rule.EMPTY)
                 .build();
         var factory = ParserFactory.of(grammar);
@@ -129,7 +130,7 @@ class ParserTest {
     @Test
     @DisplayName("parse() [Token remained]")
     void parseInCaseToeknRemained() throws Exception {
-        var grammar = Grammar.builder()
+        var grammar = SingleOriginGrammar.builder()
                 .add("S", () -> PatternRule.of("1"))
                 .build();
         var factory = ParserFactory.of(grammar);
@@ -141,7 +142,7 @@ class ParserTest {
     @Test
     @DisplayName("parse()")
     void parse() throws Exception {
-        var grammar = Grammar.builder()
+        var grammar = SingleOriginGrammar.builder()
                 .add("S", () -> PatternRule.of("1"))
                 .build();
         var factory = ParserFactory.of(grammar);
@@ -178,38 +179,38 @@ class ParserTest {
 
     static Stream<Arguments> testVariousGrammars() {
         var stream = Stream.<Arguments>of(
-                arguments(Grammar.builder()
+                arguments(SingleOriginGrammar.builder()
                         .add("A", () -> PatternRule.of("0"))
                         .build(), "0", "A(0)"),
-                arguments(Grammar.builder()
+                arguments(SingleOriginGrammar.builder()
                         .add("A", () -> PatternRule.of("0"))
                         .build(), "00", null),
-                arguments(Grammar.builder()
+                arguments(SingleOriginGrammar.builder()
                         .add("A", SequenceRule.builder()
                                 .add(() -> PatternRule.of("0"))
                                 .add(() -> PatternRule.of("1")))
                         .build(), "01", "A(0,1)"),
-                arguments(Grammar.builder()
+                arguments(SingleOriginGrammar.builder()
                         .add("A", SequenceRule.builder()
                                 .add(ChoiceRule.builder()
                                         .add(() -> PatternRule.of("0"))
                                         .addEmpty())
                                 .add(() -> PatternRule.of("1")))
                         .build(), "01", "A(0,1)"),
-                arguments(Grammar.builder()
+                arguments(SingleOriginGrammar.builder()
                         .add("A", SequenceRule.builder()
                                 .add(ChoiceRule.builder()
                                         .add(() -> PatternRule.of("0"))
                                         .addEmpty())
                                 .add(() -> PatternRule.of("1")))
                         .build(), "1", "A(1)"),
-                arguments(Grammar.builder()
+                arguments(SingleOriginGrammar.builder()
                         .add("A", () -> PatternRule.of("0"))
                         .add("A", SequenceRule.builder()
                                 .add(() -> PatternRule.of("1"))
                                 .add(() -> ReferenceRule.of("A")))
                         .build(), "10", "A(1,A(0))"),
-                arguments(Grammar.builder()
+                arguments(SingleOriginGrammar.builder()
                         .add("A", ShortCircuitChoiceRule.builder()
                                 .add(ReferenceRule.of("B"))
                                 .add(ReferenceRule.of("C")))

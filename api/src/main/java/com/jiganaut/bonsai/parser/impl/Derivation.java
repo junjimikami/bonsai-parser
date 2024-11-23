@@ -5,14 +5,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import com.jiganaut.bonsai.grammar.ChoiceGrammar;
 import com.jiganaut.bonsai.grammar.ChoiceRule;
+import com.jiganaut.bonsai.grammar.GrammarVisitor;
 import com.jiganaut.bonsai.grammar.PatternRule;
+import com.jiganaut.bonsai.grammar.Production;
 import com.jiganaut.bonsai.grammar.QuantifierRule;
 import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.grammar.RuleVisitor;
 import com.jiganaut.bonsai.grammar.SequenceRule;
 import com.jiganaut.bonsai.grammar.ShortCircuitChoiceRule;
+import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
 import com.jiganaut.bonsai.grammar.SkipRule;
 import com.jiganaut.bonsai.parser.ParseException;
 import com.jiganaut.bonsai.parser.Tree;
@@ -21,14 +25,10 @@ import com.jiganaut.bonsai.parser.Tree;
  * @author Junji Mikami
  *
  */
-final class Derivation implements RuleVisitor<List<Tree>, Context> {
-    private static final Derivation INSTANCE = new Derivation();
+final class Derivation implements GrammarVisitor<Tree, Context>, RuleVisitor<List<Tree>, Context> {
 
-    private Derivation() {
-    }
-
-    static Tree run(Context context) {
-        var tree = derive(context);
+    Tree process(Context context) {
+        var tree = visit(context.grammar(), context);
         if (context.hasNext()) {
             var message = MessageSupport.tokensRemained(context);
             throw new ParseException(message);
@@ -36,10 +36,34 @@ final class Derivation implements RuleVisitor<List<Tree>, Context> {
         return tree;
     }
 
-    private static Tree derive(Context context) {
-        var production = context.production();
-        var trees = INSTANCE.visit(production.getRule(), context);
+    private Tree derive(Production production, Context context) {
+        var subContext = context.withProduction(production);
+        var trees = visit(production.getRule(), subContext);
         return new DefaultNonTerminalNode(production.getSymbol(), trees);
+    }
+
+    @Override
+    public Tree visitSingleOrigin(SingleOriginGrammar grammar, Context context) {
+        var origin = grammar.scope().findFirst();
+        if (origin.isEmpty()) {
+            throw new ParseException();
+        }
+        return derive(origin.get(), context);
+    }
+
+    @Override
+    public Tree visitChoice(ChoiceGrammar grammar, Context context) {
+        var list = grammar.scope()
+                .filter(e -> FirstSetMatcher.scan(e.getRule(), context))
+                .toList();
+        if (list.isEmpty()) {
+            throw new ParseException();
+        }
+        if (1 < list.size()) {
+            var message = MessageSupport.ambiguousProductionSet(list);
+            throw new ParseException(message);
+        }
+        return derive(list.get(0), context);
     }
 
     @Override
@@ -113,10 +137,9 @@ final class Derivation implements RuleVisitor<List<Tree>, Context> {
 
     @Override
     public List<Tree> visitReference(ReferenceRule reference, Context context) {
-        var productionSet = context.productionSet();
+        var productionSet = context.grammar();
         var production = reference.lookup(productionSet);
-        var subContext = context.withProduction(production);
-        var tree = derive(subContext);
+        var tree = derive(production, context);
         return List.of(tree);
     }
 

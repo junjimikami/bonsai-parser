@@ -8,12 +8,10 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 
-import com.jiganaut.bonsai.grammar.ProductionSet.Builder;
-
-class ProductionSetTest {
+class ChoiceGrammarTest {
 
     @Nested
-    class TestCase1 implements ProductionSetTestCase {
+    class TestCase1 implements ChoiceGrammarTestCase {
 
         Set<Production> testData;
 
@@ -26,8 +24,8 @@ class ProductionSetTest {
         }
 
         @Override
-        public ProductionSet createTarget() {
-            var builder = ProductionSet.builder();
+        public ChoiceGrammar createTarget() {
+            var builder = ChoiceGrammar.builder();
             testData.forEach(e -> builder.add(e.getSymbol(), e.getRule()));
             return builder.build();
         }
@@ -40,7 +38,7 @@ class ProductionSetTest {
     }
 
     @Nested
-    class TestCase2 implements ProductionSetTestCase {
+    class TestCase2 implements ChoiceGrammarTestCase {
 
         Set<Production> testData;
 
@@ -56,8 +54,8 @@ class ProductionSetTest {
         }
 
         @Override
-        public ProductionSet createTarget() {
-            var builder = ProductionSet.builder();
+        public ChoiceGrammar createTarget() {
+            var builder = ChoiceGrammar.builder();
             testData.forEach(e -> builder.add(e.getSymbol(), e.getRule()));
             return builder.build();
         }
@@ -70,7 +68,7 @@ class ProductionSetTest {
     }
 
     @Nested
-    class TestCase3 implements ProductionSetTestCase {
+    class TestCase3 implements ChoiceGrammarTestCase {
 
         Set<Production> testData;
 
@@ -89,8 +87,8 @@ class ProductionSetTest {
         }
 
         @Override
-        public ProductionSet createTarget() {
-            var builder = ProductionSet.builder();
+        public ChoiceGrammar createTarget() {
+            var builder = ChoiceGrammar.builder();
             testData.forEach(e -> builder.add(e.getSymbol(), e.getRule()));
             return builder.build();
         }
@@ -103,11 +101,11 @@ class ProductionSetTest {
     }
 
     @Nested
-    class BuilderTestCase1 implements ProductionSetTestCase.BuilderTestCase {
+    class BuilderTestCase1 implements ChoiceGrammarTestCase.BuilderTestCase {
 
         @Override
-        public Builder createTarget() {
-            return ProductionSet.builder();
+        public ChoiceGrammar.Builder createTarget() {
+            return ChoiceGrammar.builder();
         }
 
         @Override
@@ -117,7 +115,7 @@ class ProductionSetTest {
     }
 
     @Nested
-    class BuilderTestCase2 implements ProductionSetTestCase.BuilderTestCase {
+    class BuilderTestCase2 implements ChoiceGrammarTestCase.BuilderTestCase {
 
         Set<Production> testData;
 
@@ -130,8 +128,8 @@ class ProductionSetTest {
         }
 
         @Override
-        public Builder createTarget() {
-            var builder = ProductionSet.builder();
+        public ChoiceGrammar.Builder createTarget() {
+            var builder = ChoiceGrammar.builder();
             testData.forEach(e -> builder.add(e.getSymbol(), e.getRule()));
             return builder;
         }
@@ -143,7 +141,7 @@ class ProductionSetTest {
     }
 
     @Nested
-    class BuilderTestCase3 implements ProductionSetTestCase.BuilderTestCase {
+    class BuilderTestCase3 implements ChoiceGrammarTestCase.BuilderTestCase {
 
         Set<Production> testData;
 
@@ -159,8 +157,8 @@ class ProductionSetTest {
         }
 
         @Override
-        public Builder createTarget() {
-            var builder = ProductionSet.builder();
+        public ChoiceGrammar.Builder createTarget() {
+            var builder = ChoiceGrammar.builder();
             testData.forEach(e -> builder.add(e.getSymbol(), e.getRule()));
             return builder;
         }
@@ -172,7 +170,7 @@ class ProductionSetTest {
     }
 
     @Nested
-    class BuilderTestCase4 implements ProductionSetTestCase.BuilderTestCase {
+    class BuilderTestCase4 implements ChoiceGrammarTestCase.BuilderTestCase {
 
         Set<Production> testData;
 
@@ -188,8 +186,8 @@ class ProductionSetTest {
         }
 
         @Override
-        public Builder createTarget() {
-            var builder = ProductionSet.builder();
+        public ChoiceGrammar.Builder createTarget() {
+            var builder = ChoiceGrammar.builder();
             testData.forEach(e -> builder.add(e.getSymbol(), e.getRule()));
             return builder;
         }
@@ -201,7 +199,7 @@ class ProductionSetTest {
     }
 
     @Nested
-    class BuilderTestCase5 implements ProductionSetTestCase.BuilderTestCase {
+    class BuilderTestCase5 implements ChoiceGrammarTestCase.BuilderTestCase {
 
         Set<Production> testData;
 
@@ -217,8 +215,8 @@ class ProductionSetTest {
         }
 
         @Override
-        public Builder createTarget() {
-            var builder = ProductionSet.builder();
+        public ChoiceGrammar.Builder createTarget() {
+            var builder = ChoiceGrammar.builder();
             testData.stream()
                     .filter(e -> e.getSymbol().equals("1"))
                     .forEach(e -> builder.add(e.getSymbol(), e.getRule()));
@@ -235,7 +233,7 @@ class ProductionSetTest {
     }
 
     @Nested
-    class BuilderTestCase6 implements ProductionSetTestCase.BuilderTestCase {
+    class BuilderTestCase6 implements ChoiceGrammarTestCase.BuilderTestCase {
 
         Set<Production> testData;
 
@@ -251,8 +249,8 @@ class ProductionSetTest {
         }
 
         @Override
-        public Builder createTarget() {
-            var builder = ProductionSet.builder();
+        public ChoiceGrammar.Builder createTarget() {
+            var builder = ChoiceGrammar.builder();
             testData.stream()
                     .filter(e -> e.getSymbol().equals("1"))
                     .forEach(e -> builder.add(e.getSymbol(), e.getRule()));
@@ -269,7 +267,7 @@ class ProductionSetTest {
     }
 
     @Nested
-    class BuilderTestCase7 implements ProductionSetTestCase.BuilderTestCase {
+    class BuilderTestCase7 implements ChoiceGrammarTestCase.BuilderTestCase {
 
         Set<Production> testData;
 
@@ -285,8 +283,8 @@ class ProductionSetTest {
         }
 
         @Override
-        public Builder createTarget() {
-            var builder = ProductionSet.builder();
+        public ChoiceGrammar.Builder createTarget() {
+            var builder = ChoiceGrammar.builder();
             testData.stream()
                     .filter(e -> e.getSymbol().equals("1"))
                     .forEach(e -> builder.add(e.getSymbol(), e.getRule()));

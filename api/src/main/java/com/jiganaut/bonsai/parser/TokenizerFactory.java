@@ -2,7 +2,7 @@ package com.jiganaut.bonsai.parser;
 
 import java.io.Reader;
 
-import com.jiganaut.bonsai.grammar.ProductionSet;
+import com.jiganaut.bonsai.grammar.Grammar;
 import com.jiganaut.bonsai.parser.spi.TokenizerFactoryProvider;
 
 /**
@@ -12,8 +12,8 @@ import com.jiganaut.bonsai.parser.spi.TokenizerFactoryProvider;
  */
 public interface TokenizerFactory {
 
-    public static TokenizerFactory of(ProductionSet productionSet) {
-        return TokenizerFactoryProvider.provider().createFactory(productionSet);
+    public static TokenizerFactory of(Grammar grammar) {
+        return TokenizerFactoryProvider.provider().createFactory(grammar);
     }
 
     public static TokenizerFactory load(String factoryName) {

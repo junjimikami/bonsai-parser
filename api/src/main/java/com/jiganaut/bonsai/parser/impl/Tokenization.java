@@ -3,14 +3,18 @@ package com.jiganaut.bonsai.parser.impl;
 import java.util.LinkedList;
 import java.util.Set;
 
+import com.jiganaut.bonsai.grammar.ChoiceGrammar;
 import com.jiganaut.bonsai.grammar.ChoiceRule;
+import com.jiganaut.bonsai.grammar.GrammarVisitor;
 import com.jiganaut.bonsai.grammar.PatternRule;
+import com.jiganaut.bonsai.grammar.Production;
 import com.jiganaut.bonsai.grammar.QuantifierRule;
 import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.grammar.RuleVisitor;
 import com.jiganaut.bonsai.grammar.SequenceRule;
 import com.jiganaut.bonsai.grammar.ShortCircuitChoiceRule;
+import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
 import com.jiganaut.bonsai.grammar.SkipRule;
 import com.jiganaut.bonsai.parser.ParseException;
 import com.jiganaut.bonsai.parser.Token;
@@ -19,29 +23,41 @@ import com.jiganaut.bonsai.parser.Token;
  * @author Junji Mikami
  *
  */
-final class Tokenization implements RuleVisitor<CharSequence, Context> {
-    private static final Tokenization INSTANCE = new Tokenization();
+final class Tokenization implements GrammarVisitor<Token, Context>, RuleVisitor<CharSequence, Context> {
     private static final String EMPTY_STRING = "";
 
-    private Tokenization() {
+    Token process(Context context) {
+        return visit(context.grammar(), context);
     }
 
-    static Token run(Context context) {
-        var list = context.productionSet().scope()
+    private Token tokenize(Production production, Context context) {
+        var subContext = context.withProduction(production);
+        var value = visit(production.getRule(), subContext).toString();
+        return new DefaultToken(production.getSymbol(), value);
+    }
+
+    @Override
+    public Token visitSingleOrigin(SingleOriginGrammar grammar, Context context) {
+        var origin = grammar.scope().findFirst();
+        if (origin.isEmpty()) {
+            throw new ParseException();
+        }
+        return tokenize(origin.get(), context);
+    }
+
+    @Override
+    public Token visitChoice(ChoiceGrammar grammar, Context context) {
+        var list = grammar.scope()
                 .filter(e -> FirstSetMatcher.scan(e.getRule(), context))
                 .toList();
         if (list.isEmpty()) {
-            context.next();
-            return context.getToken();
+            throw new ParseException();
         }
         if (1 < list.size()) {
             var message = MessageSupport.ambiguousProductionSet(list);
             throw new ParseException(message);
         }
-        var production = list.get(0);
-        var subContext = context.withProduction(production);
-        var value = INSTANCE.visit(production.getRule(), subContext).toString();
-        return new DefaultToken(production.getSymbol(), value);
+        return tokenize(list.get(0), context);
     }
 
     @Override
@@ -114,7 +130,7 @@ final class Tokenization implements RuleVisitor<CharSequence, Context> {
 
     @Override
     public CharSequence visitReference(ReferenceRule reference, Context context) {
-        var productionSet = context.productionSet();
+        var productionSet = context.grammar();
         var production = reference.lookup(productionSet);
         var subContext = context.withProduction(production);
         return visit(production.getRule(), subContext);

@@ -1,17 +1,18 @@
 package com.jiganaut.bonsai.grammar.impl;
 
+import java.util.LinkedHashSet;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Set;
 
-import com.jiganaut.bonsai.grammar.Grammar;
 import com.jiganaut.bonsai.grammar.Production;
-import com.jiganaut.bonsai.grammar.ProductionSet;
 import com.jiganaut.bonsai.grammar.Rule;
+import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
 import com.jiganaut.bonsai.impl.Message;
 
-class DefaultGrammar extends DefaultProductionSet implements Grammar {
+class DefaultSingleOriginGrammar extends AbstractGrammar implements SingleOriginGrammar {
 
-    static class Builder extends DefaultProductionSet.Builder implements Grammar.Builder {
+    static class Builder extends AbstractGrammar.Builder implements SingleOriginGrammar.Builder {
         private String startSymbol;
 
         @Override
@@ -40,21 +41,26 @@ class DefaultGrammar extends DefaultProductionSet implements Grammar {
         }
 
         @Override
-        public Grammar build() {
-            var productionSet = super.build();
+        public SingleOriginGrammar build() {
+            checkForBuild();
+            var productionSet = set.stream()
+                    .map(e -> e.get())
+                    .collect(LinkedHashSet<Production>::new, Set::add, Set::addAll);
+            ReferenceCheck.run(productionSet);
+            CompositeCheck.run(productionSet);
             var match = productionSet.stream()
                     .map(e -> e.getSymbol())
                     .anyMatch(e -> Objects.equals(e, startSymbol));
             if (!match) {
                 throw new NoSuchElementException(Message.NO_SUCH_SYMBOL.format(startSymbol));
             }
-            return new DefaultGrammar(productionSet, startSymbol);
+            return new DefaultSingleOriginGrammar(productionSet, startSymbol);
         }
     }
 
     private final String startSymbol;
 
-    private DefaultGrammar(ProductionSet productionSet, String startSymbol) {
+    private DefaultSingleOriginGrammar(Set<Production> productionSet, String startSymbol) {
         super(productionSet);
         assert startSymbol != null;
         this.startSymbol = startSymbol;

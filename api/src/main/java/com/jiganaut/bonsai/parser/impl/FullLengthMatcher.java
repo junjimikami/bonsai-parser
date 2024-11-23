@@ -92,7 +92,7 @@ final class FullLengthMatcher implements RuleVisitor<Boolean, Context> {
 
     @Override
     public Boolean visitReference(ReferenceRule reference, Context context) {
-        var productionSet = context.productionSet();
+        var productionSet = context.grammar();
         var production = reference.lookup(productionSet);
         var subContext = context.withProduction(production);
         return visit(production.getRule(), subContext);

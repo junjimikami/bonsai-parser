@@ -3,10 +3,9 @@ package com.jiganaut.bonsai.parser.impl;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.Set;
 import java.util.regex.Pattern;
 
-import com.jiganaut.bonsai.grammar.ProductionSet;
+import com.jiganaut.bonsai.grammar.Grammar;
 import com.jiganaut.bonsai.impl.Message;
 import com.jiganaut.bonsai.parser.Token;
 import com.jiganaut.bonsai.parser.Tokenizer;
@@ -18,13 +17,15 @@ import com.jiganaut.bonsai.parser.Tokenizer;
 class DefaultTokenizer extends AbstractTokenizer {
 
     private final Context context;
+    private final Tokenization tokenization;
     private Token nextToken;
     private Token currentToken;
 
-    DefaultTokenizer(ProductionSet productionSet, Tokenizer tokenizer) {
-        assert productionSet != null;
+    DefaultTokenizer(Grammar grammar, Tokenizer tokenizer) {
+        assert grammar != null;
         assert tokenizer != null;
-        context = new Context(productionSet, null, tokenizer, Set.of());
+        context = new Context(grammar, tokenizer);
+        tokenization = new Tokenization();
     }
 
     private void readNext() {
@@ -32,7 +33,7 @@ class DefaultTokenizer extends AbstractTokenizer {
             return;
         }
         while (context.hasNext()) {
-            var token = Tokenization.run(context);
+            var token = tokenization.process(context);
             if (!token.getValue().isEmpty()) {
                 nextToken = token;
                 break;
