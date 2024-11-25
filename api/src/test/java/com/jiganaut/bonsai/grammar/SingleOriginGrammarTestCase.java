@@ -89,22 +89,21 @@ interface SingleOriginGrammarTestCase extends GrammarTestCase {
     String expectedStartSymbol();
 
     @Test
-    @DisplayName("getStartProduction()")
-    default void getStartProduction() throws Exception {
+    @DisplayName("getStartSymbol()")
+    default void getStartSymbol() throws Exception {
         var target = createTarget();
 
         var expected = expectedProductionSet().stream()
                 .filter(e -> e.getSymbol().equals(expectedStartSymbol()))
                 .findFirst()
                 .orElseThrow();
-        var actual = target.getStartProduction();
-        assertEquals(expected.getSymbol(), actual.getSymbol());
-        assertEquals(expected.getRule(), actual.getRule());
+        var actual = target.getStartSymbol();
+        assertEquals(expected.getSymbol(), actual);
     }
 
     @Test
-    @DisplayName("scope()")
-    default void scope() throws Exception {
+    @DisplayName("productionSet()")
+    default void productionSet() throws Exception {
         var target = createTarget();
 
         var expectedString = expectedProductionSet().stream()
@@ -112,7 +111,7 @@ interface SingleOriginGrammarTestCase extends GrammarTestCase {
                 .map(e -> e.getSymbol() + ":" + e.getRule())
                 .sorted()
                 .collect(Collectors.joining(",", "{", "}"));
-        var actualString = target.scope()
+        var actualString = target.productionSet().stream()
                 .map(e -> e.getSymbol() + ":" + e.getRule())
                 .sorted()
                 .collect(Collectors.joining(",", "{", "}"));

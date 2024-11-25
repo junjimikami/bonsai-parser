@@ -35,9 +35,10 @@ class DefaultTokenizer extends AbstractTokenizer {
             return;
         }
         while (context.hasNext()) {
-            nextTokenName = tokenization.process(context);
-            if (!tokenization.getValue().isEmpty()) {
-                nextTokenValue = tokenization.getValue();
+            var value = tokenization.process(context);
+            if (!value.isEmpty()) {
+                nextTokenValue = value;
+                nextTokenName = tokenization.getName();
                 break;
             }
         }

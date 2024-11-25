@@ -1,7 +1,6 @@
 package com.jiganaut.bonsai.grammar;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -246,44 +245,44 @@ interface GrammarTestCase extends TestCase {
         }
     }
 
+//    @Test
+//    @DisplayName("getProduction(String)")
+//    default void getProduction() throws Exception {
+//        var target = createTarget();
+//
+//        var map = expectedProductionSet().stream()
+//                .collect(Collectors.groupingBy(e -> e.getSymbol()));
+//        map.forEach((symbol, list) -> {
+//            var actual = target.getProduction(symbol);
+//            assertEquals(symbol, actual.getSymbol());
+//
+//            if (list.size() == 1) {
+//                assertEquals(list.get(0).getRule(), actual.getRule());
+//            } else if (1 < list.size()) {
+//                // If there are multiple rules for a single key, make sure they are combined
+//                // into a ChoiceRule.
+//                var actualRule = assertInstanceOf(ChoiceRule.class, actual.getRule());
+//                assertEquals(Rule.Kind.CHOICE, actualRule.getKind());
+//                var exptectedChoices = list.stream()
+//                        .map(e -> e.getRule())
+//                        .collect(Collectors.toSet());
+//                assertEquals(exptectedChoices, actualRule.getChoices());
+//            } else {
+//                throw new AssertionError();
+//            }
+//        });
+//    }
+
     @Test
-    @DisplayName("getProduction(String)")
-    default void getProduction() throws Exception {
-        var target = createTarget();
-
-        var map = expectedProductionSet().stream()
-                .collect(Collectors.groupingBy(e -> e.getSymbol()));
-        map.forEach((symbol, list) -> {
-            var actual = target.getProduction(symbol);
-            assertEquals(symbol, actual.getSymbol());
-
-            if (list.size() == 1) {
-                assertEquals(list.get(0).getRule(), actual.getRule());
-            } else if (1 < list.size()) {
-                // If there are multiple rules for a single key, make sure they are combined
-                // into a ChoiceRule.
-                var actualRule = assertInstanceOf(ChoiceRule.class, actual.getRule());
-                assertEquals(Rule.Kind.CHOICE, actualRule.getKind());
-                var exptectedChoices = list.stream()
-                        .map(e -> e.getRule())
-                        .collect(Collectors.toSet());
-                assertEquals(exptectedChoices, actualRule.getChoices());
-            } else {
-                throw new AssertionError();
-            }
-        });
-    }
-
-    @Test
-    @DisplayName("scope()")
-    default void scope() throws Exception {
+    @DisplayName("productionSet()")
+    default void productionSet() throws Exception {
         var target = createTarget();
 
         var expectedString = expectedProductionSet().stream()
                 .map(e -> e.getSymbol() + ":" + e.getRule())
                 .sorted()
                 .collect(Collectors.joining(",", "{", "}"));
-        var actualString = target.scope()
+        var actualString = target.productionSet().stream()
                 .map(e -> e.getSymbol() + ":" + e.getRule())
                 .sorted()
                 .collect(Collectors.joining(",", "{", "}"));

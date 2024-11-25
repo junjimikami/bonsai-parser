@@ -5,19 +5,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import com.jiganaut.bonsai.grammar.ChoiceGrammar;
 import com.jiganaut.bonsai.grammar.ChoiceRule;
-import com.jiganaut.bonsai.grammar.GrammarVisitor;
 import com.jiganaut.bonsai.grammar.PatternRule;
 import com.jiganaut.bonsai.grammar.Production;
+import com.jiganaut.bonsai.grammar.ProductionSet;
 import com.jiganaut.bonsai.grammar.QuantifierRule;
 import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.grammar.RuleVisitor;
 import com.jiganaut.bonsai.grammar.SequenceRule;
-import com.jiganaut.bonsai.grammar.ShortCircuitChoiceGrammar;
 import com.jiganaut.bonsai.grammar.ShortCircuitChoiceRule;
-import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
 import com.jiganaut.bonsai.grammar.SkipRule;
 import com.jiganaut.bonsai.parser.ParseException;
 import com.jiganaut.bonsai.parser.Tree;
@@ -26,10 +23,11 @@ import com.jiganaut.bonsai.parser.Tree;
  * @author Junji Mikami
  *
  */
-final class Derivation implements GrammarVisitor<Tree, Context>, RuleVisitor<List<Tree>, Context> {
+final class Derivation implements ProductionSetVisitor<Tree, Context>, RuleVisitor<List<Tree>, Context> {
 
     Tree process(Context context) {
-        var tree = visit(context.grammar(), context);
+        var productionSet = context.grammar().productionSet();
+        var tree = visit(productionSet, context);
         if (context.hasNext()) {
             var message = MessageSupport.tokensRemained(context);
             throw new ParseException(message);
@@ -44,17 +42,22 @@ final class Derivation implements GrammarVisitor<Tree, Context>, RuleVisitor<Lis
     }
 
     @Override
-    public Tree visitSingleOrigin(SingleOriginGrammar grammar, Context context) {
-        var origin = grammar.scope().findFirst();
-        if (origin.isEmpty()) {
-            throw new ParseException();
+    public Tree visitShortCircuit(ProductionSet productionSet, Context context) {
+        int position = context.mark();
+        for (var production : productionSet) {
+            if (FullLengthMatcher.scan(production.getRule(), context)) {
+                context.reset(position);
+                context.clear();
+                return derive(production, context);
+            }
+            context.reset(position);
         }
-        return derive(origin.get(), context);
+        throw new ParseException();
     }
 
     @Override
-    public Tree visitChoice(ChoiceGrammar grammar, Context context) {
-        var list = grammar.scope()
+    public Tree visitOther(ProductionSet productionSet, Context context) {
+        var list = productionSet.stream()
                 .filter(e -> FirstSetMatcher.scan(e.getRule(), context))
                 .toList();
         if (list.isEmpty()) {
@@ -65,20 +68,6 @@ final class Derivation implements GrammarVisitor<Tree, Context>, RuleVisitor<Lis
             throw new ParseException(message);
         }
         return derive(list.get(0), context);
-    }
-
-    @Override
-    public Tree visitShortCircuitChoice(ShortCircuitChoiceGrammar grammar, Context context) {
-        int position = context.mark();
-        for (var production : grammar.scope().toList()) {
-            if (FullLengthMatcher.scan(production.getRule(), context)) {
-                context.reset(position);
-                context.clear();
-                return derive(production, context);
-            }
-            context.reset(position);
-        }
-        throw new ParseException();
     }
 
     @Override
@@ -151,9 +140,8 @@ final class Derivation implements GrammarVisitor<Tree, Context>, RuleVisitor<Lis
 
     @Override
     public List<Tree> visitReference(ReferenceRule reference, Context context) {
-        var productionSet = context.grammar();
-        var production = reference.lookup(productionSet);
-        var tree = derive(production, context);
+        var productionSet = reference.lookup(context.grammar());
+        var tree = visit(productionSet, context);
         return List.of(tree);
     }
 

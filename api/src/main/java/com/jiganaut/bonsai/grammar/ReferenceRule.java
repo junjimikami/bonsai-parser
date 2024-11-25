@@ -22,8 +22,8 @@ public interface ReferenceRule extends Rule, Quantifiable {
         return visitor.visitReference(this, p);
     }
 
-    public default Production lookup(Grammar set) {
-        return set.getProduction(getSymbol());
+    public default ProductionSet lookup(Grammar set) {
+        return set.withSymbol(getSymbol());
     }
 
     public String getSymbol();

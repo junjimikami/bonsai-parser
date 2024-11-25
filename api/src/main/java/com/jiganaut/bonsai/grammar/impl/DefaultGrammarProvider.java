@@ -9,7 +9,6 @@ import com.jiganaut.bonsai.grammar.PatternRule;
 import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.SequenceRule;
 import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
-import com.jiganaut.bonsai.grammar.ShortCircuitChoiceGrammar.Builder;
 import com.jiganaut.bonsai.grammar.spi.GrammarProvider;
 import com.jiganaut.bonsai.impl.Message;
 
@@ -23,11 +22,6 @@ public class DefaultGrammarProvider extends GrammarProvider {
     @Override
     public ChoiceGrammar.Builder createChoiceGrammarBuilder() {
         return new DefaultChoiceGrammar.Builder();
-    }
-
-    @Override
-    public Builder createShortCircuitChoiceGrammarBuilder() {
-        return new DefaultShortCircuitChoiceGrammar.Builder();
     }
 
     @Override

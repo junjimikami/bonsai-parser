@@ -1,25 +1,19 @@
 package com.jiganaut.bonsai.grammar;
 
-import java.util.Set;
-import java.util.stream.Stream;
-
-public interface Grammar extends Set<Production> {
+public interface Grammar extends ProductionSet {
 
     public static interface Builder {
-        Grammar.Builder add(String symbol, Rule rule);
+        public Grammar.Builder add(String symbol, Rule rule);
 
-        Grammar.Builder add(String symbol, Rule.Builder builder);
+        public Grammar.Builder add(String symbol, Rule.Builder builder);
 
-        Grammar build();
+        public Grammar build();
     }
 
     public boolean containsSymbol(String symbol);
 
-    public Production getProduction(String symbol);
+    public ProductionSet withSymbol(String symbol);
 
-    public default Stream<Production> scope() {
-        return stream();
-    }
+    public ProductionSet productionSet();
 
-    public <R, P> R accept(GrammarVisitor<R, P> visitor, P p);
 }

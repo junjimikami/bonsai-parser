@@ -5,6 +5,8 @@ import java.util.Set;
 
 import com.jiganaut.bonsai.grammar.ChoiceRule;
 import com.jiganaut.bonsai.grammar.PatternRule;
+import com.jiganaut.bonsai.grammar.Production;
+import com.jiganaut.bonsai.grammar.ProductionSet;
 import com.jiganaut.bonsai.grammar.QuantifierRule;
 import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.Rule;
@@ -17,7 +19,7 @@ import com.jiganaut.bonsai.grammar.SkipRule;
  * @author Junji Mikami
  *
  */
-final class FullLengthMatcher implements RuleVisitor<Boolean, Context> {
+final class FullLengthMatcher implements ProductionSetVisitor<Boolean, Context>, RuleVisitor<Boolean, Context> {
     private static final FullLengthMatcher INSTANCE = new FullLengthMatcher();
 
     private FullLengthMatcher() {
@@ -25,6 +27,44 @@ final class FullLengthMatcher implements RuleVisitor<Boolean, Context> {
 
     static boolean scan(Rule rule, Context context) {
         return INSTANCE.visit(rule, context);
+    }
+
+    @Override
+    public Boolean visitShortCircuit(ProductionSet productionSet, Context context) {
+        int position = context.mark();
+        for (var production : productionSet) {
+            if (visit(production.getRule(), context)) {
+                context.reset(position);
+                return true;
+            }
+            context.reset(position);
+        }
+        return false;
+    }
+
+    @Override
+    public Boolean visitOther(ProductionSet productionSet, Context context) {
+        var rules = productionSet.stream()
+                .map(Production::getRule)
+                .filter(e -> FirstSetMatcher.scan(e, context))
+                .toList();
+        if (rules.isEmpty()) {
+            return false;
+        }
+        if (rules.size() == 1) {
+            return visit(rules.get(0), context);
+        }
+        var subContext = context.withFollowSet(Set.of());
+        rules = rules.stream()
+                .filter(e -> FirstSetMatcher.scan(e, subContext))
+                .toList();
+        if (rules.isEmpty()) {
+            return false;
+        }
+        if (1 < rules.size()) {
+            return false;
+        }
+        return visit(rules.get(0), context);
     }
 
     @Override
@@ -60,7 +100,7 @@ final class FullLengthMatcher implements RuleVisitor<Boolean, Context> {
                 return true;
             }
             context.reset(position);
-        } 
+        }
         return false;
     }
 
@@ -92,10 +132,8 @@ final class FullLengthMatcher implements RuleVisitor<Boolean, Context> {
 
     @Override
     public Boolean visitReference(ReferenceRule reference, Context context) {
-        var productionSet = context.grammar();
-        var production = reference.lookup(productionSet);
-        var subContext = context.withProduction(production);
-        return visit(production.getRule(), subContext);
+        var production = reference.lookup(context.grammar());
+        return visit(production, context);
     }
 
     @Override
