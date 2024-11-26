@@ -12,14 +12,13 @@ import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.grammar.RuleVisitor;
 import com.jiganaut.bonsai.grammar.SequenceRule;
-import com.jiganaut.bonsai.grammar.ShortCircuitChoiceRule;
 import com.jiganaut.bonsai.grammar.SkipRule;
 
 /**
  * @author Junji Mikami
  *
  */
-final class FullLengthMatcher implements ProductionSetVisitor<Boolean, Context>, RuleVisitor<Boolean, Context> {
+final class FullLengthMatcher implements RuleVisitor<Boolean, Context> {
     private static final FullLengthMatcher INSTANCE = new FullLengthMatcher();
 
     private FullLengthMatcher() {
@@ -29,12 +28,18 @@ final class FullLengthMatcher implements ProductionSetVisitor<Boolean, Context>,
         return INSTANCE.visit(rule, context);
     }
 
-    @Override
-    public Boolean visitShortCircuit(ProductionSet productionSet, Context context) {
+    private boolean visitProductionSet(ProductionSet productionSet, Context context) {
+        if (productionSet.isShortCircuit()) {
+            return visitProductionSetAsShortCircuit(productionSet, context);
+        }
+        return visitProductionSetAsNotShortCircuit(productionSet, context);
+    }
+
+    private boolean visitProductionSetAsShortCircuit(ProductionSet productionSet, Context context) {
         int position = context.mark();
         for (var production : productionSet) {
             if (visit(production.getRule(), context)) {
-                context.reset(position);
+                context.clear();
                 return true;
             }
             context.reset(position);
@@ -42,8 +47,7 @@ final class FullLengthMatcher implements ProductionSetVisitor<Boolean, Context>,
         return false;
     }
 
-    @Override
-    public Boolean visitOther(ProductionSet productionSet, Context context) {
+    private boolean visitProductionSetAsNotShortCircuit(ProductionSet productionSet, Context context) {
         var rules = productionSet.stream()
                 .map(Production::getRule)
                 .filter(e -> FirstSetMatcher.scan(e, context))
@@ -69,6 +73,25 @@ final class FullLengthMatcher implements ProductionSetVisitor<Boolean, Context>,
 
     @Override
     public Boolean visitChoice(ChoiceRule choice, Context context) {
+        if (choice.isShortCircuit()) {
+            return visitChoiceAsShortCircuit(choice, context);
+        }
+        return visitChoiceAsNotShortCircuit(choice, context);
+    }
+
+    private Boolean visitChoiceAsShortCircuit(ChoiceRule choice, Context context) {
+        int position = context.mark();
+        for (var rule : choice.getChoices()) {
+            if (visit(rule, context)) {
+                context.clear();
+                return true;
+            }
+            context.reset(position);
+        }
+        return false;
+    }
+
+    private Boolean visitChoiceAsNotShortCircuit(ChoiceRule choice, Context context) {
         var rules = choice.getChoices().stream()
                 .filter(e -> FirstSetMatcher.scan(e, context))
                 .toList();
@@ -89,19 +112,6 @@ final class FullLengthMatcher implements ProductionSetVisitor<Boolean, Context>,
             return false;
         }
         return visit(rules.get(0), context);
-    }
-
-    @Override
-    public Boolean visitShortCircuitChoice(ShortCircuitChoiceRule choice, Context context) {
-        int position = context.mark();
-        for (var rule : choice.getChoices()) {
-            if (visit(rule, context)) {
-                context.reset(position);
-                return true;
-            }
-            context.reset(position);
-        }
-        return false;
     }
 
     @Override
@@ -132,8 +142,8 @@ final class FullLengthMatcher implements ProductionSetVisitor<Boolean, Context>,
 
     @Override
     public Boolean visitReference(ReferenceRule reference, Context context) {
-        var production = reference.lookup(context.grammar());
-        return visit(production, context);
+        var productionSet = reference.lookup(context.grammar());
+        return visitProductionSet(productionSet, context);
     }
 
     @Override

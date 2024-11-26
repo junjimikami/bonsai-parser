@@ -26,7 +26,6 @@ import com.jiganaut.bonsai.grammar.PatternRule;
 import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.grammar.SequenceRule;
-import com.jiganaut.bonsai.grammar.ShortCircuitChoiceRule;
 import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
 import com.jiganaut.bonsai.parser.Tree.Kind;
 
@@ -212,9 +211,10 @@ class ParserTest {
                                 .add(() -> ReferenceRule.of("A")))
                         .build(), "10", "A(1,A(0))"),
                 arguments(SingleOriginGrammar.builder()
-                        .add("A", ShortCircuitChoiceRule.builder()
+                        .add("A", ChoiceRule.builder()
                                 .add(ReferenceRule.of("B"))
-                                .add(ReferenceRule.of("C")))
+                                .add(ReferenceRule.of("C"))
+                                .shortCircuit())
                         .add("B", SequenceRule.of(PatternRule.of("1"), PatternRule.of("2")))
                         .add("C", SequenceRule.of(PatternRule.of("1"), PatternRule.of("3")))
                         .build(), "13", "A(C(1,3))"),
@@ -222,12 +222,12 @@ class ParserTest {
                         .add("A", SequenceRule.of(PatternRule.of("0"), PatternRule.of("0")))
                         .add("B", SequenceRule.of(PatternRule.of("1"), PatternRule.of("1")))
                         .add("C", SequenceRule.of(PatternRule.of("2"), PatternRule.of("2")))
-                        .build(), "22", "C(2,2)")
-//                arguments(ShortCircuitChoiceGrammar.builder()
-//                        .add("A", SequenceRule.of(PatternRule.of("0"), PatternRule.of("0")))
-//                        .add("B", SequenceRule.of(PatternRule.of("0"), PatternRule.of("1")))
-//                        .add("C", SequenceRule.of(PatternRule.of("0"), PatternRule.of("2")))
-//                        .build(), "02", "C(0,2)")
+                        .build(), "22", "C(2,2)"),
+                arguments(ChoiceGrammar.builder()
+                        .add("A", SequenceRule.of(PatternRule.of("0"), PatternRule.of("0")))
+                        .add("B", SequenceRule.of(PatternRule.of("0"), PatternRule.of("1")))
+                        .add("C", SequenceRule.of(PatternRule.of("0"), PatternRule.of("2")))
+                        .shortCircuit(), "02", "C(0,2)")
                 );
         return stream;
     }

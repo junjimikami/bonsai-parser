@@ -14,7 +14,6 @@ import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.grammar.RuleVisitor;
 import com.jiganaut.bonsai.grammar.SequenceRule;
-import com.jiganaut.bonsai.grammar.ShortCircuitChoiceRule;
 import com.jiganaut.bonsai.grammar.SkipRule;
 import com.jiganaut.bonsai.parser.ParseException;
 import com.jiganaut.bonsai.parser.Tree;
@@ -23,11 +22,11 @@ import com.jiganaut.bonsai.parser.Tree;
  * @author Junji Mikami
  *
  */
-final class Derivation implements ProductionSetVisitor<Tree, Context>, RuleVisitor<List<Tree>, Context> {
+final class Derivation implements RuleVisitor<List<Tree>, Context> {
 
     Tree process(Context context) {
         var productionSet = context.grammar().productionSet();
-        var tree = visit(productionSet, context);
+        var tree = visitProductionSet(productionSet, context);
         if (context.hasNext()) {
             var message = MessageSupport.tokensRemained(context);
             throw new ParseException(message);
@@ -41,8 +40,14 @@ final class Derivation implements ProductionSetVisitor<Tree, Context>, RuleVisit
         return new DefaultNonTerminalNode(production.getSymbol(), trees);
     }
 
-    @Override
-    public Tree visitShortCircuit(ProductionSet productionSet, Context context) {
+    private Tree visitProductionSet(ProductionSet productionSet, Context context) {
+        if (productionSet.isShortCircuit()) {
+            return visitProductionSetAsShortCircuit(productionSet, context);
+        }
+        return visitProductionSetAsNotShortCircuit(productionSet, context);
+    }
+
+    private Tree visitProductionSetAsShortCircuit(ProductionSet productionSet, Context context) {
         int position = context.mark();
         for (var production : productionSet) {
             if (FullLengthMatcher.scan(production.getRule(), context)) {
@@ -55,8 +60,7 @@ final class Derivation implements ProductionSetVisitor<Tree, Context>, RuleVisit
         throw new ParseException();
     }
 
-    @Override
-    public Tree visitOther(ProductionSet productionSet, Context context) {
+    private Tree visitProductionSetAsNotShortCircuit(ProductionSet productionSet, Context context) {
         var list = productionSet.stream()
                 .filter(e -> FirstSetMatcher.scan(e.getRule(), context))
                 .toList();
@@ -72,6 +76,27 @@ final class Derivation implements ProductionSetVisitor<Tree, Context>, RuleVisit
 
     @Override
     public List<Tree> visitChoice(ChoiceRule choice, Context context) {
+        if (choice.isShortCircuit()) {
+            return visitChoiceAsShortCircuit(choice, context);
+        }
+        return visitChoiceAsNotShortCircuit(choice, context);
+    }
+
+    private List<Tree> visitChoiceAsShortCircuit(ChoiceRule choice, Context context) {
+        int position = context.mark();
+        for (var rule : choice.getChoices()) {
+            if (FullLengthMatcher.scan(rule, context)) {
+                context.reset(position);
+                context.clear();
+                return visit(rule, context);
+            }
+            context.reset(position);
+        }
+        var message = MessageSupport.tokenNotMatchRule(choice, context);
+        throw new ParseException(message);
+    }
+
+    private List<Tree> visitChoiceAsNotShortCircuit(ChoiceRule choice, Context context) {
         var rules = choice.getChoices().stream()
                 .filter(e -> FirstSetMatcher.scan(e, context))
                 .toList();
@@ -94,21 +119,6 @@ final class Derivation implements ProductionSetVisitor<Tree, Context>, RuleVisit
             throw new ParseException(message);
         }
         return visit(rules.get(0), context);
-    }
-
-    @Override
-    public List<Tree> visitShortCircuitChoice(ShortCircuitChoiceRule choice, Context context) {
-        int position = context.mark();
-        for (var rule : choice.getChoices()) {
-            if (FullLengthMatcher.scan(rule, context)) {
-                context.reset(position);
-                context.clear();
-                return visit(rule, context);
-            }
-            context.reset(position);
-        }
-        var message = MessageSupport.tokenNotMatchRule(choice, context);
-        throw new ParseException(message);
     }
 
     @Override
@@ -141,7 +151,7 @@ final class Derivation implements ProductionSetVisitor<Tree, Context>, RuleVisit
     @Override
     public List<Tree> visitReference(ReferenceRule reference, Context context) {
         var productionSet = reference.lookup(context.grammar());
-        var tree = visit(productionSet, context);
+        var tree = visitProductionSet(productionSet, context);
         return List.of(tree);
     }
 

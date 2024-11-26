@@ -31,7 +31,6 @@ import com.jiganaut.bonsai.grammar.PatternRule;
 import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.grammar.SequenceRule;
-import com.jiganaut.bonsai.grammar.ShortCircuitChoiceRule;
 import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
 
 class TokenizerTest {
@@ -448,10 +447,11 @@ class TokenizerTest {
     @Test
     void testShortCircuit() throws Exception {
         var grammar = SingleOriginGrammar.builder()
-                .add("A", ShortCircuitChoiceRule.builder()
+                .add("A", ChoiceRule.builder()
                         .add(ReferenceRule.of("B"))
                         .add(ReferenceRule.of("C"))
-                        .add(ReferenceRule.of("D")))
+                        .add(ReferenceRule.of("D"))
+                        .shortCircuit())
                 .add("B", SequenceRule.of(PatternRule.of("1"), PatternRule.of("2")))
                 .add("C", SequenceRule.of(PatternRule.of("1"), PatternRule.of("3")))
                 .add("D", SequenceRule.of(PatternRule.of("1"), PatternRule.of("4")))
@@ -465,6 +465,54 @@ class TokenizerTest {
         assertTrue(tokenizer.hasNext());
         assertEquals("A", tokenizer.nextName());
         assertEquals("12", tokenizer.getValue());
+        assertFalse(tokenizer.hasNext());
+    }
+
+    @Test
+    void testShortCircuit2() throws Exception {
+        var grammar = ChoiceGrammar.builder()
+                .add("A", SequenceRule.of(ReferenceRule.of("C"), PatternRule.of("0")))
+                .add("B", SequenceRule.of(PatternRule.of("0"), PatternRule.of("1")))
+                .hidden()
+                .add("C", SequenceRule.of(PatternRule.of("1"), PatternRule.of("2")))
+                .shortCircuit();
+        var factory = TokenizerFactory.of(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader("12001"));
+
+        assertTrue(tokenizer.hasNext());
+        assertEquals("A", tokenizer.nextName());
+        assertEquals("120", tokenizer.getValue());
+        assertTrue(tokenizer.hasNext());
+        assertEquals("B", tokenizer.nextName());
+        assertEquals("01", tokenizer.getValue());
+        assertFalse(tokenizer.hasNext());
+    }
+    
+    @Test
+    void testShortCircuit3() throws Exception {
+        var grammar = SingleOriginGrammar.builder()
+                .add("A", ChoiceRule.builder()
+                        .add(ChoiceRule.builder()
+                                .add(ReferenceRule.of("B"))
+                                .add(ReferenceRule.of("C"))
+                                .shortCircuit())
+                        .add(PatternRule.of("0"))
+                        .shortCircuit())
+                .add("B", SequenceRule.of(PatternRule.of("1"), PatternRule.of("1")))
+                .add("C", SequenceRule.of(PatternRule.of("1"), PatternRule.of("2")))
+                .build();
+        var factory = TokenizerFactory.of(grammar);
+        var tokenizer = factory.createTokenizer(new StringReader("01211"));
+        
+        assertTrue(tokenizer.hasNext());
+        assertEquals("A", tokenizer.nextName());
+        assertEquals("0", tokenizer.getValue());
+        assertTrue(tokenizer.hasNext());
+        assertEquals("A", tokenizer.nextName());
+        assertEquals("12", tokenizer.getValue());
+        assertTrue(tokenizer.hasNext());
+        assertEquals("A", tokenizer.nextName());
+        assertEquals("11", tokenizer.getValue());
         assertFalse(tokenizer.hasNext());
     }
 
@@ -575,36 +623,40 @@ class TokenizerTest {
         // + Short-circuit choice
         stream = Stream.concat(stream, Stream.of(
                 arguments(SingleOriginGrammar.builder()
-                        .add("A", ShortCircuitChoiceRule.builder()
+                        .add("A", ChoiceRule.builder()
                                 .add(ReferenceRule.of("B"))
-                                .add(ReferenceRule.of("C")))
+                                .add(ReferenceRule.of("C"))
+                                .shortCircuit())
                         .add("B", SequenceRule.of(PatternRule.of("1"), PatternRule.of("2")))
                         .add("C", SequenceRule.of(PatternRule.of("1"), PatternRule.of("3")))
                         .build(), "1312", List.of("13", "12")),
                 arguments(SingleOriginGrammar.builder()
-                        .add("A", ShortCircuitChoiceRule.builder()
+                        .add("A", ChoiceRule.builder()
                                 .add(ReferenceRule.of("B"))
-                                .add(ReferenceRule.of("C")))
+                                .add(ReferenceRule.of("C"))
+                                .shortCircuit())
                         .add("B",
                                 SequenceRule.of(PatternRule.of("1"), PatternRule.of("3"), PatternRule.of("1"),
                                         PatternRule.of("9")))
                         .add("C", SequenceRule.of(PatternRule.of("1"), PatternRule.of("3")))
                         .build(), "1313", List.of("13", "13")),
                 arguments(SingleOriginGrammar.builder()
-                        .add("A", ShortCircuitChoiceRule.builder()
+                        .add("A", ChoiceRule.builder()
                                 .add(ReferenceRule.of("B"))
-                                .add(ReferenceRule.of("C")))
-                        .add("B", SequenceRule.of(PatternRule.of("1"), ShortCircuitChoiceRule.of(
+                                .add(ReferenceRule.of("C"))
+                                .shortCircuit())
+                        .add("B", SequenceRule.of(PatternRule.of("1"), ChoiceRule.of(
                                 PatternRule.of("4"),
-                                PatternRule.of("5"))))
-                        .add("C", SequenceRule.of(PatternRule.of("1"), ShortCircuitChoiceRule.of(
+                                PatternRule.of("5")).shortCircuit()))
+                        .add("C", SequenceRule.of(PatternRule.of("1"), ChoiceRule.of(
                                 PatternRule.of("2"),
-                                PatternRule.of("3"))))
+                                PatternRule.of("3")).shortCircuit()))
                         .build(), "1312", List.of("13", "12")),
                 arguments(SingleOriginGrammar.builder()
-                        .add("A", ShortCircuitChoiceRule.builder()
+                        .add("A", ChoiceRule.builder()
                                 .add(SequenceRule.of(PatternRule.of("1"), PatternRule.of("2")))
-                                .add(SequenceRule.of(PatternRule.of("1"), PatternRule.of("3"))))
+                                .add(SequenceRule.of(PatternRule.of("1"), PatternRule.of("3")))
+                                .shortCircuit())
                         .build(), "1312", List.of("13", "12"))));
         // + Reference
         stream = Stream.concat(stream, Stream.of(
@@ -739,24 +791,23 @@ class TokenizerTest {
                         .add("A", SequenceRule.of(PatternRule.of("0"), PatternRule.of("0")))
                         .add("B", SequenceRule.of(PatternRule.of("1"), PatternRule.of("1")))
                         .build(), "1100", List.of("11", "00")),
-//                arguments(ShortCircuitChoiceGrammar.builder()
-//                        .add("A", SequenceRule.of(PatternRule.of("0"), PatternRule.of("0")))
-//                        .add("B", SequenceRule.of(PatternRule.of("0"), PatternRule.of("1")))
-//                        .add("C", SequenceRule.of(PatternRule.of("0"), PatternRule.of("2")))
-//                        .build(), "020001", List.of("02", "00", "01")),
+                arguments(ChoiceGrammar.builder()
+                        .add("A", SequenceRule.of(PatternRule.of("0"), PatternRule.of("0")))
+                        .add("B", SequenceRule.of(PatternRule.of("0"), PatternRule.of("1")))
+                        .add("C", SequenceRule.of(PatternRule.of("0"), PatternRule.of("2")))
+                        .shortCircuit(), "020001", List.of("02", "00", "01")),
                 arguments(ChoiceGrammar.builder()
                         .add("A", SequenceRule.of(ReferenceRule.of("C"), PatternRule.of("0")))
                         .add("B", SequenceRule.of(PatternRule.of("0"), PatternRule.of("1")))
                         .hidden()
                         .add("C", SequenceRule.of(PatternRule.of("1"), PatternRule.of("2")))
-                        .build(), "12001", List.of("120", "01"))
-//                arguments(ShortCircuitChoiceGrammar.builder()
-//                        .add("A", SequenceRule.of(ReferenceRule.of("C"), PatternRule.of("0")))
-//                        .add("B", SequenceRule.of(PatternRule.of("0"), PatternRule.of("1")))
-//                        .hidden()
-//                        .add("C", SequenceRule.of(PatternRule.of("1"), PatternRule.of("2")))
-//                        .build(), "12001", List.of("120", "01"))
-                ));
+                        .build(), "12001", List.of("120", "01")),
+                arguments(ChoiceGrammar.builder()
+                        .add("A", SequenceRule.of(ReferenceRule.of("C"), PatternRule.of("0")))
+                        .add("B", SequenceRule.of(PatternRule.of("0"), PatternRule.of("1")))
+                        .hidden()
+                        .add("C", SequenceRule.of(PatternRule.of("1"), PatternRule.of("2")))
+                        .shortCircuit(), "12001", List.of("120", "01"))));
         return stream;
     }
 

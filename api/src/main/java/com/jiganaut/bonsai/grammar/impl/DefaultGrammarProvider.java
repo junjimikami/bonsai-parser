@@ -52,9 +52,4 @@ public class DefaultGrammarProvider extends GrammarProvider {
         return new DefaultReferenceRule(reference);
     }
 
-    @Override
-    public com.jiganaut.bonsai.grammar.ShortCircuitChoiceRule.Builder createShortCircuitChoiceBuilder() {
-        return new DefaultShortCircuitChoiceRule.Builder();
-    }
-
 }

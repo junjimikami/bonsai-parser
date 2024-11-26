@@ -12,7 +12,6 @@ import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.grammar.RuleVisitor;
 import com.jiganaut.bonsai.grammar.SequenceRule;
-import com.jiganaut.bonsai.grammar.ShortCircuitChoiceRule;
 import com.jiganaut.bonsai.grammar.SkipRule;
 import com.jiganaut.bonsai.parser.ParseException;
 
@@ -20,13 +19,13 @@ import com.jiganaut.bonsai.parser.ParseException;
  * @author Junji Mikami
  *
  */
-final class Tokenization implements ProductionSetVisitor<CharSequence, Context>, RuleVisitor<CharSequence, Context> {
+final class Tokenization implements RuleVisitor<CharSequence, Context> {
     private static final String EMPTY_STRING = "";
     private String name;
 
     String process(Context context) {
         var productionSet = context.grammar().productionSet();
-        return visit(productionSet, context).toString();
+        return visitProductionSet(productionSet, context).toString();
     }
 
     String getName() {
@@ -40,8 +39,14 @@ final class Tokenization implements ProductionSetVisitor<CharSequence, Context>,
         return value;
     }
 
-    @Override
-    public CharSequence visitShortCircuit(ProductionSet productionSet, Context context) {
+    private CharSequence visitProductionSet(ProductionSet productionSet, Context context) {
+        if (productionSet.isShortCircuit()) {
+            return visitProductionSetAsShortCircuit(productionSet, context);
+        }
+        return visitProductionSetAsNotShortCircuit(productionSet, context);
+    }
+
+    private CharSequence visitProductionSetAsShortCircuit(ProductionSet productionSet, Context context) {
         int position = context.mark();
         for (var production : productionSet) {
             if (FullLengthMatcher.scan(production.getRule(), context)) {
@@ -54,7 +59,7 @@ final class Tokenization implements ProductionSetVisitor<CharSequence, Context>,
         throw new ParseException();
     }
 
-    public CharSequence visitOther(ProductionSet productionSet, Context context) {
+    private CharSequence visitProductionSetAsNotShortCircuit(ProductionSet productionSet, Context context) {
         var list = productionSet.stream()
                 .filter(e -> FirstSetMatcher.scan(e.getRule(), context))
                 .toList();
@@ -70,6 +75,27 @@ final class Tokenization implements ProductionSetVisitor<CharSequence, Context>,
 
     @Override
     public CharSequence visitChoice(ChoiceRule choice, Context context) {
+        if (choice.isShortCircuit()) {
+            return visitChoiceAsShortCircuit(choice, context);
+        }
+        return visitChoiceAsNotShortCircuit(choice, context);
+    }
+
+    private CharSequence visitChoiceAsShortCircuit(ChoiceRule choice, Context context) {
+        int position = context.mark();
+        for (var rule : choice.getChoices()) {
+            if (FullLengthMatcher.scan(rule, context)) {
+                context.reset(position);
+                context.clear();
+                return visit(rule, context);
+            }
+            context.reset(position);
+        }
+        var message = MessageSupport.tokenNotMatchRule(choice, context);
+        throw new ParseException(message);
+    }
+
+    private CharSequence visitChoiceAsNotShortCircuit(ChoiceRule choice, Context context) {
         var rules = choice.getChoices().stream()
                 .filter(e -> FirstSetMatcher.scan(e, context))
                 .toList();
@@ -92,21 +118,6 @@ final class Tokenization implements ProductionSetVisitor<CharSequence, Context>,
             throw new ParseException(message);
         }
         return visit(rules.get(0), context);
-    }
-
-    @Override
-    public CharSequence visitShortCircuitChoice(ShortCircuitChoiceRule choice, Context context) {
-        int position = context.mark();
-        for (var rule : choice.getChoices()) {
-            if (FullLengthMatcher.scan(rule, context)) {
-                context.reset(position);
-                context.clear();
-                return visit(rule, context);
-            }
-            context.reset(position);
-        }
-        var message = MessageSupport.tokenNotMatchRule(choice, context);
-        throw new ParseException(message);
     }
 
     @Override
@@ -139,7 +150,7 @@ final class Tokenization implements ProductionSetVisitor<CharSequence, Context>,
     @Override
     public CharSequence visitReference(ReferenceRule reference, Context context) {
         var productionSet = reference.lookup(context.grammar());
-        return visit(productionSet, context);
+        return visitProductionSet(productionSet, context);
     }
 
     @Override

@@ -83,12 +83,6 @@ interface RuleTestCase extends TestCase {
         }
 
         @Override
-        public Object[] visitShortCircuitChoice(ShortCircuitChoiceRule choice, String p) {
-            assertEquals(Rule.Kind.SHORT_CIRCUIT_CHOICE, choice.getKind());
-            return defaultAction(choice, p);
-        }
-
-        @Override
         public Object[] defaultAction(Rule rule, String p) {
             return new Object[] { rule, p };
         }

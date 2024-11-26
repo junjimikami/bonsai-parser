@@ -10,14 +10,13 @@ public interface Rule {
         PATTERN,
         SEQUENCE,
         CHOICE,
-        SHORT_CIRCUIT_CHOICE,
         REFERENCE,
         QUANTIFIER,
         SKIP,
         EMPTY;
 
         public boolean isComposite() {
-            return this == SEQUENCE || this == CHOICE || this == SHORT_CIRCUIT_CHOICE;
+            return this == SEQUENCE || this == CHOICE;
         }
     }
 

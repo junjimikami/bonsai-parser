@@ -16,6 +16,9 @@ public interface ChoiceRule extends Rule, Quantifiable {
         public ChoiceRule.Builder addEmpty();
         @Override
         public ChoiceRule build();
+        public default ChoiceRule shortCircuit() {
+            return build().shortCircuit();
+        }
     }
 
     public static Builder builder() {
@@ -41,4 +44,8 @@ public interface ChoiceRule extends Rule, Quantifiable {
     }
 
     public Set<? extends Rule> getChoices();
+
+    public boolean isShortCircuit();
+    
+    public ChoiceRule shortCircuit();
 }

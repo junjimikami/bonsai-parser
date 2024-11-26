@@ -5,7 +5,6 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import com.jiganaut.bonsai.grammar.Grammar;
 import com.jiganaut.bonsai.grammar.Production;
@@ -69,7 +68,7 @@ abstract class AbstractGrammar extends DefaultProductionSet implements Grammar {
     public ProductionSet withSymbol(String symbol) {
         var set = stream()
                 .filter(e -> Objects.equals(e.getSymbol(), symbol))
-                .collect(Collectors.toSet());
+                .collect(LinkedHashSet<Production>::new, Set::add, Set::addAll);
         if (set.isEmpty()) {
             throw new NoSuchElementException(Message.NO_SUCH_SYMBOL.format(symbol));
         }

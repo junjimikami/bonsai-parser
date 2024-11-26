@@ -2,8 +2,8 @@ package com.jiganaut.bonsai.grammar.impl;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.jiganaut.bonsai.grammar.ChoiceGrammar;
 import com.jiganaut.bonsai.grammar.Production;
@@ -64,7 +64,7 @@ class DefaultChoiceGrammar extends AbstractGrammar implements ChoiceGrammar {
     public ProductionSet productionSet() {
         var set = stream()
                 .filter(e -> !getHiddenSymbols().contains(e.getSymbol()))
-                .collect(Collectors.toSet());
+                .collect(LinkedHashSet<Production>::new, Set::add, Set::addAll);
         return new DefaultProductionSet(set, isShortCircuit());
     }
 
