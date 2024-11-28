@@ -24,7 +24,7 @@ import com.jiganaut.bonsai.TestCase;
  * @author Junji Mikami
  *
  */
-interface GrammarTestCase extends TestCase {
+interface GrammarTestCase extends ProductionSetTestCase {
 
     interface BuilderTestCase extends TestCase {
 
@@ -227,51 +227,43 @@ interface GrammarTestCase extends TestCase {
             assertThrows(NullPointerException.class, () -> builder.build());
         }
 
+        @Test
+        @DisplayName("shortCircuit() [No elements]")
+        default void shortCircuitInCaseOfNoElements() throws Exception {
+            assumeTrue(isNoElements());
+
+            var builder = createTarget();
+
+            assertThrows(IllegalStateException.class, () -> builder.shortCircuit());
+        }
+
+        @Test
+        @DisplayName("shortCircuit() [Post-build operation]")
+        default void shortCircuitInCaseOfPostBuild() throws Exception {
+            assumeTrue(canBuild());
+
+            var builder = createTarget();
+            builder.build();
+
+            assertThrows(IllegalStateException.class, () -> builder.shortCircuit());
+        }
+
+        @Test
+        @DisplayName("shortCircuit()")
+        default void shortCircuit() throws Exception {
+            assumeTrue(canBuild());
+
+            var target = createTarget().shortCircuit();
+
+            assertTrue(target.isShortCircuit());
+        }
+
     }
 
     @Override
     Grammar createTarget();
 
     Set<Production> expectedProductionSet();
-
-    @Test
-    @DisplayName("containsSymbol(String)")
-    default void containsSymbol() throws Exception {
-        var target = createTarget();
-
-        for (var production : expectedProductionSet()) {
-            var symbol = production.getSymbol();
-            assertTrue(target.containsSymbol(symbol));
-        }
-    }
-
-//    @Test
-//    @DisplayName("getProduction(String)")
-//    default void getProduction() throws Exception {
-//        var target = createTarget();
-//
-//        var map = expectedProductionSet().stream()
-//                .collect(Collectors.groupingBy(e -> e.getSymbol()));
-//        map.forEach((symbol, list) -> {
-//            var actual = target.getProduction(symbol);
-//            assertEquals(symbol, actual.getSymbol());
-//
-//            if (list.size() == 1) {
-//                assertEquals(list.get(0).getRule(), actual.getRule());
-//            } else if (1 < list.size()) {
-//                // If there are multiple rules for a single key, make sure they are combined
-//                // into a ChoiceRule.
-//                var actualRule = assertInstanceOf(ChoiceRule.class, actual.getRule());
-//                assertEquals(Rule.Kind.CHOICE, actualRule.getKind());
-//                var exptectedChoices = list.stream()
-//                        .map(e -> e.getRule())
-//                        .collect(Collectors.toSet());
-//                assertEquals(exptectedChoices, actualRule.getChoices());
-//            } else {
-//                throw new AssertionError();
-//            }
-//        });
-//    }
 
     @Test
     @DisplayName("productionSet()")
@@ -287,23 +279,6 @@ interface GrammarTestCase extends TestCase {
                 .sorted()
                 .collect(Collectors.joining(",", "{", "}"));
         assertEquals(expectedString, actualString);
-    }
-
-    @Test
-    @DisplayName("add(pr:Production)")
-    default void addPr() throws Exception {
-        var target = createTarget();
-
-        assertThrows(UnsupportedOperationException.class, () -> target.add(mock(Production.class)));
-    }
-
-    @Test
-    @DisplayName("remove(ob:Object)")
-    default void removeOb() throws Exception {
-        var target = createTarget();
-        var production = target.iterator().next();
-
-        assertThrows(UnsupportedOperationException.class, () -> target.remove(production));
     }
 
 }

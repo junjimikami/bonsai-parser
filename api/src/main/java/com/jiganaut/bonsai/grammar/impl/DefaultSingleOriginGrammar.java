@@ -57,14 +57,14 @@ class DefaultSingleOriginGrammar extends AbstractGrammar implements SingleOrigin
         public SingleOriginGrammar build() {
             checkForBuild();
             var productionSet = getProductionSet();
-            return new DefaultSingleOriginGrammar(productionSet, startSymbol);
+            return new DefaultSingleOriginGrammar(productionSet, false, startSymbol);
         }
     }
 
     private final String startSymbol;
 
-    private DefaultSingleOriginGrammar(Set<Production> productionSet, String startSymbol) {
-        super(productionSet, false);
+    private DefaultSingleOriginGrammar(Set<Production> productionSet, boolean shortCircuit, String startSymbol) {
+        super(productionSet, shortCircuit);
         assert startSymbol != null;
         this.startSymbol = startSymbol;
     }
@@ -80,6 +80,11 @@ class DefaultSingleOriginGrammar extends AbstractGrammar implements SingleOrigin
                 .filter(e -> Objects.equals(getStartSymbol(), e.getSymbol()))
                 .collect(Collectors.toSet());
         return new DefaultProductionSet(set, isShortCircuit());
+    }
+
+    @Override
+    public SingleOriginGrammar shortCircuit() {
+        return new DefaultSingleOriginGrammar(productionSet, true, startSymbol);
     }
 
 }

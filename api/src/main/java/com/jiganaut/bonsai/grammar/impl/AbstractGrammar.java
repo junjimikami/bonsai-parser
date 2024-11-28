@@ -1,14 +1,12 @@
 package com.jiganaut.bonsai.grammar.impl;
 
 import java.util.LinkedHashSet;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
 import com.jiganaut.bonsai.grammar.Grammar;
 import com.jiganaut.bonsai.grammar.Production;
-import com.jiganaut.bonsai.grammar.ProductionSet;
 import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.impl.BaseBuilder;
 import com.jiganaut.bonsai.impl.Message;
@@ -58,21 +56,6 @@ abstract class AbstractGrammar extends DefaultProductionSet implements Grammar {
     }
 
     @Override
-    public boolean containsSymbol(String symbol) {
-        return stream()
-                .map(e -> e.getSymbol())
-                .anyMatch(e -> Objects.equals(e, symbol));
-    }
-
-    @Override
-    public ProductionSet withSymbol(String symbol) {
-        var set = stream()
-                .filter(e -> Objects.equals(e.getSymbol(), symbol))
-                .collect(LinkedHashSet<Production>::new, Set::add, Set::addAll);
-        if (set.isEmpty()) {
-            throw new NoSuchElementException(Message.NO_SUCH_SYMBOL.format(symbol));
-        }
-        return new DefaultProductionSet(set, isShortCircuit());
-    }
+    public abstract Grammar shortCircuit();
 
 }

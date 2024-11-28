@@ -18,6 +18,7 @@ public interface ChoiceGrammar extends Grammar {
         @Override
         public ChoiceGrammar build();
 
+        @Override
         public default ChoiceGrammar shortCircuit() {
             return build().shortCircuit();
         }
@@ -29,6 +30,7 @@ public interface ChoiceGrammar extends Grammar {
 
     public Set<String> getHiddenSymbols();
 
+    @Override
     public ChoiceGrammar shortCircuit();
 
 }

@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -36,12 +37,19 @@ class SingleOriginGrammarTest {
 
         @Override
         public Set<Production> expectedProductionSet() {
-            return testData;
+            return testData.stream()
+                    .filter(e -> expectedStartSymbol().equals(e.getSymbol()))
+                    .collect(Collectors.toSet());
         }
 
         @Override
         public String expectedStartSymbol() {
             return "1";
+        }
+
+        @Override
+        public Set<Production> expectedSet() {
+            return testData;
         }
 
     }
@@ -72,12 +80,19 @@ class SingleOriginGrammarTest {
 
         @Override
         public Set<Production> expectedProductionSet() {
-            return testData;
+            return testData.stream()
+                    .filter(e -> expectedStartSymbol().equals(e.getSymbol()))
+                    .collect(Collectors.toSet());
         }
 
         @Override
         public String expectedStartSymbol() {
             return "1";
+        }
+
+        @Override
+        public Set<Production> expectedSet() {
+            return testData;
         }
 
     }
@@ -111,12 +126,19 @@ class SingleOriginGrammarTest {
 
         @Override
         public Set<Production> expectedProductionSet() {
-            return testData;
+            return testData.stream()
+                    .filter(e -> expectedStartSymbol().equals(e.getSymbol()))
+                    .collect(Collectors.toSet());
         }
 
         @Override
         public String expectedStartSymbol() {
             return "1";
+        }
+
+        @Override
+        public Set<Production> expectedSet() {
+            return testData;
         }
 
     }
@@ -148,12 +170,19 @@ class SingleOriginGrammarTest {
 
         @Override
         public Set<Production> expectedProductionSet() {
-            return testData;
+            return testData.stream()
+                    .filter(e -> expectedStartSymbol().equals(e.getSymbol()))
+                    .collect(Collectors.toSet());
         }
 
         @Override
         public String expectedStartSymbol() {
             return "2";
+        }
+
+        @Override
+        public Set<Production> expectedSet() {
+            return testData;
         }
 
     }

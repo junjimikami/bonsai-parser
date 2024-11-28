@@ -9,6 +9,7 @@ import com.jiganaut.bonsai.grammar.ChoiceGrammar;
 import com.jiganaut.bonsai.grammar.Production;
 import com.jiganaut.bonsai.grammar.ProductionSet;
 import com.jiganaut.bonsai.grammar.Rule;
+import com.jiganaut.bonsai.impl.Message;
 
 class DefaultChoiceGrammar extends AbstractGrammar implements ChoiceGrammar {
 
@@ -43,6 +44,10 @@ class DefaultChoiceGrammar extends AbstractGrammar implements ChoiceGrammar {
 
         @Override
         public Builder hidden() {
+            check();
+            if (set.isEmpty()) {
+                throw new IllegalStateException(Message.NO_ELELEMNTS.format());
+            }
             isHidden = true;
             return this;
         }

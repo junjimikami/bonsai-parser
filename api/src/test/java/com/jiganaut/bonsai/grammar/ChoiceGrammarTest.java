@@ -4,6 +4,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -35,6 +36,16 @@ class ChoiceGrammarTest {
             return testData;
         }
 
+        @Override
+        public Set<Production> expectedSet() {
+            return testData;
+        }
+
+        @Override
+        public Set<String> expectedHiddenSymbols() {
+            return Set.of();
+        }
+
     }
 
     @Nested
@@ -63,6 +74,16 @@ class ChoiceGrammarTest {
         @Override
         public Set<Production> expectedProductionSet() {
             return testData;
+        }
+
+        @Override
+        public Set<Production> expectedSet() {
+            return testData;
+        }
+
+        @Override
+        public Set<String> expectedHiddenSymbols() {
+            return Set.of();
         }
 
     }
@@ -96,6 +117,70 @@ class ChoiceGrammarTest {
         @Override
         public Set<Production> expectedProductionSet() {
             return testData;
+        }
+
+        @Override
+        public Set<Production> expectedSet() {
+            return testData;
+        }
+
+        @Override
+        public Set<String> expectedHiddenSymbols() {
+            return Set.of();
+        }
+
+    }
+
+    @Nested
+    class TestCase4 implements ChoiceGrammarTestCase {
+
+        Set<Production> testData;
+
+        @BeforeEach
+        void init() {
+            var production1 = mock(Production.class);
+            when(production1.getSymbol()).thenReturn("1");
+            when(production1.getRule()).thenReturn(mock(Rule.class));
+            var production2 = mock(Production.class);
+            when(production2.getSymbol()).thenReturn("2");
+            when(production2.getRule()).thenReturn(mock(Rule.class));
+            var production3 = mock(Production.class);
+            when(production3.getSymbol()).thenReturn("3");
+            when(production3.getRule()).thenReturn(mock(Rule.class));
+            testData = Set.of(production1, production2, production3);
+        }
+
+        @Override
+        public ChoiceGrammar createTarget() {
+            var builder = ChoiceGrammar.builder();
+            testData.stream()
+                    .filter(e -> e.getSymbol().equals("1"))
+                    .forEach(e -> builder.add(e.getSymbol(), e.getRule()));
+            builder.hidden();
+            testData.stream()
+                    .filter(e -> !e.getSymbol().equals("1"))
+                    .forEach(e -> builder.add(e.getSymbol(), e.getRule()));
+            return builder.build();
+        }
+
+        @Override
+        public Set<Production> expectedProductionSet() {
+            return testData.stream()
+                    .filter(e -> e.getSymbol().equals("1"))
+                    .collect(Collectors.toSet());
+        }
+
+        @Override
+        public Set<Production> expectedSet() {
+            return testData;
+        }
+
+        @Override
+        public Set<String> expectedHiddenSymbols() {
+            return testData.stream()
+                    .filter(e -> !e.getSymbol().equals("1"))
+                    .map(e -> e.getSymbol())
+                    .collect(Collectors.toSet());
         }
 
     }

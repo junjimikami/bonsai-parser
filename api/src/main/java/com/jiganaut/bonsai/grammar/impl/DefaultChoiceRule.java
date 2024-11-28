@@ -83,6 +83,7 @@ class DefaultChoiceRule extends AbstractCompositeRule<Set<Rule>> implements Choi
     public boolean equals(Object obj) {
         if (obj instanceof ChoiceRule r) {
             return this.getKind() == r.getKind()
+                    && this.shortCircuit == r.isShortCircuit()
                     && this.elements.equals(r.getChoices());
         }
         return super.equals(obj);
@@ -90,7 +91,7 @@ class DefaultChoiceRule extends AbstractCompositeRule<Set<Rule>> implements Choi
 
     @Override
     public int hashCode() {
-        return Objects.hash(getKind(), elements);
+        return Objects.hash(getKind(), shortCircuit, elements);
     }
 
     @Override

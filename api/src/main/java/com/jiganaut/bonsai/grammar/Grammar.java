@@ -8,12 +8,12 @@ public interface Grammar extends ProductionSet {
         public Grammar.Builder add(String symbol, Rule.Builder builder);
 
         public Grammar build();
+
+        public Grammar shortCircuit();
     }
-
-    public boolean containsSymbol(String symbol);
-
-    public ProductionSet withSymbol(String symbol);
 
     public ProductionSet productionSet();
 
+    @Override
+    public Grammar shortCircuit();
 }

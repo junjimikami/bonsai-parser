@@ -15,6 +15,11 @@ public interface SingleOriginGrammar extends Grammar {
 
         @Override
         public SingleOriginGrammar build();
+
+        @Override
+        public default SingleOriginGrammar shortCircuit() {
+            return build().shortCircuit();
+        }
     }
 
     public static Builder builder() {
@@ -22,5 +27,8 @@ public interface SingleOriginGrammar extends Grammar {
     }
 
     public String getStartSymbol();
+
+    @Override
+    public SingleOriginGrammar shortCircuit();
 
 }

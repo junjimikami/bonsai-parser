@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -99,23 +98,6 @@ interface SingleOriginGrammarTestCase extends GrammarTestCase {
                 .orElseThrow();
         var actual = target.getStartSymbol();
         assertEquals(expected.getSymbol(), actual);
-    }
-
-    @Test
-    @DisplayName("productionSet()")
-    default void productionSet() throws Exception {
-        var target = createTarget();
-
-        var expectedString = expectedProductionSet().stream()
-                .filter(e -> e.getSymbol().equals(expectedStartSymbol()))
-                .map(e -> e.getSymbol() + ":" + e.getRule())
-                .sorted()
-                .collect(Collectors.joining(",", "{", "}"));
-        var actualString = target.productionSet().stream()
-                .map(e -> e.getSymbol() + ":" + e.getRule())
-                .sorted()
-                .collect(Collectors.joining(",", "{", "}"));
-        assertEquals(expectedString, actualString);
     }
 
 }
