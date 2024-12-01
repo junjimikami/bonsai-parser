@@ -112,7 +112,8 @@ final class Derivation implements RuleVisitor<List<Tree>, Context> {
                 .filter(e -> FirstSetMatcher.scan(e, subContext))
                 .toList();
         if (rules.isEmpty()) {
-            return List.of();
+            var message = MessageSupport.tokenNotMatchRule(choice, context);
+            throw new ParseException(message);
         }
         if (1 < rules.size()) {
             var message = MessageSupport.ambiguousChoice(choice, context);

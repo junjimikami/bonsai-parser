@@ -1,6 +1,7 @@
 package com.jiganaut.bonsai.parser.impl;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -34,13 +35,17 @@ class DefaultTokenizer extends AbstractTokenizer {
         if (nextTokenValue != null) {
             return;
         }
-        while (context.hasNext()) {
-            var value = tokenization.process(context);
-            if (!value.isEmpty()) {
-                nextTokenValue = value;
-                nextTokenName = tokenization.getName();
-                break;
+        try {
+            while (context.hasNext()) {
+                var value = tokenization.process(context);
+                if (!value.isEmpty()) {
+                    nextTokenValue = value;
+                    nextTokenName = tokenization.getName();
+                    break;
+                }
             }
+        } catch (UncheckedIOException ex) {
+            throw new IllegalStateException(ex);
         }
     }
 
@@ -62,6 +67,9 @@ class DefaultTokenizer extends AbstractTokenizer {
 
     @Override
     public boolean hasNextName(String name) {
+        if (!hasNext()) {
+            return false;
+        }
         return Objects.equals(name, nextTokenName);
     }
 

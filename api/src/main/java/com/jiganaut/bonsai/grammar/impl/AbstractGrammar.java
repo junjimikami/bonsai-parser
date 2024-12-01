@@ -1,5 +1,6 @@
 package com.jiganaut.bonsai.grammar.impl;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -15,11 +16,13 @@ abstract class AbstractGrammar extends DefaultProductionSet implements Grammar {
 
     static abstract class Builder extends BaseBuilder implements Grammar.Builder {
         final Set<Supplier<Production>> set = new LinkedHashSet<>();
+        final Set<String> symbols = new HashSet<>();
 
         @Override
         public Grammar.Builder add(String symbol, Rule rule) {
             checkParameter(symbol, rule);
             set.add(() -> new DefaultProduction(symbol, rule));
+            symbols.add(symbol);
             return this;
         }
 
@@ -30,6 +33,7 @@ abstract class AbstractGrammar extends DefaultProductionSet implements Grammar {
                 var rule = Objects.requireNonNull(builder.build(), Message.NULL_PARAMETER.format());
                 return new DefaultProduction(symbol, rule);
             });
+            symbols.add(symbol);
             return this;
         }
 

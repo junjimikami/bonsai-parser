@@ -37,6 +37,15 @@ public interface NonTerminalNode extends Tree {
         return builder.build();
     }
 
+    public static NonTerminalNode of(String name, Tree... trees) {
+        var builder = builder()
+                .setName(name);
+        for (var tree : trees) {
+            builder.add(tree);
+        }
+        return builder.build();
+    }
+
     @Override
     public default Kind getKind() {
         return Kind.NON_TERMINAL;

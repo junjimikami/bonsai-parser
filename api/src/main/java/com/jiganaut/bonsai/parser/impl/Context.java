@@ -7,9 +7,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import com.jiganaut.bonsai.grammar.Production;
 import com.jiganaut.bonsai.grammar.Grammar;
+import com.jiganaut.bonsai.grammar.Production;
 import com.jiganaut.bonsai.grammar.Rule;
+import com.jiganaut.bonsai.grammar.RuleVisitor;
 import com.jiganaut.bonsai.parser.Token;
 import com.jiganaut.bonsai.parser.Tokenizer;
 
@@ -64,6 +65,19 @@ class Context implements Tokenizer {
         }
     }
 
+    static final Rule EOF = new Rule() {
+
+        @Override
+        public Kind getKind() {
+            throw new AssertionError();
+        }
+
+        @Override
+        public <R, P> R accept(RuleVisitor<R, P> visitor, P p) {
+            throw new AssertionError();
+        }
+    };
+
     private final Grammar grammar;
     private final Production production;
     private final Tokenizer tokenizer;
@@ -73,7 +87,7 @@ class Context implements Tokenizer {
     private final Position position;
 
     Context(Grammar grammar, Tokenizer tokenizer) {
-        this(grammar, null, tokenizer, Set.of(), new LinkedList<>(), new Position());
+        this(grammar, null, tokenizer, Set.of(EOF), new LinkedList<>(), new Position());
     }
 
     private Context(

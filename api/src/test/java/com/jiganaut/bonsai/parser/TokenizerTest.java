@@ -1,33 +1,19 @@
 package com.jiganaut.bonsai.parser;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Named.named;
-import static org.junit.jupiter.params.provider.Arguments.arguments;
-
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.function.Consumer;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.function.Executable;
 
 import com.jiganaut.bonsai.grammar.ChoiceGrammar;
 import com.jiganaut.bonsai.grammar.ChoiceRule;
 import com.jiganaut.bonsai.grammar.Grammar;
 import com.jiganaut.bonsai.grammar.PatternRule;
+import com.jiganaut.bonsai.grammar.Quantifiable;
 import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.grammar.SequenceRule;
@@ -35,803 +21,1723 @@ import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
 
 class TokenizerTest {
 
-    static Stream<Arguments> allMethods() {
-        return Stream.of(
-                arguments(named("hasNext()", (Consumer<Tokenizer>) t -> t.hasNext())),
-                arguments(named("hasNext(String)", (Consumer<Tokenizer>) t -> t.hasNextValue(""))),
-                arguments(named("hasNext(Pattern)", (Consumer<Tokenizer>) t -> t.hasNextValue(Pattern.compile("")))),
-                arguments(named("next()", (Consumer<Tokenizer>) t -> t.next())));
-    }
+    @Nested
+    class ParseExceptionTestCase1 implements ParseExceptionTestCase {
 
-    @DisplayName("[Stream closed]")
-    @ParameterizedTest(name = "{0} {displayName}")
-    @MethodSource("allMethods")
-    void streamClosed(Consumer<Tokenizer> method) throws Exception {
-        var factory = TokenizerFactory.of(Stubs.DUMMY_PRODUCTION_SET);
-        var tokenizer = factory.createTokenizer(Stubs.closedReader());
-
-        assertThrows(UncheckedIOException.class, () -> method.accept(tokenizer));
-    }
-
-    @DisplayName("[Ambiguous rule]")
-    @ParameterizedTest(name = "{0} {displayName}")
-    @MethodSource("allMethods")
-    void ambiguousRule(Consumer<Tokenizer> method) throws Exception {
-        var grammar = ChoiceGrammar.builder()
-                .add("S", ChoiceRule.builder()
-                        .add(() -> PatternRule.of("1"))
-                        .add(() -> PatternRule.of(".")))
-                .build();
-        var factory = TokenizerFactory.of(grammar);
-        var tokenizer = factory.createTokenizer(new StringReader("1"));
-
-        assertThrows(ParseException.class, () -> method.accept(tokenizer));
-    }
-
-    @DisplayName("[Occurrence count out of range]")
-    @ParameterizedTest(name = "{0} {displayName}")
-    @MethodSource("allMethods")
-    void occurrenceCountOutOfRange(Consumer<Tokenizer> method) throws Exception {
-        var grammar = ChoiceGrammar.builder()
-                .add("S", () -> PatternRule.of("1").range(3, 5))
-                .build();
-        var factory = TokenizerFactory.of(grammar);
-        var tokenizer = factory.createTokenizer(new StringReader("11"));
-
-        assertThrows(ParseException.class, () -> method.accept(tokenizer));
-    }
-
-//    @DisplayName("[Token not match pattern rule]")
-//    @ParameterizedTest(name = "{0} {displayName}")
-//    @MethodSource("allMethods")
-//    void tokenNotMatchPatternRule(Consumer<Tokenizer> method) throws Exception {
-//        var grammar = ChoiceGrammar.builder()
-//                .add("S", () -> PatternRule.of("0"))
-//                .build();
-//        var factory = TokenizerFactory.of(grammar);
-//        var tokenizer = factory.createTokenizer(new StringReader("1"));
-//
-//        assertThrows(ParseException.class, () -> method.accept(tokenizer));
-//    }
-
-//    @DisplayName("[Token not match choice rule]")
-//    @ParameterizedTest(name = "{0} {displayName}")
-//    @MethodSource("allMethods")
-//    void tokenNotMatchChoiceRule(Consumer<Tokenizer> method) throws Exception {
-//        var grammar = ChoiceGrammar.builder()
-//                .add("S", ChoiceRule.builder()
-//                        .add(() -> PatternRule.of("0")))
-//                .build();
-//        var factory = TokenizerFactory.of(grammar);
-//        var tokenizer = factory.createTokenizer(new StringReader("1"));
-//
-//        assertThrows(ParseException.class, () -> method.accept(tokenizer));
-//    }
-
-//    @DisplayName("[Token not match sequence rule]")
-//    @ParameterizedTest(name = "{0} {displayName}")
-//    @MethodSource("allMethods")
-//    void tokenNotMatchSequenceRule(Consumer<Tokenizer> method) throws Exception {
-//        var grammar = ChoiceGrammar.builder()
-//                .add("S", SequenceRule.builder()
-//                        .add(() -> PatternRule.of("0")))
-//                .build();
-//        var factory = TokenizerFactory.of(grammar);
-//        var tokenizer = factory.createTokenizer(new StringReader("1"));
-//
-//        assertThrows(ParseException.class, () -> method.accept(tokenizer));
-//    }
-
-//    @DisplayName("[Token not match empty rule]")
-//    @ParameterizedTest(name = "{0} {displayName}")
-//    @MethodSource("allMethods")
-//    void tokenNotMatchEmptyRule(Consumer<Tokenizer> method) throws Exception {
-//        var grammar = ChoiceGrammar.builder()
-//                .add("S", () -> Rule.EMPTY)
-//                .build();
-//        var factory = TokenizerFactory.of(grammar);
-//        var tokenizer = factory.createTokenizer(new StringReader("1"));
-//
-//        assertThrows(ParseException.class, () -> method.accept(tokenizer));
-//    }
-
-    @Test
-    @DisplayName("hasNext(st:String) [Null parameter]")
-    void hasNextStInCaseNullParameter() throws Exception {
-        var grammar = ChoiceGrammar.builder()
-                .add("S", () -> PatternRule.of("1"))
-                .build();
-        var factory = TokenizerFactory.of(grammar);
-        var tokenizer = factory.createTokenizer(new StringReader("1"));
-
-        assertThrows(NullPointerException.class, () -> tokenizer.hasNextValue((String) null));
-    }
-
-    @Test
-    @DisplayName("hasNext(pa:Pattern) [Null parameter]")
-    void hasNextPaInCaseNullParameter() throws Exception {
-        var grammar = ChoiceGrammar.builder()
-                .add("S", () -> PatternRule.of("1"))
-                .build();
-        var factory = TokenizerFactory.of(grammar);
-        var tokenizer = factory.createTokenizer(new StringReader("1"));
-
-        assertThrows(NullPointerException.class, () -> tokenizer.hasNextValue((Pattern) null));
-    }
-
-//    @Test
-//    @DisplayName("next(st:String) [Null parameter]")
-//    void nextStInCaseNullParameter() throws Exception {
-//        var grammar = ChoiceGrammar.builder()
-//                .add("S", () -> PatternRule.of("1"))
-//                .build();
-//        var factory = TokenizerFactory.of(grammar);
-//        var tokenizer = factory.createTokenizer(new StringReader("1"));
-//
-//        assertThrows(NullPointerException.class, () -> tokenizer.next((String) null));
-//    }
-
-//    @Test
-//    @DisplayName("next(pa:Pattern) [Null parameter]")
-//    void nextPaInCaseNullParameter() throws Exception {
-//        var grammar = ChoiceGrammar.builder()
-//                .add("S", () -> PatternRule.of("1"))
-//                .build();
-//        var factory = TokenizerFactory.of(grammar);
-//        var tokenizer = factory.createTokenizer(new StringReader("1"));
-//
-//        assertThrows(NullPointerException.class, () -> tokenizer.next((Pattern) null));
-//    }
-
-//    @Test
-//    @DisplayName("next(st:String) [No tokens matching pattern]")
-//    void nextStInCaseNoTokensMatchingPattern() throws Exception {
-//        var grammar = ChoiceGrammar.builder()
-//                .add("S", () -> PatternRule.of("1"))
-//                .build();
-//        var factory = TokenizerFactory.of(grammar);
-//        var tokenizer = factory.createTokenizer(new StringReader("1"));
-//
-//        assertThrows(NoSuchElementException.class, () -> tokenizer.next("2"));
-//    }
-
-//    @Test
-//    @DisplayName("next(pa:Pattern) [No tokens matching pattern]")
-//    void nextPaInCaseNoTokensMatchingPattern() throws Exception {
-//        var grammar = ChoiceGrammar.builder()
-//                .add("S", () -> PatternRule.of("1"))
-//                .build();
-//        var factory = TokenizerFactory.of(grammar);
-//        var tokenizer = factory.createTokenizer(new StringReader("1"));
-//        var pattern = Pattern.compile("2");
-//
-//        assertThrows(NoSuchElementException.class, () -> tokenizer.next(pattern));
-//    }
-
-    @Test
-    @DisplayName("hasNext() [Token remaining]")
-    void hasNextInCaseTokenRemaining() throws Exception {
-        var grammar = ChoiceGrammar.builder()
-                .add("S", () -> PatternRule.of("1"))
-                .build();
-        var factory = TokenizerFactory.of(grammar);
-        var tokenizer = factory.createTokenizer(new StringReader("1"));
-
-        assertTrue(tokenizer.hasNext());
-    }
-
-    @Test
-    @DisplayName("hasNext(st:String) [Token remaining]")
-    void hasNextStInCaseTokenRemaining() throws Exception {
-        var grammar = ChoiceGrammar.builder()
-                .add("S", () -> PatternRule.of("1"))
-                .build();
-        var factory = TokenizerFactory.of(grammar);
-        var tokenizer = factory.createTokenizer(new StringReader("1"));
-
-        assertTrue(tokenizer.hasNextValue("1"));
-    }
-
-    @Test
-    @DisplayName("hasNext(pa:Pattern) [Token remaining]")
-    void hasNextPaInCaseTokenRemaining() throws Exception {
-        var grammar = ChoiceGrammar.builder()
-                .add("S", () -> PatternRule.of("1"))
-                .build();
-        var factory = TokenizerFactory.of(grammar);
-        var tokenizer = factory.createTokenizer(new StringReader("1"));
-        var pattern = Pattern.compile("1");
-
-        assertTrue(tokenizer.hasNextValue(pattern));
-    }
-
-    @Test
-    @DisplayName("hasNext() [No tokens remaining]")
-    void hasNextInCaseNoTokensRemaining() throws Exception {
-        var grammar = ChoiceGrammar.builder()
-                .add("S", () -> Rule.EMPTY)
-                .build();
-        var factory = TokenizerFactory.of(grammar);
-        var tokenizer = factory.createTokenizer(Reader.nullReader());
-
-        assertFalse(tokenizer.hasNext());
-    }
-
-    @Test
-    @DisplayName("hasNext(st:String) [No tokens remaining]")
-    void hasNextStInCaseNoTokensRemaining() throws Exception {
-        var grammar = ChoiceGrammar.builder()
-                .add("S", () -> Rule.EMPTY)
-                .build();
-        var factory = TokenizerFactory.of(grammar);
-        var tokenizer = factory.createTokenizer(Reader.nullReader());
-
-        assertFalse(tokenizer.hasNextValue(""));
-    }
-
-    @Test
-    @DisplayName("hasNext(pa:Pattern) [No tokens remaining]")
-    void hasNextPaInCaseNoTokensRemaining() throws Exception {
-        var grammar = ChoiceGrammar.builder()
-                .add("S", () -> Rule.EMPTY)
-                .build();
-        var factory = TokenizerFactory.of(grammar);
-        var tokenizer = factory.createTokenizer(Reader.nullReader());
-        var pattern = Pattern.compile("");
-
-        assertFalse(tokenizer.hasNextValue(pattern));
-    }
-
-    @Test
-    @DisplayName("next() [Token remaining]")
-    void nextInCaseTokenRemaining() throws Exception {
-        var grammar = ChoiceGrammar.builder()
-                .add("S", () -> PatternRule.of("1"))
-                .build();
-        var factory = TokenizerFactory.of(grammar);
-        var tokenizer = factory.createTokenizer(new StringReader("1"));
-
-        assertEquals("S", tokenizer.nextName());
-        assertEquals("1", tokenizer.getValue());
-    }
-
-//    @Test
-//    @DisplayName("next(st:String) [Token remaining]")
-//    void nextStInCaseTokenRemaining() throws Exception {
-//        var grammar = ChoiceGrammar.builder()
-//                .add("S", () -> PatternRule.of("1"))
-//                .build();
-//        var factory = TokenizerFactory.of(grammar);
-//        var tokenizer = factory.createTokenizer(new StringReader("1"));
-//
-//        assertEquals("S", tokenizer.next("1"));
-//        assertEquals("1", tokenizer.getValue());
-//    }
-
-//    @Test
-//    @DisplayName("next(pa:Pattern) [Token remaining]")
-//    void nextPaInCaseTokenRemaining() throws Exception {
-//        var grammar = ChoiceGrammar.builder()
-//                .add("S", () -> PatternRule.of("1"))
-//                .build();
-//        var factory = TokenizerFactory.of(grammar);
-//        var tokenizer = factory.createTokenizer(new StringReader("1"));
-//        var pattern = Pattern.compile("1");
-//
-//        assertEquals("S", tokenizer.next(pattern));
-//        assertEquals("1", tokenizer.getValue());
-//    }
-
-    @Test
-    @DisplayName("next() [No tokens remaining]")
-    void nextInCaseNoTokensRemaining() throws Exception {
-        var grammar = ChoiceGrammar.builder()
-                .add("S", () -> Rule.EMPTY)
-                .build();
-        var factory = TokenizerFactory.of(grammar);
-        var tokenizer = factory.createTokenizer(Reader.nullReader());
-
-        assertThrows(NoSuchElementException.class, () -> tokenizer.next());
-    }
-
-//    @Test
-//    @DisplayName("next(st:String) [No tokens remaining]")
-//    void nextStInCaseNoTokensRemaining() throws Exception {
-//        var grammar = ChoiceGrammar.builder()
-//                .add("S", () -> Rule.EMPTY)
-//                .build();
-//        var factory = TokenizerFactory.of(grammar);
-//        var tokenizer = factory.createTokenizer(Reader.nullReader());
-//
-//        assertThrows(NoSuchElementException.class, () -> tokenizer.next(""));
-//    }
-
-//    @Test
-//    @DisplayName("next(pa:Pattern) [No tokens remaining]")
-//    void nextPaInCaseNoTokensRemaining() throws Exception {
-//        var grammar = ChoiceGrammar.builder()
-//                .add("S", () -> Rule.EMPTY)
-//                .build();
-//        var factory = TokenizerFactory.of(grammar);
-//        var tokenizer = factory.createTokenizer(Reader.nullReader());
-//        var pattern = Pattern.compile("");
-//
-//        assertThrows(NoSuchElementException.class, () -> tokenizer.next(pattern));
-//    }
-
-    @Test
-    @DisplayName("hasNext()")
-    void hasNext() throws Exception {
-        var grammar = ChoiceGrammar.builder()
-                .add("S", () -> PatternRule.of("1"))
-                .build();
-        var factory = TokenizerFactory.of(grammar);
-        var tokenizer = factory.createTokenizer(new StringReader("1"));
-
-        assertTrue(tokenizer.hasNext());
-    }
-
-    @Test
-    @DisplayName("hasNext(st:String)")
-    void hasNextSt() throws Exception {
-        var grammar = ChoiceGrammar.builder()
-                .add("S", () -> PatternRule.of("1"))
-                .build();
-        var factory = TokenizerFactory.of(grammar);
-        var tokenizer = factory.createTokenizer(new StringReader("1"));
-
-        assertTrue(tokenizer.hasNextValue("1"));
-    }
-
-    @Test
-    @DisplayName("hasNext(pa:Pattern)")
-    void hasNextPa() throws Exception {
-        var grammar = ChoiceGrammar.builder()
-                .add("S", () -> PatternRule.of("1"))
-                .build();
-        var factory = TokenizerFactory.of(grammar);
-        var tokenizer = factory.createTokenizer(new StringReader("1"));
-        var pattern = Pattern.compile("1");
-
-        assertTrue(tokenizer.hasNextValue(pattern));
-    }
-
-    @Test
-    @DisplayName("next()")
-    void next() throws Exception {
-        var grammar = ChoiceGrammar.builder()
-                .add("S", () -> PatternRule.of("1"))
-                .build();
-        var factory = TokenizerFactory.of(grammar);
-        var tokenizer = factory.createTokenizer(new StringReader("1"));
-        var token = tokenizer.next();
-
-        assertEquals(Tree.Kind.TERMINAL, token.getKind());
-        assertTrue(token.getKind().isTerminal());
-        assertFalse(token.getKind().isNonTerminal());
-        assertEquals("1", token.getValue());
-    }
-
-//    @Test
-//    @DisplayName("next(st:String)")
-//    void nextSt() throws Exception {
-//        var grammar = ChoiceGrammar.builder()
-//                .add("S", () -> PatternRule.of("1"))
-//                .build();
-//        var factory = TokenizerFactory.of(grammar);
-//        var tokenizer = factory.createTokenizer(new StringReader("1"));
-//        tokenizer.next("1");
-//        var token = tokenizer.getToken();
-//
-//        assertEquals(Tree.Kind.TERMINAL, token.getKind());
-//        assertEquals("1", token.getValue());
-//
-//    }
-
-//    @Test
-//    @DisplayName("next(pa:Pattern)")
-//    void nextPa() throws Exception {
-//        var grammar = ChoiceGrammar.builder()
-//                .add("S", () -> PatternRule.of("1"))
-//                .build();
-//        var factory = TokenizerFactory.of(grammar);
-//        var tokenizer = factory.createTokenizer(new StringReader("1"));
-//        var pattern = Pattern.compile("1");
-//        tokenizer.next(pattern);
-//        var token = tokenizer.getToken();
-//
-//        assertEquals(Tree.Kind.TERMINAL, token.getKind());
-//        assertEquals("1", token.getValue());
-//    }
-
-    @Test
-    void testShortCircuit() throws Exception {
-        var grammar = SingleOriginGrammar.builder()
-                .add("A", ChoiceRule.builder()
-                        .add(ReferenceRule.of("B"))
-                        .add(ReferenceRule.of("C"))
-                        .add(ReferenceRule.of("D"))
-                        .shortCircuit())
-                .add("B", SequenceRule.of(PatternRule.of("1"), PatternRule.of("2")))
-                .add("C", SequenceRule.of(PatternRule.of("1"), PatternRule.of("3")))
-                .add("D", SequenceRule.of(PatternRule.of("1"), PatternRule.of("4")))
-                .build();
-        var factory = TokenizerFactory.of(grammar);
-        var tokenizer = factory.createTokenizer(new StringReader("1412"));
-
-        assertTrue(tokenizer.hasNext());
-        assertEquals("A", tokenizer.nextName());
-        assertEquals("14", tokenizer.getValue());
-        assertTrue(tokenizer.hasNext());
-        assertEquals("A", tokenizer.nextName());
-        assertEquals("12", tokenizer.getValue());
-        assertFalse(tokenizer.hasNext());
-    }
-
-    @Test
-    void testShortCircuit2() throws Exception {
-        var grammar = ChoiceGrammar.builder()
-                .add("A", SequenceRule.of(ReferenceRule.of("C"), PatternRule.of("0")))
-                .add("B", SequenceRule.of(PatternRule.of("0"), PatternRule.of("1")))
-                .hidden()
-                .add("C", SequenceRule.of(PatternRule.of("1"), PatternRule.of("2")))
-                .shortCircuit();
-        var factory = TokenizerFactory.of(grammar);
-        var tokenizer = factory.createTokenizer(new StringReader("12001"));
-
-        assertTrue(tokenizer.hasNext());
-        assertEquals("A", tokenizer.nextName());
-        assertEquals("120", tokenizer.getValue());
-        assertTrue(tokenizer.hasNext());
-        assertEquals("B", tokenizer.nextName());
-        assertEquals("01", tokenizer.getValue());
-        assertFalse(tokenizer.hasNext());
-    }
-    
-    @Test
-    void testShortCircuit3() throws Exception {
-        var grammar = SingleOriginGrammar.builder()
-                .add("A", ChoiceRule.builder()
-                        .add(ChoiceRule.builder()
-                                .add(ReferenceRule.of("B"))
-                                .add(ReferenceRule.of("C"))
-                                .shortCircuit())
-                        .add(PatternRule.of("0"))
-                        .shortCircuit())
-                .add("B", SequenceRule.of(PatternRule.of("1"), PatternRule.of("1")))
-                .add("C", SequenceRule.of(PatternRule.of("1"), PatternRule.of("2")))
-                .build();
-        var factory = TokenizerFactory.of(grammar);
-        var tokenizer = factory.createTokenizer(new StringReader("01211"));
-        
-        assertTrue(tokenizer.hasNext());
-        assertEquals("A", tokenizer.nextName());
-        assertEquals("0", tokenizer.getValue());
-        assertTrue(tokenizer.hasNext());
-        assertEquals("A", tokenizer.nextName());
-        assertEquals("12", tokenizer.getValue());
-        assertTrue(tokenizer.hasNext());
-        assertEquals("A", tokenizer.nextName());
-        assertEquals("11", tokenizer.getValue());
-        assertFalse(tokenizer.hasNext());
-    }
-
-    @DisplayName("Test various grammars")
-    @ParameterizedTest
-    @MethodSource
-    void testVariousGrammars(Grammar grammar, String input, List<String> tokens) {
-        var factory = TokenizerFactory.of(grammar);
-        var tokenizer = factory.createTokenizer(new StringReader(input));
-
-        if (tokens != null) {
-            var actual = new ArrayList<String>();
-            while (tokenizer.hasNext()) {
-                tokenizer.next();
-                actual.add(tokenizer.getValue());
-            }
-            assertIterableEquals(tokens, actual);
-        } else {
-            assertThrows(ParseException.class, () -> {
-                while (tokenizer.hasNext()) {
-                    tokenizer.next();
-                }
-            });
+        @Override
+        public Executable createTarget(Grammar grammar, Reader reader) {
+            var factory = TokenizerFactory.of(grammar);
+            var tokenizer = factory.createTokenizer(reader);
+            return () -> tokenizer.next();
         }
+
     }
 
-    static Stream<Arguments> testVariousGrammars() {
-        // Pattern
-        var stream = Stream.<Arguments>of(
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("0"))
-                        .build(), "0000", List.of("0", "0", "0", "0")),
-//                arguments(ChoiceGrammar.builder()
-//                        .add("A", () -> PatternRule.of("0"))
-//                        .build(), "0001", List.of("0", "0", "0", "1")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("."))
-                        .build(), "0123", List.of("0", "1", "2", "3")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of(Pattern.compile(".")))
-                        .build(), "0123", List.of("0", "1", "2", "3")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of(Pattern.compile(".", Pattern.LITERAL)))
-                        .build(), "....", List.of(".", ".", ".", ".")),
-//                arguments(ChoiceGrammar.builder()
-//                        .add("A", () -> PatternRule.of(Pattern.compile(".", Pattern.LITERAL)))
-//                        .build(), "0123", List.of("0", "1", "2", "3")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of(""))
-                        .build(), "", List.of())
-//                arguments(ChoiceGrammar.builder()
-//                        .add("A", () -> PatternRule.of(""))
-//                        .build(), "0123", List.of("0", "1", "2", "3"))
-        );
-        // + Sequence
-        stream = Stream.concat(stream, Stream.of(
-                arguments(ChoiceGrammar.builder()
+    @Nested
+    class SingleOriginGrammarTestCase {
+
+        @Nested
+        class TestCase1 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", SequenceRule.builder()
+                                .add(PatternRule.of("0"))
+                                .add(ReferenceRule.of("A")))
+                        .add("A", PatternRule.of("0"))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("0000"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("S", "00"),
+                        createToken("S", "00")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(2L, 4L).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase2 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", SequenceRule.builder()
+                                .add(PatternRule.of("0"))
+                                .add(ReferenceRule.of("A")))
+                        .add("S", PatternRule.of("1"))
+                        .add("A", PatternRule.of("0"))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("0000"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("S", "00"),
+                        createToken("S", "00")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(2L, 4L).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase3 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", SequenceRule.builder()
+                                .add(PatternRule.of("0"))
+                                .add(ReferenceRule.of("A")))
+                        .add("S", PatternRule.of("1"))
+                        .add("A", PatternRule.of("0"))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("100"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("S", "1"),
+                        createToken("S", "00")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(1L, 3L).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase4 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", SequenceRule.builder()
+                                .add(PatternRule.of("0"))
+                                .add(ReferenceRule.of("A")))
+                        .add("S", SequenceRule.builder()
+                                .add(PatternRule.of("0"))
+                                .add(ReferenceRule.of("B")))
+                        .add("A", PatternRule.of("1"))
+                        .add("B", PatternRule.of("2"))
+                        .shortCircuit();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("0102"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("S", "01"),
+                        createToken("S", "02")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(2L, 4L).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase5 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", SequenceRule.builder()
+                                .add(PatternRule.of("0"))
+                                .add(ReferenceRule.of("A")))
+                        .add("S", SequenceRule.builder()
+                                .add(PatternRule.of("0"))
+                                .add(ReferenceRule.of("B")))
+                        .add("A", PatternRule.of("1"))
+                        .add("B", PatternRule.of("2"))
+                        .shortCircuit();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("0201"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("S", "02"),
+                        createToken("S", "01")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(2L, 4L).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase6 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", SequenceRule.builder()
+                                .add(PatternRule.of("0"))
+                                .add(ReferenceRule.of("A")))
+                        .add("S", ChoiceRule.builder()
+                                .add(SequenceRule.builder()
+                                        .add(PatternRule.of("0"))
+                                        .add(ReferenceRule.of("C")))
+                                .add(SequenceRule.builder()
+                                        .add(PatternRule.of("0"))
+                                        .add(ReferenceRule.of("B")))
+                                .shortCircuit())
+                        .add("A", PatternRule.of("1"))
+                        .add("B", PatternRule.of("2"))
+                        .add("C", PatternRule.of("3"))
+                        .shortCircuit();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("020301"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("S", "02"),
+                        createToken("S", "03"),
+                        createToken("S", "01")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(2L, 4L, 6L).iterator();
+            }
+
+        }
+
+    }
+
+    @Nested
+    class ChoiceGrammarTestCase {
+
+        @Nested
+        class TestCase1 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = ChoiceGrammar.builder()
+                        .add("A", PatternRule.of("0"))
+                        .add("B", PatternRule.of("1"))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("01"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("A", "0"),
+                        createToken("B", "1")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(1L, 2L).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase2 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = ChoiceGrammar.builder()
+                        .add("A", PatternRule.of("0"))
+                        .add("B", PatternRule.of("1"))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("10"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("B", "1"),
+                        createToken("A", "0")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(1L, 2L).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase3 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = ChoiceGrammar.builder()
+                        .add("A", PatternRule.of("0"))
+                        .add("A", PatternRule.of("1"))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("01"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("A", "0"),
+                        createToken("A", "1")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(1L, 2L).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase4 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = ChoiceGrammar.builder()
+                        .add("A", PatternRule.of("0"))
+                        .add("A", PatternRule.of("1"))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("10"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("A", "1"),
+                        createToken("A", "0")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(1L, 2L).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase5 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = ChoiceGrammar.builder()
+                        .add("A", PatternRule.of("0"))
+                        .add("B", PatternRule.of("0"))
+                        .shortCircuit();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("00"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("A", "0"),
+                        createToken("A", "0")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(1L, 2L).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase6 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = ChoiceGrammar.builder()
                         .add("A", SequenceRule.builder()
-                                .add(() -> PatternRule.of("0")))
-                        .build(), "0000", List.of("0", "0", "0", "0")),
-                arguments(ChoiceGrammar.builder()
+                                .add(PatternRule.of("0"))
+                                .add(PatternRule.of("1"))
+                                .add(PatternRule.of("8")))
+                        .add("B", SequenceRule.builder()
+                                .add(PatternRule.of("0"))
+                                .add(PatternRule.of("1"))
+                                .add(PatternRule.of("9")))
+                        .shortCircuit();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("018019"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("A", "018"),
+                        createToken("B", "019")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(3L, 6L).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase7 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = ChoiceGrammar.builder()
                         .add("A", SequenceRule.builder()
-                                .add(() -> PatternRule.of("0"))
-                                .add(() -> PatternRule.of("0")))
-                        .build(), "0000", List.of("00", "00")),
-                arguments(ChoiceGrammar.builder()
+                                .add(PatternRule.of("0"))
+                                .add(PatternRule.of("1"))
+                                .add(PatternRule.of("8")))
+                        .add("B", SequenceRule.builder()
+                                .add(PatternRule.of("0"))
+                                .add(PatternRule.of("1"))
+                                .add(PatternRule.of("9")))
+                        .shortCircuit();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("019018"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("B", "019"),
+                        createToken("A", "018")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(3L, 6L).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase8 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = ChoiceGrammar.builder()
                         .add("A", SequenceRule.builder()
-                                .add(() -> PatternRule.of("0"))
-                                .add(() -> PatternRule.of("0")))
-                        .build(), "000", null),
-                arguments(ChoiceGrammar.builder()
+                                .add(PatternRule.of("0"))
+                                .add(PatternRule.of("1"))
+                                .add(PatternRule.of("8")))
+                        .add("B", ChoiceRule.builder()
+                                .add(SequenceRule.builder()
+                                        .add(PatternRule.of("0"))
+                                        .add(PatternRule.of("1"))
+                                        .add(PatternRule.of("7")))
+                                .add(SequenceRule.builder()
+                                        .add(PatternRule.of("0"))
+                                        .add(PatternRule.of("1"))
+                                        .add(PatternRule.of("9")))
+                                .shortCircuit())
+                        .shortCircuit();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("019017018"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("B", "019"),
+                        createToken("B", "017"),
+                        createToken("A", "018")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(3L, 6L, 9L).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase9 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = ChoiceGrammar.builder()
                         .add("A", SequenceRule.builder()
-                                .add(() -> PatternRule.of("0"))
-                                .add(() -> PatternRule.of("1")))
-                        .build(), "0101", List.of("01", "01"))));
-        // + Choice
-        stream = Stream.concat(stream, Stream.of(
-                arguments(ChoiceGrammar.builder()
-                        .add("A", ChoiceRule.builder()
-                                .add(() -> PatternRule.of("0")))
-                        .build(), "0000", List.of("0", "0", "0", "0")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", ChoiceRule.builder()
-                                .add(() -> PatternRule.of("0"))
-                                .add(() -> PatternRule.of("1")))
-                        .build(), "0110", List.of("0", "1", "1", "0")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", ChoiceRule.builder()
-                                .add(() -> PatternRule.of("0"))
+                                .add(PatternRule.of("0"))
+                                .add(ReferenceRule.of("B")))
+                        .hidden()
+                        .add("B", PatternRule.of("0"))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("0000"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("A", "00"),
+                        createToken("A", "00")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(2L, 4L).iterator();
+            }
+
+        }
+
+    }
+
+    @Nested
+    class EmptyRuleTestCase {
+
+        @Nested
+        class TestCase1 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", Rule.EMPTY)
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(Reader.nullReader());
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.<Token>of().iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.<Long>of().iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.<Long>of().iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase2 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", SequenceRule.builder()
+                                .add(Rule.EMPTY)
+                                .add(PatternRule.of("0")))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("00"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("S", "0"),
+                        createToken("S", "0")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(1L, 2L).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase3 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", ChoiceRule.builder()
+                                .add(Rule.EMPTY)
+                                .add(PatternRule.of("1")))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(Reader.nullReader());
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.<Token>of().iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.<Long>of().iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.<Long>of().iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase4 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", SequenceRule.builder()
+                                .add(ChoiceRule.builder()
+                                        .add(PatternRule.of("1"))
+                                        .add(Rule.EMPTY))
+                                .add(PatternRule.of("0")))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("010"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("S", "0"),
+                        createToken("S", "10")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(1L, 3L).iterator();
+            }
+
+        }
+
+    }
+
+    @Nested
+    class PatternRuleTestCase {
+
+        @Nested
+        class TestCase1 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", PatternRule.of("0"))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("00"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("S", "0"),
+                        createToken("S", "0")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(1L, 2L).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase2 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", PatternRule.of("."))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("01"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("S", "0"),
+                        createToken("S", "1")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(1L, 2L).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase3 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", PatternRule.of(Pattern.compile(".", Pattern.LITERAL)))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader(".."));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("S", "."),
+                        createToken("S", ".")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(1L, 2L).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase4 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", PatternRule.of("𝒜"))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("𝒜𝒜"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("S", "𝒜"),
+                        createToken("S", "𝒜")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(2L, 4L).iterator();
+            }
+
+        }
+
+    }
+
+    @Nested
+    class SequenceRuleTestCase {
+
+        @Nested
+        class TestCase1 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", SequenceRule.builder()
+                                .add(PatternRule.of("0")))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("00"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("S", "0"),
+                        createToken("S", "0")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(1L, 2L).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase2 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", SequenceRule.builder()
+                                .add(PatternRule.of("0"))
+                                .add(PatternRule.of("1")))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("0101"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("S", "01"),
+                        createToken("S", "01")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(2L, 4L).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase3 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", SequenceRule.builder()
+                                .add(PatternRule.of("0"))
+                                .add(SequenceRule.builder()
+                                        .add(PatternRule.of("1"))
+                                        .add(PatternRule.of("2"))))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("012012"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("S", "012"),
+                        createToken("S", "012")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(3L, 6L).iterator();
+            }
+
+        }
+
+    }
+
+    @Nested
+    class ChoiceRuleTestCase {
+
+        @Nested
+        class TestCase1 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", ChoiceRule.builder()
+                                .add(PatternRule.of("0")))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("00"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("S", "0"),
+                        createToken("S", "0")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(1L, 2L).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase2 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", ChoiceRule.builder()
+                                .add(PatternRule.of("0"))
+                                .add(PatternRule.of("1")))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("10"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("S", "1"),
+                        createToken("S", "0")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(1L, 2L).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase3 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", ChoiceRule.builder()
+                                .add(PatternRule.of("0"))
                                 .addEmpty())
-                        .build(), "0000", List.of("0", "0", "0", "0")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", ChoiceRule.builder()
-                                .add(() -> PatternRule.of("0"))
-                                .add(() -> PatternRule.of("[^0]")))
-                        .build(), "0123", List.of("0", "1", "2", "3")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", SequenceRule.builder()
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(Reader.nullReader());
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.<Token>of().iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.<Long>of().iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.<Long>of().iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase4 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", ChoiceRule.builder()
+                                .add(PatternRule.of("0"))
                                 .add(ChoiceRule.builder()
-                                        .add(() -> PatternRule.of("0"))
-                                        .addEmpty())
-                                .add(() -> PatternRule.of("1")))
-                        .build(), "011101", List.of("01", "1", "1", "01")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("0"))
-                        .add("A", () -> PatternRule.of("1"))
-                        .build(), "0110", List.of("0", "1", "1", "0"))));
-        // + Short-circuit choice
-        stream = Stream.concat(stream, Stream.of(
-                arguments(SingleOriginGrammar.builder()
-                        .add("A", ChoiceRule.builder()
-                                .add(ReferenceRule.of("B"))
-                                .add(ReferenceRule.of("C"))
+                                        .add(PatternRule.of("1"))
+                                        .add(PatternRule.of("2"))))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("201"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("S", "2"),
+                        createToken("S", "0"),
+                        createToken("S", "1")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(1L, 2L, 3L).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase5 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", ChoiceRule.builder()
+                                .add(PatternRule.of("1"))
+                                .add(PatternRule.of("."))
                                 .shortCircuit())
-                        .add("B", SequenceRule.of(PatternRule.of("1"), PatternRule.of("2")))
-                        .add("C", SequenceRule.of(PatternRule.of("1"), PatternRule.of("3")))
-                        .build(), "1312", List.of("13", "12")),
-                arguments(SingleOriginGrammar.builder()
-                        .add("A", ChoiceRule.builder()
-                                .add(ReferenceRule.of("B"))
-                                .add(ReferenceRule.of("C"))
-                                .shortCircuit())
-                        .add("B",
-                                SequenceRule.of(PatternRule.of("1"), PatternRule.of("3"), PatternRule.of("1"),
-                                        PatternRule.of("9")))
-                        .add("C", SequenceRule.of(PatternRule.of("1"), PatternRule.of("3")))
-                        .build(), "1313", List.of("13", "13")),
-                arguments(SingleOriginGrammar.builder()
-                        .add("A", ChoiceRule.builder()
-                                .add(ReferenceRule.of("B"))
-                                .add(ReferenceRule.of("C"))
-                                .shortCircuit())
-                        .add("B", SequenceRule.of(PatternRule.of("1"), ChoiceRule.of(
-                                PatternRule.of("4"),
-                                PatternRule.of("5")).shortCircuit()))
-                        .add("C", SequenceRule.of(PatternRule.of("1"), ChoiceRule.of(
-                                PatternRule.of("2"),
-                                PatternRule.of("3")).shortCircuit()))
-                        .build(), "1312", List.of("13", "12")),
-                arguments(SingleOriginGrammar.builder()
-                        .add("A", ChoiceRule.builder()
-                                .add(SequenceRule.of(PatternRule.of("1"), PatternRule.of("2")))
-                                .add(SequenceRule.of(PatternRule.of("1"), PatternRule.of("3")))
-                                .shortCircuit())
-                        .build(), "1312", List.of("13", "12"))));
-        // + Reference
-        stream = Stream.concat(stream, Stream.of(
-//                arguments(ChoiceGrammar.builder()
-//                        .add("A", () -> ReferenceRule.of("B"))
-//                        .add("B", () -> PatternRule.of("0"))
-//                        .build(), "0000", List.of("0", "0", "0", "0")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", SequenceRule.builder()
-                                .add(() -> PatternRule.of("0"))
-                                .add(ChoiceRule.builder()
-                                        .addEmpty()
-                                        .add(() -> ReferenceRule.of("A"))))
-                        .build(), "0000", List.of("0000"))));
-        // + Quantifier
-        stream = Stream.concat(stream, Stream.of(
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("0").opt())
-                        .build(), "", List.of()),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("0").opt())
-                        .build(), "0", List.of("0")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("0").opt())
-                        .build(), "00", List.of("0", "0")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("0").zeroOrMore())
-                        .build(), "", List.of()),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("0").zeroOrMore())
-                        .build(), "0", List.of("0")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("0").zeroOrMore())
-                        .build(), "00", List.of("00")),
-//                arguments(ChoiceGrammar.builder()
-//                        .add("A", () -> PatternRule.of("0").oneOrMore())
-//                        .build(), "1", List.of("1")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("0").oneOrMore())
-                        .build(), "0", List.of("0")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("0").oneOrMore())
-                        .build(), "00", List.of("00")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("0").atLeast(2))
-                        .build(), "0", null),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("0").atLeast(2))
-                        .build(), "00", List.of("00")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("0").atLeast(2))
-                        .build(), "000", List.of("000")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("0").exactly(2))
-                        .build(), "0", null),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("0").exactly(2))
-                        .build(), "00", List.of("00")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("0").exactly(2))
-                        .build(), "000", null),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("0").exactly(2))
-                        .build(), "0000", List.of("00", "00")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("0").range(2, 3))
-                        .build(), "0", null),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("0").range(2, 3))
-                        .build(), "00", List.of("00")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("0").range(2, 3))
-                        .build(), "000", List.of("000")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("0").range(2, 3))
-                        .build(), "0000", null),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("0").range(2, 3))
-                        .build(), "00000", List.of("000", "00"))));
-        // + Skip
-        stream = Stream.concat(stream, Stream.of(
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("0").skip())
-                        .build(), "0", List.of())));
-        // + More
-        stream = Stream.concat(stream, Stream.of(
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("[\\x{%X}-\\x{%X}]".formatted(
-                                Character.MIN_SUPPLEMENTARY_CODE_POINT,
-                                Character.MAX_CODE_POINT)))
-                        .build(), "🌟𝒜", List.of("🌟", "𝒜")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("."))
-                        .build(), String.valueOf("🌟".charAt(0)),
-                        List.of(String.valueOf("🌟".charAt(0)))),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", () -> PatternRule.of("."))
-                        .build(), String.valueOf("🌟".charAt(0)) + "0",
-                        List.of(String.valueOf("🌟".charAt(0)), "0")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", SequenceRule.builder()
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("12"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("S", "1"),
+                        createToken("S", "2")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(1L, 2L).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase6 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", ChoiceRule.builder()
                                 .add(SequenceRule.builder()
-                                        .add(() -> PatternRule.of("0"))
-                                        .add(() -> PatternRule.of("0")))
-                                .add(() -> PatternRule.of("0"))
-                                .add(() -> PatternRule.of("1")))
-                        .build(), "00010001", List.of("0001", "0001")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", SequenceRule.builder()
-                                .add(ChoiceRule.builder()
-                                        .add(() -> PatternRule.of("0"))
-                                        .add(() -> PatternRule.of("1")))
-                                .add(() -> PatternRule.of("0"))
-                                .add(() -> PatternRule.of("1")))
-                        .build(), "001101", List.of("001", "101")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", ChoiceRule.builder()
+                                        .add(PatternRule.of("0"))
+                                        .add(PatternRule.of("1"))
+                                        .add(PatternRule.of("8")))
                                 .add(SequenceRule.builder()
-                                        .add(() -> PatternRule.of("0"))
-                                        .add(() -> PatternRule.of("1")))
-                                .add(() -> PatternRule.of("1")))
-                        .build(), "01101", List.of("01", "1", "01")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", ChoiceRule.builder()
+                                        .add(PatternRule.of("0"))
+                                        .add(PatternRule.of("1"))
+                                        .add(PatternRule.of("9")))
+                                .shortCircuit())
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("019018"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("S", "019"),
+                        createToken("S", "018")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(3L, 6L).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase7 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", ChoiceRule.builder()
+                                .add(SequenceRule.builder()
+                                        .add(PatternRule.of("0"))
+                                        .add(PatternRule.of("1"))
+                                        .add(PatternRule.of("8")))
                                 .add(ChoiceRule.builder()
-                                        .add(() -> PatternRule.of("0"))
-                                        .add(() -> PatternRule.of("1")))
-                                .add(() -> PatternRule.of("2")))
-                        .build(), "01201", List.of("0", "1", "2", "0", "1")),
-                arguments(SingleOriginGrammar.builder()
-                        .add("S", ChoiceRule.of(ReferenceRule.of("A"), ReferenceRule.of("B")))
-                        .add("A", SequenceRule.of(PatternRule.of("0"), PatternRule.of("0")))
-                        .add("B", SequenceRule.of(PatternRule.of("1"), PatternRule.of("1")))
-                        .build(), "1100", List.of("11", "00")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", SequenceRule.of(PatternRule.of("0"), PatternRule.of("0")))
-                        .add("B", SequenceRule.of(PatternRule.of("0"), PatternRule.of("1")))
-                        .add("C", SequenceRule.of(PatternRule.of("0"), PatternRule.of("2")))
-                        .shortCircuit(), "020001", List.of("02", "00", "01")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", SequenceRule.of(ReferenceRule.of("C"), PatternRule.of("0")))
-                        .add("B", SequenceRule.of(PatternRule.of("0"), PatternRule.of("1")))
-                        .hidden()
-                        .add("C", SequenceRule.of(PatternRule.of("1"), PatternRule.of("2")))
-                        .build(), "12001", List.of("120", "01")),
-                arguments(ChoiceGrammar.builder()
-                        .add("A", SequenceRule.of(ReferenceRule.of("C"), PatternRule.of("0")))
-                        .add("B", SequenceRule.of(PatternRule.of("0"), PatternRule.of("1")))
-                        .hidden()
-                        .add("C", SequenceRule.of(PatternRule.of("1"), PatternRule.of("2")))
-                        .shortCircuit(), "12001", List.of("120", "01"))));
-        return stream;
+                                        .add(SequenceRule.builder()
+                                                .add(PatternRule.of("0"))
+                                                .add(PatternRule.of("1"))
+                                                .add(PatternRule.of("7")))
+                                        .add(SequenceRule.builder()
+                                                .add(PatternRule.of("0"))
+                                                .add(PatternRule.of("1"))
+                                                .add(PatternRule.of("9")))
+                                        .shortCircuit())
+                                .shortCircuit())
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("019017018"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("S", "019"),
+                        createToken("S", "017"),
+                        createToken("S", "018")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(3L, 6L, 9L).iterator();
+            }
+
+        }
+
     }
 
-    @Test
-    @DisplayName("Test decoration")
-    void testDecoration() throws Exception {
-        var grammar = ChoiceGrammar.builder()
-                .add("A", () -> PatternRule.of("0|1").exactly(2))
-                .add("A", () -> PatternRule.of("\\s").skip())
-                .build();
-        var tokenizer = TokenizerFactory.of(grammar)
-                .createTokenizer(new StringReader("00 01 10 11"));
+    @Nested
+    class ReferenceRuleTestCase {
 
-        var grammar2 = ChoiceGrammar.builder()
-                .add("A", () -> PatternRule.of("(0|1){2}").exactly(2))
-                .build();
-        var tokenizer2 = TokenizerFactory.of(grammar2)
-                .createTokenizer(tokenizer);
+        @Nested
+        class TestCase1 implements TokenizerTestCase {
 
-        tokenizer2.next();
-        assertEquals("0001", tokenizer2.getValue());
-        tokenizer2.next();
-        assertEquals("1011", tokenizer2.getValue());
-        assertFalse(tokenizer2.hasNext());
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", ReferenceRule.of("A"))
+                        .add("A", PatternRule.of("0"))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("00"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(
+                        createToken("S", "0"),
+                        createToken("S", "0")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L, 1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(1L, 2L).iterator();
+            }
+
+        }
+
+    }
+
+    abstract class QuantifierRuleTestCase {
+
+        abstract Quantifiable createRule();
+
+        abstract String createInput();
+
+//        abstract Stream<Tree> expectedSubTree();
+        abstract String expectedValue();
+
+        @Nested
+        class TestCase1 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", createRule().opt())
+                        .add("A", PatternRule.of("0"))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader(createInput().repeat(0)));
+            }
+
+//            @Override
+//            public Tree expectedTree() {
+//                return NonTerminalNode.of("S", Stream.generate(() -> expectedSubTree())
+//                        .limit(0)
+//                        .flatMap(e -> e)
+//                        .toArray(Tree[]::new));
+//            }
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.<Token>of().iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.<Long>of().iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.<Long>of().iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase2 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", createRule().zeroOrMore())
+                        .add("A", PatternRule.of("0"))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader(createInput().repeat(0)));
+            }
+
+//            @Override
+//            public Tree expectedTree() {
+//                return NonTerminalNode.of("S", Stream.generate(() -> expectedSubTree())
+//                        .limit(0)
+//                        .flatMap(e -> e)
+//                        .toArray(Tree[]::new));
+//            }
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.<Token>of().iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.<Long>of().iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.<Long>of().iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase3 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", createRule().oneOrMore())
+                        .add("A", PatternRule.of("0"))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader(createInput().repeat(1)));
+            }
+
+//            @Override
+//            public Tree expectedTree() {
+//                return NonTerminalNode.of("S", Stream.generate(() -> expectedSubTree())
+//                        .limit(1)
+//                        .flatMap(e -> e)
+//                        .toArray(Tree[]::new));
+//            }
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(createToken("S", expectedValue().repeat(1))).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of((long) expectedValue().repeat(1).length()).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase4 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", createRule().oneOrMore())
+                        .add("A", PatternRule.of("0"))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader(createInput().repeat(2)));
+            }
+
+//            @Override
+//            public Tree expectedTree() {
+//                return NonTerminalNode.of("S", Stream.generate(() -> expectedSubTree())
+//                        .limit(2)
+//                        .flatMap(e -> e)
+//                        .toArray(Tree[]::new));
+//            }
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(createToken("S", expectedValue().repeat(2))).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of((long) expectedValue().repeat(2).length()).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase5 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", createRule().exactly(2))
+                        .add("A", PatternRule.of("0"))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader(createInput().repeat(2)));
+            }
+
+//            @Override
+//            public Tree expectedTree() {
+//                return NonTerminalNode.of("S", Stream.generate(() -> expectedSubTree())
+//                        .limit(2)
+//                        .flatMap(e -> e)
+//                        .toArray(Tree[]::new));
+//            }
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(createToken("S", expectedValue().repeat(2))).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of((long) expectedValue().repeat(2).length()).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase6 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", createRule().atLeast(1))
+                        .add("A", PatternRule.of("0"))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader(createInput().repeat(1)));
+            }
+
+//            @Override
+//            public Tree expectedTree() {
+//                return NonTerminalNode.of("S", Stream.generate(() -> expectedSubTree())
+//                        .limit(1)
+//                        .flatMap(e -> e)
+//                        .toArray(Tree[]::new));
+//            }
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(createToken("S", expectedValue().repeat(1))).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of((long) expectedValue().repeat(1).length()).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase7 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", createRule().atLeast(1))
+                        .add("A", PatternRule.of("0"))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader(createInput().repeat(2)));
+            }
+
+//            @Override
+//            public Tree expectedTree() {
+//                return NonTerminalNode.of("S", Stream.generate(() -> expectedSubTree())
+//                        .limit(2)
+//                        .flatMap(e -> e)
+//                        .toArray(Tree[]::new));
+//            }
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(createToken("S", expectedValue().repeat(2))).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of((long) expectedValue().repeat(2).length()).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase8 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", createRule().range(1, 2))
+                        .add("A", PatternRule.of("0"))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader(createInput().repeat(1)));
+            }
+
+//            @Override
+//            public Tree expectedTree() {
+//                return NonTerminalNode.of("S", Stream.generate(() -> expectedSubTree())
+//                        .limit(1)
+//                        .flatMap(e -> e)
+//                        .toArray(Tree[]::new));
+//            }
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(createToken("S", expectedValue().repeat(1))).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of((long) expectedValue().repeat(1).length()).iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase9 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", createRule().range(1, 2))
+                        .add("A", PatternRule.of("0"))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader(createInput().repeat(2)));
+            }
+
+//            @Override
+//            public Tree expectedTree() {
+//                return NonTerminalNode.of("S", Stream.generate(() -> expectedSubTree())
+//                        .limit(2)
+//                        .flatMap(e -> e)
+//                        .toArray(Tree[]::new));
+//            }
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(createToken("S", expectedValue().repeat(2))).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of((long) expectedValue().repeat(2).length()).iterator();
+            }
+
+        }
+
+    }
+
+    @Nested
+    class QuantifierRuleTestCase1 extends QuantifierRuleTestCase {
+
+        @Override
+        Quantifiable createRule() {
+            return PatternRule.of("0");
+        }
+
+        @Override
+        String createInput() {
+            return "0";
+        }
+
+        @Override
+        String expectedValue() {
+            return "0";
+        }
+
+    }
+
+    @Nested
+    class QuantifierRuleTestCase2 extends QuantifierRuleTestCase {
+
+        @Override
+        Quantifiable createRule() {
+            return SequenceRule.builder()
+                    .add(PatternRule.of("0"))
+                    .add(PatternRule.of("1"));
+        }
+
+        @Override
+        String createInput() {
+            return "01";
+        }
+
+        @Override
+        String expectedValue() {
+            return "01";
+        }
+
+    }
+
+    @Nested
+    class QuantifierRuleTestCase3 extends QuantifierRuleTestCase {
+
+        @Override
+        Quantifiable createRule() {
+            return ChoiceRule.builder()
+                    .add(PatternRule.of("0"))
+                    .add(PatternRule.of("1"));
+        }
+
+        @Override
+        String createInput() {
+            return "1";
+        }
+
+        @Override
+        String expectedValue() {
+            return "1";
+        }
+
+    }
+
+    @Nested
+    class QuantifierRuleTestCase4 extends QuantifierRuleTestCase {
+
+        @Override
+        Quantifiable createRule() {
+            return ReferenceRule.of("A");
+        }
+
+        @Override
+        String createInput() {
+            return "0";
+        }
+
+        @Override
+        String expectedValue() {
+            return "0";
+        }
+
+    }
+
+    @Nested
+    class SkipRuleTestCase {
+
+        @Nested
+        class TestCase1 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", PatternRule.of("0").skip())
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("0"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.<Token>of().iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.<Long>of().iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.<Long>of().iterator();
+            }
+
+        }
+
+        @Nested
+        class TestCase2 implements TokenizerTestCase {
+
+            @Override
+            public Tokenizer createTarget() {
+                var grammar = SingleOriginGrammar.builder()
+                        .add("S", SequenceRule.builder()
+                                .add(PatternRule.of("0").skip())
+                                .add(PatternRule.of("1"))
+                                .add(PatternRule.of("2").skip()))
+                        .build();
+                var factory = TokenizerFactory.of(grammar);
+                return factory.createTokenizer(new StringReader("012"));
+            }
+
+            @Override
+            public Iterator<Token> expectedIterator() {
+                return List.of(createToken("S", "1")).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedLineNumbers() {
+                return List.of(1L).iterator();
+            }
+
+            @Override
+            public Iterator<Long> expectedIndexes() {
+                return List.of(3L).iterator();
+            }
+
+        }
+
     }
 
 }

@@ -3,6 +3,7 @@ package com.jiganaut.bonsai.grammar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.mockito.Mockito.mock;
 
 import java.util.Set;
 
@@ -50,6 +51,34 @@ interface ChoiceGrammarTestCase extends GrammarTestCase {
             var target = createTarget();
 
             assertEquals(target, target.hidden());
+        }
+
+        @Test
+        @DisplayName("add(st:String, ru:Rule) [Symbol added before hidden]")
+        default void addStRuInCaseOfSymbolAddedBeforeHidden() throws Exception {
+            assumeTrue(canBuild());
+
+            var builder = createTarget().hidden();
+
+            var symbol = expectedProductionSet().stream()
+                    .findFirst()
+                    .get()
+                    .getSymbol();
+            assertThrows(IllegalStateException.class, () -> builder.add(symbol, mock(Rule.class)));
+        }
+
+        @Test
+        @DisplayName("add(st:String, rb:Rule.Builder) [Symbol added before hidden]")
+        default void addStRbInCaseOfSymbolAddedBeforeHidden() throws Exception {
+            assumeTrue(canBuild());
+
+            var builder = createTarget().hidden();
+
+            var symbol = expectedProductionSet().stream()
+                    .findFirst()
+                    .get()
+                    .getSymbol();
+            assertThrows(IllegalStateException.class, () -> builder.add(symbol, mock(Rule.Builder.class)));
         }
 
     }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import com.jiganaut.bonsai.parser.NonTerminalNode;
@@ -83,9 +84,15 @@ class DefaultNonTerminalNode extends AbstractTree implements NonTerminalNode {
 
     @Override
     public String toString() {
-        return list.stream()
+        var joiner = new StringJoiner(", ", "{", "}");
+        joiner.add("name: ".concat(name));
+        if (value != null) {
+            joiner.add("value: ".concat(value));
+        }
+        joiner.add("subTrees: ".concat(list.stream()
                 .map(Tree::toString)
-                .collect(Collectors.joining());
+                .collect(Collectors.joining(", ", "{", "}"))));
+        return joiner.toString();
     }
 
     @Override

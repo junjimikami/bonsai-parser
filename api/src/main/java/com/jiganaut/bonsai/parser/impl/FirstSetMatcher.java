@@ -21,6 +21,14 @@ final class FirstSetMatcher implements SimpleRuleVisitor<Boolean, Context> {
     }
 
     @Override
+    public Boolean visit(Rule rule, Context context) {
+        if (rule == Context.EOF) {
+            return !context.hasNext();
+        }
+        return SimpleRuleVisitor.super.visit(rule, context);
+    }
+
+    @Override
     public Boolean visitPattern(PatternRule pattern, Context context) {
         return context.hasNextValue(pattern.getPattern());
     }
@@ -44,9 +52,6 @@ final class FirstSetMatcher implements SimpleRuleVisitor<Boolean, Context> {
     @Override
     public Boolean defaultAction(Rule rule, Context context) {
         var firstSet = FirstSet.of(rule, context);
-        if (firstSet.isEmpty()) {
-            return !context.hasNext();
-        }
         return firstSet.stream().anyMatch(e -> visit(e, context));
     }
 }

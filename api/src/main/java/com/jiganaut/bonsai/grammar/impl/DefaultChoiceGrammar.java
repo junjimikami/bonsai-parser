@@ -19,19 +19,25 @@ class DefaultChoiceGrammar extends AbstractGrammar implements ChoiceGrammar {
 
         @Override
         public Builder add(String symbol, Rule rule) {
-            super.add(symbol, rule);
             if (isHidden) {
+                if (symbols.contains(symbol)) {
+                    throw new IllegalStateException();
+                }
                 hiddenSymbols.add(symbol);
             }
+            super.add(symbol, rule);
             return this;
         }
 
         @Override
         public Builder add(String symbol, Rule.Builder builder) {
-            super.add(symbol, builder);
             if (isHidden) {
+                if (symbols.contains(symbol)) {
+                    throw new IllegalStateException();
+                }
                 hiddenSymbols.add(symbol);
             }
+            super.add(symbol, builder);
             return this;
         }
 

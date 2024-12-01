@@ -34,6 +34,12 @@ public interface TerminalNode extends Tree {
                 .build();
     }
 
+    public static TerminalNode ofUnnamed(String value) {
+        return builder()
+                .setValue(value)
+                .build();
+    }
+
     @Override
     public default Kind getKind() {
         return Kind.TERMINAL;

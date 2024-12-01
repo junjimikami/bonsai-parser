@@ -111,7 +111,8 @@ final class Tokenization implements RuleVisitor<CharSequence, Context> {
                 .filter(e -> FirstSetMatcher.scan(e, subContext))
                 .toList();
         if (rules.isEmpty()) {
-            return EMPTY_STRING;
+            var message = MessageSupport.tokenNotMatchRule(choice, context);
+            throw new ParseException(message);
         }
         if (1 < rules.size()) {
             var message = MessageSupport.ambiguousChoice(choice, context);

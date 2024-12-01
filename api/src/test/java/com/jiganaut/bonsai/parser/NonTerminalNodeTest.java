@@ -129,7 +129,7 @@ class NonTerminalNodeTest {
 
         @Override
         public NonTerminalNode expectedTree() {
-            return NonTerminalNode.of("NAME", null);
+            return NonTerminalNode.of("NAME");
         }
     }
 
@@ -172,7 +172,7 @@ class NonTerminalNodeTest {
 
         @Override
         public NonTerminalNode expectedTree() {
-            return NonTerminalNode.of("NAME", null, testData);
+            return NonTerminalNode.of("NAME", testData);
         }
     }
 
@@ -195,7 +195,7 @@ class NonTerminalNodeTest {
 
         @Override
         public NonTerminalNode expectedTree() {
-            return NonTerminalNode.of("NAME", null, testData);
+            return NonTerminalNode.of("NAME", testData);
         }
     }
 
