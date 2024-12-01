@@ -44,6 +44,13 @@ class RulesTest {
     }
 
     @Test
+    @DisplayName("firstOf(Rule...) [Null parameter]")
+    void firstOfInCaseOfNullParameter() throws Exception {
+
+        assertThrows(NullPointerException.class, () -> Rules.firstOf((Rule[]) null));
+    }
+
+    @Test
     @DisplayName("reference(String) [Null parameter]")
     void referenceInCaseOfNullParameter() throws Exception {
 
@@ -111,6 +118,19 @@ class RulesTest {
         list.forEach(builder::add);
         var expected = builder.build();
         var actual = Rules.oneOf(list.toArray(Rule[]::new));
+
+        assertEquals(expected, actual);
+    }
+
+    @ParameterizedTest
+    @EmptySource
+    @MethodSource("ruleParameters")
+    @DisplayName("firstOf(Rule...)")
+    void firstOf(List<Rule> list) throws Exception {
+        var builder = ChoiceRule.builder();
+        list.forEach(builder::add);
+        var expected = builder.shortCircuit();
+        var actual = Rules.firstOf(list.toArray(Rule[]::new));
 
         assertEquals(expected, actual);
     }

@@ -23,6 +23,10 @@ public final class Rules {
         return ChoiceRule.of(choices);
     }
 
+    public static ChoiceRule firstOf(Rule... choices) {
+        return ChoiceRule.of(choices).shortCircuit();
+    }
+
     public static ReferenceRule reference(String reference) {
         return ReferenceRule.of(reference);
     }
