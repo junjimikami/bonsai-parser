@@ -1,6 +1,8 @@
 package com.jiganaut.bonsai.sample.json;
 
 import static com.jiganaut.bonsai.grammar.Rules.concat;
+import static com.jiganaut.bonsai.grammar.Rules.empty;
+import static com.jiganaut.bonsai.grammar.Rules.firstOf;
 import static com.jiganaut.bonsai.grammar.Rules.oneOf;
 import static com.jiganaut.bonsai.grammar.Rules.pattern;
 import static com.jiganaut.bonsai.grammar.Rules.quote;
@@ -9,23 +11,55 @@ import static com.jiganaut.bonsai.grammar.Rules.reference;
 import java.io.Reader;
 
 import com.jiganaut.bonsai.grammar.Grammar;
+import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
 import com.jiganaut.bonsai.parser.Parser;
 import com.jiganaut.bonsai.parser.ParserFactory;
 import com.jiganaut.bonsai.parser.Tokenizer;
-import com.jiganaut.bonsai.parser.TokenizerFactory;
 
 public class JsonParsesrFactory implements ParserFactory {
 
-    private static final Grammar TOKEN = Grammar.builder()
-            .add("token", oneOf(
+    /**
+     * https://www.json.org/json-en.html
+     */
+    private static final Grammar GRAMMAR = SingleOriginGrammar.builder()
+            .add("json", reference("element"))
+            .add("value", oneOf(
+                    reference("object"),
+                    reference("array"),
                     reference("string"),
                     reference("number"),
-                    reference("true"),
-                    reference("false"),
-                    reference("null"),
+                    concat(quote("t"), quote("r"), quote("u"), quote("e")),
+                    concat(quote("f"), quote("a"), quote("l"), quote("s"), quote("e")),
+                    concat(quote("n"), quote("u"), quote("l"), quote("l"))))
+            .add("object", firstOf(
+                    concat(quote("{"), reference("ws"), quote("}")),
+                    concat(quote("{"), reference("members"), quote("}"))))
+            .add("members", firstOf(
+                    concat(reference("member"), quote(","), reference("members")),
+                    concat(reference("member"))))
+            .add("member", concat(
+                    reference("ws"),
+                    reference("string"),
+                    reference("ws"),
+                    quote(":"),
+                    reference("element")))
+            .add("array", firstOf(
+                    concat(quote("["), reference("ws"), quote("]")),
+                    concat(quote("["), reference("elements"), quote("]"))))
+            .add("elements", firstOf(
+                    concat(reference("element"), quote(","), reference("elements")),
+                    concat(reference("element"))))
+            .add("element", concat(
+                    reference("ws"),
+                    reference("value"),
                     reference("ws")))
-            .add("string", concat(quote("\""), reference("characters"), quote("\"")))
-            .add("characters", reference("character").zeroOrMore())
+            .add("string", concat(
+                    quote("\""),
+                    reference("characters"),
+                    quote("\"")))
+            .add("characters", oneOf(
+                    empty(),
+                    concat(reference("character"), reference("characters"))))
             .add("character", oneOf(
                     pattern("[\\x{0020}-\\x{10ffff}&&[^\"\\\\]]"),
                     concat(quote("\\"), reference("escape"))))
@@ -44,65 +78,37 @@ public class JsonParsesrFactory implements ParserFactory {
                     pattern("[a-fA-F]")))
             .add("number", concat(
                     reference("integer"),
-                    reference("fraction").opt(),
-                    reference("exponent").opt()))
-            .add("integer", concat(
-                    quote("-").opt(),
-                    oneOf(
-                            quote("0"),
-                            concat(reference("onenine"), reference("digits").opt()))))
-            .add("digits", reference("digit").oneOrMore())
+                    reference("fraction"),
+                    reference("exponent")))
+            .add("integer", firstOf(
+                    concat(reference("onenine"), reference("digits")),
+                    concat(reference("digit")),
+                    concat(quote("-"), reference("onenine"), reference("digits")),
+                    concat(quote("-"), reference("digit"))))
+            .add("digits", firstOf(
+                    concat(reference("digit"), reference("digits")),
+                    concat(reference("digit"))))
             .add("digit", oneOf(
                     quote("0"),
                     reference("onenine")))
             .add("onenine", pattern("[1-9]"))
-            .add("fraction", concat(quote("."), reference("digits")))
+            .add("fraction", oneOf(
+                    empty(),
+                    concat(quote("."), reference("digits"))))
             .add("exponent", oneOf(
+                    empty(),
                     concat(quote("E"), reference("sign"), reference("digits")),
                     concat(quote("e"), reference("sign"), reference("digits"))))
             .add("sign", oneOf(
+                    empty(),
                     quote("+"),
-                    quote("-")).opt())
-            .add("true", concat(quote("t"), quote("r"), quote("u"), quote("e")))
-            .add("false", concat(quote("f"), quote("a"), quote("l"), quote("s"), quote("e")))
-            .add("null", concat(quote("n"), quote("u"), quote("l"), quote("l")))
-            .add("ws", pattern("\\x{0020}").skip())
-            .add("ws", pattern("\\x{000a}").skip())
-            .add("ws", pattern("\\x{000d}").skip())
-            .add("ws", pattern("\\x{0009}").skip())
-            .build();
-
-    private static final Grammar GRAMMAR = Grammar.builder()
-            .add("json", reference("element"))
-            .add("value", oneOf(
-                    reference("object"),
-                    reference("array"),
-                    reference("string"),
-                    reference("number"),
-                    pattern("true"),
-                    pattern("false"),
-                    pattern("null")))
-            .add("object", concat(
-                    quote("{"),
-                    reference("members").opt(),
-                    quote("}")))
-            .add("members", concat(
-                    reference("member"),
-                    concat(quote(","), reference("member")).zeroOrMore()))
-            .add("member", concat(
-                    reference("string"),
-                    quote(":"),
-                    reference("element")))
-            .add("array", concat(
-                    quote("["),
-                    reference("elements").opt(),
-                    quote("]")))
-            .add("elements", concat(
-                    reference("element"),
-                    concat(quote(","), reference("element")).zeroOrMore()))
-            .add("element", reference("value"))
-            .add("string", pattern("\"([^\"]|[\\\\][\"])*\""))
-            .add("number", pattern("[-0-9][\\S]*"))
+                    quote("-")))
+            .add("ws", oneOf(
+                    empty(),
+                    concat(pattern("\\x{0020}"), reference("ws")),
+                    concat(pattern("\\x{000a}"), reference("ws")),
+                    concat(pattern("\\x{000d}"), reference("ws")),
+                    concat(pattern("\\x{0009}"), reference("ws"))))
             .build();
 
     @Override
@@ -112,8 +118,7 @@ public class JsonParsesrFactory implements ParserFactory {
 
     @Override
     public Parser createParser(Reader reader) {
-        var tokenizer = TokenizerFactory.of(TOKEN).createTokenizer(reader);
-        return ParserFactory.of(GRAMMAR).createParser(tokenizer);
+        return ParserFactory.of(GRAMMAR).createParser(reader);
     }
 
 }
