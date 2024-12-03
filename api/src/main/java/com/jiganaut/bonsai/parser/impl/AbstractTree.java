@@ -23,4 +23,8 @@ abstract class AbstractTree implements Tree {
         }
     }
 
+    String encode(String s) {
+        return s.replace("\\", "\\\\")
+                .replace("\"", "\\\"");
+    }
 }

@@ -54,7 +54,15 @@ class DefaultToken extends AbstractTree implements Token {
 
     @Override
     public String toString() {
-        return value;
+        var sb = new StringBuilder();
+        if (name != null) {
+            sb.append(name);
+            sb.append(":");
+        }
+        sb.append("\"");
+        sb.append(encode(value));
+        sb.append("\"");
+        return sb.toString();
     }
 
     @Override

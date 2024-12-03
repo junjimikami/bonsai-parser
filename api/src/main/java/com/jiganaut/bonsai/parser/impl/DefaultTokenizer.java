@@ -1,12 +1,12 @@
 package com.jiganaut.bonsai.parser.impl;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.Set;
 import java.util.regex.Pattern;
 
-import com.jiganaut.bonsai.grammar.ProductionSet;
+import com.jiganaut.bonsai.grammar.Grammar;
 import com.jiganaut.bonsai.impl.Message;
 import com.jiganaut.bonsai.parser.Token;
 import com.jiganaut.bonsai.parser.Tokenizer;
@@ -18,107 +18,121 @@ import com.jiganaut.bonsai.parser.Tokenizer;
 class DefaultTokenizer extends AbstractTokenizer {
 
     private final Context context;
-    private Token nextToken;
-    private Token currentToken;
+    private final Tokenization tokenization;
+    private String nextTokenName;
+    private String nextTokenValue;
+    private String currentTokenName;
+    private String currentTokenValue;
 
-    DefaultTokenizer(ProductionSet productionSet, Tokenizer tokenizer) {
-        assert productionSet != null;
+    DefaultTokenizer(Grammar grammar, Tokenizer tokenizer) {
+        assert grammar != null;
         assert tokenizer != null;
-        context = new Context(productionSet, null, tokenizer, Set.of());
+        context = new Context(grammar, tokenizer);
+        tokenization = new Tokenization();
     }
 
     private void readNext() {
-        if (nextToken != null) {
+        if (nextTokenValue != null) {
             return;
         }
-        while (context.tokenizer().hasNext()) {
-            var token = Tokenization.run(context);
-            if (!token.getValue().isEmpty()) {
-                nextToken = token;
-                break;
+        try {
+            while (context.hasNext()) {
+                var value = tokenization.process(context);
+                if (!value.isEmpty()) {
+                    nextTokenValue = value;
+                    nextTokenName = tokenization.getName();
+                    break;
+                }
             }
+        } catch (UncheckedIOException ex) {
+            throw new IllegalStateException(ex);
         }
+    }
+
+    private void writeCurrent() {
+        if (nextTokenValue == null) {
+            throw new NoSuchElementException(Message.TOKEN_NOT_FOUND.format());
+        }
+        currentTokenName = nextTokenName;
+        currentTokenValue = nextTokenValue;
+        nextTokenName = null;
+        nextTokenValue = null;
     }
 
     @Override
     public boolean hasNext() {
         readNext();
-        return nextToken != null;
+        return nextTokenValue != null;
     }
 
     @Override
-    public boolean hasNext(String regex) {
+    public boolean hasNextName(String name) {
+        if (!hasNext()) {
+            return false;
+        }
+        return Objects.equals(name, nextTokenName);
+    }
+
+    @Override
+    public boolean hasNextValue(String regex) {
         Objects.requireNonNull(regex, Message.NULL_PARAMETER.format());
         var pattern = Pattern.compile(regex);
-        return hasNext(pattern);
+        return hasNextValue(pattern);
     }
 
     @Override
-    public boolean hasNext(Pattern pattern) {
+    public boolean hasNextValue(Pattern pattern) {
         Objects.requireNonNull(pattern, Message.NULL_PARAMETER.format());
         if (!hasNext()) {
             return false;
         }
-        var matcher = pattern.matcher(nextToken.getValue());
+        var matcher = pattern.matcher(nextTokenValue);
         return matcher.matches();
     }
 
     @Override
-    public String next() {
+    public Token next() {
         readNext();
-        if (nextToken == null) {
-            throw new NoSuchElementException(Message.TOKEN_NOT_FOUND.format());
-        }
-        currentToken = nextToken;
-        nextToken = null;
-        return currentToken.getName();
+        writeCurrent();
+        return new DefaultToken(currentTokenName, currentTokenValue);
     }
 
     @Override
-    public String next(String regex) {
-        Objects.requireNonNull(regex, Message.NULL_PARAMETER.format());
-        var pattern = Pattern.compile(regex);
-        return next(pattern);
-    }
-
-    @Override
-    public String next(Pattern pattern) {
-        Objects.requireNonNull(pattern, Message.NULL_PARAMETER.format());
+    public String nextName() {
         readNext();
-        if (nextToken == null) {
-            throw new NoSuchElementException(Message.TOKEN_NOT_FOUND.format());
-        }
-        var matcher = pattern.matcher(nextToken.getValue());
-        if (!matcher.matches()) {
-            throw new NoSuchElementException(Message.TOKEN_NOT_MATCH_PATTERN.format(pattern));
-        }
-        currentToken = nextToken;
-        nextToken = null;
-        return currentToken.getName();
+        writeCurrent();
+        return currentTokenName;
     }
 
     @Override
-    public Token getToken() {
-        return currentToken;
+    public String nextValue() {
+        readNext();
+        writeCurrent();
+        return currentTokenValue;
+    }
+
+    @Override
+    public String getName() {
+        return currentTokenName;
     }
 
     @Override
     public String getValue() {
-        return currentToken.getValue();
+        return currentTokenValue;
     }
 
     @Override
     public long getLineNumber() {
-        return context.tokenizer().getLineNumber();
+        return context.getLineNumber();
     }
 
     @Override
     public long getIndex() {
-        return context.tokenizer().getIndex();
+        return context.getIndex();
     }
 
     @Override
     public void close() throws IOException {
-        context.tokenizer().close();
+        context.close();
     }
 }

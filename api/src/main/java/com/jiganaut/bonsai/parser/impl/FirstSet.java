@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import com.jiganaut.bonsai.grammar.ChoiceRule;
 import com.jiganaut.bonsai.grammar.PatternRule;
+import com.jiganaut.bonsai.grammar.ProductionSet;
 import com.jiganaut.bonsai.grammar.QuantifierRule;
 import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.Rule;
@@ -21,18 +22,6 @@ import com.jiganaut.bonsai.grammar.SkipRule;
  *
  */
 final class FirstSet implements RuleVisitor<Set<Rule>, Context> {
-    private static final FirstSet INSTANCE = new FirstSet();
-
-    private FirstSet() {
-    }
-
-    static Set<Rule> of(Rule rule, Context context) {
-        return INSTANCE.visit(rule, context);
-    }
-
-    static Set<Rule> of(List<? extends Rule> sequence, Context context) {
-        return INSTANCE.visit(sequence, context);
-    }
 
     @FunctionalInterface
     private interface TemporaryRule extends Rule, Supplier<Set<Rule>> {
@@ -45,6 +34,19 @@ final class FirstSet implements RuleVisitor<Set<Rule>, Context> {
         default <R, P> R accept(RuleVisitor<R, P> visitor, P p) {
             throw new AssertionError();
         }
+    }
+
+    private static final FirstSet INSTANCE = new FirstSet();
+
+    private FirstSet() {
+    }
+
+    static Set<Rule> of(Rule rule, Context context) {
+        return INSTANCE.visit(rule, context);
+    }
+
+    static Set<Rule> of(List<? extends Rule> sequence, Context context) {
+        return INSTANCE.visit(sequence, context);
     }
 
     private Set<Rule> visit(List<? extends Rule> sequence, Context context) {
@@ -65,6 +67,17 @@ final class FirstSet implements RuleVisitor<Set<Rule>, Context> {
                     }
                 })
                 .collect(Collectors.toSet());
+    }
+
+    private Set<Rule> visit(ProductionSet productionSet, Context context) {
+        if (productionSet.isEmpty()) {
+            return context.followSet();
+        }
+        var set = new HashSet<Rule>();
+        for (var production : productionSet) {
+            set.addAll(visit(production.getRule(), context));
+        }
+        return set;
     }
 
     @Override
@@ -91,9 +104,8 @@ final class FirstSet implements RuleVisitor<Set<Rule>, Context> {
 
     @Override
     public Set<Rule> visitReference(ReferenceRule reference, Context context) {
-        var productionSet = context.productionSet();
-        var production = reference.lookup(productionSet);
-        return visit(production.getRule(), context);
+        var productionSet = reference.lookup(context.grammar());
+        return visit(productionSet, context);
     }
 
     @Override

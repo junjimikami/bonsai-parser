@@ -1,5 +1,7 @@
 package com.jiganaut.bonsai.grammar.impl;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -42,14 +44,17 @@ class DefaultChoiceRule extends AbstractCompositeRule<Set<Rule>> implements Choi
             checkForBuild();
             var elements = builders.stream()
                     .map(e -> e.get())
-                    .collect(Collectors.toUnmodifiableSet());
-            return new DefaultChoiceRule(elements);
+                    .collect(LinkedHashSet<Rule>::new, Set::add, Set::addAll);
+            return new DefaultChoiceRule(elements, false);
         }
 
     }
 
-    private DefaultChoiceRule(Set<Rule> elements) {
-        super(elements);
+    private final boolean shortCircuit;
+
+    DefaultChoiceRule(Set<Rule> elements, boolean shortCircuit) {
+        super(Collections.unmodifiableSet(elements));
+        this.shortCircuit = shortCircuit;
     }
 
     @Override
@@ -59,6 +64,7 @@ class DefaultChoiceRule extends AbstractCompositeRule<Set<Rule>> implements Choi
 
     @Override
     public String toString() {
+        var delimiter = isShortCircuit() ? " / " : " | ";
         return elements.stream()
                 .map(e -> {
                     try {
@@ -70,13 +76,14 @@ class DefaultChoiceRule extends AbstractCompositeRule<Set<Rule>> implements Choi
                         return "?";
                     }
                 })
-                .collect(Collectors.joining(" | "));
+                .collect(Collectors.joining(delimiter));
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof ChoiceRule r) {
             return this.getKind() == r.getKind()
+                    && this.shortCircuit == r.isShortCircuit()
                     && this.elements.equals(r.getChoices());
         }
         return super.equals(obj);
@@ -84,7 +91,17 @@ class DefaultChoiceRule extends AbstractCompositeRule<Set<Rule>> implements Choi
 
     @Override
     public int hashCode() {
-        return Objects.hash(getKind(), elements);
+        return Objects.hash(getKind(), shortCircuit, elements);
+    }
+
+    @Override
+    public boolean isShortCircuit() {
+        return shortCircuit;
+    }
+
+    @Override
+    public ChoiceRule shortCircuit() {
+        return new DefaultChoiceRule(elements, true);
     }
 
 }

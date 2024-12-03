@@ -83,9 +83,23 @@ class DefaultNonTerminalNode extends AbstractTree implements NonTerminalNode {
 
     @Override
     public String toString() {
-        return list.stream()
-                .map(Tree::toString)
-                .collect(Collectors.joining());
+        var sb = new StringBuilder();
+        sb.append("@");
+        sb.append("\"");
+        sb.append(encode(name));
+        sb.append("\"");
+        if (value != null) {
+            sb.append(":");
+            sb.append("\"");
+            sb.append(encode(value));
+            sb.append("\"");
+        }
+        if (!list.isEmpty()) {
+            sb.append(list.stream()
+                    .map(Tree::toString)
+                    .collect(Collectors.joining(", ", "(", ")")));
+        }
+        return sb.toString();
     }
 
     @Override

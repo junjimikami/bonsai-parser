@@ -3,7 +3,9 @@ package com.jiganaut.bonsai.grammar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.util.Set;
@@ -98,6 +100,25 @@ interface ChoiceRuleTestCase extends CompositeRuleTestCase<ChoiceRule> {
             assertNotNull(rule);
             assertIterableEquals(expectedRule().getChoices(), rule.getChoices());
         }
+        
+
+        @Test
+        @DisplayName("shortCircuit() [Post-build operation]")
+        default void shortCircuitInCaseOfPostBuild() throws Exception {
+            var builder = createTarget();
+            builder.build();
+
+            assertThrows(IllegalStateException.class, () -> builder.shortCircuit());
+        }
+
+        @Test
+        @DisplayName("shortCircuit()")
+        default void shortCircuit() throws Exception {
+            var target = createTarget().shortCircuit();
+
+            assertTrue(target.isShortCircuit());
+        }
+
     }
 
     @Override
@@ -110,12 +131,33 @@ interface ChoiceRuleTestCase extends CompositeRuleTestCase<ChoiceRule> {
 
     Set<? extends Rule> expectedChoices();
 
+    default boolean expectedToBeShortCircuit() {
+        return false;
+    }
+
     @Test
     @DisplayName("getChoices()")
     default void getChoices() throws Exception {
         var target = createTarget();
 
         assertEquals(expectedChoices(), target.getChoices());
+    }
+
+    @Test
+    @DisplayName("isShortCircuit()")
+    default void isShortCircuit() throws Exception {
+        var target = createTarget();
+
+        assertEquals(expectedToBeShortCircuit(), target.isShortCircuit());
+    }
+
+    @Test
+    @DisplayName("shortCircuit()")
+    default void shortCircuit() throws Exception {
+        var target = createTarget();
+
+        assertNotSame(target, target.shortCircuit());
+        assertTrue(target.shortCircuit().isShortCircuit());
     }
 
 }

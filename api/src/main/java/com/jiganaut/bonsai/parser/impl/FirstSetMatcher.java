@@ -10,10 +10,10 @@ import com.jiganaut.bonsai.grammar.SimpleRuleVisitor;
  * @author Junji Mikami
  *
  */
-final class AnyMatcher implements SimpleRuleVisitor<Boolean, Context> {
-    private static final AnyMatcher INSTANCE = new AnyMatcher();
+final class FirstSetMatcher implements SimpleRuleVisitor<Boolean, Context> {
+    private static final FirstSetMatcher INSTANCE = new FirstSetMatcher();
 
-    private AnyMatcher() {
+    private FirstSetMatcher() {
     }
 
     static boolean scan(Rule rule, Context context) {
@@ -21,9 +21,16 @@ final class AnyMatcher implements SimpleRuleVisitor<Boolean, Context> {
     }
 
     @Override
+    public Boolean visit(Rule rule, Context context) {
+        if (rule == Context.EOF) {
+            return !context.hasNext();
+        }
+        return SimpleRuleVisitor.super.visit(rule, context);
+    }
+
+    @Override
     public Boolean visitPattern(PatternRule pattern, Context context) {
-        var tokenizer = context.tokenizer();
-        return tokenizer.hasNext(pattern.getPattern());
+        return context.hasNextValue(pattern.getPattern());
     }
 
     @Override
@@ -45,9 +52,6 @@ final class AnyMatcher implements SimpleRuleVisitor<Boolean, Context> {
     @Override
     public Boolean defaultAction(Rule rule, Context context) {
         var firstSet = FirstSet.of(rule, context);
-        if (firstSet.isEmpty()) {
-            return !context.tokenizer().hasNext();
-        }
         return firstSet.stream().anyMatch(e -> visit(e, context));
     }
 }

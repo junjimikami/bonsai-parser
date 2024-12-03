@@ -21,6 +21,11 @@ public interface NonTerminalNode extends Tree {
 
         public NonTerminalNode.Builder add(Tree tree);
 
+        public default NonTerminalNode.Builder addAll(NonTerminalNode.Builder builder) {
+            builder.build().getSubTrees().forEach(this::add);
+            return this;
+        }
+
     }
 
     public static NonTerminalNode.Builder builder() {
@@ -31,6 +36,15 @@ public interface NonTerminalNode extends Tree {
         var builder = builder()
                 .setName(name)
                 .setValue(value);
+        for (var tree : trees) {
+            builder.add(tree);
+        }
+        return builder.build();
+    }
+
+    public static NonTerminalNode of(String name, Tree... trees) {
+        var builder = builder()
+                .setName(name);
         for (var tree : trees) {
             builder.add(tree);
         }

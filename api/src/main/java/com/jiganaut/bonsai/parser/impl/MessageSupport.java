@@ -15,12 +15,12 @@ final class MessageSupport {
 
     static String tokenNotMatchRule(Rule rule, Context context) {
         var symbol = context.production().getSymbol();
-        var line = context.tokenizer().getLineNumber();
-        var index = context.tokenizer().getIndex();
+        var line = context.getLineNumber();
+        var index = context.getIndex();
         var token = "EOF";
-        if (context.tokenizer().hasNext()) {
-            context.tokenizer().next();
-            token = context.tokenizer().getValue();
+        if (context.hasNext()) {
+            context.next();
+            token = context.getValue();
         }
         return Message.TOKEN_NOT_MATCH_RULE.format(rule, symbol, token, line, index);
     }
@@ -45,12 +45,12 @@ final class MessageSupport {
         var rule = quantfier.getRule();
         var symbol = context.production().getSymbol();
         var from = quantfier.getMinCount();
-        var line = context.tokenizer().getLineNumber();
-        var index = context.tokenizer().getIndex();
+        var line = context.getLineNumber();
+        var index = context.getIndex();
         var token = "EOF";
-        if (context.tokenizer().hasNext()) {
-            context.tokenizer().next();
-            token = context.tokenizer().getValue();
+        if (context.hasNext()) {
+            context.next();
+            token = context.getValue();
         }
         if (quantfier.getMaxCount().isEmpty()) {
             return Message.TOKEN_COUNT_OUT_OF_RANGE_WITHOUT_UPPER_LIMIT.format(from, null, rule, symbol, count, token,
@@ -64,12 +64,12 @@ final class MessageSupport {
     }
 
     static String tokensRemained(Context context) {
-        var line = context.tokenizer().getLineNumber();
-        var index = context.tokenizer().getIndex();
+        var line = context.getLineNumber();
+        var index = context.getIndex();
         var token = "EOF";
-        if (context.tokenizer().hasNext()) {
-            context.tokenizer().next();
-            token = context.tokenizer().getValue();
+        if (context.hasNext()) {
+            context.next();
+            token = context.getValue();
         }
         return Message.TOKEN_REMAINED.format(token, line, index);
     }

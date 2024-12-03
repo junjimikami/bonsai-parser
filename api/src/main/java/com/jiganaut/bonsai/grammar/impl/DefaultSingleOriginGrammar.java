@@ -2,16 +2,18 @@ package com.jiganaut.bonsai.grammar.impl;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import com.jiganaut.bonsai.grammar.Grammar;
 import com.jiganaut.bonsai.grammar.Production;
 import com.jiganaut.bonsai.grammar.ProductionSet;
 import com.jiganaut.bonsai.grammar.Rule;
+import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
 import com.jiganaut.bonsai.impl.Message;
 
-class DefaultGrammar extends DefaultProductionSet implements Grammar {
+class DefaultSingleOriginGrammar extends AbstractGrammar implements SingleOriginGrammar {
 
-    static class Builder extends DefaultProductionSet.Builder implements Grammar.Builder {
+    static class Builder extends AbstractGrammar.Builder implements SingleOriginGrammar.Builder {
         private String startSymbol;
 
         @Override
@@ -40,29 +42,49 @@ class DefaultGrammar extends DefaultProductionSet implements Grammar {
         }
 
         @Override
-        public Grammar build() {
-            var productionSet = super.build();
+        Set<Production> getProductionSet() {
+            var productionSet = super.getProductionSet();
             var match = productionSet.stream()
                     .map(e -> e.getSymbol())
                     .anyMatch(e -> Objects.equals(e, startSymbol));
             if (!match) {
                 throw new NoSuchElementException(Message.NO_SUCH_SYMBOL.format(startSymbol));
             }
-            return new DefaultGrammar(productionSet, startSymbol);
+            return productionSet;
+        }
+
+        @Override
+        public SingleOriginGrammar build() {
+            checkForBuild();
+            var productionSet = getProductionSet();
+            return new DefaultSingleOriginGrammar(productionSet, false, startSymbol);
         }
     }
 
     private final String startSymbol;
 
-    private DefaultGrammar(ProductionSet productionSet, String startSymbol) {
-        super(productionSet);
+    private DefaultSingleOriginGrammar(Set<Production> productionSet, boolean shortCircuit, String startSymbol) {
+        super(productionSet, shortCircuit);
         assert startSymbol != null;
         this.startSymbol = startSymbol;
     }
 
     @Override
-    public Production getStartProduction() {
-        return getProduction(startSymbol);
+    public String getStartSymbol() {
+        return startSymbol;
+    }
+
+    @Override
+    public ProductionSet productionSet() {
+        var set = stream()
+                .filter(e -> Objects.equals(getStartSymbol(), e.getSymbol()))
+                .collect(Collectors.toSet());
+        return new DefaultProductionSet(set, isShortCircuit());
+    }
+
+    @Override
+    public SingleOriginGrammar shortCircuit() {
+        return new DefaultSingleOriginGrammar(productionSet, true, startSymbol);
     }
 
 }

@@ -125,7 +125,7 @@ interface RuleTestCase extends TestCase {
         assertArrayEquals(expected, result2);
     }
 
-    @DisplayName("accept(rv:RuleVisitor, p:P)")
+    @DisplayName("accept(rv:RuleVisitor, pos:P)")
     @ParameterizedTest
     @NullSource
     @EmptySource
