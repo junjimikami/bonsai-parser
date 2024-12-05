@@ -2,11 +2,11 @@ package com.jiganaut.bonsai.grammar.impl;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.grammar.SequenceRule;
-import com.jiganaut.bonsai.impl.Message;
 
 /**
  *
@@ -15,28 +15,21 @@ import com.jiganaut.bonsai.impl.Message;
 class DefaultSequenceRule extends AbstractCompositeRule<List<Rule>> implements SequenceRule {
     static class Builder extends AbstractCompositeRule.Builder implements SequenceRule.Builder {
 
-        Builder() {
-        }
-
         @Override
         public Builder add(Rule rule) {
-            checkParameter(rule);
-            builders.add(() -> rule);
-            return this;
+            return (Builder) super.add(rule);
         }
 
         @Override
         public Builder add(Rule.Builder builder) {
-            checkParameter(builder);
-            builders.add(() -> Objects.requireNonNull(builder.build(), Message.NULL_PARAMETER.format()));
-            return this;
+            return (Builder) super.add(builder);
         }
 
         @Override
         public SequenceRule build() {
             checkForBuild();
-            var elements = builders.stream()
-                    .map(e -> e.get())
+            var elements = suppliers.stream()
+                    .map(Supplier::get)
                     .toList();
             return new DefaultSequenceRule(elements);
         }
