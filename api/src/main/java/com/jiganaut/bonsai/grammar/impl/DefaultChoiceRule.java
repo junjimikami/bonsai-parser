@@ -4,11 +4,11 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.jiganaut.bonsai.grammar.ChoiceRule;
 import com.jiganaut.bonsai.grammar.Rule;
-import com.jiganaut.bonsai.impl.Message;
 
 /**
  * 
@@ -20,30 +20,19 @@ class DefaultChoiceRule extends AbstractCompositeRule<Set<Rule>> implements Choi
 
         @Override
         public Builder add(Rule rule) {
-            checkParameter(rule);
-            builders.add(() -> rule);
-            return this;
+            return (Builder) super.add(rule);
         }
 
         @Override
         public Builder add(Rule.Builder builder) {
-            checkParameter(builder);
-            builders.add(() -> Objects.requireNonNull(builder.build(), Message.NULL_PARAMETER.format()));
-            return this;
-        }
-
-        @Override
-        public Builder addEmpty() {
-            check();
-            builders.add(() -> Rule.EMPTY);
-            return this;
+            return (Builder) super.add(builder);
         }
 
         @Override
         public ChoiceRule build() {
             checkForBuild();
-            var elements = builders.stream()
-                    .map(e -> e.get())
+            var elements = suppliers.stream()
+                    .map(Supplier::get)
                     .collect(LinkedHashSet<Rule>::new, Set::add, Set::addAll);
             return new DefaultChoiceRule(elements, false);
         }

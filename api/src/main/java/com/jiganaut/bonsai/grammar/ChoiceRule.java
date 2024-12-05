@@ -13,7 +13,9 @@ public interface ChoiceRule extends Rule, Quantifiable {
     public static interface Builder extends Rule.Builder, Quantifiable {
         public ChoiceRule.Builder add(Rule rule);
         public ChoiceRule.Builder add(Rule.Builder builder);
-        public ChoiceRule.Builder addEmpty();
+        public default ChoiceRule.Builder addEmpty() {
+            return add(EMPTY);
+        }
         @Override
         public ChoiceRule build();
         public default ChoiceRule shortCircuit() {
