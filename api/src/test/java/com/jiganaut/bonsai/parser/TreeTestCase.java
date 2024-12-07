@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.NullSource;
@@ -27,37 +28,43 @@ interface TreeTestCase extends TestCase {
 
         boolean canBuild();
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("setName(String) [Post-build operation]")
-        default void setNameInCaseOfPostBuild() throws Exception {
+        default void setNameInCaseOfPostBuild(TestReporter testReporter) throws Exception {
             assumeTrue(canBuild());
 
             var builder = createTarget();
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.setName(""));
+            var ex = assertThrows(IllegalStateException.class, () -> builder.setName(""));
+            testReporter.publishEntry(ex.getMessage());
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("setValue(String) [Post-build operation]")
-        default void setValueInCaseOfPostBuild() throws Exception {
+        default void setValueInCaseOfPostBuild(TestReporter testReporter) throws Exception {
             assumeTrue(canBuild());
 
             var builder = createTarget();
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.setValue(""));
+            var ex = assertThrows(IllegalStateException.class, () -> builder.setValue(""));
+            testReporter.publishEntry(ex.getMessage());
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("build() [Post-build operation]")
-        default void buildInCaseOfPostBuild() throws Exception {
+        default void buildInCaseOfPostBuild(TestReporter testReporter) throws Exception {
             assumeTrue(canBuild());
 
             var builder = createTarget();
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.build());
+            var ex = assertThrows(IllegalStateException.class, () -> builder.build());
+            testReporter.publishEntry(ex.getMessage());
         }
 
         @ParameterizedTest
@@ -160,10 +167,11 @@ interface TreeTestCase extends TestCase {
 
     @Test
     @DisplayName("accept(ev:ElementVisitor) [Null parameter]")
-    default void acceptEvInCaseOfNullParameter() throws Exception {
+    default void acceptEvInCaseOfNullParameter(TestReporter testReporter) throws Exception {
         var target = createTarget();
 
-        assertThrows(NullPointerException.class, () -> target.accept(null));
+        var ex = assertThrows(NullPointerException.class, () -> target.accept(null));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test

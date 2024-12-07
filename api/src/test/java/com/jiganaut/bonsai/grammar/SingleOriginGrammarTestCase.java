@@ -8,6 +8,7 @@ import java.util.NoSuchElementException;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -41,23 +42,27 @@ interface SingleOriginGrammarTestCase extends GrammarTestCase {
                     && !isMissingStartSymbol();
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("setStartSymbol(String) [Null parameter]")
-        default void setStartSymbolInCaseOfNullParameter() throws Exception {
+        default void setStartSymbolInCaseOfNullParameter(TestReporter testReporter) throws Exception {
             var builder = createTarget();
 
-            assertThrows(NullPointerException.class, () -> builder.setStartSymbol(null));
+            var ex = assertThrows(NullPointerException.class, () -> builder.setStartSymbol(null));
+            testReporter.publishEntry(ex.getMessage());
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("setStartSymbol(String) [Post-build operation]")
-        default void setStartSymbolInCaseOfPostBuild() throws Exception {
+        default void setStartSymbolInCaseOfPostBuild(TestReporter testReporter) throws Exception {
             assumeTrue(canBuild());
 
             var builder = createTarget();
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.setStartSymbol(""));
+            var ex = assertThrows(IllegalStateException.class, () -> builder.setStartSymbol(""));
+            testReporter.publishEntry(ex.getMessage());
         }
 
         @ParameterizedTest
@@ -70,14 +75,16 @@ interface SingleOriginGrammarTestCase extends GrammarTestCase {
             assertEquals(builder, builder.setStartSymbol(s));
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("build() [Missing start symbol]")
-        default void buildInCaseOfMissingStartSymbol() throws Exception {
+        default void buildInCaseOfMissingStartSymbol(TestReporter testReporter) throws Exception {
             assumeTrue(isMissingStartSymbol());
 
             var builder = createTarget();
 
-            assertThrows(NoSuchElementException.class, () -> builder.build());
+            var ex = assertThrows(NoSuchElementException.class, () -> builder.build());
+            testReporter.publishEntry(ex.getMessage());
         }
 
     }

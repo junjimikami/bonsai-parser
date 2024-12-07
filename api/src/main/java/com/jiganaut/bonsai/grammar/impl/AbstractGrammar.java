@@ -30,7 +30,7 @@ abstract class AbstractGrammar extends DefaultProductionSet implements Grammar {
         public Grammar.Builder add(String symbol, Rule.Builder builder) {
             checkParameter(symbol, builder);
             set.add(() -> {
-                var rule = Objects.requireNonNull(builder.build(), Message.NULL_PARAMETER.format());
+                var rule = Objects.requireNonNull(builder.build(), Message.NULL_BUILD.format());
                 return new DefaultProduction(symbol, rule);
             });
             symbols.add(symbol);
@@ -40,7 +40,7 @@ abstract class AbstractGrammar extends DefaultProductionSet implements Grammar {
         @Override
         protected void checkForBuild() {
             if (set.isEmpty()) {
-                throw new IllegalStateException(Message.NO_ELELEMNTS.format());
+                throw new IllegalStateException(Message.EMPTY_GRAMMAR.format());
             }
             super.checkForBuild();
         }

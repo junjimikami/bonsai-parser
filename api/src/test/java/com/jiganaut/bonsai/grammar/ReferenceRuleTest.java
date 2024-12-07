@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -14,8 +15,9 @@ class ReferenceRuleTest {
 
     @Test
     @DisplayName("of(String) [Null parameter]")
-    void ofInCaseOfNullParameter() throws Exception {
-        assertThrows(NullPointerException.class, () -> ReferenceRule.of(null));
+    void ofInCaseOfNullParameter(TestReporter testReporter) throws Exception {
+        var ex = assertThrows(NullPointerException.class, () -> ReferenceRule.of(null));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @ParameterizedTest

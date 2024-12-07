@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 
 import com.jiganaut.bonsai.TestCase;
 
@@ -47,11 +48,13 @@ interface ProductionSetTestCase extends TestCase {
 
     @Test
     @DisplayName("withSymbol(String) [No such symbol]")
-    default void withSymbolInCaseOfNoSuchSymbol() throws Exception {
+    default void withSymbolInCaseOfNoSuchSymbol(TestReporter testReporter) throws Exception {
         var target = createTarget();
 
-        assertThrows(NoSuchElementException.class, () -> target.withSymbol(null));
-        assertThrows(NoSuchElementException.class, () -> target.withSymbol(""));
+        var ex0 = assertThrows(NoSuchElementException.class, () -> target.withSymbol(null));
+        testReporter.publishEntry(ex0.getMessage());
+        var ex1 = assertThrows(NoSuchElementException.class, () -> target.withSymbol(""));
+        testReporter.publishEntry(ex1.getMessage());
     }
 
     @Test

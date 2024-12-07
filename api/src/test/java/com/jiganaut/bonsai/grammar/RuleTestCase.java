@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.NullSource;
@@ -21,13 +22,15 @@ interface RuleTestCase extends TestCase {
 
         Rule expectedRule();
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("build() [Post-build operation]")
-        default void buildInCaseOfPostBuild() throws Exception {
+        default void buildInCaseOfPostBuild(TestReporter testReporter) throws Exception {
             var builder = createTarget();
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.build());
+            var ex = assertThrows(IllegalStateException.class, () -> builder.build());
+            testReporter.publishEntry(ex.getMessage());
         }
 
         void build() throws Exception;
@@ -106,10 +109,11 @@ interface RuleTestCase extends TestCase {
 
     @Test
     @DisplayName("accept(ev:ElementVisitor) [Null parameter]")
-    default void acceptEvInCaseOfNullParameter() throws Exception {
+    default void acceptEvInCaseOfNullParameter(TestReporter testReporter) throws Exception {
         var rule = createTarget();
 
-        assertThrows(NullPointerException.class, () -> rule.accept(null));
+        var ex = assertThrows(NullPointerException.class, () -> rule.accept(null));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test

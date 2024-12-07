@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -18,8 +19,9 @@ class SequenceRuleTest {
 
     @Test
     @DisplayName("of(Rule...) [Null parameter]")
-    void ofInCaseOfNullParameter() throws Exception {
-        assertThrows(NullPointerException.class, () -> SequenceRule.of((Rule[]) null));
+    void ofInCaseOfNullParameter(TestReporter testReporter) throws Exception {
+        var ex = assertThrows(NullPointerException.class, () -> SequenceRule.of((Rule[]) null));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @ParameterizedTest

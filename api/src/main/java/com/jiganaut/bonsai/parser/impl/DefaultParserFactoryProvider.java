@@ -1,6 +1,7 @@
 package com.jiganaut.bonsai.parser.impl;
 
 import java.util.Objects;
+import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.ServiceLoader.Provider;
 
@@ -31,6 +32,6 @@ public class DefaultParserFactoryProvider implements ParserFactoryProvider {
                 .filter(p -> p.type().getName().equals(factoryName))
                 .map(Provider::get)
                 .findFirst()
-                .get();
+                .orElseThrow(() -> new ServiceConfigurationError(Message.FACTORY_NOT_FOUND.format(factoryName)));
     }
 }

@@ -22,7 +22,7 @@ abstract class AbstractCompositeRule<E extends Collection<Rule>> extends Abstrac
 
         public Builder add(Rule.Builder builder) {
             checkParameter(builder);
-            suppliers.add(() -> Objects.requireNonNull(builder.build(), Message.NULL_PARAMETER.format()));
+            suppliers.add(() -> Objects.requireNonNull(builder.build(), Message.NULL_BUILD.format()));
             return this;
         }
 

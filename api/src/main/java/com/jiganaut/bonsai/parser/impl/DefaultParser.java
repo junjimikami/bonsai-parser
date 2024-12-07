@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 
 import com.jiganaut.bonsai.grammar.Grammar;
+import com.jiganaut.bonsai.impl.Message;
 import com.jiganaut.bonsai.parser.Parser;
 import com.jiganaut.bonsai.parser.Tokenizer;
 import com.jiganaut.bonsai.parser.Tree;
@@ -21,7 +22,7 @@ class DefaultParser implements Parser {
     @Override
     public Tree parse() {
         if (isParsed) {
-            throw new IllegalStateException();
+            throw new IllegalStateException(Message.ALREADY_PARSED.format());
         }
         try {
             var derivation = new Derivation();

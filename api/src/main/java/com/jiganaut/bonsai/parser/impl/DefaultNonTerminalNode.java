@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.jiganaut.bonsai.impl.Message;
 import com.jiganaut.bonsai.parser.NonTerminalNode;
 import com.jiganaut.bonsai.parser.Tree;
 
@@ -36,7 +37,7 @@ class DefaultNonTerminalNode extends AbstractTree implements NonTerminalNode {
 
         @Override
         public NonTerminalNode build() {
-            checkParameter(name);
+            Objects.requireNonNull(name, Message.NAME_NOT_SET.format());
             checkForBuild();
             return new DefaultNonTerminalNode(name, value, list);
         }

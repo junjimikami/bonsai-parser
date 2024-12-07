@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -21,9 +22,11 @@ class NonTerminalNodeTest {
 
     @Test
     @DisplayName("of(String, String, Tree...) [Null parameter]")
-    void ofInCaseOfNullParameter() throws Exception {
-        assertThrows(NullPointerException.class, () -> NonTerminalNode.of(null, ""));
-        assertThrows(NullPointerException.class, () -> NonTerminalNode.of("", "", (Tree[]) null));
+    void ofInCaseOfNullParameter(TestReporter testReporter) throws Exception {
+        var ex0 = assertThrows(NullPointerException.class, () -> NonTerminalNode.of(null, ""));
+        testReporter.publishEntry(ex0.getMessage());
+        var ex1 = assertThrows(NullPointerException.class, () -> NonTerminalNode.of("", "", (Tree[]) null));
+        testReporter.publishEntry(ex1.getMessage());
     }
 
     static Stream<Arguments> of() {

@@ -17,28 +17,25 @@ class DefaultChoiceGrammar extends AbstractGrammar implements ChoiceGrammar {
         private boolean isHidden = false;
         private Set<String> hiddenSymbols = new HashSet<>();
 
-        @Override
-        public Builder add(String symbol, Rule rule) {
+        private void checkForAdd(String symbol) {
             if (isHidden) {
                 if (symbols.contains(symbol)) {
-                    throw new IllegalStateException();
+                    throw new IllegalStateException(Message.SYMBOL_ADDED_VISIBLE.format(symbol));
                 }
                 hiddenSymbols.add(symbol);
             }
-            super.add(symbol, rule);
-            return this;
+        }
+
+        @Override
+        public Builder add(String symbol, Rule rule) {
+            checkForAdd(symbol);
+            return (Builder) super.add(symbol, rule);
         }
 
         @Override
         public Builder add(String symbol, Rule.Builder builder) {
-            if (isHidden) {
-                if (symbols.contains(symbol)) {
-                    throw new IllegalStateException();
-                }
-                hiddenSymbols.add(symbol);
-            }
-            super.add(symbol, builder);
-            return this;
+            checkForAdd(symbol);
+            return (Builder) super.add(symbol, builder);
         }
 
         @Override
@@ -50,11 +47,11 @@ class DefaultChoiceGrammar extends AbstractGrammar implements ChoiceGrammar {
 
         @Override
         public Builder hidden() {
-            check();
             if (set.isEmpty()) {
-                throw new IllegalStateException(Message.NO_ELELEMNTS.format());
+                throw new IllegalStateException(Message.EMPTY_GRAMMAR.format());
             }
             isHidden = true;
+            check();
             return this;
         }
     }

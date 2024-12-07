@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -17,51 +18,58 @@ class RulesTest {
 
     @Test
     @DisplayName("pattern(st:String) [Null parameter]")
-    void patternStInCaseOfNullParameter() throws Exception {
+    void patternStInCaseOfNullParameter(TestReporter testReporter) throws Exception {
 
-        assertThrows(NullPointerException.class, () -> Rules.pattern((String) null));
+        var ex = assertThrows(NullPointerException.class, () -> Rules.pattern((String) null));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
     @DisplayName("pattern(pa:Pattern) [Null parameter]")
-    void patternPaInCaseOfNullParameter() throws Exception {
+    void patternPaInCaseOfNullParameter(TestReporter testReporter) throws Exception {
 
-        assertThrows(NullPointerException.class, () -> Rules.pattern((Pattern) null));
+        var ex = assertThrows(NullPointerException.class, () -> Rules.pattern((Pattern) null));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
     @DisplayName("concat(Rule...) [Null parameter]")
-    void concatInCaseOfNullParameter() throws Exception {
+    void concatInCaseOfNullParameter(TestReporter testReporter) throws Exception {
 
-        assertThrows(NullPointerException.class, () -> Rules.concat((Rule[]) null));
+        var ex = assertThrows(NullPointerException.class, () -> Rules.concat((Rule[]) null));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
     @DisplayName("oneOf(Rule...) [Null parameter]")
-    void oneOfInCaseOfNullParameter() throws Exception {
+    void oneOfInCaseOfNullParameter(TestReporter testReporter) throws Exception {
 
-        assertThrows(NullPointerException.class, () -> Rules.oneOf((Rule[]) null));
+        var ex = assertThrows(NullPointerException.class, () -> Rules.oneOf((Rule[]) null));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
     @DisplayName("firstOf(Rule...) [Null parameter]")
-    void firstOfInCaseOfNullParameter() throws Exception {
+    void firstOfInCaseOfNullParameter(TestReporter testReporter) throws Exception {
 
-        assertThrows(NullPointerException.class, () -> Rules.firstOf((Rule[]) null));
+        var ex = assertThrows(NullPointerException.class, () -> Rules.firstOf((Rule[]) null));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
     @DisplayName("reference(String) [Null parameter]")
-    void referenceInCaseOfNullParameter() throws Exception {
+    void referenceInCaseOfNullParameter(TestReporter testReporter) throws Exception {
 
-        assertThrows(NullPointerException.class, () -> Rules.reference(null));
+        var ex = assertThrows(NullPointerException.class, () -> Rules.reference(null));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
     @DisplayName("quote(String) [Null parameter]")
-    void quoteInCaseOfNullParameter() throws Exception {
+    void quoteInCaseOfNullParameter(TestReporter testReporter) throws Exception {
 
-        assertThrows(NullPointerException.class, () -> Rules.quote(null));
+        var ex = assertThrows(NullPointerException.class, () -> Rules.quote(null));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     static Stream<String> regexParameters() {

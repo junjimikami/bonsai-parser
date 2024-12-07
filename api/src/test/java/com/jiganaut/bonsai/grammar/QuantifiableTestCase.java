@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -16,26 +17,29 @@ interface QuantifiableTestCase extends TestCase {
 
     @Test
     @DisplayName("exactly(int) [Negative parameter]")
-    default void exactlyInCaseOfNegativeParameter() throws Exception {
+    default void exactlyInCaseOfNegativeParameter(TestReporter testReporter) throws Exception {
         var target = createTarget();
 
-        assertThrows(IllegalArgumentException.class, () -> target.exactly(-1));
+        var ex = assertThrows(IllegalArgumentException.class, () -> target.exactly(-1));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
     @DisplayName("atLeast(int) [Negative parameter]")
-    default void atLeastInCaseOfNegativeParameter() throws Exception {
+    default void atLeastInCaseOfNegativeParameter(TestReporter testReporter) throws Exception {
         var target = createTarget();
 
-        assertThrows(IllegalArgumentException.class, () -> target.atLeast(-1));
+        var ex = assertThrows(IllegalArgumentException.class, () -> target.atLeast(-1));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
     @DisplayName("range(int, int) [Negative parameter]")
-    default void rangeInCaseOfNegativeParameter() throws Exception {
+    default void rangeInCaseOfNegativeParameter(TestReporter testReporter) throws Exception {
         var target = createTarget();
 
-        assertThrows(IllegalArgumentException.class, () -> target.range(-1, 0));
+        var ex = assertThrows(IllegalArgumentException.class, () -> target.range(-1, 0));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @ParameterizedTest
@@ -43,10 +47,11 @@ interface QuantifiableTestCase extends TestCase {
             "0,-1", "1,0", "2,1"
     })
     @DisplayName("range(int, int) [Max count < Min count]")
-    default void rangeInCaseOfInvalidMaxCount(int min, int max) throws Exception {
+    default void rangeInCaseOfInvalidMaxCount(int min, int max, TestReporter testReporter) throws Exception {
         var target = createTarget();
 
-        assertThrows(IllegalArgumentException.class, () -> target.range(min, max));
+        var ex = assertThrows(IllegalArgumentException.class, () -> target.range(min, max));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @ParameterizedTest

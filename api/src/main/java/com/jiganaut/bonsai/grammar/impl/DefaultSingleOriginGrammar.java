@@ -48,7 +48,7 @@ class DefaultSingleOriginGrammar extends AbstractGrammar implements SingleOrigin
                     .map(e -> e.getSymbol())
                     .anyMatch(e -> Objects.equals(e, startSymbol));
             if (!match) {
-                throw new NoSuchElementException(Message.NO_SUCH_SYMBOL.format(startSymbol));
+                throw new NoSuchElementException(Message.SYMBOL_NOT_FOUND.format(startSymbol));
             }
             return productionSet;
         }

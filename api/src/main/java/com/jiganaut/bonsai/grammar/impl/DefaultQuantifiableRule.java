@@ -40,14 +40,14 @@ interface DefaultQuantifiableRule extends Rule, Quantifiable {
 
     private static void checkParameter(int times) {
         if (times < 0) {
-            throw new IllegalArgumentException(Message.NEGATIVE_PARAMETER.format());
+            throw new IllegalArgumentException(Message.NEGATIVE_QUANTIFIER.format());
         }
     }
 
     private static void checkParameter(int from, int to) {
         checkParameter(from);
         if (to < from) {
-            throw new IllegalArgumentException(Message.INVALID_MAX_COUNT.format());
+            throw new IllegalArgumentException(Message.INVALID_RANGE.format());
         }
     }
 }

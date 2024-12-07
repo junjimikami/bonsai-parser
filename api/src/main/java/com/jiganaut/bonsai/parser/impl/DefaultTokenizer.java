@@ -51,7 +51,7 @@ class DefaultTokenizer extends AbstractTokenizer {
 
     private void writeCurrent() {
         if (nextTokenValue == null) {
-            throw new NoSuchElementException(Message.TOKEN_NOT_FOUND.format());
+            throw new NoSuchElementException(Message.NO_TOKENS_REMAINING.format());
         }
         currentTokenName = nextTokenName;
         currentTokenValue = nextTokenValue;

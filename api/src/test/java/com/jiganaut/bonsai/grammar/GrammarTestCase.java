@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -96,55 +97,67 @@ interface GrammarTestCase extends ProductionSetTestCase {
                     && !isContainingBuildersReturningNull();
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("add(st:String, ru:Rule) [Null parameter]")
-        default void addStRuInCaseOfNullParameter() throws Exception {
+        default void addStRuInCaseOfNullParameter(TestReporter testReporter) throws Exception {
             var builder = createTarget();
 
-            assertThrows(NullPointerException.class, () -> builder.add(null, mock(Rule.class)));
-            assertThrows(NullPointerException.class, () -> builder.add("", (Rule) null));
+            var ex0 = assertThrows(NullPointerException.class, () -> builder.add(null, mock(Rule.class)));
+            testReporter.publishEntry(ex0.getMessage());
+            var ex1 = assertThrows(NullPointerException.class, () -> builder.add("", (Rule) null));
+            testReporter.publishEntry(ex1.getMessage());
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("add(st:String, rb:Rule.Builder) [Null parameter]")
-        default void addStRbInCaseOfNullParameter() throws Exception {
+        default void addStRbInCaseOfNullParameter(TestReporter testReporter) throws Exception {
             var builder = createTarget();
 
-            assertThrows(NullPointerException.class, () -> builder.add(null, mock(Rule.Builder.class)));
-            assertThrows(NullPointerException.class, () -> builder.add("", (Rule.Builder) null));
+            var ex0 = assertThrows(NullPointerException.class, () -> builder.add(null, mock(Rule.Builder.class)));
+            testReporter.publishEntry(ex0.getMessage());
+            var ex1 = assertThrows(NullPointerException.class, () -> builder.add("", (Rule.Builder) null));
+            testReporter.publishEntry(ex1.getMessage());
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("add(st:String, ru:Rule) [Post-build operation]")
-        default void addStRuInCaseOfPostBuild() throws Exception {
+        default void addStRuInCaseOfPostBuild(TestReporter testReporter) throws Exception {
             assumeTrue(canBuild());
 
             var builder = createTarget();
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.add("", mock(Rule.class)));
+            var ex = assertThrows(IllegalStateException.class, () -> builder.add("", mock(Rule.class)));
+            testReporter.publishEntry(ex.getMessage());
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("add(st:String, rb:Rule.Builder) [Post-build operation]")
-        default void addRtbInCaseOfPostBuild() throws Exception {
+        default void addRtbInCaseOfPostBuild(TestReporter testReporter) throws Exception {
             assumeTrue(canBuild());
 
             var builder = createTarget();
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.add("", mock(Rule.Builder.class)));
+            var ex = assertThrows(IllegalStateException.class, () -> builder.add("", mock(Rule.Builder.class)));
+            testReporter.publishEntry(ex.getMessage());
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("build() [Post-build operation]")
-        default void buildInCaseOfPostBuild() throws Exception {
+        default void buildInCaseOfPostBuild(TestReporter testReporter) throws Exception {
             assumeTrue(canBuild());
 
             var builder = createTarget();
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.build());
+            var ex = assertThrows(IllegalStateException.class, () -> builder.build());
+            testReporter.publishEntry(ex.getMessage());
         }
 
         @ParameterizedTest
@@ -187,65 +200,77 @@ interface GrammarTestCase extends ProductionSetTestCase {
             assertEquals(expectedString, actualString);
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("build() [No elements]")
-        default void buildInCaseOfNoElements() throws Exception {
+        default void buildInCaseOfNoElements(TestReporter testReporter) throws Exception {
             assumeTrue(isNoElements());
 
             var builder = createTarget();
 
-            assertThrows(IllegalStateException.class, () -> builder.build());
+            var ex = assertThrows(IllegalStateException.class, () -> builder.build());
+            testReporter.publishEntry(ex.getMessage());
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("build() [Containing invalid reference]")
-        default void buildInCaseOfContainingInvalidReference() throws Exception {
+        default void buildInCaseOfContainingInvalidReference(TestReporter testReporter) throws Exception {
             assumeTrue(isContainingInvalidReference());
 
             var builder = createTarget();
 
-            assertThrows(NoSuchElementException.class, () -> builder.build());
+            var ex = assertThrows(NoSuchElementException.class, () -> builder.build());
+            testReporter.publishEntry(ex.getMessage());
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("build() [Containing rules with no elements]")
-        default void buildInCaseOfContainingRulesWithNoElements() throws Exception {
+        default void buildInCaseOfContainingRulesWithNoElements(TestReporter testReporter) throws Exception {
             assumeTrue(isContainingRulesWithNoElements());
 
             var builder = createTarget();
 
-            assertThrows(IllegalStateException.class, () -> builder.build());
+            var ex = assertThrows(IllegalStateException.class, () -> builder.build());
+            testReporter.publishEntry(ex.getMessage());
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("build() [Containing builders returning null]")
-        default void buildInCaseOfContainingBuildersReturningNull() throws Exception {
+        default void buildInCaseOfContainingBuildersReturningNull(TestReporter testReporter) throws Exception {
             assumeTrue(isContainingBuildersReturningNull());
 
             var builder = createTarget();
 
-            assertThrows(NullPointerException.class, () -> builder.build());
+            var ex = assertThrows(NullPointerException.class, () -> builder.build());
+            testReporter.publishEntry(ex.getMessage());
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("shortCircuit() [No elements]")
-        default void shortCircuitInCaseOfNoElements() throws Exception {
+        default void shortCircuitInCaseOfNoElements(TestReporter testReporter) throws Exception {
             assumeTrue(isNoElements());
 
             var builder = createTarget();
 
-            assertThrows(IllegalStateException.class, () -> builder.shortCircuit());
+            var ex = assertThrows(IllegalStateException.class, () -> builder.shortCircuit());
+            testReporter.publishEntry(ex.getMessage());
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("shortCircuit() [Post-build operation]")
-        default void shortCircuitInCaseOfPostBuild() throws Exception {
+        default void shortCircuitInCaseOfPostBuild(TestReporter testReporter) throws Exception {
             assumeTrue(canBuild());
 
             var builder = createTarget();
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.shortCircuit());
+            var ex = assertThrows(IllegalStateException.class, () -> builder.shortCircuit());
+            testReporter.publishEntry(ex.getMessage());
         }
 
         @Test

@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -16,9 +17,11 @@ class TerminalNodeTest {
 
     @Test
     @DisplayName("of(String, String) [Null parameter]")
-    void ofInCaseOfNullParameter() throws Exception {
-        assertThrows(NullPointerException.class, () -> TerminalNode.of("", null));
-        assertThrows(NullPointerException.class, () -> TerminalNode.of(null, null));
+    void ofInCaseOfNullParameter(TestReporter testReporter) throws Exception {
+        var ex0 = assertThrows(NullPointerException.class, () -> TerminalNode.of("", null));
+        testReporter.publishEntry(ex0.getMessage());
+        var ex1 = assertThrows(NullPointerException.class, () -> TerminalNode.of(null, null));
+        testReporter.publishEntry(ex1.getMessage());
     }
 
     @ParameterizedTest

@@ -8,6 +8,7 @@ import java.io.Reader;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 
 import com.jiganaut.bonsai.TestCase;
 
@@ -18,10 +19,11 @@ interface ParserFactoryTestCase extends TestCase {
 
     @Test
     @DisplayName("createParser(to:Tokenizer) [Null parameter]")
-    default void createParserToInCaseOfNullParameter() throws Exception {
+    default void createParserToInCaseOfNullParameter(TestReporter testReporter) throws Exception {
         var target = createTarget();
 
-        assertThrows(NullPointerException.class, () -> target.createParser((Tokenizer) null));
+        var ex = assertThrows(NullPointerException.class, () -> target.createParser((Tokenizer) null));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
@@ -35,10 +37,11 @@ interface ParserFactoryTestCase extends TestCase {
 
     @Test
     @DisplayName("createParser(re:Reader) [Null parameter]")
-    default void createParserReInCaseOfNullParameter() throws Exception {
+    default void createParserReInCaseOfNullParameter(TestReporter testReporter) throws Exception {
         var target = createTarget();
 
-        assertThrows(NullPointerException.class, () -> target.createParser((Reader) null));
+        var ex = assertThrows(NullPointerException.class, () -> target.createParser((Reader) null));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test

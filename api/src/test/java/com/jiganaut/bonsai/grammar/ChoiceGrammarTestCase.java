@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 
 /**
  * 
@@ -22,25 +23,29 @@ interface ChoiceGrammarTestCase extends GrammarTestCase {
         @Override
         ChoiceGrammar.Builder createTarget();
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("hidden() [No elements]")
-        default void hiddenInCaseOfNoElements() throws Exception {
+        default void hiddenInCaseOfNoElements(TestReporter testReporter) throws Exception {
             assumeTrue(isNoElements());
 
             var builder = createTarget();
 
-            assertThrows(IllegalStateException.class, () -> builder.hidden());
+            var ex = assertThrows(IllegalStateException.class, () -> builder.hidden());
+            testReporter.publishEntry(ex.getMessage());
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("hidden() [Post-build operation]")
-        default void hiddenInCaseOfPostBuild() throws Exception {
+        default void hiddenInCaseOfPostBuild(TestReporter testReporter) throws Exception {
             assumeTrue(canBuild());
 
             var builder = createTarget();
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.hidden());
+            var ex = assertThrows(IllegalStateException.class, () -> builder.hidden());
+            testReporter.publishEntry(ex.getMessage());
         }
 
         @Test
@@ -53,9 +58,10 @@ interface ChoiceGrammarTestCase extends GrammarTestCase {
             assertEquals(target, target.hidden());
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("add(st:String, ru:Rule) [Symbol added before hidden]")
-        default void addStRuInCaseOfSymbolAddedBeforeHidden() throws Exception {
+        default void addStRuInCaseOfSymbolAddedBeforeHidden(TestReporter testReporter) throws Exception {
             assumeTrue(canBuild());
 
             var builder = createTarget().hidden();
@@ -64,12 +70,14 @@ interface ChoiceGrammarTestCase extends GrammarTestCase {
                     .findFirst()
                     .get()
                     .getSymbol();
-            assertThrows(IllegalStateException.class, () -> builder.add(symbol, mock(Rule.class)));
+            var ex = assertThrows(IllegalStateException.class, () -> builder.add(symbol, mock(Rule.class)));
+            testReporter.publishEntry(ex.getMessage());
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("add(st:String, rb:Rule.Builder) [Symbol added before hidden]")
-        default void addStRbInCaseOfSymbolAddedBeforeHidden() throws Exception {
+        default void addStRbInCaseOfSymbolAddedBeforeHidden(TestReporter testReporter) throws Exception {
             assumeTrue(canBuild());
 
             var builder = createTarget().hidden();
@@ -78,7 +86,8 @@ interface ChoiceGrammarTestCase extends GrammarTestCase {
                     .findFirst()
                     .get()
                     .getSymbol();
-            assertThrows(IllegalStateException.class, () -> builder.add(symbol, mock(Rule.Builder.class)));
+            var ex = assertThrows(IllegalStateException.class, () -> builder.add(symbol, mock(Rule.Builder.class)));
+            testReporter.publishEntry(ex.getMessage());
         }
 
     }

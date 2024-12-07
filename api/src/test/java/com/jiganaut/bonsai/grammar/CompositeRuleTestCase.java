@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 
 interface CompositeRuleTestCase<U extends Rule & Quantifiable> extends RuleTestCase, QuantifiableTestCase {
 
@@ -14,58 +15,70 @@ interface CompositeRuleTestCase<U extends Rule & Quantifiable> extends RuleTestC
         @Override
         T createTarget();
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("exactly(int) [Post-build operation]")
-        default void exactlyInCaseOfPostBuild() throws Exception {
+        default void exactlyInCaseOfPostBuild(TestReporter testReporter) throws Exception {
             var builder = createTarget();
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.exactly(0));
+            var ex = assertThrows(IllegalStateException.class, () -> builder.exactly(0));
+            testReporter.publishEntry(ex.getMessage());
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("atLeast(int) [Post-build operation]")
-        default void atLeastInCaseOfPostBuild() throws Exception {
+        default void atLeastInCaseOfPostBuild(TestReporter testReporter) throws Exception {
             var builder = createTarget();
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.atLeast(0));
+            var ex = assertThrows(IllegalStateException.class, () -> builder.atLeast(0));
+            testReporter.publishEntry(ex.getMessage());
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("range(int, int) [Post-build operation]")
-        default void rangeInCaseOfPostBuild() throws Exception {
+        default void rangeInCaseOfPostBuild(TestReporter testReporter) throws Exception {
             var builder = createTarget();
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.range(0, 0));
+            var ex = assertThrows(IllegalStateException.class, () -> builder.range(0, 0));
+            testReporter.publishEntry(ex.getMessage());
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("opt() [Post-build operation]")
-        default void optInCaseOfPostBuild() throws Exception {
+        default void optInCaseOfPostBuild(TestReporter testReporter) throws Exception {
             var builder = createTarget();
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.opt());
+            var ex = assertThrows(IllegalStateException.class, () -> builder.opt());
+            testReporter.publishEntry(ex.getMessage());
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("zeroOrMore() [Post-build operation]")
-        default void zeroOrMoreInCaseOfPostBuild() throws Exception {
+        default void zeroOrMoreInCaseOfPostBuild(TestReporter testReporter) throws Exception {
             var builder = createTarget();
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.zeroOrMore());
+            var ex = assertThrows(IllegalStateException.class, () -> builder.zeroOrMore());
+            testReporter.publishEntry(ex.getMessage());
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("oneOrMore() [Post-build operation]")
-        default void oneOrMoreInCaseOfPostBuild() throws Exception {
+        default void oneOrMoreInCaseOfPostBuild(TestReporter testReporter) throws Exception {
             var builder = createTarget();
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.oneOrMore());
+            var ex = assertThrows(IllegalStateException.class, () -> builder.oneOrMore());
+            testReporter.publishEntry(ex.getMessage());
         }
 
     }

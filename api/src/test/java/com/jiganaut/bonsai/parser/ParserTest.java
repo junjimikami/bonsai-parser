@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 import org.junit.jupiter.api.function.Executable;
 
 import com.jiganaut.bonsai.grammar.ChoiceGrammar;
@@ -36,14 +37,15 @@ class ParserTest {
 
         @Test
         @DisplayName("[Tokens remained]")
-        void tokensRemained() throws Exception {
+        void tokensRemained(TestReporter testReporter) throws Exception {
             var grammar = SingleOriginGrammar.builder()
                     .add("S", () -> PatternRule.of("1"))
                     .build();
             var factory = ParserFactory.of(grammar);
             var parser = factory.createParser(new StringReader("11"));
 
-            assertThrows(ParseException.class, () -> parser.parse());
+            var ex = assertThrows(ParseException.class, () -> parser.parse());
+            testReporter.publishEntry(ex.getMessage());
         }
 
     }

@@ -13,6 +13,7 @@ import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
@@ -32,38 +33,46 @@ interface ChoiceRuleTestCase extends CompositeRuleTestCase<ChoiceRule> {
         @Override
         ChoiceRule expectedRule();
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("add(r:Rule) [Null parameter]")
-        default void addRInCaseOfNullParameter() throws Exception {
+        default void addRInCaseOfNullParameter(TestReporter testReporter) throws Exception {
             var builder = createTarget();
 
-            assertThrows(NullPointerException.class, () -> builder.add((Rule) null));
+            var ex = assertThrows(NullPointerException.class, () -> builder.add((Rule) null));
+            testReporter.publishEntry(ex.getMessage());
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("add(rb:Rule.Builder) [Null parameter]")
-        default void addRbInCaseOfNullParameter() throws Exception {
+        default void addRbInCaseOfNullParameter(TestReporter testReporter) throws Exception {
             var builder = createTarget();
 
-            assertThrows(NullPointerException.class, () -> builder.add((Rule.Builder) null));
+            var ex = assertThrows(NullPointerException.class, () -> builder.add((Rule.Builder) null));
+            testReporter.publishEntry(ex.getMessage());
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("add(r:Rule) [Post-build operation]")
-        default void addRInCaseOfPostBuild() throws Exception {
+        default void addRInCaseOfPostBuild(TestReporter testReporter) throws Exception {
             var builder = createTarget();
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.add(mock(Rule.class)));
+            var ex = assertThrows(IllegalStateException.class, () -> builder.add(mock(Rule.class)));
+            testReporter.publishEntry(ex.getMessage());
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("add(rb:Rule.Builder) [Post-build operation]")
-        default void addRbInCaseOfPostBuild() throws Exception {
+        default void addRbInCaseOfPostBuild(TestReporter testReporter) throws Exception {
             var builder = createTarget();
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.add(mock(Rule.Builder.class)));
+            var ex = assertThrows(IllegalStateException.class, () -> builder.add(mock(Rule.Builder.class)));
+            testReporter.publishEntry(ex.getMessage());
         }
 
         @Test
@@ -102,13 +111,15 @@ interface ChoiceRuleTestCase extends CompositeRuleTestCase<ChoiceRule> {
         }
         
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("shortCircuit() [Post-build operation]")
-        default void shortCircuitInCaseOfPostBuild() throws Exception {
+        default void shortCircuitInCaseOfPostBuild(TestReporter testReporter) throws Exception {
             var builder = createTarget();
             builder.build();
 
-            assertThrows(IllegalStateException.class, () -> builder.shortCircuit());
+            var ex = assertThrows(IllegalStateException.class, () -> builder.shortCircuit());
+            testReporter.publishEntry(ex.getMessage());
         }
 
         @Test

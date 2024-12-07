@@ -50,7 +50,7 @@ class DefaultProductionSet extends AbstractSet<Production> implements Production
                 .filter(e -> Objects.equals(e.getSymbol(), symbol))
                 .collect(LinkedHashSet<Production>::new, Set::add, Set::addAll);
         if (set.isEmpty()) {
-            throw new NoSuchElementException(Message.NO_SUCH_SYMBOL.format(symbol));
+            throw new NoSuchElementException(Message.SYMBOL_NOT_FOUND.format(symbol));
         }
         return new DefaultProductionSet(set, isShortCircuit());
     }

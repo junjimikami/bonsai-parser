@@ -7,6 +7,7 @@ import java.io.StringReader;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 import org.junit.jupiter.api.function.Executable;
 
 import com.jiganaut.bonsai.grammar.ChoiceRule;
@@ -22,31 +23,33 @@ interface ParseExceptionTestCase {
 
     @Test
     @DisplayName("Grammar [No matching production rule]")
-    default void noMatchingProductionRule() throws Exception {
+    default void noMatchingProductionRule(TestReporter testReporter) throws Exception {
         var grammar = SingleOriginGrammar.builder()
                 .add("S", PatternRule.of("1"))
                 .add("S", PatternRule.of("2"))
                 .build();
         var target = createTarget(grammar, new StringReader("0"));
 
-        assertThrows(ParseException.class, target);
+        var ex = assertThrows(ParseException.class, target);
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
     @DisplayName("Grammar [Ambiguous grammar]")
-    default void ambiguousGrammar() throws Exception {
+    default void ambiguousGrammar(TestReporter testReporter) throws Exception {
         var grammar = SingleOriginGrammar.builder()
                 .add("S", PatternRule.of("1"))
                 .add("S", PatternRule.of("."))
                 .build();
         var target = createTarget(grammar, new StringReader("1"));
 
-        assertThrows(ParseException.class, target);
+        var ex = assertThrows(ParseException.class, target);
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
     @DisplayName("Choice rule [No matching rules]")
-    default void noMatchingRulesInChoiceRule() throws Exception {
+    default void noMatchingRulesInChoiceRule(TestReporter testReporter) throws Exception {
         var grammar = SingleOriginGrammar.builder()
                 .add("S", ChoiceRule.builder()
                         .add(() -> PatternRule.of("1"))
@@ -54,12 +57,13 @@ interface ParseExceptionTestCase {
                 .build();
         var target = createTarget(grammar, new StringReader("0"));
 
-        assertThrows(ParseException.class, target);
+        var ex = assertThrows(ParseException.class, target);
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
     @DisplayName("Choice rule [Ambiguous choice]")
-    default void ambiguousChoiceInChoiceRule() throws Exception {
+    default void ambiguousChoiceInChoiceRule(TestReporter testReporter) throws Exception {
         var grammar = SingleOriginGrammar.builder()
                 .add("S", ChoiceRule.builder()
                         .add(() -> PatternRule.of("1"))
@@ -67,12 +71,13 @@ interface ParseExceptionTestCase {
                 .build();
         var target = createTarget(grammar, new StringReader("1"));
 
-        assertThrows(ParseException.class, target);
+        var ex = assertThrows(ParseException.class, target);
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
     @DisplayName("Sequence rule [No matching rules]")
-    default void noMatchingRulesInSequenceRule() throws Exception {
+    default void noMatchingRulesInSequenceRule(TestReporter testReporter) throws Exception {
         var grammar = SingleOriginGrammar.builder()
                 .add("S", SequenceRule.builder()
                         .add(() -> PatternRule.of("1"))
@@ -80,40 +85,44 @@ interface ParseExceptionTestCase {
                 .build();
         var target = createTarget(grammar, new StringReader("0"));
 
-        assertThrows(ParseException.class, target);
+        var ex = assertThrows(ParseException.class, target);
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
     @DisplayName("Pattern rule [No matching rules]")
-    default void noMatchingRulesInPatternRule() throws Exception {
+    default void noMatchingRulesInPatternRule(TestReporter testReporter) throws Exception {
         var grammar = SingleOriginGrammar.builder()
                 .add("S", PatternRule.of("1"))
                 .build();
         var target = createTarget(grammar, new StringReader("0"));
 
-        assertThrows(ParseException.class, target);
+        var ex = assertThrows(ParseException.class, target);
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
     @DisplayName("Quantifier rule [Match Count Shortage]")
-    default void matchCountShortageInQuantifierRule() throws Exception {
+    default void matchCountShortageInQuantifierRule(TestReporter testReporter) throws Exception {
         var grammar = SingleOriginGrammar.builder()
                 .add("S", PatternRule.of("0").atLeast(2))
                 .build();
         var target = createTarget(grammar, new StringReader("0"));
 
-        assertThrows(ParseException.class, target);
+        var ex = assertThrows(ParseException.class, target);
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
     @DisplayName("Empty rule [No matching rules]")
-    default void noMatchingRulesInEmptyRule() throws Exception {
+    default void noMatchingRulesInEmptyRule(TestReporter testReporter) throws Exception {
         var grammar = SingleOriginGrammar.builder()
                 .add("S", Rule.EMPTY)
                 .build();
         var target = createTarget(grammar, new StringReader("0"));
 
-        assertThrows(ParseException.class, target);
+        var ex = assertThrows(ParseException.class, target);
+        testReporter.publishEntry(ex.getMessage());
     }
 
 }

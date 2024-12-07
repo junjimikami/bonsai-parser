@@ -12,6 +12,7 @@ import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.grammar.SequenceRule;
 import com.jiganaut.bonsai.grammar.SimpleRuleVisitor;
 import com.jiganaut.bonsai.grammar.SkipRule;
+import com.jiganaut.bonsai.impl.Message;
 
 class ReferenceCheck implements SimpleRuleVisitor<Void, List<String>> {
     private static final ReferenceCheck INSTANCE = new ReferenceCheck();
@@ -43,7 +44,7 @@ class ReferenceCheck implements SimpleRuleVisitor<Void, List<String>> {
     @Override
     public Void visitReference(ReferenceRule reference, List<String> p) {
         if (!p.contains(reference.getSymbol())) {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException(Message.SYMBOL_NOT_FOUND.format(reference.getSymbol()));
         }
         return null;
     }

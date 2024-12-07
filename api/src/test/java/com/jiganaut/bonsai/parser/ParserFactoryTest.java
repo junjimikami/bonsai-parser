@@ -4,11 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
-import java.util.NoSuchElementException;
+import java.util.ServiceConfigurationError;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 
 import com.jiganaut.bonsai.grammar.ChoiceGrammar;
 import com.jiganaut.bonsai.grammar.Grammar;
@@ -18,8 +19,9 @@ class ParserFactoryTest {
 
     @Test
     @DisplayName("of(Grammar) [Null parameter]")
-    void ofInCaseNullParameter() throws Exception {
-        assertThrows(NullPointerException.class, () -> ParserFactory.of(null));
+    void ofInCaseNullParameter(TestReporter testReporter) throws Exception {
+        var ex = assertThrows(NullPointerException.class, () -> ParserFactory.of(null));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
@@ -33,14 +35,16 @@ class ParserFactoryTest {
 
     @Test
     @DisplayName("load(st:String) [Null parameter]")
-    void loadStInCaseNullParameter() throws Exception {
-        assertThrows(NoSuchElementException.class, () -> ParserFactory.load((String) null));
+    void loadStInCaseNullParameter(TestReporter testReporter) throws Exception {
+        var ex = assertThrows(ServiceConfigurationError.class, () -> ParserFactory.load((String) null));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
     @DisplayName("load(st:String) [No such factory]")
-    void loadStInCaseNoSuchFactory() throws Exception {
-        assertThrows(NoSuchElementException.class, () -> ParserFactory.load(""));
+    void loadStInCaseNoSuchFactory(TestReporter testReporter) throws Exception {
+        var ex = assertThrows(ServiceConfigurationError.class, () -> ParserFactory.load(""));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Nested

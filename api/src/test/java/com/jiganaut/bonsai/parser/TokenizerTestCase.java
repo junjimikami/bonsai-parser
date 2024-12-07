@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -69,10 +70,11 @@ interface TokenizerTestCase extends TestCase {
 
     @Test
     @DisplayName("hasNextValue(st:String) [Null parameter]")
-    default void hasNextValueStInCaseOfNullParameter() throws Exception {
+    default void hasNextValueStInCaseOfNullParameter(TestReporter testReporter) throws Exception {
         var target = createTarget();
 
-        assertThrows(NullPointerException.class, () -> target.hasNextValue((String) null));
+        var ex = assertThrows(NullPointerException.class, () -> target.hasNextValue((String) null));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
@@ -91,10 +93,11 @@ interface TokenizerTestCase extends TestCase {
 
     @Test
     @DisplayName("hasNextValue(pa:Pattern) [Null parameter]")
-    default void hasNextValuePaInCaseOfNullParameter() throws Exception {
+    default void hasNextValuePaInCaseOfNullParameter(TestReporter testReporter) throws Exception {
         var target = createTarget();
 
-        assertThrows(NullPointerException.class, () -> target.hasNextValue((Pattern) null));
+        var ex = assertThrows(NullPointerException.class, () -> target.hasNextValue((Pattern) null));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
@@ -115,7 +118,7 @@ interface TokenizerTestCase extends TestCase {
 
     @Test
     @DisplayName("next()")
-    default void next() throws Exception {
+    default void next(TestReporter testReporter) throws Exception {
         var target = createTarget();
 
         var expected = expectedIterator();
@@ -126,12 +129,13 @@ interface TokenizerTestCase extends TestCase {
             assertEquals(next.getValue(), actual.getValue());
         }
         assertFalse(target.hasNext());
-        assertThrows(NoSuchElementException.class, () -> target.next());
+        var ex = assertThrows(NoSuchElementException.class, () -> target.next());
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
     @DisplayName("nextName()")
-    default void nextName() throws Exception {
+    default void nextName(TestReporter testReporter) throws Exception {
         var target = createTarget();
 
         var expected = expectedIterator();
@@ -140,12 +144,13 @@ interface TokenizerTestCase extends TestCase {
             assertEquals(next.getName(), target.nextName());
         }
         assertFalse(target.hasNext());
-        assertThrows(NoSuchElementException.class, () -> target.nextName());
+        var ex = assertThrows(NoSuchElementException.class, () -> target.nextName());
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
     @DisplayName("nextValue()")
-    default void nextValue() throws Exception {
+    default void nextValue(TestReporter testReporter) throws Exception {
         var target = createTarget();
 
         var expected = expectedIterator();
@@ -154,7 +159,8 @@ interface TokenizerTestCase extends TestCase {
             assertEquals(next.getValue(), target.nextValue());
         }
         assertFalse(target.hasNext());
-        assertThrows(NoSuchElementException.class, () -> target.nextValue());
+        var ex = assertThrows(NoSuchElementException.class, () -> target.nextValue());
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
@@ -201,7 +207,7 @@ interface TokenizerTestCase extends TestCase {
 
     @Test
     @DisplayName("getIndex()")
-    default void getIndex() throws Exception {
+    default void getIndex(TestReporter testReporter) throws Exception {
         var target = createTarget();
 
         assertEquals(0, target.getIndex());
@@ -216,11 +222,13 @@ interface TokenizerTestCase extends TestCase {
     @ParameterizedTest
     @MethodSource("tokenizerOperations")
     @DisplayName("Tokenizer operation [Closed input stream]")
-    default void tokenizerOperationInCaseOfClosedInputStream(Consumer<Tokenizer> operation) throws Exception {
+    default void tokenizerOperationInCaseOfClosedInputStream(Consumer<Tokenizer> operation, TestReporter testReporter)
+            throws Exception {
         var target = createTarget();
         target.close();
 
-        assertThrows(IllegalStateException.class, () -> operation.accept(target));
+        var ex = assertThrows(IllegalStateException.class, () -> operation.accept(target));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     static Stream<Consumer<Tokenizer>> tokenizerOperations() {

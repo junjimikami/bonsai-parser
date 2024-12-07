@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 
 import com.jiganaut.bonsai.parser.Tree.Kind;
 
@@ -23,24 +24,28 @@ interface NonTerminalNodeTestCase extends TreeTestCase {
             return isSetName();
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("setName(String) [Null parameter]")
-        default void setNameInCaseOfNullParameter() throws Exception {
+        default void setNameInCaseOfNullParameter(TestReporter testReporter) throws Exception {
             assumeFalse(isSetName());
 
             var builder = createTarget();
 
-            assertThrows(NullPointerException.class, () -> builder.setName(null));
+            var ex = assertThrows(NullPointerException.class, () -> builder.setName(null));
+            testReporter.publishEntry(ex.getMessage());
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("build() [setName not excuted]")
-        default void buildInCaseOfSetNameNotExcuted() throws Exception {
+        default void buildInCaseOfSetNameNotExcuted(TestReporter testReporter) throws Exception {
             assumeFalse(isSetName());
 
             var builder = createTarget();
 
-            assertThrows(NullPointerException.class, () -> builder.build());
+            var ex = assertThrows(NullPointerException.class, () -> builder.build());
+            testReporter.publishEntry(ex.getMessage());
         }
 
     }

@@ -2,6 +2,7 @@ package com.jiganaut.bonsai.parser.impl;
 
 import java.util.Objects;
 
+import com.jiganaut.bonsai.impl.Message;
 import com.jiganaut.bonsai.parser.TerminalNode;
 import com.jiganaut.bonsai.parser.Token;
 
@@ -24,7 +25,7 @@ class DefaultToken extends AbstractTree implements Token {
 
         @Override
         public DefaultToken build() {
-            checkParameter(value);
+            Objects.requireNonNull(value, Message.VALUE_NOT_SET.format());
             checkForBuild();
             return new DefaultToken(name, value);
         }
@@ -56,7 +57,9 @@ class DefaultToken extends AbstractTree implements Token {
     public String toString() {
         var sb = new StringBuilder();
         if (name != null) {
+            sb.append("\"");
             sb.append(name);
+            sb.append("\"");
             sb.append(":");
         }
         sb.append("\"");

@@ -8,6 +8,7 @@ import java.util.regex.PatternSyntaxException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -16,20 +17,23 @@ class PatternRuleTest {
 
     @Test
     @DisplayName("of(st:String) [Null parameter]")
-    void ofStInCaseOfNullParameter() throws Exception {
-        assertThrows(NullPointerException.class, () -> PatternRule.of((String) null));
+    void ofStInCaseOfNullParameter(TestReporter testReporter) throws Exception {
+        var ex = assertThrows(NullPointerException.class, () -> PatternRule.of((String) null));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
     @DisplayName("of(pa:Pattern) [Null parameter]")
-    void ofPaInCaseOfNullParameter() throws Exception {
-        assertThrows(NullPointerException.class, () -> PatternRule.of((Pattern) null));
+    void ofPaInCaseOfNullParameter(TestReporter testReporter) throws Exception {
+        var ex = assertThrows(NullPointerException.class, () -> PatternRule.of((Pattern) null));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
     @DisplayName("of(st:String) [Invalid regex]")
-    void ofStInCaseOfInvalidRegex() throws Exception {
-        assertThrows(PatternSyntaxException.class, () -> PatternRule.of("["));
+    void ofStInCaseOfInvalidRegex(TestReporter testReporter) throws Exception {
+        var ex = assertThrows(PatternSyntaxException.class, () -> PatternRule.of("["));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @ParameterizedTest

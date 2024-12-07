@@ -71,7 +71,9 @@ class ReaderTokenizer extends AbstractTokenizer {
     }
 
     private void writeCurrent() {
-        assert nextToken != null;
+        if (nextToken == null) {
+            throw new NoSuchElementException(Message.NO_TOKENS_REMAINING.format());
+        }
         if (lineIncrement != 0) {
             lineNumber += lineIncrement;
             lineIncrement = 0;
@@ -114,9 +116,6 @@ class ReaderTokenizer extends AbstractTokenizer {
     @Override
     public Token next() {
         readNext();
-        if (nextToken == null) {
-            throw new NoSuchElementException(Message.TOKEN_NOT_FOUND.format());
-        }
         writeCurrent();
         return new DefaultToken(null, currentToken);
     }
@@ -124,9 +123,6 @@ class ReaderTokenizer extends AbstractTokenizer {
     @Override
     public String nextName() {
         readNext();
-        if (nextToken == null) {
-            throw new NoSuchElementException(Message.TOKEN_NOT_FOUND.format());
-        }
         writeCurrent();
         return null;
     }
@@ -134,9 +130,6 @@ class ReaderTokenizer extends AbstractTokenizer {
     @Override
     public String nextValue() {
         readNext();
-        if (nextToken == null) {
-            throw new NoSuchElementException(Message.TOKEN_NOT_FOUND.format());
-        }
         writeCurrent();
         return currentToken;
     }

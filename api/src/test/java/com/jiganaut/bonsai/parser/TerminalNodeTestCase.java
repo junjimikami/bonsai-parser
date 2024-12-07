@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 
 import com.jiganaut.bonsai.parser.Tree.Kind;
 
@@ -25,24 +26,28 @@ interface TerminalNodeTestCase extends TreeTestCase {
             return isSetValue();
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("setValue(String) [Null parameter]")
-        default void setValueInCaseOfNullParameter() throws Exception {
+        default void setValueInCaseOfNullParameter(TestReporter testReporter) throws Exception {
             assumeFalse(isSetValue());
 
             var builder = createTarget();
 
-            assertThrows(NullPointerException.class, () -> builder.setValue(null));
+            var ex = assertThrows(NullPointerException.class, () -> builder.setValue(null));
+            testReporter.publishEntry(ex.getMessage());
         }
 
+        @SuppressWarnings("exports")
         @Test
         @DisplayName("build() [setValue not excuted]")
-        default void buildInCaseOfSetValueNotExcuted() throws Exception {
+        default void buildInCaseOfSetValueNotExcuted(TestReporter testReporter) throws Exception {
             assumeFalse(isSetValue());
 
             var builder = createTarget();
 
-            assertThrows(NullPointerException.class, () -> builder.build());
+            var ex = assertThrows(NullPointerException.class, () -> builder.build());
+            testReporter.publishEntry(ex.getMessage());
         }
 
     }

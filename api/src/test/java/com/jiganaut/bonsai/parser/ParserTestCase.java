@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 
 import com.jiganaut.bonsai.TestCase;
 
@@ -19,22 +20,24 @@ interface ParserTestCase extends TestCase {
 
     @Test
     @DisplayName("parse() [Closed input stream]")
-    default void parseInCaseOfClosedInputStream() throws Exception {
+    default void parseInCaseOfClosedInputStream(TestReporter testReporter) throws Exception {
         var target = createTarget();
         target.close();
 
-        assertThrows(IllegalStateException.class, () -> target.parse());
+        var ex = assertThrows(IllegalStateException.class, () -> target.parse());
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
     @DisplayName("parse() [Post-parse operation]")
-    default void parseInCaseOfPostParseOperation() throws Exception {
+    default void parseInCaseOfPostParseOperation(TestReporter testReporter) throws Exception {
         assumeFalse(expectedTree().getSubTrees().isEmpty());
 
         var target = createTarget();
         target.parse();
 
-        assertThrows(IllegalStateException.class, () -> target.parse());
+        var ex = assertThrows(IllegalStateException.class, () -> target.parse());
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test

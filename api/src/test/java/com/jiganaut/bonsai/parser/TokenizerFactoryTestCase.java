@@ -8,6 +8,7 @@ import java.io.Reader;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 
 import com.jiganaut.bonsai.TestCase;
 
@@ -18,10 +19,11 @@ interface TokenizerFactoryTestCase extends TestCase {
 
     @Test
     @DisplayName("createTokenizer(to:Tokenizer) [Null parameter]")
-    default void createTokenizerToInCaseOfNullParameter() throws Exception {
+    default void createTokenizerToInCaseOfNullParameter(TestReporter testReporter) throws Exception {
         var target = createTarget();
 
-        assertThrows(NullPointerException.class, () -> target.createTokenizer((Tokenizer) null));
+        var ex = assertThrows(NullPointerException.class, () -> target.createTokenizer((Tokenizer) null));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test
@@ -35,10 +37,11 @@ interface TokenizerFactoryTestCase extends TestCase {
 
     @Test
     @DisplayName("createTokenizer(re:Reader) [Null parameter]")
-    default void createTokenizerReInCaseOfNullParameter() throws Exception {
+    default void createTokenizerReInCaseOfNullParameter(TestReporter testReporter) throws Exception {
         var target = createTarget();
 
-        assertThrows(NullPointerException.class, () -> target.createTokenizer((Reader) null));
+        var ex = assertThrows(NullPointerException.class, () -> target.createTokenizer((Reader) null));
+        testReporter.publishEntry(ex.getMessage());
     }
 
     @Test

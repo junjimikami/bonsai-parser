@@ -9,6 +9,7 @@ import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.grammar.SequenceRule;
 import com.jiganaut.bonsai.grammar.SimpleRuleVisitor;
 import com.jiganaut.bonsai.grammar.SkipRule;
+import com.jiganaut.bonsai.impl.Message;
 
 class CompositeCheck implements SimpleRuleVisitor<Void, Void> {
     private static final CompositeCheck INSTANCE = new CompositeCheck();
@@ -25,7 +26,7 @@ class CompositeCheck implements SimpleRuleVisitor<Void, Void> {
     @Override
     public Void visitChoice(ChoiceRule choice, Void p) {
         if (choice.getChoices().isEmpty()) {
-            throw new IllegalStateException();
+            throw new IllegalStateException(Message.EMPTY_CHOICE.format());
         }
         choice.getChoices().forEach(this::visit);
         return null;
@@ -34,7 +35,7 @@ class CompositeCheck implements SimpleRuleVisitor<Void, Void> {
     @Override
     public Void visitSequence(SequenceRule sequence, Void p) {
         if (sequence.getRules().isEmpty()) {
-            throw new IllegalStateException();
+            throw new IllegalStateException(Message.EMPTY_SEQUENCE.format());
         }
         sequence.getRules().forEach(this::visit);
         return null;
