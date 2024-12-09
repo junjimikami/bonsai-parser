@@ -10,7 +10,6 @@ import com.jiganaut.bonsai.grammar.ProductionSet;
 import com.jiganaut.bonsai.grammar.QuantifierRule;
 import com.jiganaut.bonsai.grammar.ReferenceRule;
 import com.jiganaut.bonsai.grammar.Rule;
-import com.jiganaut.bonsai.grammar.RuleVisitor;
 import com.jiganaut.bonsai.grammar.SequenceRule;
 import com.jiganaut.bonsai.grammar.SkipRule;
 
@@ -18,7 +17,7 @@ import com.jiganaut.bonsai.grammar.SkipRule;
  * @author Junji Mikami
  *
  */
-final class FullLengthMatcher implements RuleVisitor<Boolean, Context> {
+final class FullLengthMatcher implements ProductionProcessor<Boolean, Context>, RuleProcessor<Boolean, Context> {
     private static final FullLengthMatcher INSTANCE = new FullLengthMatcher();
 
     private FullLengthMatcher() {
@@ -28,17 +27,16 @@ final class FullLengthMatcher implements RuleVisitor<Boolean, Context> {
         return INSTANCE.visit(rule, context);
     }
 
-    private boolean visitProductionSet(ProductionSet productionSet, Context context) {
-        if (productionSet.isShortCircuit()) {
-            return visitProductionSetAsShortCircuit(productionSet, context);
-        }
-        return visitProductionSetAsNotShortCircuit(productionSet, context);
+    @Override
+    public Boolean visitProduction(Production production, Context context) {
+        return visit(production.getRule(), context);
     }
 
-    private boolean visitProductionSetAsShortCircuit(ProductionSet productionSet, Context context) {
+    @Override
+    public Boolean visitProductionSetAsShortCircuit(ProductionSet productionSet, Context context) {
         int position = context.mark();
         for (var production : productionSet) {
-            if (visit(production.getRule(), context)) {
+            if (visitProduction(production, context)) {
                 context.clear();
                 return true;
             }
@@ -47,7 +45,8 @@ final class FullLengthMatcher implements RuleVisitor<Boolean, Context> {
         return false;
     }
 
-    private boolean visitProductionSetAsNotShortCircuit(ProductionSet productionSet, Context context) {
+    @Override
+    public Boolean visitProductionSetAsNotShortCircuit(ProductionSet productionSet, Context context) {
         var rules = productionSet.stream()
                 .map(Production::getRule)
                 .filter(e -> FirstSetMatcher.scan(e, context))
@@ -72,14 +71,7 @@ final class FullLengthMatcher implements RuleVisitor<Boolean, Context> {
     }
 
     @Override
-    public Boolean visitChoice(ChoiceRule choice, Context context) {
-        if (choice.isShortCircuit()) {
-            return visitChoiceAsShortCircuit(choice, context);
-        }
-        return visitChoiceAsNotShortCircuit(choice, context);
-    }
-
-    private Boolean visitChoiceAsShortCircuit(ChoiceRule choice, Context context) {
+    public Boolean visitChoiceAsShortCircuit(ChoiceRule choice, Context context) {
         int position = context.mark();
         for (var rule : choice.getChoices()) {
             if (visit(rule, context)) {
@@ -91,7 +83,8 @@ final class FullLengthMatcher implements RuleVisitor<Boolean, Context> {
         return false;
     }
 
-    private Boolean visitChoiceAsNotShortCircuit(ChoiceRule choice, Context context) {
+    @Override
+    public Boolean visitChoiceAsNotShortCircuit(ChoiceRule choice, Context context) {
         var rules = choice.getChoices().stream()
                 .filter(e -> FirstSetMatcher.scan(e, context))
                 .toList();
