@@ -22,5 +22,11 @@ public interface QuantifierRule extends Rule {
     public int getMinCount();
     public OptionalInt getMaxCount();
     public Rule getRule();
-    public Stream<Rule> stream();
+    public default Stream<Rule> stream() {
+        var stream = Stream.generate(this::getRule);
+        if (getMaxCount().isPresent()) {
+            return stream.limit(getMaxCount().getAsInt());
+        }
+        return stream;
+    }
 }

@@ -2,7 +2,6 @@ package com.jiganaut.bonsai.grammar.impl;
 
 import java.util.Objects;
 import java.util.OptionalInt;
-import java.util.stream.Stream;
 
 import com.jiganaut.bonsai.grammar.QuantifierRule;
 import com.jiganaut.bonsai.grammar.Rule;
@@ -47,15 +46,6 @@ class DefaultQuantifierRule extends AbstractRule implements QuantifierRule {
     @Override
     public Rule getRule() {
         return rule;
-    }
-
-    @Override
-    public Stream<Rule> stream() {
-        var stream = Stream.generate(() -> rule);
-        if (maxCount.isPresent()) {
-            return stream.limit(maxCount.getAsInt());
-        }
-        return stream;
     }
 
     @Override
