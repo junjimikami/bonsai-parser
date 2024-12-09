@@ -1,6 +1,6 @@
 package com.jiganaut.bonsai.parser;
 
-import com.jiganaut.bonsai.parser.spi.TreeProvider;
+import com.jiganaut.bonsai.parser.spi.ParserProvider;
 
 /**
  *
@@ -29,7 +29,7 @@ public interface NonTerminalNode extends Tree {
     }
 
     public static NonTerminalNode.Builder builder() {
-        return TreeProvider.load().createNonTerminalBuilder();
+        return ParserProvider.load().createNonTerminalNodeBuilder();
     }
 
     public static NonTerminalNode of(String name, String value, Tree... trees) {

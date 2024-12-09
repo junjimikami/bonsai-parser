@@ -4,6 +4,5 @@ module com.jiganaut.bonsai {
 
     uses com.jiganaut.bonsai.parser.TokenizerFactory;
     uses com.jiganaut.bonsai.parser.ParserFactory;
-    uses com.jiganaut.bonsai.parser.spi.TokenizerFactoryProvider;
-    uses com.jiganaut.bonsai.parser.spi.ParserFactoryProvider;
+    uses com.jiganaut.bonsai.parser.spi.ParserProvider;
 }

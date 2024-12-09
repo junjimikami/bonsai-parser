@@ -12,15 +12,13 @@ class DefaultToken extends AbstractTree implements Token {
         @Override
         public DefaultToken.Builder setName(String name) {
             check();
-            super.setName(name);
-            return this;
+            return (Builder) super.setName(name);
         }
 
         @Override
         public DefaultToken.Builder setValue(String value) {
             checkParameter(value);
-            super.setValue(value);
-            return this;
+            return (Builder) super.setValue(value);
         }
 
         @Override

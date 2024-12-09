@@ -24,15 +24,13 @@ class DefaultNonTerminalNode extends AbstractTree implements NonTerminalNode {
         @Override
         public NonTerminalNode.Builder setName(String name) {
             checkParameter(name);
-            super.setName(name);
-            return this;
+            return (Builder) super.setName(name);
         }
 
         @Override
         public NonTerminalNode.Builder setValue(String value) {
             check();
-            super.setValue(value);
-            return this;
+            return (Builder) super.setValue(value);
         }
 
         @Override

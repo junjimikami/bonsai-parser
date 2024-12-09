@@ -12,7 +12,7 @@ import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
 import com.jiganaut.bonsai.grammar.spi.GrammarProvider;
 import com.jiganaut.bonsai.impl.Message;
 
-public class DefaultGrammarProvider extends GrammarProvider {
+public final class DefaultGrammarProvider extends GrammarProvider {
 
     @Override
     public SingleOriginGrammar.Builder createSingleOriginGrammarBuilder() {

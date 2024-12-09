@@ -3,7 +3,7 @@ package com.jiganaut.bonsai.parser;
 import java.io.Reader;
 
 import com.jiganaut.bonsai.grammar.Grammar;
-import com.jiganaut.bonsai.parser.spi.TokenizerFactoryProvider;
+import com.jiganaut.bonsai.parser.spi.ParserProvider;
 
 /**
  * 
@@ -13,11 +13,11 @@ import com.jiganaut.bonsai.parser.spi.TokenizerFactoryProvider;
 public interface TokenizerFactory {
 
     public static TokenizerFactory of(Grammar grammar) {
-        return TokenizerFactoryProvider.provider().createFactory(grammar);
+        return ParserProvider.load().createTokenizerFactory(grammar);
     }
 
     public static TokenizerFactory load(String factoryName) {
-        return TokenizerFactoryProvider.provider().loadFactory(factoryName);
+        return ParserProvider.load().loadTokenizerFactory(factoryName);
     }
 
     public static TokenizerFactory load(Class<?> factoryClass) {

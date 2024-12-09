@@ -2,7 +2,7 @@ package com.jiganaut.bonsai.parser;
 
 import java.util.List;
 
-import com.jiganaut.bonsai.parser.spi.TreeProvider;
+import com.jiganaut.bonsai.parser.spi.ParserProvider;
 
 /**
  *
@@ -24,7 +24,7 @@ public interface TerminalNode extends Tree {
     }
 
     public static TerminalNode.Builder builder() {
-        return TreeProvider.load().createTerminalBuilder();
+        return ParserProvider.load().createTerminalNodeBuilder();
     }
 
     public static TerminalNode of(String name, String value) {
