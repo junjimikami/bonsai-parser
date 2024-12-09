@@ -15,6 +15,10 @@ import com.jiganaut.bonsai.grammar.ChoiceGrammar;
 import com.jiganaut.bonsai.grammar.Grammar;
 import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 class TokenizerFactoryTest {
 
     @Test

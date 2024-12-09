@@ -9,6 +9,10 @@ import com.jiganaut.bonsai.parser.Parser;
 import com.jiganaut.bonsai.parser.Tokenizer;
 import com.jiganaut.bonsai.parser.Tree;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 class DefaultParser implements Parser {
     private final Context context;
     private boolean isParsed;

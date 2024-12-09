@@ -12,6 +12,10 @@ import org.junit.jupiter.api.TestReporter;
 
 import com.jiganaut.bonsai.TestCase;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 interface ParserFactoryTestCase extends TestCase {
 
     @Override

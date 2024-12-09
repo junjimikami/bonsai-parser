@@ -3,8 +3,16 @@ package com.jiganaut.bonsai.parser.impl;
 import com.jiganaut.bonsai.impl.BaseBuilder;
 import com.jiganaut.bonsai.parser.Tree;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 abstract class AbstractTree implements Tree {
 
+    /**
+     * 
+     * @author Junji Mikami
+     */
     static abstract class Builder extends BaseBuilder implements Tree.Builder {
 
         String name;

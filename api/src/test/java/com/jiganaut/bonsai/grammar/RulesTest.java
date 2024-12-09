@@ -14,6 +14,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.MethodSource;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 class RulesTest {
 
     @Test

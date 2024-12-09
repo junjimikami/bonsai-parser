@@ -9,6 +9,10 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 class ChoiceGrammarTest {
 
     @Nested

@@ -11,6 +11,10 @@ import java.util.regex.Pattern;
 import com.jiganaut.bonsai.impl.Message;
 import com.jiganaut.bonsai.parser.Token;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 class ReaderTokenizer extends AbstractTokenizer {
 
     private final PushbackReader reader;

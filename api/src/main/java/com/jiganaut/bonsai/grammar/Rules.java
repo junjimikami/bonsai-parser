@@ -2,6 +2,10 @@ package com.jiganaut.bonsai.grammar;
 
 import java.util.regex.Pattern;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 public final class Rules {
 
     private Rules() {

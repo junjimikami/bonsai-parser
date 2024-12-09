@@ -13,6 +13,10 @@ import org.junit.jupiter.api.Nested;
 
 import com.jiganaut.bonsai.grammar.SingleOriginGrammar.Builder;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 class SingleOriginGrammarTest {
 
     @Nested

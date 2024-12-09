@@ -6,8 +6,16 @@ import com.jiganaut.bonsai.impl.Message;
 import com.jiganaut.bonsai.parser.TerminalNode;
 import com.jiganaut.bonsai.parser.Token;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 class DefaultToken extends AbstractTree implements Token {
 
+    /**
+     * 
+     * @author Junji Mikami
+     */
     static class Builder extends AbstractTree.Builder implements TerminalNode.Builder {
         @Override
         public DefaultToken.Builder setName(String name) {

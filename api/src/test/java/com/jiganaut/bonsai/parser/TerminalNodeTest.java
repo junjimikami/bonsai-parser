@@ -13,6 +13,10 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import com.jiganaut.bonsai.parser.TerminalNode.Builder;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 class TerminalNodeTest {
 
     @Test

@@ -12,6 +12,10 @@ import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
 import com.jiganaut.bonsai.grammar.spi.GrammarProvider;
 import com.jiganaut.bonsai.impl.Message;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 public final class DefaultGrammarProvider extends GrammarProvider {
 
     @Override

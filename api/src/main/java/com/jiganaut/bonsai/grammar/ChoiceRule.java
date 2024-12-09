@@ -10,6 +10,10 @@ import com.jiganaut.bonsai.grammar.spi.GrammarProvider;
  */
 public interface ChoiceRule extends Rule, Quantifiable {
 
+    /**
+     * 
+     * @author Junji Mikami
+     */
     public static interface Builder extends Rule.Builder, Quantifiable {
         public ChoiceRule.Builder add(Rule rule);
         public ChoiceRule.Builder add(Rule.Builder builder);

@@ -18,6 +18,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import com.jiganaut.bonsai.parser.NonTerminalNode.Builder;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 class NonTerminalNodeTest {
 
     @Test

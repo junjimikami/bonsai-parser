@@ -4,6 +4,10 @@ import java.util.OptionalInt;
 
 import org.junit.jupiter.api.Nested;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 class QuantifierRuleTest {
 
     @Nested

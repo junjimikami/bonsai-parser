@@ -20,9 +20,17 @@ import com.jiganaut.bonsai.parser.Tokenizer;
  */
 class Context implements Tokenizer {
 
+    /**
+     * 
+     * @author Junji Mikami
+     */
     private static record Cache(long lineNumber, long index, String name, String value) {
     }
 
+    /**
+     * 
+     * @author Junji Mikami
+     */
     private static class Position {
         int pos;
         int count;

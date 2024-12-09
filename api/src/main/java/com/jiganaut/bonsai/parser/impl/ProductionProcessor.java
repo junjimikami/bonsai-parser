@@ -3,6 +3,10 @@ package com.jiganaut.bonsai.parser.impl;
 import com.jiganaut.bonsai.grammar.Production;
 import com.jiganaut.bonsai.grammar.ProductionSet;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 interface ProductionProcessor<R, P> {
 
     R visitProduction(Production production, P p);

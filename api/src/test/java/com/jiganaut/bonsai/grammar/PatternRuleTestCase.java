@@ -7,6 +7,10 @@ import org.junit.jupiter.api.Test;
 
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 interface PatternRuleTestCase extends RuleTestCase, QuantifiableTestCase, SkippableTestCase {
 
     @Override

@@ -12,8 +12,16 @@ import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.impl.BaseBuilder;
 import com.jiganaut.bonsai.impl.Message;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 abstract class AbstractGrammar extends DefaultProductionSet implements Grammar {
 
+    /**
+     * 
+     * @author Junji Mikami
+     */
     static abstract class Builder extends BaseBuilder implements Grammar.Builder {
         final Set<Supplier<Production>> set = new LinkedHashSet<>();
         final Set<String> symbols = new HashSet<>();

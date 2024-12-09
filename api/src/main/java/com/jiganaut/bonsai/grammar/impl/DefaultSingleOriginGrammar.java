@@ -11,8 +11,16 @@ import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
 import com.jiganaut.bonsai.impl.Message;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 class DefaultSingleOriginGrammar extends AbstractGrammar implements SingleOriginGrammar {
 
+    /**
+     * 
+     * @author Junji Mikami
+     */
     static class Builder extends AbstractGrammar.Builder implements SingleOriginGrammar.Builder {
         private String startSymbol;
 

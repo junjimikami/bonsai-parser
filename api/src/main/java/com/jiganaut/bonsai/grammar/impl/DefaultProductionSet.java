@@ -12,6 +12,10 @@ import com.jiganaut.bonsai.grammar.Production;
 import com.jiganaut.bonsai.grammar.ProductionSet;
 import com.jiganaut.bonsai.impl.Message;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 class DefaultProductionSet extends AbstractSet<Production> implements ProductionSet {
     final Set<Production> productionSet;
     private final boolean shortCircuit;

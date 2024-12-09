@@ -17,6 +17,10 @@ import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.grammar.SequenceRule;
 import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 interface ParseExceptionTestCase {
 
     Executable createTarget(Grammar grammar, Reader reader);

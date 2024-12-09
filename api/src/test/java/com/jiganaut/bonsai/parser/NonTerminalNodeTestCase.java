@@ -15,6 +15,10 @@ import org.junit.jupiter.api.TestReporter;
 
 import com.jiganaut.bonsai.parser.Tree.Kind;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 interface NonTerminalNodeTestCase extends TreeTestCase {
 
     interface BuilderTestCase extends TreeTestCase.BuilderTestCase {

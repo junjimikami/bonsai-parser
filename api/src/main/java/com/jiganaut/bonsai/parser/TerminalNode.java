@@ -10,6 +10,10 @@ import com.jiganaut.bonsai.parser.spi.ParserProvider;
  */
 public interface TerminalNode extends Tree {
 
+    /**
+     * 
+     * @author Junji Mikami
+     */
     public static interface Builder extends Tree.Builder {
 
         @Override

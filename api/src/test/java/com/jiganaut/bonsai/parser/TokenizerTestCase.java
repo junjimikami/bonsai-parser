@@ -20,6 +20,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import com.jiganaut.bonsai.TestCase;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 interface TokenizerTestCase extends TestCase {
 
     @Override

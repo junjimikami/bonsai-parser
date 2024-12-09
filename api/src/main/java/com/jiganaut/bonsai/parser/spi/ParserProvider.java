@@ -7,6 +7,10 @@ import com.jiganaut.bonsai.parser.TerminalNode;
 import com.jiganaut.bonsai.parser.TokenizerFactory;
 import com.jiganaut.bonsai.parser.impl.DefaultParserProvider;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 public abstract class ParserProvider {
     private static final ParserProvider DEFAULT_PROVIDER = new DefaultParserProvider();
 

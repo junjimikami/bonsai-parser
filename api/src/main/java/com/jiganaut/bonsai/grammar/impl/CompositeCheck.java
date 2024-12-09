@@ -11,6 +11,10 @@ import com.jiganaut.bonsai.grammar.SimpleRuleVisitor;
 import com.jiganaut.bonsai.grammar.SkipRule;
 import com.jiganaut.bonsai.impl.Message;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 class CompositeCheck implements SimpleRuleVisitor<Void, Void> {
     private static final CompositeCheck INSTANCE = new CompositeCheck();
 

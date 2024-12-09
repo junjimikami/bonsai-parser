@@ -16,6 +16,10 @@ import com.jiganaut.bonsai.grammar.Rule;
  *
  */
 class DefaultChoiceRule extends AbstractCompositeRule<Set<Rule>> implements ChoiceRule {
+    /**
+     * 
+     * @author Junji Mikami
+     */
     static class Builder extends AbstractCompositeRule.Builder implements ChoiceRule.Builder {
 
         @Override

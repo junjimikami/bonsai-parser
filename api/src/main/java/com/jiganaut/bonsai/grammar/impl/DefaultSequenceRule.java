@@ -13,6 +13,10 @@ import com.jiganaut.bonsai.grammar.SequenceRule;
  * @author Junji Mikami
  */
 class DefaultSequenceRule extends AbstractCompositeRule<List<Rule>> implements SequenceRule {
+    /**
+     * 
+     * @author Junji Mikami
+     */
     static class Builder extends AbstractCompositeRule.Builder implements SequenceRule.Builder {
 
         @Override

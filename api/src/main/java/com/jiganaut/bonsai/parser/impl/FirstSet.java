@@ -23,6 +23,10 @@ import com.jiganaut.bonsai.grammar.SkipRule;
  */
 final class FirstSet implements RuleVisitor<Set<Rule>, Context> {
 
+    /**
+     * 
+     * @author Junji Mikami
+     */
     @FunctionalInterface
     private interface TemporaryRule extends Rule, Supplier<Set<Rule>> {
         @Override

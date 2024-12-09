@@ -10,6 +10,10 @@ import com.jiganaut.bonsai.grammar.SequenceRule;
 import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
 import com.jiganaut.bonsai.grammar.impl.DefaultGrammarProvider;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 public abstract class GrammarProvider {
 
     private static final GrammarProvider DEFAULT_PROVIDER = new DefaultGrammarProvider();

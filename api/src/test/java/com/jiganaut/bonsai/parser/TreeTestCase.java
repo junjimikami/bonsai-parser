@@ -19,6 +19,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 import com.jiganaut.bonsai.TestCase;
 import com.jiganaut.bonsai.parser.Tree.Kind;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 interface TreeTestCase extends TestCase {
 
     interface BuilderTestCase extends TestCase {

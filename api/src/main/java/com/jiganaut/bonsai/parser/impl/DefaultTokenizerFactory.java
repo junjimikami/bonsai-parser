@@ -8,6 +8,10 @@ import com.jiganaut.bonsai.impl.Message;
 import com.jiganaut.bonsai.parser.Tokenizer;
 import com.jiganaut.bonsai.parser.TokenizerFactory;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 class DefaultTokenizerFactory implements TokenizerFactory {
     private final Grammar grammar;
 

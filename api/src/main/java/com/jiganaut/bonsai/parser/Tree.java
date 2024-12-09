@@ -26,6 +26,10 @@ public interface Tree {
         }
     }
 
+    /**
+     * 
+     * @author Junji Mikami
+     */
     public static interface Builder {
         public Tree.Builder setName(String name);
 

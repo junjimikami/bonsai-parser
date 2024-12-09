@@ -15,6 +15,10 @@ import org.junit.jupiter.api.TestReporter;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 class SequenceRuleTest {
 
     @Test

@@ -6,6 +6,10 @@ package com.jiganaut.bonsai.grammar;
  */
 public interface Rule {
 
+    /**
+     * 
+     * @author Junji Mikami
+     */
     public static enum Kind {
         PATTERN,
         SEQUENCE,
@@ -20,6 +24,10 @@ public interface Rule {
         }
     }
 
+    /**
+     * 
+     * @author Junji Mikami
+     */
     public static interface Builder {
         public Rule build();
     }

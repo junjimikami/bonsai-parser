@@ -5,6 +5,10 @@ import java.util.Objects;
 import com.jiganaut.bonsai.grammar.Production;
 import com.jiganaut.bonsai.grammar.Rule;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 class DefaultProduction implements Production {
 
     private final String symbol;

@@ -2,7 +2,11 @@ package com.jiganaut.bonsai.grammar;
 
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
-class EmptyRuleTestCase implements RuleTestCase {
+/**
+ * 
+ * @author Junji Mikami
+ */
+class EmptyRuleTest implements RuleTestCase {
 
     @Override
     public Rule createTarget() {

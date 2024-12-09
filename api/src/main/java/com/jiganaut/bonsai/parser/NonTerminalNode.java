@@ -8,6 +8,10 @@ import com.jiganaut.bonsai.parser.spi.ParserProvider;
  */
 public interface NonTerminalNode extends Tree {
 
+    /**
+     * 
+     * @author Junji Mikami
+     */
     public static interface Builder extends Tree.Builder {
 
         @Override

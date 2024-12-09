@@ -7,6 +7,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestReporter;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 interface CompositeRuleTestCase<U extends Rule & Quantifiable> extends RuleTestCase, QuantifiableTestCase {
 
     @Nested

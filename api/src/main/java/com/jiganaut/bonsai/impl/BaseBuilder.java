@@ -2,6 +2,10 @@ package com.jiganaut.bonsai.impl;
 
 import java.util.Objects;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 public abstract class BaseBuilder {
     private boolean isBuilt;
 

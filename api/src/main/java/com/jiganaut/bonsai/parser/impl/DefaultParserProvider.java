@@ -13,6 +13,10 @@ import com.jiganaut.bonsai.parser.TerminalNode;
 import com.jiganaut.bonsai.parser.TokenizerFactory;
 import com.jiganaut.bonsai.parser.spi.ParserProvider;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 public final class DefaultParserProvider extends ParserProvider {
 
     @Override

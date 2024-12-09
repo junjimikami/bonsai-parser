@@ -4,8 +4,16 @@ import java.util.Set;
 
 import com.jiganaut.bonsai.grammar.spi.GrammarProvider;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 public interface ChoiceGrammar extends Grammar {
 
+    /**
+     * 
+     * @author Junji Mikami
+     */
     public static interface Builder extends Grammar.Builder {
         @Override
         public ChoiceGrammar.Builder add(String symbol, Rule rule);

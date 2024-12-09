@@ -11,8 +11,16 @@ import com.jiganaut.bonsai.grammar.ProductionSet;
 import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.impl.Message;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 class DefaultChoiceGrammar extends AbstractGrammar implements ChoiceGrammar {
 
+    /**
+     * 
+     * @author Junji Mikami
+     */
     static class Builder extends AbstractGrammar.Builder implements ChoiceGrammar.Builder {
         private boolean isHidden = false;
         private Set<String> hiddenSymbols = new HashSet<>();

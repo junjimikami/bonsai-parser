@@ -7,6 +7,10 @@ import org.junit.jupiter.api.Test;
 
 import com.jiganaut.bonsai.TestCase;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 interface SkippableTestCase extends TestCase {
     Skippable createTarget();
 

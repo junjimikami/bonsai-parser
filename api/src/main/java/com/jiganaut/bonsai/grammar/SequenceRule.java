@@ -10,6 +10,10 @@ import com.jiganaut.bonsai.grammar.spi.GrammarProvider;
  */
 public interface SequenceRule extends Rule, Quantifiable {
 
+    /**
+     * 
+     * @author Junji Mikami
+     */
     public static interface Builder extends Rule.Builder, Quantifiable {
         public SequenceRule.Builder add(Rule rule);
         public SequenceRule.Builder add(Rule.Builder builder);

@@ -17,6 +17,10 @@ import com.jiganaut.bonsai.parser.Tree;
  */
 class DefaultNonTerminalNode extends AbstractTree implements NonTerminalNode {
 
+    /**
+     * 
+     * @author Junji Mikami
+     */
     static class Builder extends AbstractTree.Builder implements NonTerminalNode.Builder {
 
         private final List<Tree> list = new ArrayList<>();

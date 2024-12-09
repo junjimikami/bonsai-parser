@@ -2,6 +2,10 @@ package com.jiganaut.bonsai.grammar;
 
 import java.util.Set;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 public interface ProductionSet extends Set<Production> {
 
     public boolean containsSymbol(String symbol);

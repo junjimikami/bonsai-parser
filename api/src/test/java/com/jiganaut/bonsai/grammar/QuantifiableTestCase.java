@@ -12,6 +12,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import com.jiganaut.bonsai.TestCase;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 interface QuantifiableTestCase extends TestCase {
     Quantifiable createTarget();
 

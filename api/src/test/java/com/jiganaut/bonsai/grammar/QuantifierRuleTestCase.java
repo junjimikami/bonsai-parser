@@ -10,6 +10,10 @@ import org.junit.jupiter.api.Test;
 
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 interface QuantifierRuleTestCase extends RuleTestCase {
 
     @Override

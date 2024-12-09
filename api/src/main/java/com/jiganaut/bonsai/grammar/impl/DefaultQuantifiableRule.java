@@ -11,6 +11,10 @@ import com.jiganaut.bonsai.impl.Message;
  */
 interface DefaultQuantifiableRule extends Rule, Quantifiable {
 
+    /**
+     * 
+     * @author Junji Mikami
+     */
     interface Builder extends Rule.Builder, Quantifiable {
 
         @Override

@@ -11,6 +11,10 @@ import org.junit.jupiter.api.TestReporter;
 
 import com.jiganaut.bonsai.parser.Tree.Kind;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 interface TerminalNodeTestCase extends TreeTestCase {
 
     interface BuilderTestCase extends TreeTestCase.BuilderTestCase {

@@ -9,6 +9,10 @@ import com.jiganaut.bonsai.impl.BaseBuilder;
  */
 abstract class AbstractRule implements Rule {
 
+    /**
+     * 
+     * @author Junji Mikami
+     */
     static abstract class Builder extends BaseBuilder implements Rule.Builder {
     }
 

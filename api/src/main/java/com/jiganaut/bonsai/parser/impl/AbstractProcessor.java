@@ -10,6 +10,10 @@ import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.impl.Message;
 import com.jiganaut.bonsai.parser.ParseException;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 abstract class AbstractProcessor<R0, R1> implements ProductionProcessor<R0, Context>, RuleProcessor<R1, Context> {
 
     @Override

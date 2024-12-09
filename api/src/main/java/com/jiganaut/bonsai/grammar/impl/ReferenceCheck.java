@@ -14,6 +14,10 @@ import com.jiganaut.bonsai.grammar.SimpleRuleVisitor;
 import com.jiganaut.bonsai.grammar.SkipRule;
 import com.jiganaut.bonsai.impl.Message;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 class ReferenceCheck implements SimpleRuleVisitor<Void, List<String>> {
     private static final ReferenceCheck INSTANCE = new ReferenceCheck();
 

@@ -3,6 +3,10 @@ package com.jiganaut.bonsai.parser.impl;
 import com.jiganaut.bonsai.grammar.ChoiceRule;
 import com.jiganaut.bonsai.grammar.RuleVisitor;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 interface RuleProcessor<R, P> extends RuleVisitor<R, P> {
 
     @Override

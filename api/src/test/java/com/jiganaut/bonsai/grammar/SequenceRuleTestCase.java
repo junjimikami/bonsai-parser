@@ -14,6 +14,10 @@ import org.junit.jupiter.api.TestReporter;
 
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
+/**
+ * 
+ * @author Junji Mikami
+ */
 interface SequenceRuleTestCase extends CompositeRuleTestCase<SequenceRule> {
 
     interface BuilderTestCase extends CompositeRuleTestCase.BuilderTestCase<SequenceRule.Builder> {
