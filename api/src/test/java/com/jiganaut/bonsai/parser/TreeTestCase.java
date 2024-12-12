@@ -2,9 +2,12 @@ package com.jiganaut.bonsai.parser;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.mockito.Mockito.mock;
 
 import java.util.List;
 
@@ -130,11 +133,28 @@ interface TreeTestCase extends TestCase {
     };
 
     @Test
-    @DisplayName("objectMethods()")
-    default void objectMethods() throws Exception {
+    @DisplayName("equals(Object)")
+    default void equals(TestReporter testReporter) throws Exception {
         var target = createTarget();
 
-        target.toString();
+        assertFalse(target.equals(mock(Tree.class)));
+        assertTrue(target.equals(createTarget()));
+    }
+
+    @Test
+    @DisplayName("hashCode()")
+    default void hashCOde(TestReporter testReporter) throws Exception {
+        var target = createTarget();
+
+        testReporter.publishEntry("hashCode()", String.valueOf(target.hashCode()));
+    }
+
+    @Test
+    @DisplayName("toString()")
+    default void toString(TestReporter testReporter) throws Exception {
+        var target = createTarget();
+
+        testReporter.publishEntry("toString()", target.toString());
     }
 
     @Test

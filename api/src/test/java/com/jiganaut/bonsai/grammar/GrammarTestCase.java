@@ -304,6 +304,7 @@ interface GrammarTestCase extends ProductionSetTestCase {
                 .sorted()
                 .collect(Collectors.joining(",", "{", "}"));
         assertEquals(expectedString, actualString);
+        assertTrue(target.productionSet().shortCircuit().isShortCircuit());
     }
 
 }

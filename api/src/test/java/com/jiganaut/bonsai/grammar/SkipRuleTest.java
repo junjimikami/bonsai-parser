@@ -18,7 +18,7 @@ class SkipRuleTest {
 
         @Override
         public Skippable expectedRule() {
-            return PatternRule.of("");
+            return PatternRule.of("\\s");
         }
 
     }

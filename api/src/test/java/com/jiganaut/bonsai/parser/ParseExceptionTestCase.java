@@ -27,7 +27,7 @@ interface ParseExceptionTestCase {
 
     @Test
     @DisplayName("Grammar [No matching production rule]")
-    default void noMatchingProductionRule(TestReporter testReporter) throws Exception {
+    default void grammarInCaseOfNoMatchingProductionRule(TestReporter testReporter) throws Exception {
         var grammar = SingleOriginGrammar.builder()
                 .add("S", PatternRule.of("1"))
                 .add("S", PatternRule.of("2"))
@@ -39,8 +39,99 @@ interface ParseExceptionTestCase {
     }
 
     @Test
+    @DisplayName("Short-circuit grammar [No matching production rule]")
+    default void shortCircuitGrammarInCaseOfNoMatchingProductionRule(TestReporter testReporter) throws Exception {
+        var grammar = SingleOriginGrammar.builder()
+                .add("S", PatternRule.of("1"))
+                .add("S", PatternRule.of("2"))
+                .shortCircuit();
+        var target = createTarget(grammar, new StringReader("0"));
+
+        var ex = assertThrows(ParseException.class, target);
+        testReporter.publishEntry(ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Short-circuit grammar [No matching production rule 2]")
+    default void shortCircuitGrammarInCaseOfNoMatchingProductionRule2(TestReporter testReporter) throws Exception {
+        var grammar = SingleOriginGrammar.builder()
+                .add("S", SequenceRule.builder()
+                        .add(PatternRule.of("0"))
+                        .add(ChoiceRule.builder()
+                                .add(PatternRule.of("8"))
+                                .add(PatternRule.of("9"))))
+                .shortCircuit();
+        var target = createTarget(grammar, new StringReader("01"));
+
+        var ex = assertThrows(ParseException.class, target);
+        testReporter.publishEntry(ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Short-circuit grammar [No matching production rule 3]")
+    default void shortCircuitGrammarInCaseOfNoMatchingProductionRule3(TestReporter testReporter) throws Exception {
+        var grammar = SingleOriginGrammar.builder()
+                .add("S", SequenceRule.builder()
+                        .add(PatternRule.of("0"))
+                        .add(ChoiceRule.builder()
+                                .add(PatternRule.of("8").opt())
+                                .add(PatternRule.of("9").opt()))
+                        .add(PatternRule.of("3")))
+                .shortCircuit();
+        var target = createTarget(grammar, new StringReader("03"));
+
+        var ex = assertThrows(ParseException.class, target);
+        testReporter.publishEntry(ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Short-circuit grammar [No matching production rule 4]")
+    default void shortCircuitGrammarInCaseOfNoMatchingProductionRule4(TestReporter testReporter) throws Exception {
+        var grammar = SingleOriginGrammar.builder()
+                .add("S", SequenceRule.builder()
+                        .add(PatternRule.of("0"))
+                        .add(ChoiceRule.builder()
+                                .add(PatternRule.of("8"))
+                                .add(PatternRule.of(".")))
+                        .add(PatternRule.of("3")))
+                .shortCircuit();
+        var target = createTarget(grammar, new StringReader("083"));
+
+        var ex = assertThrows(ParseException.class, target);
+        testReporter.publishEntry(ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Short-circuit grammar [No matching production rule 5]")
+    default void shortCircuitGrammarInCaseOfNoMatchingProductionRule5(TestReporter testReporter) throws Exception {
+        var grammar = SingleOriginGrammar.builder()
+                .add("S", SequenceRule.builder()
+                        .add(PatternRule.of("0").skip())
+                        .add(PatternRule.of("1").atLeast(2)))
+                .shortCircuit();
+        var target = createTarget(grammar, new StringReader("01"));
+
+        var ex = assertThrows(ParseException.class, target);
+        testReporter.publishEntry(ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Short-circuit grammar [No matching production rule 6]")
+    default void shortCircuitGrammarInCaseOfNoMatchingProductionRule6(TestReporter testReporter) throws Exception {
+        var grammar = SingleOriginGrammar.builder()
+                .add("S", SequenceRule.builder()
+                        .add(PatternRule.of("0"))
+                        .add(Rule.EMPTY))
+                .shortCircuit();
+        var target = createTarget(grammar, new StringReader("01"));
+
+        var ex = assertThrows(ParseException.class, target);
+        testReporter.publishEntry(ex.getMessage());
+    }
+
+    @Test
     @DisplayName("Grammar [Ambiguous grammar]")
-    default void ambiguousGrammar(TestReporter testReporter) throws Exception {
+    default void grammarInCaseOfAmbiguousGrammar(TestReporter testReporter) throws Exception {
         var grammar = SingleOriginGrammar.builder()
                 .add("S", PatternRule.of("1"))
                 .add("S", PatternRule.of("."))
@@ -53,13 +144,49 @@ interface ParseExceptionTestCase {
 
     @Test
     @DisplayName("Choice rule [No matching rules]")
-    default void noMatchingRulesInChoiceRule(TestReporter testReporter) throws Exception {
+    default void choiceRuleInCaseOfNoMatchingRules(TestReporter testReporter) throws Exception {
         var grammar = SingleOriginGrammar.builder()
-                .add("S", ChoiceRule.builder()
-                        .add(() -> PatternRule.of("1"))
-                        .add(() -> PatternRule.of("2")))
+                .add("S", SequenceRule.builder()
+                        .add(PatternRule.of("0"))
+                        .add(ChoiceRule.builder()
+                                .add(PatternRule.of("1"))
+                                .add(PatternRule.of("2"))))
                 .build();
-        var target = createTarget(grammar, new StringReader("0"));
+        var target = createTarget(grammar, new StringReader("03"));
+
+        var ex = assertThrows(ParseException.class, target);
+        testReporter.publishEntry(ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Choice rule [No matching rules 2]")
+    default void choiceRuleInCaseOfNoMatchingRules2(TestReporter testReporter) throws Exception {
+        var grammar = SingleOriginGrammar.builder()
+                .add("S", SequenceRule.builder()
+                        .add(PatternRule.of("0"))
+                        .add(ChoiceRule.builder()
+                                .add(PatternRule.of("8").opt())
+                                .add(PatternRule.of("9").opt()))
+                        .add(PatternRule.of("3")))
+                .build();
+        var target = createTarget(grammar, new StringReader("03"));
+
+        var ex = assertThrows(ParseException.class, target);
+        testReporter.publishEntry(ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Short-circuit choice rule [No matching rules]")
+    default void shortCircuitChoiceRuleInCaseOfNoMatchingRules(TestReporter testReporter) throws Exception {
+        var grammar = SingleOriginGrammar.builder()
+                .add("S", SequenceRule.builder()
+                        .add(PatternRule.of("0"))
+                        .add(ChoiceRule.builder()
+                                .add(PatternRule.of("1"))
+                                .add(PatternRule.of("2"))
+                                .shortCircuit()))
+                .build();
+        var target = createTarget(grammar, new StringReader("03"));
 
         var ex = assertThrows(ParseException.class, target);
         testReporter.publishEntry(ex.getMessage());
@@ -67,7 +194,7 @@ interface ParseExceptionTestCase {
 
     @Test
     @DisplayName("Choice rule [Ambiguous choice]")
-    default void ambiguousChoiceInChoiceRule(TestReporter testReporter) throws Exception {
+    default void choiceRuleInCaseOfAmbiguousChoice(TestReporter testReporter) throws Exception {
         var grammar = SingleOriginGrammar.builder()
                 .add("S", ChoiceRule.builder()
                         .add(() -> PatternRule.of("1"))
@@ -81,13 +208,15 @@ interface ParseExceptionTestCase {
 
     @Test
     @DisplayName("Sequence rule [No matching rules]")
-    default void noMatchingRulesInSequenceRule(TestReporter testReporter) throws Exception {
+    default void sequenceRuleInCaseOfNoMatchingRules(TestReporter testReporter) throws Exception {
         var grammar = SingleOriginGrammar.builder()
                 .add("S", SequenceRule.builder()
-                        .add(() -> PatternRule.of("1"))
-                        .add(() -> PatternRule.of("2")))
+                        .add(PatternRule.of("1"))
+                        .add(SequenceRule.builder()
+                                .add(PatternRule.of("2"))
+                                .add(PatternRule.of("3"))))
                 .build();
-        var target = createTarget(grammar, new StringReader("0"));
+        var target = createTarget(grammar, new StringReader("13"));
 
         var ex = assertThrows(ParseException.class, target);
         testReporter.publishEntry(ex.getMessage());
@@ -95,9 +224,11 @@ interface ParseExceptionTestCase {
 
     @Test
     @DisplayName("Pattern rule [No matching rules]")
-    default void noMatchingRulesInPatternRule(TestReporter testReporter) throws Exception {
+    default void patternRuleInCaseOfNoMatchingRules(TestReporter testReporter) throws Exception {
         var grammar = SingleOriginGrammar.builder()
-                .add("S", PatternRule.of("1"))
+                .add("S", SequenceRule.builder()
+                        .add(PatternRule.of("0"))
+                        .add(PatternRule.of("1")))
                 .build();
         var target = createTarget(grammar, new StringReader("0"));
 
@@ -107,7 +238,7 @@ interface ParseExceptionTestCase {
 
     @Test
     @DisplayName("Quantifier rule [Match Count Shortage]")
-    default void matchCountShortageInQuantifierRule(TestReporter testReporter) throws Exception {
+    default void quantifierRuleInCaseOfMatchCountShortage(TestReporter testReporter) throws Exception {
         var grammar = SingleOriginGrammar.builder()
                 .add("S", PatternRule.of("0").atLeast(2))
                 .build();
@@ -119,11 +250,31 @@ interface ParseExceptionTestCase {
 
     @Test
     @DisplayName("Empty rule [No matching rules]")
-    default void noMatchingRulesInEmptyRule(TestReporter testReporter) throws Exception {
+    default void emptyRuleInCaseOfNoMatchingRules(TestReporter testReporter) throws Exception {
         var grammar = SingleOriginGrammar.builder()
-                .add("S", Rule.EMPTY)
+                .add("S", SequenceRule.builder()
+                        .add(PatternRule.of("0"))
+                        .add(Rule.EMPTY))
                 .build();
-        var target = createTarget(grammar, new StringReader("0"));
+        var target = createTarget(grammar, new StringReader("01"));
+
+        var ex = assertThrows(ParseException.class, target);
+        testReporter.publishEntry(ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Skip rule [No matching rules]")
+    default void skipRuleInCaseOfNoMatchingRules(TestReporter testReporter) throws Exception {
+        var grammar = SingleOriginGrammar.builder()
+                .add("S", SequenceRule.builder()
+                        .add(PatternRule.of("\n").skip())
+                        .add(PatternRule.of("\r").skip())
+                        .add(PatternRule.of("\r").skip())
+                        .add(PatternRule.of("\n").skip())
+                        .add(PatternRule.of("0"))
+                        .add(PatternRule.of("2").skip()))
+                .build();
+        var target = createTarget(grammar, new StringReader("\n\r\r\n01"));
 
         var ex = assertThrows(ParseException.class, target);
         testReporter.publishEntry(ex.getMessage());

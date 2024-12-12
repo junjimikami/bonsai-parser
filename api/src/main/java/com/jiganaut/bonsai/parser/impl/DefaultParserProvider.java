@@ -27,6 +27,7 @@ public final class DefaultParserProvider extends ParserProvider {
 
     @Override
     public ParserFactory loadParserFactory(String factoryName) {
+        Objects.requireNonNull(factoryName, Message.NULL_PARAMETER.format());
         return ServiceLoader.load(ParserFactory.class).stream()
                 .filter(p -> p.type().getName().equals(factoryName))
                 .map(Provider::get)
@@ -42,6 +43,7 @@ public final class DefaultParserProvider extends ParserProvider {
 
     @Override
     public TokenizerFactory loadTokenizerFactory(String factoryName) {
+        Objects.requireNonNull(factoryName, Message.NULL_PARAMETER.format());
         return ServiceLoader.load(TokenizerFactory.class).stream()
                 .filter(p -> p.type().getName().equals(factoryName))
                 .map(Provider::get)

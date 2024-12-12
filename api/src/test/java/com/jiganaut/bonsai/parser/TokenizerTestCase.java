@@ -56,6 +56,7 @@ interface TokenizerTestCase extends TestCase {
         var target = createTarget();
 
         assertEquals(expectedIterator().hasNext(), target.hasNext());
+        assertEquals(expectedIterator().hasNext(), target.hasNext());
     }
 
     @Test

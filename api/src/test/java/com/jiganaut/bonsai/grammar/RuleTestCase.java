@@ -2,7 +2,10 @@ package com.jiganaut.bonsai.grammar;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -96,11 +99,20 @@ interface RuleTestCase extends TestCase {
     };
 
     @Test
-    @DisplayName("objectMethods()")
-    default void objectMethods() throws Exception {
+    @DisplayName("equals(Object)")
+    default void equals(TestReporter testReporter) throws Exception {
         var rule = createTarget();
 
-        rule.toString();
+        assertFalse(rule.equals(mock(Rule.class)));
+        assertTrue(rule.equals(createTarget()));
+    }
+
+    @Test
+    @DisplayName("toString()")
+    default void toString(TestReporter testReporter) throws Exception {
+        var rule = createTarget();
+
+        testReporter.publishEntry("toString()", rule.toString());
     }
 
     @Test

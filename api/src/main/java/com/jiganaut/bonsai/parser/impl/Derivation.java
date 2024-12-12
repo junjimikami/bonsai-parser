@@ -25,10 +25,11 @@ final class Derivation extends AbstractProcessor<Tree, List<Tree>> {
         var productionSet = context.grammar().productionSet();
         var tree = visitProductionSet(productionSet, context);
         if (context.hasNext()) {
-            var message = Message.TOKENS_REMAINING.format(
-                    context.getValue(),
-                    context.getLineNumber(),
-                    context.getIndex());
+            var args = new Object[3];
+            args[1] = context.getLineNumber();
+            args[2] = context.getIndex();
+            args[0] = Message.stringEncode(context.nextValue());
+            var message = Message.TOKENS_REMAINING.format(args);
             throw new ParseException(message);
         }
         return tree;

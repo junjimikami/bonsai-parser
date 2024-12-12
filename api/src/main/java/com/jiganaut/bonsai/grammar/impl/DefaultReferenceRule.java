@@ -3,6 +3,7 @@ package com.jiganaut.bonsai.grammar.impl;
 import java.util.Objects;
 
 import com.jiganaut.bonsai.grammar.ReferenceRule;
+import com.jiganaut.bonsai.impl.Message;
 
 /**
  * @author Junji Mikami
@@ -23,7 +24,7 @@ class DefaultReferenceRule extends AbstractRule implements ReferenceRule, Defaul
 
     @Override
     public String toString() {
-        return symbol;
+        return Message.symbolEncode(symbol);
     }
 
     @Override

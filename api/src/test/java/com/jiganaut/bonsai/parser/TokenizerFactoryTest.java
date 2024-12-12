@@ -40,7 +40,7 @@ class TokenizerFactoryTest {
     @Test
     @DisplayName("load(st:String) [Null parameter]")
     void loadStInCaseNullParameter(TestReporter testReporter) throws Exception {
-        var ex = assertThrows(ServiceConfigurationError.class, () -> TokenizerFactory.load((String) null));
+        var ex = assertThrows(NullPointerException.class, () -> TokenizerFactory.load((String) null));
         testReporter.publishEntry(ex.getMessage());
     }
 
@@ -48,6 +48,20 @@ class TokenizerFactoryTest {
     @DisplayName("load(st:String) [No such factory]")
     void loadStInCaseNoSuchFactory(TestReporter testReporter) throws Exception {
         var ex = assertThrows(ServiceConfigurationError.class, () -> TokenizerFactory.load(""));
+        testReporter.publishEntry(ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("load(cl:Class) [Null parameter]")
+    void loadClInCaseNullParameter(TestReporter testReporter) throws Exception {
+        var ex = assertThrows(NullPointerException.class, () -> TokenizerFactory.load((Class<?>) null));
+        testReporter.publishEntry(ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("load(cl:Class) [No such factory]")
+    void loadClInCaseNoSuchFactory(TestReporter testReporter) throws Exception {
+        var ex = assertThrows(ServiceConfigurationError.class, () -> TokenizerFactory.load(Object.class));
         testReporter.publishEntry(ex.getMessage());
     }
 

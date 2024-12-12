@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 import com.jiganaut.bonsai.grammar.PatternRule;
+import com.jiganaut.bonsai.impl.Message;
 
 /**
  *
@@ -24,7 +25,7 @@ class DefaultPatternRule extends AbstractRule implements PatternRule, DefaultQua
 
     @Override
     public String toString() {
-        return "\"%s\"".formatted(pattern.pattern());
+        return Message.stringEncode(pattern.pattern());
     }
 
     @Override

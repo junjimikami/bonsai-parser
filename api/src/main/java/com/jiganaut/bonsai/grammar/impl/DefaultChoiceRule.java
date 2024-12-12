@@ -61,15 +61,12 @@ class DefaultChoiceRule extends AbstractCompositeRule<Set<Rule>> implements Choi
         return elements.stream()
                 .map(e -> {
                     try {
-                        if (e.getKind().isComposite()) {
-                            return "(%s)".formatted(e);
-                        }
                         return e.toString();
                     } catch (Exception ex) {
                         return "?";
                     }
                 })
-                .collect(Collectors.joining(delimiter));
+                .collect(Collectors.joining(delimiter, "(", ")"));
     }
 
     @Override

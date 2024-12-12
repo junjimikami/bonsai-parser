@@ -46,7 +46,7 @@ class ParserTest {
                     .add("S", () -> PatternRule.of("1"))
                     .build();
             var factory = ParserFactory.of(grammar);
-            var parser = factory.createParser(new StringReader("11"));
+            var parser = factory.createParser(new StringReader("12"));
 
             var ex = assertThrows(ParseException.class, () -> parser.parse());
             testReporter.publishEntry(ex.getMessage());

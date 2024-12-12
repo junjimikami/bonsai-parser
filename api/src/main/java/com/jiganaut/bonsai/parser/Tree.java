@@ -17,13 +17,6 @@ public interface Tree {
         TERMINAL,
         NON_TERMINAL;
 
-        public boolean isTerminal() {
-            return this == TERMINAL;
-        }
-
-        public boolean isNonTerminal() {
-            return this == NON_TERMINAL;
-        }
     }
 
     /**

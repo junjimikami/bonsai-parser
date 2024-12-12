@@ -19,9 +19,9 @@ public interface Rule {
         SKIP,
         EMPTY;
 
-        public boolean isComposite() {
-            return this == SEQUENCE || this == CHOICE;
-        }
+//        public boolean isComposite() {
+//            return this == SEQUENCE || this == CHOICE;
+//        }
     }
 
     /**

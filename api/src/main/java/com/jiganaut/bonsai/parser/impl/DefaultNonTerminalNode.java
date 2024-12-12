@@ -87,15 +87,10 @@ class DefaultNonTerminalNode extends AbstractTree implements NonTerminalNode {
     @Override
     public String toString() {
         var sb = new StringBuilder();
-        sb.append("@");
-        sb.append("\"");
-        sb.append(encode(name));
-        sb.append("\"");
+        sb.append(Message.symbolEncode(name));
         if (value != null) {
             sb.append(":");
-            sb.append("\"");
-            sb.append(encode(value));
-            sb.append("\"");
+            sb.append(Message.stringEncode(value));
         }
         if (!list.isEmpty()) {
             sb.append(list.stream()

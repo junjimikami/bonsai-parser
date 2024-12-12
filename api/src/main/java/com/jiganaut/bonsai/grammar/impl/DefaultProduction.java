@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import com.jiganaut.bonsai.grammar.Production;
 import com.jiganaut.bonsai.grammar.Rule;
+import com.jiganaut.bonsai.impl.Message;
 
 /**
  * 
@@ -37,7 +38,8 @@ class DefaultProduction implements Production {
 
     @Override
     public String toString() {
-        return "%s = %s ;".formatted(symbol, rule);
+        var encoded = Message.symbolEncode(symbol);
+        return "%s = %s".formatted(encoded, rule);
     }
 
     @Override

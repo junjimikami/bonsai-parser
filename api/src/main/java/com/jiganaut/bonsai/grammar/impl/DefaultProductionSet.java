@@ -7,6 +7,7 @@ import java.util.LinkedHashSet;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.jiganaut.bonsai.grammar.Production;
 import com.jiganaut.bonsai.grammar.ProductionSet;
@@ -38,7 +39,10 @@ class DefaultProductionSet extends AbstractSet<Production> implements Production
 
     @Override
     public String toString() {
-        return productionSet.toString();
+        var delimiter = isShortCircuit() ? " / " : " | ";
+        return productionSet.stream()
+                .map(Production::toString)
+                .collect(Collectors.joining(delimiter));
     }
 
     @Override

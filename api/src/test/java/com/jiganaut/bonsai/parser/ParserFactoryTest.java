@@ -40,7 +40,7 @@ class ParserFactoryTest {
     @Test
     @DisplayName("load(st:String) [Null parameter]")
     void loadStInCaseNullParameter(TestReporter testReporter) throws Exception {
-        var ex = assertThrows(ServiceConfigurationError.class, () -> ParserFactory.load((String) null));
+        var ex = assertThrows(NullPointerException.class, () -> ParserFactory.load((String) null));
         testReporter.publishEntry(ex.getMessage());
     }
 
@@ -48,6 +48,20 @@ class ParserFactoryTest {
     @DisplayName("load(st:String) [No such factory]")
     void loadStInCaseNoSuchFactory(TestReporter testReporter) throws Exception {
         var ex = assertThrows(ServiceConfigurationError.class, () -> ParserFactory.load(""));
+        testReporter.publishEntry(ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("load(cl:Class) [Null parameter]")
+    void loadClInCaseNullParameter(TestReporter testReporter) throws Exception {
+        var ex = assertThrows(NullPointerException.class, () -> ParserFactory.load((Class<?>) null));
+        testReporter.publishEntry(ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("load(cl:Class) [No such factory]")
+    void loadClInCaseNoSuchFactory(TestReporter testReporter) throws Exception {
+        var ex = assertThrows(ServiceConfigurationError.class, () -> ParserFactory.load(Object.class));
         testReporter.publishEntry(ex.getMessage());
     }
 

@@ -110,4 +110,34 @@ class ReferenceRuleTest {
 
     }
 
+    @Nested
+    class TestCase6 implements ReferenceRuleTestCase {
+
+        @Override
+        public ReferenceRule createTarget() {
+            return ReferenceRule.of(expectedSymbol());
+        }
+
+        @Override
+        public String expectedSymbol() {
+            return "<";
+        }
+
+    }
+
+    @Nested
+    class TestCase7 implements ReferenceRuleTestCase {
+
+        @Override
+        public ReferenceRule createTarget() {
+            return ReferenceRule.of(expectedSymbol());
+        }
+
+        @Override
+        public String expectedSymbol() {
+            return ">";
+        }
+
+    }
+
 }

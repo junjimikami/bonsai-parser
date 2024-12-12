@@ -153,9 +153,6 @@ final class FullLengthMatcher implements ProductionProcessor<Boolean, Context>, 
     @Override
     public Boolean visitEmpty(Rule empty, Context context) {
         var firstSet = FirstSet.of(empty, context);
-        if (firstSet.isEmpty()) {
-            return !context.hasNext();
-        }
         return firstSet.stream().anyMatch(e -> FirstSetMatcher.scan(e, context));
     }
 
