@@ -1,6 +1,8 @@
 package com.jiganaut.bonsai.parser;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 
 import java.io.Reader;
 import java.io.StringReader;
@@ -28,6 +30,43 @@ import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
  * @author Junji Mikami
  */
 class ParserTest {
+
+    @Test
+    @DisplayName("of(gr:Grammar, re:Reader) [Null parameter]")
+    void ofGrReInCaseNullParameter(TestReporter testReporter) throws Exception {
+        var ex1 = assertThrows(NullPointerException.class, () -> Parser.of(null, Reader.nullReader()));
+        testReporter.publishEntry(ex1.getMessage());
+        var ex2 = assertThrows(NullPointerException.class, () -> Parser.of(mock(Grammar.class), (Reader) null));
+        testReporter.publishEntry(ex2.getMessage());
+    }
+
+    @Test
+    @DisplayName("of(gr:Grammar, re:Reader)")
+    void ofGrRe() throws Exception {
+        var grammar = mock(Grammar.class);
+        var parser = Parser.of(grammar, Reader.nullReader());
+
+        assertNotNull(parser);
+    }
+
+    @Test
+    @DisplayName("of(gr:Grammar, to:Tokenizer) [Null parameter]")
+    void ofGrToInCaseNullParameter(TestReporter testReporter) throws Exception {
+        var ex1 = assertThrows(NullPointerException.class, () -> Parser.of(null, mock(Tokenizer.class)));
+        testReporter.publishEntry(ex1.getMessage());
+        var ex2 = assertThrows(NullPointerException.class, () -> Parser.of(mock(Grammar.class), (Tokenizer) null));
+        testReporter.publishEntry(ex2.getMessage());
+    }
+
+    @Test
+    @DisplayName("of(gr:Grammar, to:Tokenizer)")
+    void ofGrTo() throws Exception {
+        var grammar = mock(Grammar.class);
+        var tokenizer = mock(Tokenizer.class);
+        var parser = Parser.of(grammar, tokenizer);
+
+        assertNotNull(parser);
+    }
 
     @Nested
     class ParseExceptionTestCase1 implements ParseExceptionTestCase {

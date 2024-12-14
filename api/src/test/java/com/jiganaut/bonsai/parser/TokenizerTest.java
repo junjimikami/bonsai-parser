@@ -1,12 +1,19 @@
 package com.jiganaut.bonsai.parser;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 import org.junit.jupiter.api.function.Executable;
 
 import com.jiganaut.bonsai.grammar.ChoiceGrammar;
@@ -24,6 +31,43 @@ import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
  * @author Junji Mikami
  */
 class TokenizerTest {
+
+    @Test
+    @DisplayName("of(gr:Grammar, re:Reader) [Null parameter]")
+    void ofGrReInCaseNullParameter(TestReporter testReporter) throws Exception {
+        var ex1 = assertThrows(NullPointerException.class, () -> Tokenizer.of(null, Reader.nullReader()));
+        testReporter.publishEntry(ex1.getMessage());
+        var ex2 = assertThrows(NullPointerException.class, () -> Tokenizer.of(mock(Grammar.class), (Reader) null));
+        testReporter.publishEntry(ex2.getMessage());
+    }
+
+    @Test
+    @DisplayName("of(gr:Grammar, re:Reader)")
+    void ofGrRe() throws Exception {
+        var grammar = mock(Grammar.class);
+        var parser = Tokenizer.of(grammar, Reader.nullReader());
+
+        assertNotNull(parser);
+    }
+
+    @Test
+    @DisplayName("of(gr:Grammar, to:Tokenizer) [Null parameter]")
+    void ofGrToInCaseNullParameter(TestReporter testReporter) throws Exception {
+        var ex1 = assertThrows(NullPointerException.class, () -> Tokenizer.of(null, mock(Tokenizer.class)));
+        testReporter.publishEntry(ex1.getMessage());
+        var ex2 = assertThrows(NullPointerException.class, () -> Tokenizer.of(mock(Grammar.class), (Tokenizer) null));
+        testReporter.publishEntry(ex2.getMessage());
+    }
+
+    @Test
+    @DisplayName("of(gr:Grammar, to:Tokenizer)")
+    void ofGrTo() throws Exception {
+        var grammar = mock(Grammar.class);
+        var tokenizer = mock(Tokenizer.class);
+        var parser = Tokenizer.of(grammar, tokenizer);
+
+        assertNotNull(parser);
+    }
 
     @Nested
     class ParseExceptionTestCase1 implements ParseExceptionTestCase {
