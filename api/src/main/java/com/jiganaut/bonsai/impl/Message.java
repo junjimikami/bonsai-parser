@@ -8,6 +8,9 @@ import java.text.MessageFormat;
  */
 public enum Message {
 
+        VALIDATION_PARAMETER_NULL(""),
+        VALIDATION_PARAMETER_MIN(""),
+
     ALREADY_BUILT("Already built."),
     SYMBOL_ADDED_VISIBLE("Symbol \"{0}\" has already been added as visible."),
     SYMBOL_NOT_FOUND("Symbol \"{0}\" not found."),

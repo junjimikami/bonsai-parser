@@ -1,48 +1,15 @@
 package com.jiganaut.bonsai.parser;
 
-import java.util.List;
-
-import com.jiganaut.bonsai.parser.spi.ParserProvider;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  *
  * @author Junji Mikami
  */
-public interface TerminalNode extends Tree {
+public non-sealed interface TerminalNode extends Tree {
 
-    /**
-     * 
-     * @author Junji Mikami
-     */
-    public static interface Builder extends Tree.Builder {
-
-        @Override
-        public TerminalNode.Builder setName(String name);
-
-        @Override
-        public TerminalNode.Builder setValue(String value);
-
-        @Override
-        public TerminalNode build();
-
-    }
-
-    public static TerminalNode.Builder builder() {
-        return ParserProvider.load().createTerminalNodeBuilder();
-    }
-
-    public static TerminalNode of(String name, String value) {
-        return builder()
-                .setName(name)
-                .setValue(value)
-                .build();
-    }
-
-    public static TerminalNode ofUnnamed(String value) {
-        return builder()
-                .setValue(value)
-                .build();
-    }
+    public String getValue();
 
     @Override
     public default Kind getKind() {
@@ -50,8 +17,13 @@ public interface TerminalNode extends Tree {
     }
 
     @Override
-    public default List<? extends Tree> getSubTrees() {
-        return List.of();
+    public default Stream<? extends Tree> subTrees() {
+        return Stream.empty();
+    }
+
+    @Override
+    public default Optional<String> value() {
+        return Optional.ofNullable(getValue());
     }
 
     @Override

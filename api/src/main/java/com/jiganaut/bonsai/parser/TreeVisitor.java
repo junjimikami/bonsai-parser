@@ -1,7 +1,7 @@
 package com.jiganaut.bonsai.parser;
 
 /**
- * 
+ *
  * @author Junji Mikami
  *
  * @param <R>
@@ -10,7 +10,7 @@ package com.jiganaut.bonsai.parser;
 public interface TreeVisitor<R, P> {
 
     public default R visit(Tree tree) {
-        return visit(tree, null);
+        return tree.accept(this, null);
     }
 
     public default R visit(Tree tree, P p) {
@@ -20,4 +20,9 @@ public interface TreeVisitor<R, P> {
     public R visitTerminal(TerminalNode tree, P p);
 
     public R visitNonTerminal(NonTerminalNode tree, P p);
+
+    public default R visitError(ErrorNode tree, P p) {
+        return visitNonTerminal(tree, p);
+    }
+
 }

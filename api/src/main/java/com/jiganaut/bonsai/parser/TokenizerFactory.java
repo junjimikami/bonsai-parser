@@ -1,6 +1,6 @@
 package com.jiganaut.bonsai.parser;
 
-import java.io.Reader;
+import java.util.stream.Collector;
 
 import com.jiganaut.bonsai.grammar.Grammar;
 import com.jiganaut.bonsai.parser.spi.ParserProvider;
@@ -12,18 +12,13 @@ import com.jiganaut.bonsai.parser.spi.ParserProvider;
  */
 public interface TokenizerFactory {
 
-    public static TokenizerFactory of(Grammar grammar) {
-        return ParserProvider.load().createTokenizerFactory(grammar);
+    public static TokenizerFactory of(Grammar grammar, Collector<CharSequence, ?, String> collector) {
+        return ParserProvider.load().createTokenizerFactory(grammar, collector);
     }
 
-    public static TokenizerFactory load(String factoryName) {
-        return ParserProvider.load().loadTokenizerFactory(factoryName);
-    }
-
-    public static TokenizerFactory load(Class<?> factoryClass) {
-        return load(factoryClass.getName());
-    }
-
-    public Tokenizer createTokenizer(Reader reader);
     public Tokenizer createTokenizer(Tokenizer tokenizer);
+
+    public default Tokenizer createTokenizer(Source source) {
+        return createTokenizer(source.toTokenizer());
+    }
 }

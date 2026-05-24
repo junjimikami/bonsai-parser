@@ -1,50 +1,47 @@
 package com.jiganaut.bonsai.parser;
 
-import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  *
  * @author Junji Mikami
  */
-public interface Tree {
+public sealed interface Tree permits TerminalNode, NonTerminalNode {
 
     /**
-     * 
-     * @author Junji Mikami
+     *
      *
      */
     public static enum Kind {
         TERMINAL,
-        NON_TERMINAL;
-
+        NON_TERMINAL,
+        ERROR;
     }
 
     /**
-     * 
-     * @author Junji Mikami
+     *
      */
     public static interface Builder {
-        public Tree.Builder setName(String name);
-
-        public Tree.Builder setValue(String value);
-
         public Tree build();
     }
 
     /**
-     * 
+     *
      * @return
      */
     public Kind getKind();
 
     public String getName();
 
-    public String getValue();
+    public Position getPosition();
 
-    public List<? extends Tree> getSubTrees();
+    public Stream<? extends Tree> subTrees();
+
+    public Optional<String> value();
 
     /**
-     * 
+     *
      * @param <R>
      * @param <P>
      * @param v
