@@ -3,7 +3,7 @@ package com.jiganaut.bonsai.parser;
 import java.util.List;
 
 import com.jiganaut.bonsai.grammar.Grammar;
-import com.jiganaut.bonsai.grammar.Production;
+import com.jiganaut.bonsai.grammar.ProductionRule;
 import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.parser.spi.ParserProvider;
 
@@ -32,7 +32,7 @@ public interface ErrorNode extends NonTerminalNode {
 
         public ErrorNode.Builder setGrammar(Grammar grammar);
 
-        public ErrorNode.Builder setProductionPath(List<? extends Production> productionPath);
+        public ErrorNode.Builder setProductionPath(List<? extends ProductionRule> productionPath);
 
         public ErrorNode.Builder setExpectedRule(Rule expectedRule);
 
@@ -60,7 +60,7 @@ public interface ErrorNode extends NonTerminalNode {
 
     public Grammar getGrammar();
 
-    public List<? extends Production> getProductionPath();
+    public List<? extends ProductionRule> getProductionPath();
 
     public Rule getExpectedRule();
 

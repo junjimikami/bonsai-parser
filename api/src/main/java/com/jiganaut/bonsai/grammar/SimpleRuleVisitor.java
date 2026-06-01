@@ -17,8 +17,8 @@ public interface SimpleRuleVisitor<R, P> extends RuleVisitor<R, P> {
     }
 
     @Override
-    public default R visitPattern(PatternRule pattern, P p) {
-        return defaultAction(pattern, p);
+    public default R visitMatch(MatchingRule match, P p) {
+        return defaultAction(match, p);
     }
 
     @Override
@@ -32,13 +32,18 @@ public interface SimpleRuleVisitor<R, P> extends RuleVisitor<R, P> {
     }
 
     @Override
-    default R visitSkip(SkipRule skip, P p) {
+    public default R visitSkip(SkipRule skip, P p) {
         return defaultAction(skip, p);
     }
 
     @Override
-    public default R visitEmpty(Rule empty, P p) {
+    public default R visitEmpty(EmptyRule empty, P p) {
         return defaultAction(empty, p);
+    }
+
+    @Override
+    public default R visitProduction(ProductionRule production, P p) {
+        return defaultAction(production, p);
     }
 
     public R defaultAction(Rule rule, P p);

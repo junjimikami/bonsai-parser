@@ -9,29 +9,21 @@ import com.jiganaut.bonsai.impl.Message;
  * @author Junji Mikami
  *
  */
-public interface SkipRule extends Rule {
+public interface EmptyRule extends Rule {
 
-    public static interface Builder extends Rule.Builder {
-
-        @Override
-        public SkipRule build();
-
-    }
-
-    public static SkipRule of(Rule rule) {
-        return GrammarProvider.load().createSkip(rule);
+    public static EmptyRule empty() {
+        return GrammarProvider.load().createEmpty();
     }
 
     @Override
     public default Kind getKind() {
-        return Kind.SKIP;
+        return Kind.EMPTY;
     }
 
     @Override
     public default <R, P> R accept(RuleVisitor<R, P> visitor, P p) {
         Objects.requireNonNull(visitor, () -> Message.VALIDATION_PARAMETER_NULL.format("visitor"));
-        return visitor.visitSkip(this, p);
+        return visitor.visitEmpty(this, p);
     }
 
-    public Rule getRule();
 }

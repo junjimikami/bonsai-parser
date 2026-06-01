@@ -1,42 +1,36 @@
 package com.jiganaut.bonsai.grammar;
 
+import java.util.Objects;
 import java.util.Set;
 
 import com.jiganaut.bonsai.grammar.spi.GrammarProvider;
+import com.jiganaut.bonsai.impl.Message;
 
 /**
  * @author Junji Mikami
  *
  */
-public interface ChoiceRule extends Rule, Quantifiable {
+public interface ChoiceRule extends Quantifiable, Skippable {
 
     /**
-     * 
-     * @author Junji Mikami
+     *
      */
-    public static interface Builder extends Rule.Builder, Quantifiable {
-        public ChoiceRule.Builder add(Rule rule);
-        public ChoiceRule.Builder add(Rule.Builder builder);
-        public default ChoiceRule.Builder addEmpty() {
-            return add(EMPTY);
+    public static interface Builder extends Quantifiable.Builder, Skippable.Builder, Iterable<Rule.Builder> {
+        public default ChoiceRule.Builder add(Rule rule) {
+            return add(() -> rule);
         }
+        public ChoiceRule.Builder add(Rule.Builder builder);
+        public ChoiceRule.Builder addAll(ChoiceRule.Builder builder);
+        public default ChoiceRule.Builder addEmpty() {
+            return add(EmptyRule::empty);
+        }
+        public ChoiceRule.Builder asShortCircuit();
         @Override
         public ChoiceRule build();
-        public default ChoiceRule shortCircuit() {
-            return build().shortCircuit();
-        }
     }
 
     public static Builder builder() {
         return GrammarProvider.load().createChoiceBuilder();
-    }
-
-    public static ChoiceRule of(Rule... rules) {
-        var builder = builder();
-        for (var rule : rules) {
-            builder.add(rule);
-        }
-        return builder.build();
     }
 
     @Override
@@ -46,12 +40,15 @@ public interface ChoiceRule extends Rule, Quantifiable {
 
     @Override
     public default <R, P> R accept(RuleVisitor<R, P> visitor, P p) {
+        Objects.requireNonNull(visitor, () -> Message.VALIDATION_PARAMETER_NULL.format("visitor"));
+        if (isShortCircuit()) {
+            return visitor.visitChoiceAsShortCircuit(this, p);
+        }
         return visitor.visitChoice(this, p);
     }
 
     public Set<? extends Rule> getChoices();
 
     public boolean isShortCircuit();
-    
-    public ChoiceRule shortCircuit();
+
 }

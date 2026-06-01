@@ -16,9 +16,13 @@ public interface RuleVisitor<R, P> {
 
     public R visitChoice(ChoiceRule choice, P p);
 
+    public default R visitChoiceAsShortCircuit(ChoiceRule choice, P p) {
+        return visitChoice(choice, p);
+    }
+
     public R visitSequence(SequenceRule sequence, P p);
 
-    public R visitPattern(PatternRule pattern, P p);
+    public R visitMatch(MatchingRule match, P p);
 
     public R visitReference(ReferenceRule reference, P p);
 
@@ -26,5 +30,7 @@ public interface RuleVisitor<R, P> {
 
     public R visitSkip(SkipRule skip, P p);
 
-    public R visitEmpty(Rule rule, P p);
+    public R visitEmpty(EmptyRule empty, P p);
+
+    public R visitProduction(ProductionRule production, P p);
 }
