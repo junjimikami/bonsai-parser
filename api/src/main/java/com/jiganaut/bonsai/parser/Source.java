@@ -8,11 +8,13 @@ import com.jiganaut.bonsai.grammar.Grammar;
  *
  * @author Junji Mikami
  */
-public interface Source {
+public interface Source<T> {
 
-    public Source addLayer(Grammar grammar, Collector<CharSequence, ?, String> collector);
-    public Tokenizer toTokenizer();
-    public default Parser toParser(Grammar grammar) {
+    public <R> Source<R> addLayer(Grammar<T> grammar, Collector<? super T, ?, R> collector);
+
+    public Tokenizer<T> toTokenizer();
+
+    public default Parser<T> toParser(Grammar<T> grammar) {
         return ParserFactory.of(grammar).createParser(this);
     }
 

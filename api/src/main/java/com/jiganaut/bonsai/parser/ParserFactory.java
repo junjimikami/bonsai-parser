@@ -7,15 +7,15 @@ import com.jiganaut.bonsai.parser.spi.ParserProvider;
  * @author Junji Mikami
  *
  */
-public interface ParserFactory {
+public interface ParserFactory<T> {
 
-    public static ParserFactory of(Grammar grammar) {
+    public static <T> ParserFactory<T> of(Grammar<T> grammar) {
         return ParserProvider.load().createParserFactory(grammar);
     }
 
-    public Parser createParser(Tokenizer tokenizer);
+    public Parser<T> createParser(Tokenizer<T> tokenizer);
 
-    public default Parser createParser(Source source) {
+    public default Parser<T> createParser(Source<T> source) {
         return createParser(source.toTokenizer());
     }
 }

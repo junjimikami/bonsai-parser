@@ -8,7 +8,7 @@ import com.jiganaut.bonsai.impl.Message;
  *
  * @author Junji Mikami
  */
-public interface ProductionRule extends Rule {
+public interface ProductionRule<T> extends Rule<T> {
 
     @Override
     public default Rule.Kind getKind() {
@@ -16,12 +16,12 @@ public interface ProductionRule extends Rule {
     }
 
     @Override
-    public default <R, P> R accept(RuleVisitor<R, P> visitor, P p) {
+    public default <R, P> R accept(RuleVisitor<T, R, P> visitor, P p) {
         Objects.requireNonNull(visitor, () -> Message.VALIDATION_PARAMETER_NULL.format("visitor"));
         return visitor.visitProduction(this, p);
     }
 
     public String getSymbol();
 
-    public Rule getRule();
+    public Rule<T> getRule();
 }

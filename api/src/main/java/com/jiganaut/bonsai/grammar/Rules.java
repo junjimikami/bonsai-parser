@@ -11,7 +11,7 @@ import com.jiganaut.bonsai.impl.Message;
  */
 public final class Rules {
 
-    private static record NameValueMatchingRule(String name, String value) implements MatchingRule {
+    private static record NameValueMatchingRule(String name, String value) implements MatchingRule<String> {
 
         @Override
         public boolean test(String name, String value) {
@@ -25,7 +25,7 @@ public final class Rules {
 
     }
 
-    private static record NameMatchingRule(String name) implements MatchingRule {
+    private static record NameMatchingRule(String name) implements MatchingRule<String> {
 
         @Override
         public boolean test(String name, String value) {
@@ -39,7 +39,7 @@ public final class Rules {
 
     }
 
-    private static record ValueMatchingRule(String value) implements MatchingRule {
+    private static record ValueMatchingRule(String value) implements MatchingRule<String> {
 
         @Override
         public boolean test(String name, String value) {
@@ -53,7 +53,7 @@ public final class Rules {
 
     }
 
-    private static record PatternMatchingRule(Pattern pattern) implements MatchingRule {
+    private static record PatternMatchingRule(Pattern pattern) implements MatchingRule<String> {
 
         @Override
         public boolean test(String name, String value) {
@@ -87,58 +87,61 @@ public final class Rules {
     private Rules() {
     }
 
-    public static MatchingRule token(String name, String value) {
+    public static MatchingRule<String> token(String name, String value) {
         return new NameValueMatchingRule(name, value);
     }
 
-    public static MatchingRule token(String name) {
+    public static MatchingRule<String> token(String name) {
         return new NameMatchingRule(name);
     }
 
-    public static MatchingRule matching(String value) {
+    public static MatchingRule<String> matching(String value) {
         return new ValueMatchingRule(value);
     }
 
-    public static MatchingRule pattern(String regex) {
+    public static MatchingRule<String> pattern(String regex) {
         Objects.requireNonNull(regex, () -> Message.VALIDATION_PARAMETER_NULL.format("regex"));
         var pattern = Pattern.compile(regex);
         return new PatternMatchingRule(pattern);
     }
 
-    public static MatchingRule pattern(Pattern pattern) {
+    public static MatchingRule<String> pattern(Pattern pattern) {
         Objects.requireNonNull(pattern, () -> Message.VALIDATION_PARAMETER_NULL.format("pattern"));
         return new PatternMatchingRule(pattern);
     }
 
-    public static SequenceRule concat(Rule... rules) {
-        var builder = SequenceRule.builder();
+    @SafeVarargs
+    public static <T> SequenceRule<T> concat(Rule<T>... rules) {
+        var builder = SequenceRule.<T>builder();
         for (var rule : rules) {
             builder.add(rule);
         }
         return builder.build();
     }
 
-    public static ChoiceRule oneOf(Rule... choices) {
-        var builder = ChoiceRule.builder();
+    @SafeVarargs
+    public static <T> ChoiceRule<T> oneOf(Rule<T>... choices) {
+        var builder = ChoiceRule.<T>builder();
         for (var choice : choices) {
             builder.add(choice);
         }
         return builder.build();
     }
 
-    public static ChoiceRule firstOf(Rule... choices) {
-        var builder = ChoiceRule.builder();
+    @SafeVarargs
+    public static <T> ChoiceRule<T> firstOf(Rule<T>... choices) {
+        var builder = ChoiceRule.<T>builder();
         for (var choice : choices) {
             builder.add(choice);
         }
         return builder.asShortCircuit().build();
     }
 
-    public static ReferenceRule reference(String reference) {
+    public static <T> ReferenceRule<T> reference(String reference) {
         return ReferenceRule.of(reference);
     }
 
-    public static EmptyRule empty() {
+    public static <T> EmptyRule<T> empty() {
         return EmptyRule.empty();
     }
 

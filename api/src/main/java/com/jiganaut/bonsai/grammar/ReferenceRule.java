@@ -9,9 +9,9 @@ import com.jiganaut.bonsai.impl.Message;
  * @author Junji Mikami
  *
  */
-public interface ReferenceRule extends Quantifiable {
+public interface ReferenceRule<T> extends Quantifiable<T> {
 
-    public static ReferenceRule of(String reference) {
+    public static <T> ReferenceRule<T> of(String reference) {
         return GrammarProvider.load().createReference(reference);
     }
 
@@ -21,16 +21,16 @@ public interface ReferenceRule extends Quantifiable {
     }
 
     @Override
-    public default <R, P> R accept(RuleVisitor<R, P> visitor, P p) {
+    public default <R, P> R accept(RuleVisitor<T, R, P> visitor, P p) {
         Objects.requireNonNull(visitor, () -> Message.VALIDATION_PARAMETER_NULL.format("visitor"));
         return visitor.visitReference(this, p);
     }
 
-    public default ChoiceRule lookup(Grammar grammar) {
+    public default ChoiceRule<T> lookup(Grammar<T> grammar) {
         Objects.requireNonNull(grammar, () -> Message.VALIDATION_PARAMETER_NULL.format("grammar"));
         var builder = grammar.getProductionRules().stream()
                 .filter(e -> Objects.equals(getSymbol(), e.getSymbol()))
-                .collect(ChoiceRule::builder,
+                .collect(ChoiceRule::<T>builder,
                      ChoiceRule.Builder::add,
                      ChoiceRule.Builder::addAll);
         if (grammar.isShortCircuit()) {

@@ -6,34 +6,34 @@ import com.jiganaut.bonsai.impl.Message;
  *
  * @author Junji Mikami
  */
-public interface Quantifiable extends Rule {
+public interface Quantifiable<T> extends Rule<T> {
 
-    public static interface Builder extends Rule.Builder {
+    public static interface Builder<T> extends Rule.Builder<T> {
 
-        public default QuantifierRule.Builder opt() {
+        public default QuantifierRule.Builder<T> opt() {
             return range(0, 1);
         }
 
-        public default QuantifierRule.Builder zeroOrMore() {
+        public default QuantifierRule.Builder<T> zeroOrMore() {
             return atLeast(0);
         }
 
-        public default QuantifierRule.Builder oneOrMore() {
+        public default QuantifierRule.Builder<T> oneOrMore() {
             return atLeast(1);
         }
 
-        public default QuantifierRule.Builder exactly(int times) {
+        public default QuantifierRule.Builder<T> exactly(int times) {
             return range(times, times);
         }
 
-        public default QuantifierRule.Builder atLeast(int times) {
+        public default QuantifierRule.Builder<T> atLeast(int times) {
             if (times < 0) {
                 throw new IllegalArgumentException(Message.VALIDATION_PARAMETER_MIN.format("times", 0, times));
             }
             return () -> QuantifierRule.of(build(), times);
         }
 
-        public default QuantifierRule.Builder range(int from, int to) {
+        public default QuantifierRule.Builder<T> range(int from, int to) {
             if (from < 0) {
                 throw new IllegalArgumentException(Message.VALIDATION_PARAMETER_MIN.format("from", 0, from));
             }
@@ -45,27 +45,27 @@ public interface Quantifiable extends Rule {
 
     }
 
-    public default QuantifierRule opt() {
+    public default QuantifierRule<T> opt() {
         return range(0, 1);
     }
 
-    public default QuantifierRule zeroOrMore() {
+    public default QuantifierRule<T> zeroOrMore() {
         return atLeast(0);
     }
 
-    public default QuantifierRule oneOrMore() {
+    public default QuantifierRule<T> oneOrMore() {
         return atLeast(1);
     }
 
-    public default QuantifierRule exactly(int times) {
+    public default QuantifierRule<T> exactly(int times) {
         return range(times, times);
     }
 
-    public default QuantifierRule atLeast(int times) {
+    public default QuantifierRule<T> atLeast(int times) {
         return QuantifierRule.of(this, times);
     }
 
-    public default QuantifierRule range(int from, int to) {
+    public default QuantifierRule<T> range(int from, int to) {
         return QuantifierRule.of(this, from, to);
     }
 

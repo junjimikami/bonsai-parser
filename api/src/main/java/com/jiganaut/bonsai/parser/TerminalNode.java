@@ -1,15 +1,14 @@
 package com.jiganaut.bonsai.parser;
 
-import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
  *
  * @author Junji Mikami
  */
-public non-sealed interface TerminalNode extends Tree {
+public non-sealed interface TerminalNode<T> extends Tree<T> {
 
-    public String getValue();
+    public T getValue();
 
     @Override
     public default Kind getKind() {
@@ -17,17 +16,17 @@ public non-sealed interface TerminalNode extends Tree {
     }
 
     @Override
-    public default Stream<? extends Tree> subTrees() {
+    public default Stream<? extends Tree<T>> subTrees() {
         return Stream.empty();
     }
 
     @Override
-    public default Optional<String> value() {
-        return Optional.ofNullable(getValue());
+    public default Stream<T> values() {
+        return Stream.of(getValue());
     }
 
     @Override
-    public default <R, P> R accept(TreeVisitor<R, P> v, P p) {
+    public default <R, P> R accept(TreeVisitor<T, R, P> v, P p) {
         return v.visitTerminal(this, p);
     }
 

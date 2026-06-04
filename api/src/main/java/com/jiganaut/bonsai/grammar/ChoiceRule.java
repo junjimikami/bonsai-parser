@@ -10,26 +10,26 @@ import com.jiganaut.bonsai.impl.Message;
  * @author Junji Mikami
  *
  */
-public interface ChoiceRule extends Quantifiable, Skippable {
+public interface ChoiceRule<T> extends Quantifiable<T>, Skippable<T> {
 
     /**
      *
      */
-    public static interface Builder extends Quantifiable.Builder, Skippable.Builder, Iterable<Rule.Builder> {
-        public default ChoiceRule.Builder add(Rule rule) {
+    public static interface Builder<T> extends Quantifiable.Builder<T>, Skippable.Builder<T>, Iterable<Rule.Builder<T>> {
+        public default ChoiceRule.Builder<T> add(Rule<T> rule) {
             return add(() -> rule);
         }
-        public ChoiceRule.Builder add(Rule.Builder builder);
-        public ChoiceRule.Builder addAll(ChoiceRule.Builder builder);
-        public default ChoiceRule.Builder addEmpty() {
+        public ChoiceRule.Builder<T> add(Rule.Builder<T> builder);
+        public ChoiceRule.Builder<T> addAll(ChoiceRule.Builder<T> builder);
+        public default ChoiceRule.Builder<T> addEmpty() {
             return add(EmptyRule::empty);
         }
-        public ChoiceRule.Builder asShortCircuit();
+        public ChoiceRule.Builder<T> asShortCircuit();
         @Override
-        public ChoiceRule build();
+        public ChoiceRule<T> build();
     }
 
-    public static Builder builder() {
+    public static <T> Builder<T> builder() {
         return GrammarProvider.load().createChoiceBuilder();
     }
 
@@ -39,7 +39,7 @@ public interface ChoiceRule extends Quantifiable, Skippable {
     }
 
     @Override
-    public default <R, P> R accept(RuleVisitor<R, P> visitor, P p) {
+    public default <R, P> R accept(RuleVisitor<T, R, P> visitor, P p) {
         Objects.requireNonNull(visitor, () -> Message.VALIDATION_PARAMETER_NULL.format("visitor"));
         if (isShortCircuit()) {
             return visitor.visitChoiceAsShortCircuit(this, p);
@@ -47,7 +47,7 @@ public interface ChoiceRule extends Quantifiable, Skippable {
         return visitor.visitChoice(this, p);
     }
 
-    public Set<? extends Rule> getChoices();
+    public Set<? extends Rule<T>> getChoices();
 
     public boolean isShortCircuit();
 

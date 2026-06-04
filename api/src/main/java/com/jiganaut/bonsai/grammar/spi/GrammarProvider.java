@@ -22,20 +22,20 @@ public abstract class GrammarProvider {
         return DEFAULT_PROVIDER;
     }
 
-    public abstract Grammar.Builder createGrammarBuilder(String startSymbol);
+    public abstract <T> Grammar.Builder<T> createGrammarBuilder(String startSymbol);
 
-    public abstract SequenceRule.Builder createSequenceBuilder();
+    public abstract <T> SequenceRule.Builder<T> createSequenceBuilder();
 
-    public abstract ChoiceRule.Builder createChoiceBuilder();
+    public abstract <T> ChoiceRule.Builder<T> createChoiceBuilder();
 
-    public abstract ReferenceRule createReference(String reference);
+    public abstract <T> ReferenceRule<T> createReference(String reference);
 
-    public abstract QuantifierRule createQuantifier(Rule rule, int times);
+    public abstract <T> QuantifierRule<T> createQuantifier(Rule<T> rule, int times);
 
-    public abstract QuantifierRule createQuantifier(Rule rule, int from, int to);
+    public abstract <T> QuantifierRule<T> createQuantifier(Rule<T> rule, int from, int to);
 
-    public abstract SkipRule createSkip(Rule rule);
+    public abstract <T> SkipRule<T> createSkip(Rule<T> rule);
 
-    public abstract EmptyRule createEmpty();
+    public abstract <T> EmptyRule<T> createEmpty();
 
 }

@@ -6,13 +6,13 @@ import com.jiganaut.bonsai.parser.spi.ParserProvider;
  *
  * @author Junji Mikami
  */
-public interface Token extends TerminalNode {
+public interface Token<T> extends TerminalNode<T> {
 
-    public static Token of(String name, String value) {
+    public static <T> Token<T> of(String name, T value) {
         return ParserProvider.load().createToken(name, value);
     }
 
-    public static Token ofUnnamed(String value) {
+    public static <T> Token<T> ofUnnamed(T value) {
         return ParserProvider.load().createToken(null, value);
     }
 

@@ -4,7 +4,7 @@ package com.jiganaut.bonsai.grammar;
  *
  * @author Junji Mikami
  */
-public interface Rule {
+public interface Rule<T> {
 
     /**
      *
@@ -27,13 +27,13 @@ public interface Rule {
     /**
      *
      */
-    public static interface Builder {
-        public Rule build();
+    public static interface Builder<T> {
+        public Rule<T> build();
     }
 
-    public <R, P> R accept(RuleVisitor<R, P> visitor, P p);
+    public <R, P> R accept(RuleVisitor<T, R, P> visitor, P p);
 
-    public default <R, P> R accept(RuleVisitor<R, P> visitor) {
+    public default <R, P> R accept(RuleVisitor<T, R, P> visitor) {
         return accept(visitor, null);
     }
 

@@ -7,9 +7,10 @@ import java.util.Iterator;
  *
  * @author Junji Mikami
  */
-public interface Tokenizer extends Closeable, Iterator<Token> {
+public interface Tokenizer<T> extends Closeable, Iterator<Token<T>> {
 
     public boolean hasNext();
-    public Token next();
+
+    public Token<T> next();
 
 }

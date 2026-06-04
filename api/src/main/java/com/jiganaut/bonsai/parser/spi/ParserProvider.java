@@ -25,14 +25,14 @@ public abstract class ParserProvider {
 
     public abstract TextSource createTextSource(Reader reader);
 
-    public abstract ParserFactory createParserFactory(Grammar grammar);
+    public abstract <T> ParserFactory<T> createParserFactory(Grammar<T> grammar);
 
-    public abstract TokenizerFactory createTokenizerFactory(Grammar grammar, Collector<CharSequence, ?, String> collector);
+    public abstract <T, R> TokenizerFactory<T, R> createTokenizerFactory(Grammar<T> grammar, Collector<? super T, ?, R> collector);
 
-    public abstract NonTerminalNode.Builder createNonTerminalNodeBuilder(String name);
+    public abstract <T> NonTerminalNode.Builder<T> createNonTerminalNodeBuilder(String name);
 
-    public abstract Token createToken(String name, String value);
+    public abstract <T> Token<T> createToken(String name, T value);
 
-    public abstract ErrorNode.Builder createErrorNodeBuilder(String name);
+    public abstract <T> ErrorNode.Builder<T> createErrorNodeBuilder(String name);
 
 }

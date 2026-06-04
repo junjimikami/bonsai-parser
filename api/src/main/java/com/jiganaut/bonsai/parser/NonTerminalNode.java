@@ -1,7 +1,6 @@
 package com.jiganaut.bonsai.parser;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import com.jiganaut.bonsai.parser.spi.ParserProvider;
@@ -10,29 +9,31 @@ import com.jiganaut.bonsai.parser.spi.ParserProvider;
  *
  * @author Junji Mikami
  */
-public non-sealed interface NonTerminalNode extends Tree {
+public non-sealed interface NonTerminalNode<T> extends Tree<T> {
 
     /**
      *
      */
-    public static interface Builder extends Tree.Builder {
+    public static interface Builder<T> extends Tree.Builder<T>, Iterable<Tree.Builder<T>> {
 
         @Override
-        public NonTerminalNode build();
+        public NonTerminalNode<T> build();
 
-        public NonTerminalNode.Builder add(Tree tree);
+        public default NonTerminalNode.Builder<T> add(Tree<T> tree) {
+            return add(() -> tree);
+        }
 
-        public NonTerminalNode.Builder add(Tree.Builder builder);
+        public NonTerminalNode.Builder<T> add(Tree.Builder<T> builder);
 
-        public NonTerminalNode.Builder addAll(NonTerminalNode.Builder builder);
+        public NonTerminalNode.Builder<T> addAll(NonTerminalNode.Builder<T> builder);
 
     }
 
-    public static NonTerminalNode.Builder builder(String name) {
+    public static <T> NonTerminalNode.Builder<T> builder(String name) {
         return ParserProvider.load().createNonTerminalNodeBuilder(name);
     }
 
-    public static NonTerminalNode.Builder builder() {
+    public static <T> NonTerminalNode.Builder<T> builder() {
         return ParserProvider.load().createNonTerminalNodeBuilder(null);
     }
 
@@ -51,20 +52,20 @@ public non-sealed interface NonTerminalNode extends Tree {
     }
 
     @Override
-    public default Stream<? extends Tree> subTrees() {
+    public default Stream<? extends Tree<T>> subTrees() {
         return getSubTrees().stream();
     }
 
     @Override
-    public default Optional<String> value() {
-        return Optional.empty();
+    public default Stream<T> values() {
+        return getSubTrees().stream().flatMap(Tree::values);
     }
 
     @Override
-    public default <R, P> R accept(TreeVisitor<R, P> v, P p) {
+    public default <R, P> R accept(TreeVisitor<T, R, P> v, P p) {
         return v.visitNonTerminal(this, p);
     }
 
-    public List<? extends Tree> getSubTrees();
+    public List<? extends Tree<T>> getSubTrees();
 
 }

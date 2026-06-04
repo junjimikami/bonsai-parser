@@ -10,22 +10,22 @@ import com.jiganaut.bonsai.impl.Message;
  * @author Junji Mikami
  *
  */
-public interface SequenceRule extends Quantifiable {
+public interface SequenceRule<T> extends Quantifiable<T> {
 
     /**
      *
      */
-    public static interface Builder extends Quantifiable.Builder, Iterable<Rule.Builder> {
-        public default SequenceRule.Builder add(Rule rule) {
+    public static interface Builder<T> extends Quantifiable.Builder<T>, Iterable<Rule.Builder<T>> {
+        public default SequenceRule.Builder<T> add(Rule<T> rule) {
             return add(() -> rule);
         }
-        public SequenceRule.Builder add(Rule.Builder builder);
-        public SequenceRule.Builder addAll(SequenceRule.Builder builder);
+        public SequenceRule.Builder<T> add(Rule.Builder<T> builder);
+        public SequenceRule.Builder<T> addAll(SequenceRule.Builder<T> builder);
         @Override
-        public SequenceRule build();
+        public SequenceRule<T> build();
     }
 
-    public static Builder builder() {
+    public static <T> Builder<T> builder() {
         return GrammarProvider.load().createSequenceBuilder();
     }
 
@@ -35,10 +35,10 @@ public interface SequenceRule extends Quantifiable {
     }
 
     @Override
-    public default <R, P> R accept(RuleVisitor<R, P> visitor, P p) {
+    public default <R, P> R accept(RuleVisitor<T, R, P> visitor, P p) {
         Objects.requireNonNull(visitor, () -> Message.VALIDATION_PARAMETER_NULL.format("visitor"));
         return visitor.visitSequence(this, p);
     }
 
-    public List<? extends Rule> getRules();
+    public List<? extends Rule<T>> getRules();
 }

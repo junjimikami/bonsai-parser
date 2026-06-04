@@ -3,10 +3,10 @@ package com.jiganaut.bonsai.parser;
 import java.io.Closeable;
 
 /**
- * 
+ *
  * @author Junji Mikami
  */
-public interface Parser extends Closeable {
+public interface Parser<T> extends Closeable {
 
-    public Tree parse();
+    public Tree<T> parse();
 }

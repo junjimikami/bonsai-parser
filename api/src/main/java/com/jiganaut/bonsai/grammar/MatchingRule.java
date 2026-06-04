@@ -9,7 +9,7 @@ import com.jiganaut.bonsai.parser.Token;
  * @author Junji Mikami
  *
  */
-public interface MatchingRule extends Quantifiable, Skippable {
+public interface MatchingRule<T> extends Quantifiable<T>, Skippable<T> {
 
     @Override
     public default Kind getKind() {
@@ -17,14 +17,14 @@ public interface MatchingRule extends Quantifiable, Skippable {
     }
 
     @Override
-    public default <R, P> R accept(RuleVisitor<R, P> visitor, P p) {
+    public default <R, P> R accept(RuleVisitor<T, R, P> visitor, P p) {
         Objects.requireNonNull(visitor, () -> Message.VALIDATION_PARAMETER_NULL.format("visitor"));
         return visitor.visitMatch(this, p);
     }
 
-    public boolean test(String name, String value);
+    public boolean test(String name, T value);
 
-    public default boolean test(Token token) {
+    public default boolean test(Token<T> token) {
         if (token == null) {
             return false;
         }

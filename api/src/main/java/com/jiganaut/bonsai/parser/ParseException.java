@@ -13,19 +13,19 @@ public class ParseException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
-    private final ErrorNode errorNode;
+    private final ErrorNode<?> errorNode;
 
     /**
      * Creates a parse exception from an error node.
      *
      * @param errorNode parse error details
      */
-    public ParseException(ErrorNode errorNode) {
+    public ParseException(ErrorNode<?> errorNode) {
         super(getMessage(errorNode));
         this.errorNode = errorNode;
     }
 
-    private static String getMessage(ErrorNode errorNode) {
+    private static String getMessage(ErrorNode<?> errorNode) {
         Objects.requireNonNull(errorNode, Message.VALIDATION_PARAMETER_NULL.format("errorNode"));
         return errorNode.getMessage();
     }
@@ -35,7 +35,7 @@ public class ParseException extends RuntimeException {
      *
      * @return the associated error node
      */
-    public ErrorNode getErrorNode() {
+    public ErrorNode<?> getErrorNode() {
         return errorNode;
     }
 

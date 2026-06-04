@@ -9,9 +9,9 @@ import com.jiganaut.bonsai.impl.Message;
  * @author Junji Mikami
  *
  */
-public interface EmptyRule extends Rule {
+public interface EmptyRule<T> extends Rule<T> {
 
-    public static EmptyRule empty() {
+    public static <T> EmptyRule<T> empty() {
         return GrammarProvider.load().createEmpty();
     }
 
@@ -21,7 +21,7 @@ public interface EmptyRule extends Rule {
     }
 
     @Override
-    public default <R, P> R accept(RuleVisitor<R, P> visitor, P p) {
+    public default <R, P> R accept(RuleVisitor<T, R, P> visitor, P p) {
         Objects.requireNonNull(visitor, () -> Message.VALIDATION_PARAMETER_NULL.format("visitor"));
         return visitor.visitEmpty(this, p);
     }

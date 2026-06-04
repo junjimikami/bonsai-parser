@@ -1,13 +1,12 @@
 package com.jiganaut.bonsai.parser;
 
-import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
  *
  * @author Junji Mikami
  */
-public sealed interface Tree permits TerminalNode, NonTerminalNode {
+public sealed interface Tree<T> permits TerminalNode, NonTerminalNode {
 
     /**
      *
@@ -22,8 +21,8 @@ public sealed interface Tree permits TerminalNode, NonTerminalNode {
     /**
      *
      */
-    public static interface Builder {
-        public Tree build();
+    public static interface Builder<T> {
+        public Tree<T> build();
     }
 
     /**
@@ -36,9 +35,9 @@ public sealed interface Tree permits TerminalNode, NonTerminalNode {
 
     public Position getPosition();
 
-    public Stream<? extends Tree> subTrees();
+    public Stream<? extends Tree<T>> subTrees();
 
-    public Optional<String> value();
+    public Stream<T> values();
 
     /**
      *
@@ -48,9 +47,9 @@ public sealed interface Tree permits TerminalNode, NonTerminalNode {
      * @param p
      * @return
      */
-    public <R, P> R accept(TreeVisitor<R, P> v, P p);
+    public <R, P> R accept(TreeVisitor<T, R, P> v, P p);
 
-    public default <R, P> R accept(TreeVisitor<R, P> v) {
+    public default <R, P> R accept(TreeVisitor<T, R, P> v) {
         return accept(v, null);
     }
 
