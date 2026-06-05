@@ -1,9 +1,11 @@
 package com.jiganaut.bonsai.parser.spi;
 
+import java.io.InputStream;
 import java.io.Reader;
 import java.util.stream.Collector;
 
 import com.jiganaut.bonsai.grammar.Grammar;
+import com.jiganaut.bonsai.parser.BinarySource;
 import com.jiganaut.bonsai.parser.ErrorNode;
 import com.jiganaut.bonsai.parser.NonTerminalNode;
 import com.jiganaut.bonsai.parser.ParserFactory;
@@ -24,6 +26,8 @@ public abstract class ParserProvider {
     }
 
     public abstract TextSource createTextSource(Reader reader);
+
+    public abstract BinarySource createBinarySource(InputStream inputStream);
 
     public abstract <T> ParserFactory<T> createParserFactory(Grammar<T> grammar);
 
