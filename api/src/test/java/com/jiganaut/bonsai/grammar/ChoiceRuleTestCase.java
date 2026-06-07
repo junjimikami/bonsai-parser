@@ -1,13 +1,14 @@
 package com.jiganaut.bonsai.grammar;
 
+import static com.jiganaut.bonsai.grammar.GrammarMockFactory.mockChoiceRuleBuilder;
+import static com.jiganaut.bonsai.grammar.GrammarMockFactory.mockRule;
+import static com.jiganaut.bonsai.grammar.GrammarMockFactory.mockRuleBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 import org.junit.jupiter.api.DisplayName;
@@ -18,60 +19,75 @@ import org.junit.jupiter.api.TestReporter;
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
 /**
- * 
+ *
  * @author Junji Mikami
  *
  */
-interface ChoiceRuleTestCase extends CompositeRuleTestCase<ChoiceRule> {
+interface ChoiceRuleTestCase<T> extends CompositeRuleTestCase<T>, SkippableTestCase<T> {
 
     @Nested
-    interface BuilderTestCase extends CompositeRuleTestCase.BuilderTestCase<ChoiceRule.Builder> {
+    interface BuilderTestCase<T> extends CompositeRuleTestCase.BuilderTestCase<T>, SkippableTestCase.BuilderTestCase<T> {
 
         @Override
-        ChoiceRule.Builder createTarget();
+        ChoiceRule.Builder<T> createTarget();
 
         @Override
-        ChoiceRule expectedRule();
+        ChoiceRule<T> expectedRule();
+
+        default boolean expectedShortCircuit() {
+            return false;
+        }
 
         @SuppressWarnings("exports")
         @Test
-        @DisplayName("add(r:Rule) [Null parameter]")
-        default void addRInCaseOfNullParameter(TestReporter testReporter) throws Exception {
+        @DisplayName("add(rb:Rule.Builder) [rb == null]")
+        default void addRbWhenRbIsNull(TestReporter testReporter) throws Exception {
             var builder = createTarget();
 
-            var ex = assertThrows(NullPointerException.class, () -> builder.add((Rule) null));
+            var ex = assertThrows(NullPointerException.class, () -> builder.add((Rule.Builder<T>) null));
             testReporter.publishEntry(ex.getMessage());
         }
 
         @SuppressWarnings("exports")
         @Test
-        @DisplayName("add(rb:Rule.Builder) [Null parameter]")
-        default void addRbInCaseOfNullParameter(TestReporter testReporter) throws Exception {
+        @DisplayName("addAll(rb:ChoiceRule.Builder) [rb == null]")
+        default void addAllRbWhenRbIsNull(TestReporter testReporter) throws Exception {
             var builder = createTarget();
 
-            var ex = assertThrows(NullPointerException.class, () -> builder.add((Rule.Builder) null));
+            var ex = assertThrows(NullPointerException.class, () -> builder.addAll((ChoiceRule.Builder<T>) null));
             testReporter.publishEntry(ex.getMessage());
         }
 
         @SuppressWarnings("exports")
         @Test
-        @DisplayName("add(r:Rule) [Post-build operation]")
-        default void addRInCaseOfPostBuild(TestReporter testReporter) throws Exception {
+        @DisplayName("add(r:Rule) [Post-build]")
+        default void addRWhenPostBuild(TestReporter testReporter) throws Exception {
             var builder = createTarget();
             builder.build();
 
-            var ex = assertThrows(IllegalStateException.class, () -> builder.add(mock(Rule.class)));
+            var ex = assertThrows(IllegalStateException.class, () -> builder.add(mockRule()));
             testReporter.publishEntry(ex.getMessage());
         }
 
         @SuppressWarnings("exports")
         @Test
-        @DisplayName("add(rb:Rule.Builder) [Post-build operation]")
-        default void addRbInCaseOfPostBuild(TestReporter testReporter) throws Exception {
+        @DisplayName("add(rb:Rule.Builder) [Post-build]")
+        default void addRbWhenPostBuild(TestReporter testReporter) throws Exception {
             var builder = createTarget();
             builder.build();
 
-            var ex = assertThrows(IllegalStateException.class, () -> builder.add(mock(Rule.Builder.class)));
+            var ex = assertThrows(IllegalStateException.class, () -> builder.add(mockRuleBuilder()));
+            testReporter.publishEntry(ex.getMessage());
+        }
+
+        @SuppressWarnings("exports")
+        @Test
+        @DisplayName("addAll(rb:ChoiceRule.Builder) [Post-build]")
+        default void addAllRbWhenPostBuild(TestReporter testReporter) throws Exception {
+            var builder = createTarget();
+            builder.build();
+
+            var ex = assertThrows(IllegalStateException.class, () -> builder.addAll(mockChoiceRuleBuilder()));
             testReporter.publishEntry(ex.getMessage());
         }
 
@@ -80,7 +96,7 @@ interface ChoiceRuleTestCase extends CompositeRuleTestCase<ChoiceRule> {
         default void addR() throws Exception {
             var builder = createTarget();
 
-            assertEquals(builder, builder.add(mock(Rule.class)));
+            assertEquals(builder, builder.add(mockRule()));
         }
 
         @Test
@@ -88,7 +104,15 @@ interface ChoiceRuleTestCase extends CompositeRuleTestCase<ChoiceRule> {
         default void addRb() throws Exception {
             var builder = createTarget();
 
-            assertEquals(builder, builder.add(mock(Rule.Builder.class)));
+            assertEquals(builder, builder.add(mockRuleBuilder()));
+        }
+
+        @Test
+        @DisplayName("addAll(rb:ChoiceRule.Builder)")
+        default void addAll() throws Exception {
+            var builder = createTarget();
+
+            assertEquals(builder, builder.addAll(mockChoiceRuleBuilder()));
         }
 
         @Test
@@ -100,6 +124,14 @@ interface ChoiceRuleTestCase extends CompositeRuleTestCase<ChoiceRule> {
         }
 
         @Test
+        @DisplayName("asShortCircuit()")
+        default void asShortCircuit() throws Exception {
+            var builder = createTarget();
+
+            assertEquals(builder, builder.asShortCircuit());
+        }
+
+        @Test
         @DisplayName("build()")
         @Override
         default void build() throws Exception {
@@ -108,41 +140,32 @@ interface ChoiceRuleTestCase extends CompositeRuleTestCase<ChoiceRule> {
 
             assertNotNull(rule);
             assertIterableEquals(expectedRule().getChoices(), rule.getChoices());
-        }
-        
-
-        @SuppressWarnings("exports")
-        @Test
-        @DisplayName("shortCircuit() [Post-build operation]")
-        default void shortCircuitInCaseOfPostBuild(TestReporter testReporter) throws Exception {
-            var builder = createTarget();
-            builder.build();
-
-            var ex = assertThrows(IllegalStateException.class, () -> builder.shortCircuit());
-            testReporter.publishEntry(ex.getMessage());
+            assertEquals(expectedShortCircuit(), rule.isShortCircuit());
         }
 
         @Test
-        @DisplayName("shortCircuit()")
-        default void shortCircuit() throws Exception {
-            var target = createTarget().shortCircuit();
+        @DisplayName("iterate()")
+        default void iterate() throws Exception {
+            var target = createTarget();
 
-            assertTrue(target.isShortCircuit());
+            var rules = new ArrayList<Rule<T>>();
+            target.forEach(e -> rules.add(e.build()));
+            assertIterableEquals(expectedRule().getChoices(), rules);
         }
 
     }
 
     @Override
-    ChoiceRule createTarget();
+    ChoiceRule<T> createTarget();
 
     @Override
     default Kind expectedKind() {
         return Kind.CHOICE;
     }
 
-    Set<? extends Rule> expectedChoices();
+    Set<? extends Rule<T>> expectedChoices();
 
-    default boolean expectedToBeShortCircuit() {
+    default boolean expectedShortCircuit() {
         return false;
     }
 
@@ -159,16 +182,7 @@ interface ChoiceRuleTestCase extends CompositeRuleTestCase<ChoiceRule> {
     default void isShortCircuit() throws Exception {
         var target = createTarget();
 
-        assertEquals(expectedToBeShortCircuit(), target.isShortCircuit());
-    }
-
-    @Test
-    @DisplayName("shortCircuit()")
-    default void shortCircuit() throws Exception {
-        var target = createTarget();
-
-        assertNotSame(target, target.shortCircuit());
-        assertTrue(target.shortCircuit().isShortCircuit());
+        assertEquals(expectedShortCircuit(), target.isShortCircuit());
     }
 
 }

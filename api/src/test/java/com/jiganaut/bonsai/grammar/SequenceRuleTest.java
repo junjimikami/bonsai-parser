@@ -1,148 +1,136 @@
 package com.jiganaut.bonsai.grammar;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
+import static com.jiganaut.bonsai.grammar.GrammarMockFactory.mockRule;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestReporter;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 
 /**
- * 
+ *
  * @author Junji Mikami
  */
 class SequenceRuleTest {
 
     @Test
-    @DisplayName("of(Rule...) [Null parameter]")
-    void ofInCaseOfNullParameter(TestReporter testReporter) throws Exception {
-        var ex = assertThrows(NullPointerException.class, () -> SequenceRule.of((Rule[]) null));
-        testReporter.publishEntry(ex.getMessage());
-    }
+    @DisplayName("builder()")
+    void builder() throws Exception {
+        var target = SequenceRule.<String>builder();
 
-    @ParameterizedTest
-    @MethodSource
-    @DisplayName("of(Rule...)")
-    void of(List<Rule> rules) throws Exception {
-        var rule = SequenceRule.of(rules.toArray(Rule[]::new));
-
-        assertEquals(Rule.Kind.SEQUENCE, rule.getKind());
-        assertIterableEquals(rules, rule.getRules());
-    }
-
-    static Stream<List<Rule>> of() {
-        return Stream.of(
-                List.of(),
-                List.of(mock(Rule.class)),
-                List.of(mock(Rule.class), mock(Rule.class)));
+        assertNotNull(target);
+        assertInstanceOf(SequenceRule.Builder.class, target);
     }
 
     @Nested
-    class TestCase1 implements SequenceRuleTestCase {
+    class TestCase1 implements SequenceRuleTestCase<String> {
 
         @Override
-        public SequenceRule createTarget() {
-            return SequenceRule.of();
+        public SequenceRule<String> createTarget() {
+            return SequenceRule.<String>builder().build();
         }
 
         @Override
-        public List<? extends Rule> expectedRules() {
+        public List<? extends Rule<String>> expectedRules() {
             return List.of();
         }
 
     }
 
     @Nested
-    class TestCase2 implements SequenceRuleTestCase {
+    class TestCase2 implements SequenceRuleTestCase<String> {
 
-        List<Rule> testData = List.of(mock(Rule.class));
+        List<Rule<String>> testData = List.of(mockRule());
 
         @Override
-        public SequenceRule createTarget() {
-            return SequenceRule.of(testData.toArray(Rule[]::new));
+        public SequenceRule<String> createTarget() {
+            var builder = SequenceRule.<String>builder();
+            testData.forEach(builder::add);
+            return builder.build();
         }
 
         @Override
-        public List<? extends Rule> expectedRules() {
+        public List<? extends Rule<String>> expectedRules() {
             return testData;
         }
 
     }
 
     @Nested
-    class TestCase3 implements SequenceRuleTestCase {
+    class TestCase3 implements SequenceRuleTestCase<String> {
 
-        List<Rule> testData = List.of(mock(Rule.class), mock(Rule.class));
+        List<Rule<String>> testData = List.of(mockRule(), mockRule());
 
         @Override
-        public SequenceRule createTarget() {
-            return SequenceRule.of(testData.toArray(Rule[]::new));
+        public SequenceRule<String> createTarget() {
+            var builder = SequenceRule.<String>builder();
+            testData.forEach(builder::add);
+            return builder.build();
         }
 
         @Override
-        public List<? extends Rule> expectedRules() {
+        public List<? extends Rule<String>> expectedRules() {
             return testData;
         }
 
     }
 
     @Nested
-    class BuilderTestCase1 implements SequenceRuleTestCase.BuilderTestCase {
+    class BuilderTestCase1 implements SequenceRuleTestCase.BuilderTestCase<String> {
 
         @Override
-        public SequenceRule.Builder createTarget() {
-            return SequenceRule.builder();
+        public SequenceRule.Builder<String> createTarget() {
+            return SequenceRule.<String>builder();
         }
 
         @Override
-        public SequenceRule expectedRule() {
-            return SequenceRule.of();
-        }
-
-    }
-
-    @Nested
-    class BuilderTestCase2 implements SequenceRuleTestCase.BuilderTestCase {
-
-        List<Rule> testData = List.of(mock(Rule.class));
-
-        @Override
-        public SequenceRule.Builder createTarget() {
-            var builder = SequenceRule.builder();
-            testData.forEach(builder::add);
-            return builder;
-        }
-
-        @Override
-        public SequenceRule expectedRule() {
-            return SequenceRule.of(testData.toArray(Rule[]::new));
+        public SequenceRule<String> expectedRule() {
+            return SequenceRule.<String>builder().build();
         }
 
     }
 
     @Nested
-    class BuilderTestCase3 implements SequenceRuleTestCase.BuilderTestCase {
+    class BuilderTestCase2 implements SequenceRuleTestCase.BuilderTestCase<String> {
 
-        List<Rule> testData = List.of(mock(Rule.class), mock(Rule.class));
+        List<Rule<String>> testData = List.of(mockRule());
 
         @Override
-        public SequenceRule.Builder createTarget() {
-            var builder = SequenceRule.builder();
+        public SequenceRule.Builder<String> createTarget() {
+            var builder = SequenceRule.<String>builder();
             testData.forEach(builder::add);
             return builder;
         }
 
         @Override
-        public SequenceRule expectedRule() {
-            return SequenceRule.of(testData.toArray(Rule[]::new));
+        public SequenceRule<String> expectedRule() {
+            var builder = SequenceRule.<String>builder();
+            testData.forEach(builder::add);
+            return builder.build();
+        }
+
+    }
+
+    @Nested
+    class BuilderTestCase3 implements SequenceRuleTestCase.BuilderTestCase<String> {
+
+        List<Rule<String>> testData = List.of(mockRule(), mockRule());
+
+        @Override
+        public SequenceRule.Builder<String> createTarget() {
+            var builder = SequenceRule.<String>builder();
+            testData.forEach(builder::add);
+            return builder;
+        }
+
+        @Override
+        public SequenceRule<String> expectedRule() {
+            var builder = SequenceRule.<String>builder();
+            testData.forEach(builder::add);
+            return builder.build();
         }
 
     }

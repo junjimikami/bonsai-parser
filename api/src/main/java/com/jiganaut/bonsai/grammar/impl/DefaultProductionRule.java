@@ -2,24 +2,23 @@ package com.jiganaut.bonsai.grammar.impl;
 
 import java.util.Objects;
 
-import com.jiganaut.bonsai.grammar.Production;
+import com.jiganaut.bonsai.grammar.ProductionRule;
 import com.jiganaut.bonsai.grammar.Rule;
-import com.jiganaut.bonsai.impl.Message;
 
 /**
- * 
+ *
  * @author Junji Mikami
  */
-class DefaultProduction implements Production {
+class DefaultProductionRule<T> implements ProductionRule<T> {
 
     private final String symbol;
-    private final Rule rule;
+    private final Rule<T> rule;
 
     /**
      * @param symbol
      * @param rule
      */
-    DefaultProduction(String symbol, Rule rule) {
+    DefaultProductionRule(String symbol, Rule<T> rule) {
         assert symbol != null;
         assert rule != null;
         this.symbol = symbol;
@@ -32,28 +31,28 @@ class DefaultProduction implements Production {
     }
 
     @Override
-    public Rule getRule() {
+    public Rule<T> getRule() {
         return rule;
     }
 
     @Override
     public String toString() {
-        var encoded = Message.symbolEncode(symbol);
-        return "%s = %s".formatted(encoded, rule);
+        return "%s = %s".formatted(symbol, rule);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Production p) {
-            return this.getSymbol().equals(p.getSymbol())
-                    && this.getRule().equals(p.getRule());
+        if (obj instanceof ProductionRule<?> other) {
+            return this.getKind() == other.getKind()
+                    && this.symbol.equals(other.getSymbol())
+                    && this.rule.equals(other.getRule());
         }
         return super.equals(obj);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(symbol, rule);
+        return Objects.hash(getKind(), symbol, rule);
     }
 
 }

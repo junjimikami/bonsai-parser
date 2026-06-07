@@ -10,13 +10,13 @@ import com.jiganaut.bonsai.grammar.Rule;
  * @author Junji Mikami
  *
  */
-class DefaultQuantifierRule extends AbstractRule implements QuantifierRule {
+class DefaultQuantifierRule<T> implements QuantifierRule<T> {
 
-    private final Rule rule;
+    private final Rule<T> rule;
     private final int minCount;
     private final OptionalInt maxCount;
 
-    DefaultQuantifierRule(Rule rule, int minCount) {
+    DefaultQuantifierRule(Rule<T> rule, int minCount) {
         assert rule != null;
         assert minCount >= 0;
         this.rule = rule;
@@ -24,7 +24,7 @@ class DefaultQuantifierRule extends AbstractRule implements QuantifierRule {
         this.maxCount = OptionalInt.empty();
     }
 
-    DefaultQuantifierRule(Rule rule, int minCount, int maxCount) {
+    DefaultQuantifierRule(Rule<T> rule, int minCount, int maxCount) {
         assert rule != null;
         assert minCount >= 0;
         assert minCount <= maxCount;
@@ -44,33 +44,41 @@ class DefaultQuantifierRule extends AbstractRule implements QuantifierRule {
     }
 
     @Override
-    public Rule getRule() {
+    public Rule<T> getRule() {
         return rule;
     }
 
     @Override
     public String toString() {
-        var sb = new StringBuilder();
-        sb.append(rule);
-        sb.append("{");
-        sb.append(minCount);
-        if (maxCount.isEmpty()) {
-            sb.append(",");
-        } else if (minCount != maxCount.getAsInt()) {
-            sb.append(",");
-            sb.append(maxCount.getAsInt());
+        var string = rule.toString();
+        if (rule.getKind().isComposite()) {
+            string = string.isEmpty() ? "()" : "( %s )".formatted(string);
         }
-        sb.append("}");
-        return sb.toString();
+        if (minCount == 0 && maxCount.isEmpty()) {
+            return "%s*".formatted(string);
+        }
+        if (minCount == 1 && maxCount.isEmpty()) {
+            return "%s+".formatted(string);
+        }
+        if (maxCount.isEmpty()) {
+            return "%d*%s".formatted(minCount, string);
+        }
+        if (minCount == 0 && maxCount.getAsInt() == 1) {
+            return "%s?".formatted(string);
+        }
+        if (minCount == maxCount.getAsInt()) {
+            return "%d%s".formatted(minCount, string);
+        }
+        return "%d*%d%s".formatted(minCount, maxCount.getAsInt(), string);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof QuantifierRule r) {
-            return this.getKind() == r.getKind()
-                    && this.rule.equals(r.getRule())
-                    && this.minCount == r.getMinCount()
-                    && this.maxCount.equals(r.getMaxCount());
+        if (obj instanceof QuantifierRule<?> other) {
+            return this.getKind() == other.getKind()
+                    && this.rule.equals(other.getRule())
+                    && this.minCount == other.getMinCount()
+                    && this.maxCount.equals(other.getMaxCount());
         }
         return super.equals(obj);
     }

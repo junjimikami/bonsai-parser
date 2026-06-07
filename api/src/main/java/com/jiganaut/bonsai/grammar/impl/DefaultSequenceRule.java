@@ -1,51 +1,63 @@
 package com.jiganaut.bonsai.grammar.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.grammar.SequenceRule;
+import com.jiganaut.bonsai.impl.Message;
 
 /**
  *
  * @author Junji Mikami
  */
-class DefaultSequenceRule extends AbstractCompositeRule<List<Rule>> implements SequenceRule {
+class DefaultSequenceRule<T> extends CompositeRule<T, List<Rule<T>>> implements SequenceRule<T> {
+
     /**
-     * 
-     * @author Junji Mikami
+     *
      */
-    static class Builder extends AbstractCompositeRule.Builder implements SequenceRule.Builder {
+    static class Builder<T> extends CompositeRule.Builder<T> implements SequenceRule.Builder<T> {
 
-        @Override
-        public Builder add(Rule rule) {
-            return (Builder) super.add(rule);
+        Builder() {
+            super(new ArrayList<>());
         }
 
         @Override
-        public Builder add(Rule.Builder builder) {
-            return (Builder) super.add(builder);
+        public Builder<T> add(Rule.Builder<T> builder) {
+            check();
+            Objects.requireNonNull(builder, () -> Message.VALIDATION_PARAMETER_NULL.format("builder"));
+            builders.add(builder);
+            return this;
         }
 
         @Override
-        public SequenceRule build() {
+        public Builder<T> addAll(SequenceRule.Builder<T> builder) {
+            check();
+            Objects.requireNonNull(builder, () -> Message.VALIDATION_PARAMETER_NULL.format("builder"));
+            builder.forEach(this::add);
+            return this;
+        }
+
+        @Override
+        public SequenceRule<T> build() {
             checkForBuild();
-            var elements = suppliers.stream()
-                    .map(Supplier::get)
+            var elements = builders.stream()
+                    .map(Rule.Builder::build)
+                    .filter(Objects::nonNull)
                     .toList();
-            return new DefaultSequenceRule(elements);
+            return new DefaultSequenceRule<>(elements);
         }
 
     }
 
-    private DefaultSequenceRule(List<Rule> elements) {
+    private DefaultSequenceRule(List<Rule<T>> elements) {
         super(elements);
     }
 
     @Override
-    public List<? extends Rule> getRules() {
+    public List<? extends Rule<T>> getRules() {
         return elements;
     }
 
@@ -53,20 +65,19 @@ class DefaultSequenceRule extends AbstractCompositeRule<List<Rule>> implements S
     public String toString() {
         return elements.stream()
                 .map(e -> {
-                    try {
-                        return e.toString();
-                    } catch (Exception ex) {
-                        return "?";
+                    if (e.getKind().isComposite()) {
+                        return "( %s )".formatted(e.toString());
                     }
+                    return e.toString();
                 })
-                .collect(Collectors.joining(" ", "(", ")"));
+                .collect(Collectors.joining(" "));
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof SequenceRule r) {
-            return this.getKind() == r.getKind()
-                    && this.elements.equals(r.getRules());
+        if (obj instanceof SequenceRule<?> other) {
+            return this.getKind() == other.getKind()
+                    && this.elements.equals(other.getRules());
         }
         return super.equals(obj);
     }

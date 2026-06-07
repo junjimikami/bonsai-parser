@@ -9,30 +9,31 @@ import com.jiganaut.bonsai.grammar.SkipRule;
  * @author Junji Mikami
  *
  */
-class DefaultSkipRule extends AbstractRule implements SkipRule {
+class DefaultSkipRule<T> implements SkipRule<T> {
 
-    private final Rule rule;
+    private final Rule<T> rule;
 
-    DefaultSkipRule(Rule rule) {
+    DefaultSkipRule(Rule<T> rule) {
         assert rule != null;
         this.rule = rule;
     }
 
     @Override
-    public Rule getRule() {
+    public Rule<T> getRule() {
         return rule;
     }
 
     @Override
     public String toString() {
-        return "skip " + rule.toString();
+        var string = rule.toString();
+        return string.isEmpty() ? "skip()" : "skip( %s )".formatted(string);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof SkipRule r) {
-            return this.getKind() == r.getKind()
-                    && this.rule.equals(r.getRule());
+        if (obj instanceof SkipRule<?> other) {
+            return this.getKind() == other.getKind()
+                    && this.rule.equals(other.getRule());
         }
         return super.equals(obj);
     }

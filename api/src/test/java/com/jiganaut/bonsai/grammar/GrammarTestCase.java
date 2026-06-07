@@ -1,12 +1,14 @@
 package com.jiganaut.bonsai.grammar;
 
+import static com.jiganaut.bonsai.grammar.GrammarMockFactory.mockRule;
+import static com.jiganaut.bonsai.grammar.GrammarMockFactory.mockRuleBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
-import static org.mockito.Mockito.mock;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -21,31 +23,27 @@ import org.junit.jupiter.params.provider.ValueSource;
 import com.jiganaut.bonsai.TestCase;
 
 /**
- * 
+ *
  * @author Junji Mikami
  *
  */
-interface GrammarTestCase extends ProductionSetTestCase {
+interface GrammarTestCase<T> extends TestCase {
 
-    interface BuilderTestCase extends TestCase {
+    interface BuilderTestCase<T> extends TestCase {
 
         @Override
-        Grammar.Builder createTarget();
+        Grammar.Builder<T> createTarget();
 
-        Set<Production> expectedProductionSet();
-
-        default boolean isNoElements() {
-            return expectedProductionSet().isEmpty();
-        }
+        Set<ProductionRule<T>> expectedProductionRules();
 
         default boolean isContainingInvalidReference() {
-            var expected = expectedProductionSet();
+            var expected = expectedProductionRules();
             if (expected.isEmpty()) {
                 return false;
             }
             var references = expected.stream()
-                    .<ReferenceRule>mapMulti((e, consumer) -> {
-                        if (e.getRule() instanceof ReferenceRule r) {
+                    .<ReferenceRule<T>>mapMulti((e, consumer) -> {
+                        if (e.getRule() instanceof ReferenceRule<T> r) {
                             consumer.accept(r);
                         }
                     })
@@ -60,103 +58,76 @@ interface GrammarTestCase extends ProductionSetTestCase {
                             .anyMatch(e2 -> e2.equals(e)));
         }
 
-        default boolean isContainingRulesWithNoElements() {
-            var expected = expectedProductionSet();
-            if (expected.isEmpty()) {
-                return false;
-            }
-            return expected.stream()
-                    .<Rule>mapMulti((e, consumer) -> {
-                        if (e.getRule() instanceof ChoiceRule r
-                                && r.getChoices().isEmpty()) {
-                            consumer.accept(r);
-                        } else if (e.getRule() instanceof SequenceRule r
-                                && r.getRules().isEmpty()) {
-                            consumer.accept(r);
-                        }
-                    })
-                    .findAny()
-                    .isPresent();
-        }
-
-        default boolean isContainingBuildersReturningNull() {
-            var expected = expectedProductionSet();
-            if (expected.isEmpty()) {
-                return false;
-            }
-            return expected.stream()
-                    .filter(e -> e.getRule() == null)
-                    .findAny()
-                    .isPresent();
-        }
-
         default boolean canBuild() {
-            return !isNoElements()
-                    && !isContainingInvalidReference()
-                    && !isContainingRulesWithNoElements()
-                    && !isContainingBuildersReturningNull();
+            return !isContainingInvalidReference();
         }
 
         @SuppressWarnings("exports")
         @Test
-        @DisplayName("add(st:String, ru:Rule) [Null parameter]")
-        default void addStRuInCaseOfNullParameter(TestReporter testReporter) throws Exception {
-            var builder = createTarget();
+        @DisplayName("add(st:String, ru:Rule) [st == null]")
+        default void addStRuWhenStIsNull(TestReporter testReporter) throws Exception {
+            var target = createTarget();
 
-            var ex0 = assertThrows(NullPointerException.class, () -> builder.add(null, mock(Rule.class)));
-            testReporter.publishEntry(ex0.getMessage());
-            var ex1 = assertThrows(NullPointerException.class, () -> builder.add("", (Rule) null));
-            testReporter.publishEntry(ex1.getMessage());
-        }
-
-        @SuppressWarnings("exports")
-        @Test
-        @DisplayName("add(st:String, rb:Rule.Builder) [Null parameter]")
-        default void addStRbInCaseOfNullParameter(TestReporter testReporter) throws Exception {
-            var builder = createTarget();
-
-            var ex0 = assertThrows(NullPointerException.class, () -> builder.add(null, mock(Rule.Builder.class)));
-            testReporter.publishEntry(ex0.getMessage());
-            var ex1 = assertThrows(NullPointerException.class, () -> builder.add("", (Rule.Builder) null));
-            testReporter.publishEntry(ex1.getMessage());
-        }
-
-        @SuppressWarnings("exports")
-        @Test
-        @DisplayName("add(st:String, ru:Rule) [Post-build operation]")
-        default void addStRuInCaseOfPostBuild(TestReporter testReporter) throws Exception {
-            assumeTrue(canBuild());
-
-            var builder = createTarget();
-            builder.build();
-
-            var ex = assertThrows(IllegalStateException.class, () -> builder.add("", mock(Rule.class)));
+            var ex = assertThrows(NullPointerException.class, () -> target.add(null, mockRule()));
             testReporter.publishEntry(ex.getMessage());
         }
 
         @SuppressWarnings("exports")
         @Test
-        @DisplayName("add(st:String, rb:Rule.Builder) [Post-build operation]")
-        default void addRtbInCaseOfPostBuild(TestReporter testReporter) throws Exception {
-            assumeTrue(canBuild());
+        @DisplayName("add(st:String, rb:Rule.Builder) [st == null]")
+        default void addStRbWhenStIsNull(TestReporter testReporter) throws Exception {
+            var target = createTarget();
 
-            var builder = createTarget();
-            builder.build();
-
-            var ex = assertThrows(IllegalStateException.class, () -> builder.add("", mock(Rule.Builder.class)));
+            var ex = assertThrows(NullPointerException.class, () -> target.add(null, mockRuleBuilder()));
             testReporter.publishEntry(ex.getMessage());
         }
 
         @SuppressWarnings("exports")
         @Test
-        @DisplayName("build() [Post-build operation]")
-        default void buildInCaseOfPostBuild(TestReporter testReporter) throws Exception {
+        @DisplayName("add(st:String, rb:Rule.Builder) [rb == null]")
+        default void addStRbWhenRbIsNull(TestReporter testReporter) throws Exception {
+            var target = createTarget();
+
+            var ex = assertThrows(NullPointerException.class, () -> target.add("", (Rule.Builder<T>) null));
+            testReporter.publishEntry(ex.getMessage());
+        }
+
+        @SuppressWarnings("exports")
+        @Test
+        @DisplayName("add(st:String, ru:Rule) [Post-build]")
+        default void addStRuWhenPostBuild(TestReporter testReporter) throws Exception {
             assumeTrue(canBuild());
 
-            var builder = createTarget();
-            builder.build();
+            var target = createTarget();
+            target.build();
 
-            var ex = assertThrows(IllegalStateException.class, () -> builder.build());
+            var ex = assertThrows(IllegalStateException.class, () -> target.add("", mockRule()));
+            testReporter.publishEntry(ex.getMessage());
+        }
+
+        @SuppressWarnings("exports")
+        @Test
+        @DisplayName("add(st:String, rb:Rule.Builder) [Post-build]")
+        default void addStRbWhenPostBuild(TestReporter testReporter) throws Exception {
+            assumeTrue(canBuild());
+
+            var target = createTarget();
+            target.build();
+
+            var ex = assertThrows(IllegalStateException.class, () -> target.add("", mockRuleBuilder()));
+            testReporter.publishEntry(ex.getMessage());
+        }
+
+        @SuppressWarnings("exports")
+        @Test
+        @DisplayName("build() [Post-build]")
+        default void buildWhenPostBuild(TestReporter testReporter) throws Exception {
+            assumeTrue(canBuild());
+
+            var target = createTarget();
+            target.build();
+
+            var ex = assertThrows(IllegalStateException.class, () -> target.build());
             testReporter.publishEntry(ex.getMessage());
         }
 
@@ -165,9 +136,17 @@ interface GrammarTestCase extends ProductionSetTestCase {
         @ValueSource(strings = { "1", "a", "[" })
         @DisplayName("add(st:String, ru:Rule)")
         default void addStRu(String s) throws Exception {
-            var builder = createTarget();
+            var target = createTarget();
 
-            assertEquals(builder, builder.add(s, mock(Rule.class)));
+            assertEquals(target, target.add(s, mockRule()));
+        }
+
+        @Test
+        @DisplayName("add(st:String, ru:Rule) [ru == null]")
+        default void addStRuWhenRuIsNull() throws Exception {
+            var target = createTarget();
+
+            assertEquals(target, target.add("1", (Rule<T>) null));
         }
 
         @ParameterizedTest
@@ -175,9 +154,9 @@ interface GrammarTestCase extends ProductionSetTestCase {
         @ValueSource(strings = { "1", "a", "[" })
         @DisplayName("add(st:String, rb:Rule.Builder)")
         default void addStRb(String s) throws Exception {
-            var builder = createTarget();
+            var target = createTarget();
 
-            assertEquals(builder, builder.add(s, mock(Rule.Builder.class)));
+            assertEquals(target, target.add(s, mockRuleBuilder()));
         }
 
         @Test
@@ -185,15 +164,15 @@ interface GrammarTestCase extends ProductionSetTestCase {
         default void build() throws Exception {
             assumeTrue(canBuild());
 
-            var builder = createTarget();
-            var productionSet = builder.build();
+            var target = createTarget();
+            var productionSet = target.build();
 
             assertNotNull(productionSet);
-            var expectedString = expectedProductionSet().stream()
+            var expectedString = expectedProductionRules().stream()
                     .map(e -> e.getSymbol() + ":" + e.getRule())
                     .sorted()
                     .collect(Collectors.joining(",", "{", "}"));
-            var actualString = productionSet.stream()
+            var actualString = productionSet.getProductionRules().stream()
                     .map(e -> e.getSymbol() + ":" + e.getRule())
                     .sorted()
                     .collect(Collectors.joining(",", "{", "}"));
@@ -202,83 +181,35 @@ interface GrammarTestCase extends ProductionSetTestCase {
 
         @SuppressWarnings("exports")
         @Test
-        @DisplayName("build() [No elements]")
-        default void buildInCaseOfNoElements(TestReporter testReporter) throws Exception {
-            assumeTrue(isNoElements());
-
-            var builder = createTarget();
-
-            var ex = assertThrows(IllegalStateException.class, () -> builder.build());
-            testReporter.publishEntry(ex.getMessage());
-        }
-
-        @SuppressWarnings("exports")
-        @Test
         @DisplayName("build() [Containing invalid reference]")
-        default void buildInCaseOfContainingInvalidReference(TestReporter testReporter) throws Exception {
+        default void buildWhenContainingInvalidReference(TestReporter testReporter) throws Exception {
             assumeTrue(isContainingInvalidReference());
 
-            var builder = createTarget();
+            var target = createTarget();
 
-            var ex = assertThrows(NoSuchElementException.class, () -> builder.build());
+            var ex = assertThrows(NoSuchElementException.class, () -> target.build());
             testReporter.publishEntry(ex.getMessage());
         }
 
         @SuppressWarnings("exports")
         @Test
-        @DisplayName("build() [Containing rules with no elements]")
-        default void buildInCaseOfContainingRulesWithNoElements(TestReporter testReporter) throws Exception {
-            assumeTrue(isContainingRulesWithNoElements());
-
-            var builder = createTarget();
-
-            var ex = assertThrows(IllegalStateException.class, () -> builder.build());
-            testReporter.publishEntry(ex.getMessage());
-        }
-
-        @SuppressWarnings("exports")
-        @Test
-        @DisplayName("build() [Containing builders returning null]")
-        default void buildInCaseOfContainingBuildersReturningNull(TestReporter testReporter) throws Exception {
-            assumeTrue(isContainingBuildersReturningNull());
-
-            var builder = createTarget();
-
-            var ex = assertThrows(NullPointerException.class, () -> builder.build());
-            testReporter.publishEntry(ex.getMessage());
-        }
-
-        @SuppressWarnings("exports")
-        @Test
-        @DisplayName("shortCircuit() [No elements]")
-        default void shortCircuitInCaseOfNoElements(TestReporter testReporter) throws Exception {
-            assumeTrue(isNoElements());
-
-            var builder = createTarget();
-
-            var ex = assertThrows(IllegalStateException.class, () -> builder.shortCircuit());
-            testReporter.publishEntry(ex.getMessage());
-        }
-
-        @SuppressWarnings("exports")
-        @Test
-        @DisplayName("shortCircuit() [Post-build operation]")
-        default void shortCircuitInCaseOfPostBuild(TestReporter testReporter) throws Exception {
+        @DisplayName("asShortCircuit() [Post-build]")
+        default void asShortCircuitWhenPostBuild(TestReporter testReporter) throws Exception {
             assumeTrue(canBuild());
 
-            var builder = createTarget();
-            builder.build();
+            var target = createTarget();
+            target.build();
 
-            var ex = assertThrows(IllegalStateException.class, () -> builder.shortCircuit());
+            var ex = assertThrows(IllegalStateException.class, () -> target.asShortCircuit());
             testReporter.publishEntry(ex.getMessage());
         }
 
         @Test
-        @DisplayName("shortCircuit()")
-        default void shortCircuit() throws Exception {
+        @DisplayName("asShortCircuit()")
+        default void asShortCircuit() throws Exception {
             assumeTrue(canBuild());
 
-            var target = createTarget().shortCircuit();
+            var target = createTarget().asShortCircuit().build();
 
             assertTrue(target.isShortCircuit());
         }
@@ -286,25 +217,69 @@ interface GrammarTestCase extends ProductionSetTestCase {
     }
 
     @Override
-    Grammar createTarget();
+    Grammar<T> createTarget();
 
-    Set<Production> expectedProductionSet();
+    default String expectedStartSymbol() {
+        return null;
+    }
+
+    Set<ProductionRule<T>> expectedProductionRules();
+
+    default boolean expectedShortCircuit() {
+        return false;
+    }
+
+    default ChoiceRule<T> expectedChoiceRule() {
+        var builder = ChoiceRule.<T>builder();
+        expectedProductionRules().forEach(e -> builder.add(e.getRule()));
+        return builder.build();
+    }
 
     @Test
-    @DisplayName("productionSet()")
-    default void productionSet() throws Exception {
+    @DisplayName("getStartSymbol()")
+    default void getStartSymbol() throws Exception {
         var target = createTarget();
 
-        var expectedString = expectedProductionSet().stream()
-                .map(e -> e.getSymbol() + ":" + e.getRule())
-                .sorted()
-                .collect(Collectors.joining(",", "{", "}"));
-        var actualString = target.productionSet().stream()
-                .map(e -> e.getSymbol() + ":" + e.getRule())
-                .sorted()
-                .collect(Collectors.joining(",", "{", "}"));
-        assertEquals(expectedString, actualString);
-        assertTrue(target.productionSet().shortCircuit().isShortCircuit());
+        assertEquals(expectedStartSymbol(), target.getStartSymbol());
+    }
+
+    @Test
+    @DisplayName("getProductionRules()")
+    default void getProductionRules() throws Exception {
+        var target = createTarget();
+
+        var expected = expectedProductionRules().stream()
+                .map(e -> List.of(e.getSymbol(), e.getRule()))
+                .collect(Collectors.toSet());
+        var actual = target.getProductionRules().stream()
+                .map(e -> List.of(e.getSymbol(), e.getRule()))
+                .collect(Collectors.toSet());
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    @DisplayName("isShortCircuit()")
+    default void isShortCircuit() throws Exception {
+        var target = createTarget();
+
+        assertEquals(expectedShortCircuit(), target.isShortCircuit());
+    }
+
+    @Test
+    @DisplayName("toChoiceRule()")
+    default void toChoiceRule() throws Exception {
+        var target = createTarget();
+
+        var expected = expectedProductionRules().stream()
+                .filter(e -> expectedStartSymbol() == null || expectedStartSymbol().equals(e.getSymbol()))
+                .map(e -> (ProductionRule<?>) e)
+                .map(e -> List.of(e.getSymbol(), e.getRule()))
+                .collect(Collectors.toSet());
+        var actual = target.toChoiceRule().getChoices().stream()
+                .map(e -> (ProductionRule<?>) e)
+                .map(e -> List.of(e.getSymbol(), e.getRule()))
+                .collect(Collectors.toSet());
+        assertEquals(expected, actual);
     }
 
 }

@@ -112,6 +112,7 @@ public final class Rules {
 
     @SafeVarargs
     public static <T> SequenceRule<T> concat(Rule<T>... rules) {
+        Objects.requireNonNull(rules, () -> Message.VALIDATION_PARAMETER_NULL.format("rules"));
         var builder = SequenceRule.<T>builder();
         for (var rule : rules) {
             builder.add(rule);
@@ -121,6 +122,7 @@ public final class Rules {
 
     @SafeVarargs
     public static <T> ChoiceRule<T> oneOf(Rule<T>... choices) {
+        Objects.requireNonNull(choices, () -> Message.VALIDATION_PARAMETER_NULL.format("choices"));
         var builder = ChoiceRule.<T>builder();
         for (var choice : choices) {
             builder.add(choice);
@@ -130,6 +132,7 @@ public final class Rules {
 
     @SafeVarargs
     public static <T> ChoiceRule<T> firstOf(Rule<T>... choices) {
+        Objects.requireNonNull(choices, () -> Message.VALIDATION_PARAMETER_NULL.format("choices"));
         var builder = ChoiceRule.<T>builder();
         for (var choice : choices) {
             builder.add(choice);

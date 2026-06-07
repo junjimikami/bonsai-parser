@@ -1,9 +1,7 @@
 package com.jiganaut.bonsai.impl;
 
-import java.util.Objects;
-
 /**
- * 
+ *
  * @author Junji Mikami
  */
 public abstract class BaseBuilder {
@@ -11,15 +9,8 @@ public abstract class BaseBuilder {
 
     protected void check() {
         if (isBuilt) {
-            throw new IllegalStateException(Message.ALREADY_BUILT.format());
+            throw new IllegalStateException(Message.STATE_ALREADY_COMPLETED.format("build"));
         }
-    }
-
-    protected void checkParameter(Object... args) {
-        for (var o : args) {
-            Objects.requireNonNull(o, Message.NULL_PARAMETER.format());
-        }
-        check();
     }
 
     protected void checkForBuild() {

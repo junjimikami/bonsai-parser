@@ -12,14 +12,14 @@ import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 /**
- * 
+ *
  * @author Junji Mikami
  */
 class ReferenceRuleTest {
 
     @Test
-    @DisplayName("of(String) [Null parameter]")
-    void ofInCaseOfNullParameter(TestReporter testReporter) throws Exception {
+    @DisplayName("of(st:String) [st == null]")
+    void ofWhenStIsNull(TestReporter testReporter) throws Exception {
         var ex = assertThrows(NullPointerException.class, () -> ReferenceRule.of(null));
         testReporter.publishEntry(ex.getMessage());
     }
@@ -27,7 +27,7 @@ class ReferenceRuleTest {
     @ParameterizedTest
     @EmptySource
     @ValueSource(strings = { " ", "1", "a", "[" })
-    @DisplayName("of(String)")
+    @DisplayName("of(st:String)")
     void of(String symbol) throws Exception {
         var rule = ReferenceRule.of(symbol);
 
@@ -36,10 +36,10 @@ class ReferenceRuleTest {
     }
 
     @Nested
-    class TestCase1 implements ReferenceRuleTestCase {
+    class TestCase1 implements ReferenceRuleTestCase<String> {
 
         @Override
-        public ReferenceRule createTarget() {
+        public ReferenceRule<String> createTarget() {
             return ReferenceRule.of(expectedSymbol());
         }
 
@@ -51,10 +51,10 @@ class ReferenceRuleTest {
     }
 
     @Nested
-    class TestCase2 implements ReferenceRuleTestCase {
+    class TestCase2 implements ReferenceRuleTestCase<String> {
 
         @Override
-        public ReferenceRule createTarget() {
+        public ReferenceRule<String> createTarget() {
             return ReferenceRule.of(expectedSymbol());
         }
 
@@ -66,10 +66,10 @@ class ReferenceRuleTest {
     }
 
     @Nested
-    class TestCase3 implements ReferenceRuleTestCase {
+    class TestCase3 implements ReferenceRuleTestCase<String> {
 
         @Override
-        public ReferenceRule createTarget() {
+        public ReferenceRule<String> createTarget() {
             return ReferenceRule.of(expectedSymbol());
         }
 
@@ -81,10 +81,10 @@ class ReferenceRuleTest {
     }
 
     @Nested
-    class TestCase4 implements ReferenceRuleTestCase {
+    class TestCase4 implements ReferenceRuleTestCase<String> {
 
         @Override
-        public ReferenceRule createTarget() {
+        public ReferenceRule<String> createTarget() {
             return ReferenceRule.of(expectedSymbol());
         }
 
@@ -96,10 +96,10 @@ class ReferenceRuleTest {
     }
 
     @Nested
-    class TestCase5 implements ReferenceRuleTestCase {
+    class TestCase5 implements ReferenceRuleTestCase<String> {
 
         @Override
-        public ReferenceRule createTarget() {
+        public ReferenceRule<String> createTarget() {
             return ReferenceRule.of(expectedSymbol());
         }
 
@@ -111,10 +111,10 @@ class ReferenceRuleTest {
     }
 
     @Nested
-    class TestCase6 implements ReferenceRuleTestCase {
+    class TestCase6 implements ReferenceRuleTestCase<String> {
 
         @Override
-        public ReferenceRule createTarget() {
+        public ReferenceRule<String> createTarget() {
             return ReferenceRule.of(expectedSymbol());
         }
 
@@ -126,10 +126,10 @@ class ReferenceRuleTest {
     }
 
     @Nested
-    class TestCase7 implements ReferenceRuleTestCase {
+    class TestCase7 implements ReferenceRuleTestCase<String> {
 
         @Override
-        public ReferenceRule createTarget() {
+        public ReferenceRule<String> createTarget() {
             return ReferenceRule.of(expectedSymbol());
         }
 
