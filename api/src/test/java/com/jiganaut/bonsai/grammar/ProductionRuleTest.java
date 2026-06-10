@@ -1,6 +1,6 @@
 package com.jiganaut.bonsai.grammar;
 
-import static com.jiganaut.bonsai.grammar.GrammarMockFactory.mockRule;
+import static com.jiganaut.bonsai.grammar.MockFactory.mockRule;
 
 import org.junit.jupiter.api.Nested;
 

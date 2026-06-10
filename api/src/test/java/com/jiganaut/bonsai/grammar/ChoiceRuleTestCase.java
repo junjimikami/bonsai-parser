@@ -1,14 +1,14 @@
 package com.jiganaut.bonsai.grammar;
 
-import static com.jiganaut.bonsai.grammar.GrammarMockFactory.mockChoiceRuleBuilder;
-import static com.jiganaut.bonsai.grammar.GrammarMockFactory.mockRule;
-import static com.jiganaut.bonsai.grammar.GrammarMockFactory.mockRuleBuilder;
+import static com.jiganaut.bonsai.grammar.MockFactory.mockChoiceRuleBuilder;
+import static com.jiganaut.bonsai.grammar.MockFactory.mockRule;
+import static com.jiganaut.bonsai.grammar.MockFactory.mockRuleBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.junit.jupiter.api.DisplayName;
@@ -148,7 +148,7 @@ interface ChoiceRuleTestCase<T> extends CompositeRuleTestCase<T>, SkippableTestC
         default void iterate() throws Exception {
             var target = createTarget();
 
-            var rules = new ArrayList<Rule<T>>();
+            var rules = new LinkedHashSet<Rule<T>>();
             target.forEach(e -> rules.add(e.build()));
             assertIterableEquals(expectedRule().getChoices(), rules);
         }

@@ -1,6 +1,6 @@
 package com.jiganaut.bonsai.grammar;
 
-import static com.jiganaut.bonsai.grammar.GrammarMockFactory.mockRule;
+import static com.jiganaut.bonsai.grammar.MockFactory.mockRule;
 
 import java.util.List;
 import java.util.Set;

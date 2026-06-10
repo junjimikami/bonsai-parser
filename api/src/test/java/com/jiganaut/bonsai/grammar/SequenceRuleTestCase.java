@@ -1,8 +1,8 @@
 package com.jiganaut.bonsai.grammar;
 
-import static com.jiganaut.bonsai.grammar.GrammarMockFactory.mockRule;
-import static com.jiganaut.bonsai.grammar.GrammarMockFactory.mockRuleBuilder;
-import static com.jiganaut.bonsai.grammar.GrammarMockFactory.mockSequenceRuleBuilder;
+import static com.jiganaut.bonsai.grammar.MockFactory.mockRule;
+import static com.jiganaut.bonsai.grammar.MockFactory.mockRuleBuilder;
+import static com.jiganaut.bonsai.grammar.MockFactory.mockSequenceRuleBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

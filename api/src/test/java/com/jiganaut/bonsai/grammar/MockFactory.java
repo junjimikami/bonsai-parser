@@ -5,7 +5,7 @@ import static org.mockito.Mockito.when;
 
 import com.jiganaut.bonsai.parser.Token;
 
-final class GrammarMockFactory {
+final class MockFactory {
 
     static <T> Grammar<T> mockGrammar() {
         @SuppressWarnings("unchecked")
@@ -53,7 +53,7 @@ final class GrammarMockFactory {
         return builder;
     }
 
-    static <T, R, P> RuleVisitor<T, R, P> mockVisitor() {
+    static <T, R, P> RuleVisitor<T, R, P> mockRuleVisitor() {
         @SuppressWarnings("unchecked")
         RuleVisitor<T, R, P> visitor = mock(RuleVisitor.class);
         return visitor;

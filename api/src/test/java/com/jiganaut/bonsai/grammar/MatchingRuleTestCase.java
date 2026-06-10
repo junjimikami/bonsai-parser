@@ -1,6 +1,6 @@
 package com.jiganaut.bonsai.grammar;
 
-import static com.jiganaut.bonsai.grammar.GrammarMockFactory.mockToken;
+import static com.jiganaut.bonsai.grammar.MockFactory.mockToken;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.DisplayName;

@@ -1,7 +1,7 @@
 package com.jiganaut.bonsai.grammar;
 
-import static com.jiganaut.bonsai.grammar.GrammarMockFactory.mockProductionRule;
-import static com.jiganaut.bonsai.grammar.GrammarMockFactory.mockRule;
+import static com.jiganaut.bonsai.grammar.MockFactory.mockProductionRule;
+import static com.jiganaut.bonsai.grammar.MockFactory.mockRule;
 
 import java.util.Set;
 import java.util.stream.Collectors;

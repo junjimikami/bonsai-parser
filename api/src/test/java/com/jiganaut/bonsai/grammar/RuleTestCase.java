@@ -1,7 +1,7 @@
 package com.jiganaut.bonsai.grammar;
 
-import static com.jiganaut.bonsai.grammar.GrammarMockFactory.mockRule;
-import static com.jiganaut.bonsai.grammar.GrammarMockFactory.mockVisitor;
+import static com.jiganaut.bonsai.grammar.MockFactory.mockRule;
+import static com.jiganaut.bonsai.grammar.MockFactory.mockRuleVisitor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -100,7 +100,7 @@ interface RuleTestCase<T> extends TestCase {
     @DisplayName("accept(rv:RuleVisitor)")
     default void acceptRv() throws Exception {
         var target = createTarget();
-        RuleVisitor<T, Void, Void> visitor = mockVisitor();
+        RuleVisitor<T, Void, Void> visitor = mockRuleVisitor();
 
         target.accept(visitor);
 
@@ -125,7 +125,7 @@ interface RuleTestCase<T> extends TestCase {
     @ValueSource(strings = { "test" })
     default void acceptRvP(String arg) throws Exception {
         var target = createTarget();
-        RuleVisitor<T, Void, String> visitor = mockVisitor();
+        RuleVisitor<T, Void, String> visitor = mockRuleVisitor();
 
         target.accept(visitor, arg);
 

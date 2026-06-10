@@ -1,7 +1,7 @@
 package com.jiganaut.bonsai.grammar;
 
-import static com.jiganaut.bonsai.grammar.GrammarMockFactory.mockGrammar;
-import static com.jiganaut.bonsai.grammar.GrammarMockFactory.mockProductionRule;
+import static com.jiganaut.bonsai.grammar.MockFactory.mockGrammar;
+import static com.jiganaut.bonsai.grammar.MockFactory.mockProductionRule;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
