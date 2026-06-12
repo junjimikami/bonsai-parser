@@ -69,7 +69,7 @@ interface GrammarTestCase<T> extends TestCase {
             var target = createTarget();
 
             var ex = assertThrows(NullPointerException.class, () -> target.add(null, mockRule()));
-            testReporter.publishEntry(ex.getMessage());
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
         @SuppressWarnings("exports")
@@ -79,7 +79,7 @@ interface GrammarTestCase<T> extends TestCase {
             var target = createTarget();
 
             var ex = assertThrows(NullPointerException.class, () -> target.add(null, mockRuleBuilder()));
-            testReporter.publishEntry(ex.getMessage());
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
         @SuppressWarnings("exports")
@@ -89,7 +89,7 @@ interface GrammarTestCase<T> extends TestCase {
             var target = createTarget();
 
             var ex = assertThrows(NullPointerException.class, () -> target.add("", (Rule.Builder<T>) null));
-            testReporter.publishEntry(ex.getMessage());
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
         @SuppressWarnings("exports")
@@ -102,7 +102,7 @@ interface GrammarTestCase<T> extends TestCase {
             target.build();
 
             var ex = assertThrows(IllegalStateException.class, () -> target.add("", mockRule()));
-            testReporter.publishEntry(ex.getMessage());
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
         @SuppressWarnings("exports")
@@ -115,7 +115,7 @@ interface GrammarTestCase<T> extends TestCase {
             target.build();
 
             var ex = assertThrows(IllegalStateException.class, () -> target.add("", mockRuleBuilder()));
-            testReporter.publishEntry(ex.getMessage());
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
         @SuppressWarnings("exports")
@@ -128,7 +128,7 @@ interface GrammarTestCase<T> extends TestCase {
             target.build();
 
             var ex = assertThrows(IllegalStateException.class, () -> target.build());
-            testReporter.publishEntry(ex.getMessage());
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
         @ParameterizedTest
@@ -188,7 +188,7 @@ interface GrammarTestCase<T> extends TestCase {
             var target = createTarget();
 
             var ex = assertThrows(NoSuchElementException.class, () -> target.build());
-            testReporter.publishEntry(ex.getMessage());
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
         @SuppressWarnings("exports")
@@ -201,7 +201,7 @@ interface GrammarTestCase<T> extends TestCase {
             target.build();
 
             var ex = assertThrows(IllegalStateException.class, () -> target.asShortCircuit());
-            testReporter.publishEntry(ex.getMessage());
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
         @Test

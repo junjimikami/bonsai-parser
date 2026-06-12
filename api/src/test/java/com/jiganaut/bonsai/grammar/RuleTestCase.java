@@ -39,7 +39,7 @@ interface RuleTestCase<T> extends TestCase {
             target.build();
 
             var ex = assertThrows(IllegalStateException.class, () -> target.build());
-            testReporter.publishEntry(ex.getMessage());
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
         void build() throws Exception;

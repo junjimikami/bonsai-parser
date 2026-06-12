@@ -29,42 +29,42 @@ class RulesTest {
     @DisplayName("pattern(st:String) [st == null]")
     void patternStWhenStIsNull(TestReporter testReporter) throws Exception {
         var ex = assertThrows(NullPointerException.class, () -> Rules.pattern((String) null));
-        testReporter.publishEntry(ex.getMessage());
+        testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
     }
 
     @Test
     @DisplayName("pattern(pa:Pattern) [pa == null]")
     void patternPaWhenPaIsNull(TestReporter testReporter) throws Exception {
         var ex = assertThrows(NullPointerException.class, () -> Rules.pattern((Pattern) null));
-        testReporter.publishEntry(ex.getMessage());
+        testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
     }
 
     @Test
     @DisplayName("concat(rules:Rule...) [rules == null]")
     void concatRulesWhenRulesIsNull(TestReporter testReporter) throws Exception {
         var ex = assertThrows(NullPointerException.class, () -> Rules.concat((Rule<String>[]) null));
-        testReporter.publishEntry(ex.getMessage());
+        testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
     }
 
     @Test
     @DisplayName("oneOf(choices:Rule...) [choices == null]")
     void oneOfChoicesWhenChoicesIsNull(TestReporter testReporter) throws Exception {
         var ex = assertThrows(NullPointerException.class, () -> Rules.oneOf((Rule<String>[]) null));
-        testReporter.publishEntry(ex.getMessage());
+        testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
     }
 
     @Test
     @DisplayName("firstOf(choices:Rule...) [choices == null]")
     void firstOfChoicesWhenChoicesIsNull(TestReporter testReporter) throws Exception {
         var ex = assertThrows(NullPointerException.class, () -> Rules.firstOf((Rule<String>[]) null));
-        testReporter.publishEntry(ex.getMessage());
+        testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
     }
 
     @Test
     @DisplayName("reference(st:String) [st == null]")
     void referenceWhenStIsNull(TestReporter testReporter) throws Exception {
         var ex = assertThrows(NullPointerException.class, () -> Rules.reference(null));
-        testReporter.publishEntry(ex.getMessage());
+        testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
     }
 
     static Stream<Arguments> nameValueParameters() {

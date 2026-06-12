@@ -38,7 +38,7 @@ interface SequenceRuleTestCase<T> extends CompositeRuleTestCase<T> {
             var target = createTarget();
 
             var ex = assertThrows(NullPointerException.class, () -> target.add((Rule.Builder<T>) null));
-            testReporter.publishEntry(ex.getMessage());
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
         @SuppressWarnings("exports")
@@ -48,7 +48,7 @@ interface SequenceRuleTestCase<T> extends CompositeRuleTestCase<T> {
             var target = createTarget();
 
             var ex = assertThrows(NullPointerException.class, () -> target.addAll((null)));
-            testReporter.publishEntry(ex.getMessage());
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
         @SuppressWarnings("exports")
@@ -59,7 +59,7 @@ interface SequenceRuleTestCase<T> extends CompositeRuleTestCase<T> {
             target.build();
 
             var ex = assertThrows(IllegalStateException.class, () -> target.add(mockRule()));
-            testReporter.publishEntry(ex.getMessage());
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
         @SuppressWarnings("exports")
@@ -70,7 +70,7 @@ interface SequenceRuleTestCase<T> extends CompositeRuleTestCase<T> {
             target.build();
 
             var ex = assertThrows(IllegalStateException.class, () -> target.add(mockRuleBuilder()));
-            testReporter.publishEntry(ex.getMessage());
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
         @SuppressWarnings("exports")
@@ -81,7 +81,7 @@ interface SequenceRuleTestCase<T> extends CompositeRuleTestCase<T> {
             target.build();
 
             var ex = assertThrows(IllegalStateException.class, () -> target.addAll(mockSequenceRuleBuilder()));
-            testReporter.publishEntry(ex.getMessage());
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
         @Test

@@ -21,7 +21,7 @@ class ReferenceRuleTest {
     @DisplayName("of(st:String) [st == null]")
     void ofWhenStIsNull(TestReporter testReporter) throws Exception {
         var ex = assertThrows(NullPointerException.class, () -> ReferenceRule.of(null));
-        testReporter.publishEntry(ex.getMessage());
+        testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
     }
 
     @ParameterizedTest

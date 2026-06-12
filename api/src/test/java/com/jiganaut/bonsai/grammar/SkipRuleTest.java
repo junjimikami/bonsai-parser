@@ -20,7 +20,7 @@ class SkipRuleTest {
     @DisplayName("of(r:Rule) [r == null]")
     void ofWhenRIsNull(TestReporter testReporter) throws Exception {
         var ex = assertThrows(NullPointerException.class, () -> SkipRule.of(null));
-        testReporter.publishEntry(ex.getMessage());
+        testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
     }
 
     @Test

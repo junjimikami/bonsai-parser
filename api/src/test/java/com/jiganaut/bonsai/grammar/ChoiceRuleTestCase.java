@@ -45,7 +45,7 @@ interface ChoiceRuleTestCase<T> extends CompositeRuleTestCase<T>, SkippableTestC
             var builder = createTarget();
 
             var ex = assertThrows(NullPointerException.class, () -> builder.add((Rule.Builder<T>) null));
-            testReporter.publishEntry(ex.getMessage());
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
         @SuppressWarnings("exports")
@@ -55,7 +55,7 @@ interface ChoiceRuleTestCase<T> extends CompositeRuleTestCase<T>, SkippableTestC
             var builder = createTarget();
 
             var ex = assertThrows(NullPointerException.class, () -> builder.addAll((ChoiceRule.Builder<T>) null));
-            testReporter.publishEntry(ex.getMessage());
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
         @SuppressWarnings("exports")
@@ -66,7 +66,7 @@ interface ChoiceRuleTestCase<T> extends CompositeRuleTestCase<T>, SkippableTestC
             builder.build();
 
             var ex = assertThrows(IllegalStateException.class, () -> builder.add(mockRule()));
-            testReporter.publishEntry(ex.getMessage());
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
         @SuppressWarnings("exports")
@@ -77,7 +77,7 @@ interface ChoiceRuleTestCase<T> extends CompositeRuleTestCase<T>, SkippableTestC
             builder.build();
 
             var ex = assertThrows(IllegalStateException.class, () -> builder.add(mockRuleBuilder()));
-            testReporter.publishEntry(ex.getMessage());
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
         @SuppressWarnings("exports")
@@ -88,7 +88,7 @@ interface ChoiceRuleTestCase<T> extends CompositeRuleTestCase<T>, SkippableTestC
             builder.build();
 
             var ex = assertThrows(IllegalStateException.class, () -> builder.addAll(mockChoiceRuleBuilder()));
-            testReporter.publishEntry(ex.getMessage());
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
         @Test
@@ -150,7 +150,7 @@ interface ChoiceRuleTestCase<T> extends CompositeRuleTestCase<T>, SkippableTestC
 
             var rules = new LinkedHashSet<Rule<T>>();
             target.forEach(e -> rules.add(e.build()));
-            assertIterableEquals(expectedRule().getChoices(), rules);
+            assertEquals(expectedRule().getChoices(), rules);
         }
 
     }
