@@ -163,7 +163,7 @@ interface ChoiceRuleTestCase<T> extends CompositeRuleTestCase<T>, SkippableTestC
         return Kind.CHOICE;
     }
 
-    Set<? extends Rule<T>> expectedChoices();
+    Set<Rule<T>> expectedChoices();
 
     default boolean expectedShortCircuit() {
         return false;

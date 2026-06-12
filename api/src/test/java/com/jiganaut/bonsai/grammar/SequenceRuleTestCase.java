@@ -138,7 +138,7 @@ interface SequenceRuleTestCase<T> extends CompositeRuleTestCase<T> {
         return Kind.SEQUENCE;
     }
 
-    List<? extends Rule<T>> expectedRules();
+    List<Rule<T>> expectedRules();
 
     @Test
     @DisplayName("getRules()")

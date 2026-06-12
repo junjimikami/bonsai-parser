@@ -34,7 +34,7 @@ class SequenceRuleTest {
         }
 
         @Override
-        public List<? extends Rule<String>> expectedRules() {
+        public List<Rule<String>> expectedRules() {
             return List.of();
         }
 
@@ -53,7 +53,7 @@ class SequenceRuleTest {
         }
 
         @Override
-        public List<? extends Rule<String>> expectedRules() {
+        public List<Rule<String>> expectedRules() {
             return testData;
         }
 
@@ -72,7 +72,7 @@ class SequenceRuleTest {
         }
 
         @Override
-        public List<? extends Rule<String>> expectedRules() {
+        public List<Rule<String>> expectedRules() {
             return testData;
         }
 

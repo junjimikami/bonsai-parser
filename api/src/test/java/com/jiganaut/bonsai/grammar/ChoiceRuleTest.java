@@ -22,7 +22,7 @@ class ChoiceRuleTest {
         }
 
         @Override
-        public Set<? extends Rule<String>> expectedChoices() {
+        public Set<Rule<String>> expectedChoices() {
             return Set.of();
         }
 
@@ -41,7 +41,7 @@ class ChoiceRuleTest {
         }
 
         @Override
-        public Set<? extends Rule<String>> expectedChoices() {
+        public Set<Rule<String>> expectedChoices() {
             return testData;
         }
 
@@ -60,7 +60,7 @@ class ChoiceRuleTest {
         }
 
         @Override
-        public Set<? extends Rule<String>> expectedChoices() {
+        public Set<Rule<String>> expectedChoices() {
             return testData;
         }
 
@@ -75,7 +75,7 @@ class ChoiceRuleTest {
         }
 
         @Override
-        public Set<? extends Rule<String>> expectedChoices() {
+        public Set<Rule<String>> expectedChoices() {
             return Set.of();
         }
 
