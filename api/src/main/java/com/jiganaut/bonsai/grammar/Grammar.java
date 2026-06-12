@@ -36,7 +36,7 @@ public interface Grammar<T> {
 
     public String getStartSymbol();
 
-    public Set<? extends ProductionRule<T>> getProductionRules();
+    public Set<ProductionRule<T>> getProductionRules();
 
     public boolean isShortCircuit();
 

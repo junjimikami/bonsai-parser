@@ -47,7 +47,7 @@ public interface ChoiceRule<T> extends Quantifiable<T>, Skippable<T> {
         return visitor.visitChoice(this, p);
     }
 
-    public Set<? extends Rule<T>> getChoices();
+    public Set<Rule<T>> getChoices();
 
     public boolean isShortCircuit();
 

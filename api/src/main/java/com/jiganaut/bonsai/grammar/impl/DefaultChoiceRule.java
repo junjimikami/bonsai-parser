@@ -76,7 +76,7 @@ class DefaultChoiceRule<T> extends CompositeRule<T, Set<Rule<T>>> implements Cho
     }
 
     @Override
-    public Set<? extends Rule<T>> getChoices() {
+    public Set<Rule<T>> getChoices() {
         return elements;
     }
 

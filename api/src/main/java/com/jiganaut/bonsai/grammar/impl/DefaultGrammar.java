@@ -95,7 +95,7 @@ class DefaultGrammar<T> implements Grammar<T> {
     }
 
     @Override
-    public Set<? extends ProductionRule<T>> getProductionRules() {
+    public Set<ProductionRule<T>> getProductionRules() {
         return productionSet;
     }
 

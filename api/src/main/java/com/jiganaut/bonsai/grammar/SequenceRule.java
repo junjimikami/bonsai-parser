@@ -40,5 +40,5 @@ public interface SequenceRule<T> extends Quantifiable<T> {
         return visitor.visitSequence(this, p);
     }
 
-    public List<? extends Rule<T>> getRules();
+    public List<Rule<T>> getRules();
 }

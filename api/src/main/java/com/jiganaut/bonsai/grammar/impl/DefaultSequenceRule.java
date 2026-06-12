@@ -57,7 +57,7 @@ class DefaultSequenceRule<T> extends CompositeRule<T, List<Rule<T>>> implements 
     }
 
     @Override
-    public List<? extends Rule<T>> getRules() {
+    public List<Rule<T>> getRules() {
         return elements;
     }
 
