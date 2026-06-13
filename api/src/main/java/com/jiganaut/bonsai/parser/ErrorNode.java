@@ -32,7 +32,7 @@ public interface ErrorNode<T> extends NonTerminalNode<T> {
 
         public ErrorNode.Builder<T> setGrammar(Grammar<T> grammar);
 
-        public ErrorNode.Builder<T> setProductionPath(List<? extends ProductionRule<T>> productionPath);
+        public ErrorNode.Builder<T> setProductionPath(List<ProductionRule<T>> productionPath);
 
         public ErrorNode.Builder<T> setExpectedRule(Rule<T> expectedRule);
 
@@ -60,7 +60,7 @@ public interface ErrorNode<T> extends NonTerminalNode<T> {
 
     public Grammar<T> getGrammar();
 
-    public List<? extends ProductionRule<T>> getProductionPath();
+    public List<ProductionRule<T>> getProductionPath();
 
     public Rule<T> getExpectedRule();
 

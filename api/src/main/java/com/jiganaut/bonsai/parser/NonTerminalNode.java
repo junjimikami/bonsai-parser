@@ -52,7 +52,7 @@ public non-sealed interface NonTerminalNode<T> extends Tree<T> {
     }
 
     @Override
-    public default Stream<? extends Tree<T>> subTrees() {
+    public default Stream<Tree<T>> subTrees() {
         return getSubTrees().stream();
     }
 
@@ -66,6 +66,6 @@ public non-sealed interface NonTerminalNode<T> extends Tree<T> {
         return v.visitNonTerminal(this, p);
     }
 
-    public List<? extends Tree<T>> getSubTrees();
+    public List<Tree<T>> getSubTrees();
 
 }

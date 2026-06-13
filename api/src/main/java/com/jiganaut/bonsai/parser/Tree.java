@@ -35,7 +35,7 @@ public sealed interface Tree<T> permits TerminalNode, NonTerminalNode {
 
     public Position getPosition();
 
-    public Stream<? extends Tree<T>> subTrees();
+    public Stream<Tree<T>> subTrees();
 
     public Stream<T> values();
 

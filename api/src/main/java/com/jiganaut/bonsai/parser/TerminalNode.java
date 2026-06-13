@@ -16,7 +16,7 @@ public non-sealed interface TerminalNode<T> extends Tree<T> {
     }
 
     @Override
-    public default Stream<? extends Tree<T>> subTrees() {
+    public default Stream<Tree<T>> subTrees() {
         return Stream.empty();
     }
 
