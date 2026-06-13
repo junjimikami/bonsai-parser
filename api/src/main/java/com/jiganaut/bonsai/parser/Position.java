@@ -1,6 +1,6 @@
 package com.jiganaut.bonsai.parser;
 
-import java.util.List;
+import java.util.Objects;
 
 import com.jiganaut.bonsai.impl.Message;
 
@@ -8,7 +8,7 @@ import com.jiganaut.bonsai.impl.Message;
  * @author Junji Mikami
  *
  */
-public sealed interface Position permits Position.Unknown, Position.Range, Position.Point {
+public sealed interface Position permits Position.Unknown, Position.Offset {
 
     /**
      *
@@ -17,11 +17,6 @@ public sealed interface Position permits Position.Unknown, Position.Range, Posit
 
         private Unknown() {
             // no-op
-        }
-
-        @Override
-        public List<Position.Point> points() {
-            return List.of();
         }
 
         @Override
@@ -34,63 +29,76 @@ public sealed interface Position permits Position.Unknown, Position.Range, Posit
     /**
      *
      */
-    public static final class Range implements Position {
-
-        private final Position.Point start;
-        private final Position.Point end;
-
-        private Range(Position.Point start, Position.Point end) {
-            assert start != null;
-            assert end != null;
-            assert start.getClass() == end.getClass();
-            this.start = start;
-            this.end = end;
-        }
-
-        public Position.Point start() {
-            return start;
-        }
-
-        public Position.Point end() {
-            return end;
-        }
-
-        @Override
-        public List<Position.Point> points() {
-            return List.of(start, end);
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%s..%s", start, end);
-        }
-
-    }
-
-    /**
-     *
-     */
-    public static sealed class Point implements Position permits LineColumn {
+    public static sealed class Offset implements Position permits LineColumn {
 
         private final long offset;
+        private final Offset opposite;
 
-        private Point(long offset) {
+        private Offset(long offset) {
             assert 0 <= offset;
             this.offset = offset;
+            this.opposite = null;
+        }
+
+        private Offset(long offset, Offset opposite) {
+            assert 0 <= offset;
+            assert opposite != null;
+            this.offset = offset;
+            this.opposite = opposite;
+        }
+
+        private Offset(long offset, long oppositeOffset) {
+            assert 0 <= offset;
+            assert 0 <= oppositeOffset;
+            this.offset = offset;
+            this.opposite = new Offset(oppositeOffset, this);
         }
 
         public long offset() {
             return offset;
         }
 
-        @Override
-        public List<Position.Point> points() {
-            return List.of(this);
+        public boolean hasRange() {
+            return opposite != null;
+        }
+
+        public Offset rangeEnd() {
+            return opposite;
+        }
+
+        public Offset withRangeEnd(long offset) {
+            if (offset < 0) {
+                throw new IllegalArgumentException(Message.VALIDATION_PARAMETER_MIN.format("offset", 0));
+            }
+            return new Offset(this.offset, offset);
         }
 
         @Override
         public String toString() {
+            if (opposite != null) {
+                return String.format("%d..%d", offset, opposite.offset);
+            }
             return Long.toString(offset);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof Offset other) {
+                return this.offset == other.offset
+                        && this.equalsRange(other);
+            }
+            return super.equals(obj);
+        }
+
+        private boolean equalsRange(Offset other) {
+            return (this.opposite == null && other.opposite == null)
+                    || (this.opposite != null && other.opposite != null
+                            && this.opposite.offset == other.opposite.offset);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(offset, opposite);
         }
 
     }
@@ -98,10 +106,11 @@ public sealed interface Position permits Position.Unknown, Position.Range, Posit
     /**
      *
      */
-    public static final class LineColumn extends Point {
+    public static final class LineColumn extends Offset {
 
         private final long line;
         private final long column;
+        private final LineColumn opposite;
 
         private LineColumn(long offset, long line, long column) {
             super(offset);
@@ -109,6 +118,26 @@ public sealed interface Position permits Position.Unknown, Position.Range, Posit
             assert 1 <= column;
             this.line = line;
             this.column = column;
+            this.opposite = null;
+        }
+
+        private LineColumn(long offset, long line, long column, LineColumn opposite) {
+            super(offset, opposite);
+            assert 1 <= line;
+            assert 1 <= column;
+            this.line = line;
+            this.column = column;
+            this.opposite = opposite;
+        }
+
+        private LineColumn(long offset, long line, long column, long oppositeOffset, long oppositeLine,
+                long oppositeColumn) {
+            super(offset);
+            assert 1 <= line;
+            assert 1 <= column;
+            this.line = line;
+            this.column = column;
+            this.opposite = new LineColumn(oppositeOffset, oppositeLine, oppositeColumn, this);
         }
 
         public long line() {
@@ -120,26 +149,74 @@ public sealed interface Position permits Position.Unknown, Position.Range, Posit
         }
 
         @Override
+        public boolean hasRange() {
+            return opposite != null;
+        }
+
+        @Override
+        public LineColumn rangeEnd() {
+            return opposite;
+        }
+
+        public LineColumn withRangeEnd(long offset, long line, long column) {
+            if (offset < 0) {
+                throw new IllegalArgumentException(Message.VALIDATION_PARAMETER_MIN.format("offset", 0));
+            }
+            if (line < 1) {
+                throw new IllegalArgumentException(Message.VALIDATION_PARAMETER_MIN.format("line", 1));
+            }
+            if (column < 1) {
+                throw new IllegalArgumentException(Message.VALIDATION_PARAMETER_MIN.format("column", 1));
+            }
+            return new LineColumn(this.offset(), this.line, this.column, offset, line, column);
+        }
+
+        @Override
         public String toString() {
-            return String.format("%d:%d (offset=%d)", line, column, offset());
+            if (opposite != null) {
+                return String.format("[%d,%d]..[%d,%d](%d..%d)",
+                        line, column, opposite.line, opposite.column,
+                        offset(), opposite.offset());
+            }
+            return String.format("[%d,%d](%d)", line, column, offset());
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof LineColumn other) {
+                return this.offset() == other.offset()
+                        && this.line == other.line
+                        && this.column == other.column
+                        && this.equalsRange(other);
+            }
+            return super.equals(obj);
+        }
+
+        private boolean equalsRange(LineColumn other) {
+            return (this.opposite == null && other.opposite == null)
+                    || (this.opposite != null && other.opposite != null
+                            && this.opposite.offset() == other.opposite.offset()
+                            && this.opposite.line == other.opposite.line
+                            && this.opposite.column == other.opposite.column);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(offset(), line, column, opposite);
         }
 
     }
 
     public static final Position.Unknown UNKNOWN = new Unknown();
 
-    public static Position.Point of(long offset) {
+    public static Position.Offset of(long offset) {
         if (offset < 0) {
             throw new IllegalArgumentException(Message.VALIDATION_PARAMETER_MIN.format("offset", 0));
         }
-        return new Point(offset);
+        return new Offset(offset);
     }
 
-    public static Position.Range ofRange(long startOffset, long endOffset) {
-        return new Range(of(startOffset), of(endOffset));
-    }
-
-    public static Position.LineColumn ofLineColumn(long offset, long line, long column) {
+    public static Position.LineColumn of(long offset, long line, long column) {
         if (offset < 0) {
             throw new IllegalArgumentException(Message.VALIDATION_PARAMETER_MIN.format("offset", 0));
         }
@@ -151,20 +228,6 @@ public sealed interface Position permits Position.Unknown, Position.Range, Posit
         }
         return new LineColumn(offset, line, column);
     }
-
-    public static Position.Range ofLineColumnRange(
-            long startOffset,
-            long startLine,
-            long startColumn,
-            long endOffset,
-            long endLine,
-            long endColumn) {
-        return new Range(
-                ofLineColumn(startOffset, startLine, startColumn),
-                ofLineColumn(endOffset, endLine, endColumn));
-    }
-
-    public List<Position.Point> points();
 
     @Override
     public String toString();

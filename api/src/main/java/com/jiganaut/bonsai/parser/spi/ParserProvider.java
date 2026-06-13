@@ -9,6 +9,7 @@ import com.jiganaut.bonsai.parser.BinarySource;
 import com.jiganaut.bonsai.parser.ErrorNode;
 import com.jiganaut.bonsai.parser.NonTerminalNode;
 import com.jiganaut.bonsai.parser.ParserFactory;
+import com.jiganaut.bonsai.parser.Position;
 import com.jiganaut.bonsai.parser.TextSource;
 import com.jiganaut.bonsai.parser.Token;
 import com.jiganaut.bonsai.parser.TokenizerFactory;
@@ -35,7 +36,7 @@ public abstract class ParserProvider {
 
     public abstract <T> NonTerminalNode.Builder<T> createNonTerminalNodeBuilder(String name);
 
-    public abstract <T> Token<T> createToken(String name, T value);
+    public abstract <T> Token<T> createToken(String name, T value, Position position);
 
     public abstract <T> ErrorNode.Builder<T> createErrorNodeBuilder(String name);
 
