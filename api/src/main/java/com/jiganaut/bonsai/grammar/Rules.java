@@ -11,24 +11,27 @@ import com.jiganaut.bonsai.impl.Message;
  */
 public final class Rules {
 
-    private static record NameValueMatchingRule(String name, String value) implements MatchingRule<String> {
+    private static record NameValueMatchingRule<T>(String name, T value) implements MatchingRule<T> {
 
         @Override
-        public boolean test(String name, String value) {
+        public boolean test(String name, T value) {
             return Objects.equals(this.name, name) && Objects.equals(this.value, value);
         }
 
         @Override
         public String toString() {
-            return "%s:\"%s\"".formatted(name, value);
+            if (value instanceof String) {
+                return "%s: \"%s\"".formatted(name, value);
+            }
+            return "%s: %s".formatted(name, value);
         }
 
     }
 
-    private static record NameMatchingRule(String name) implements MatchingRule<String> {
+    private static record NameMatchingRule<T>(String name) implements MatchingRule<T> {
 
         @Override
-        public boolean test(String name, String value) {
+        public boolean test(String name, T value) {
             return Objects.equals(this.name, name);
         }
 
@@ -39,16 +42,19 @@ public final class Rules {
 
     }
 
-    private static record ValueMatchingRule(String value) implements MatchingRule<String> {
+    private static record ValueMatchingRule<T>(T value) implements MatchingRule<T> {
 
         @Override
-        public boolean test(String name, String value) {
+        public boolean test(String name, T value) {
             return Objects.equals(this.value, value);
         }
 
         @Override
         public String toString() {
-            return "\"%s\"".formatted(value);
+            if (value instanceof String) {
+                return "\"%s\"".formatted(value);
+            }
+            return "%s".formatted(value);
         }
 
     }
@@ -87,16 +93,16 @@ public final class Rules {
     private Rules() {
     }
 
-    public static MatchingRule<String> token(String name, String value) {
-        return new NameValueMatchingRule(name, value);
+    public static <T> MatchingRule<T> token(String name, T value) {
+        return new NameValueMatchingRule<>(name, value);
     }
 
-    public static MatchingRule<String> token(String name) {
-        return new NameMatchingRule(name);
+    public static <T> MatchingRule<T> token(String name) {
+        return new NameMatchingRule<>(name);
     }
 
-    public static MatchingRule<String> matching(String value) {
-        return new ValueMatchingRule(value);
+    public static <T> MatchingRule<T> matching(T value) {
+        return new ValueMatchingRule<>(value);
     }
 
     public static MatchingRule<String> pattern(String regex) {
