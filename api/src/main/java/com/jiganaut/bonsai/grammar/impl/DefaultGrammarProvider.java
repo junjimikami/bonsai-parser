@@ -36,7 +36,7 @@ public final class DefaultGrammarProvider extends GrammarProvider {
 
         @Override
         public String toString() {
-            return "ε";
+            return "empty";
         }
 
     };
