@@ -1,6 +1,9 @@
 package com.jiganaut.bonsai.parser;
 
+import java.util.Objects;
 import java.util.stream.Stream;
+
+import com.jiganaut.bonsai.impl.Message;
 
 /**
  *
@@ -28,8 +31,9 @@ public non-sealed interface TerminalNode<T> extends Tree<T> {
     }
 
     @Override
-    public default <R, P> R accept(TreeVisitor<T, R, P> v, P p) {
-        return v.visitTerminal(this, p);
+    public default <R, P> R accept(TreeVisitor<T, R, P> visitor, P p) {
+        Objects.requireNonNull(visitor, () -> Message.VALIDATION_PARAMETER_NULL.format("visitor"));
+        return visitor.visitTerminal(this, p);
     }
 
 }

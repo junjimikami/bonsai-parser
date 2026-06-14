@@ -41,14 +41,14 @@ public sealed interface Tree<T> permits TerminalNode, NonTerminalNode, ErrorNode
      *
      * @param <R>
      * @param <P>
-     * @param v
+     * @param visitor
      * @param p
      * @return
      */
-    public <R, P> R accept(TreeVisitor<T, R, P> v, P p);
+    public <R, P> R accept(TreeVisitor<T, R, P> visitor, P p);
 
-    public default <R, P> R accept(TreeVisitor<T, R, P> v) {
-        return accept(v, null);
+    public default <R, P> R accept(TreeVisitor<T, R, P> visitor) {
+        return accept(visitor, null);
     }
 
 }

@@ -1,8 +1,10 @@
 package com.jiganaut.bonsai.parser;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
+import com.jiganaut.bonsai.impl.Message;
 import com.jiganaut.bonsai.parser.spi.ParserProvider;
 
 /**
@@ -59,8 +61,9 @@ public non-sealed interface NonTerminalNode<T> extends Tree<T> {
     }
 
     @Override
-    public default <R, P> R accept(TreeVisitor<T, R, P> v, P p) {
-        return v.visitNonTerminal(this, p);
+    public default <R, P> R accept(TreeVisitor<T, R, P> visitor, P p) {
+        Objects.requireNonNull(visitor, () -> Message.VALIDATION_PARAMETER_NULL.format("visitor"));
+        return visitor.visitNonTerminal(this, p);
     }
 
     public List<Tree<T>> getSubTrees();
