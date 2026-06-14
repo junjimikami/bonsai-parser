@@ -4,6 +4,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.jiganaut.bonsai.grammar.Grammar;
+import com.jiganaut.bonsai.parser.Tree.Kind;
 
 final class MockFactory {
 
@@ -16,6 +17,7 @@ final class MockFactory {
     static <T> Token<T> mockToken() {
         @SuppressWarnings("unchecked")
         Token<T> token = mock(Token.class);
+        when(token.getKind()).thenReturn(Kind.TERMINAL);
         when(token.getPosition()).thenReturn(Position.UNKNOWN);
         return token;
     }
@@ -23,6 +25,7 @@ final class MockFactory {
     static <T> Token<T> mockToken(String name, T value) {
         @SuppressWarnings("unchecked")
         Token<T> token = mock(Token.class);
+        when(token.getKind()).thenReturn(Kind.TERMINAL);
         when(token.getPosition()).thenReturn(Position.UNKNOWN);
         when(token.getName()).thenReturn(name);
         when(token.getValue()).thenReturn(value);
@@ -50,6 +53,14 @@ final class MockFactory {
     static <T> NonTerminalNode<T> mockNonTerminalNode() {
         @SuppressWarnings("unchecked")
         NonTerminalNode<T> node = mock(NonTerminalNode.class);
+        when(node.getKind()).thenReturn(Kind.NON_TERMINAL);
+        return node;
+    }
+
+    static <T> ErrorNode<T> mockErrorNode() {
+        @SuppressWarnings("unchecked")
+        ErrorNode<T> node = mock(ErrorNode.class);
+        when(node.getKind()).thenReturn(Kind.ERROR);
         return node;
     }
 
