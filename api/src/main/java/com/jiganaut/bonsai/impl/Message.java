@@ -21,7 +21,6 @@ public enum Message {
 
     PARSER_NO_MATCHING_RULE("parser.no_matching_rule"),
     PARSER_AMBIGUOUS_CHOICE("parser.ambiguous_choice"),
-    PARSER_TOKENS_REMAINING("parser.tokens_remaining"),
     ;
 
     private static final ResourceBundle MESSAGES = ResourceBundle.getBundle("messages");
@@ -34,19 +33,6 @@ public enum Message {
     public String format(Object... args) {
         var pattern = MESSAGES.getString(key);
         return MessageFormat.format(pattern, args);
-    }
-
-    public static String symbolEncode(String s) {
-        return "<" + s.replaceAll("\\s", "_")
-                .replace("<", "`<`")
-                .replace(">", "`>`")
-                + ">";
-    }
-
-    public static String stringEncode(String s) {
-        return "\"" + s.replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                + "\"";
     }
 
 }
