@@ -1,6 +1,7 @@
 package com.jiganaut.bonsai.parser;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import com.jiganaut.bonsai.grammar.Grammar;
 import com.jiganaut.bonsai.grammar.ProductionRule;
@@ -11,21 +12,12 @@ import com.jiganaut.bonsai.parser.spi.ParserProvider;
  *
  * @author Junji Mikami
  */
-public interface ErrorNode<T> extends NonTerminalNode<T> {
+public non-sealed interface ErrorNode<T> extends Tree<T> {
 
     /**
      *
      */
-    public static interface Builder<T> extends NonTerminalNode.Builder<T> {
-
-        @Override
-        public ErrorNode.Builder<T> add(Tree<T> tree);
-
-        @Override
-        public ErrorNode.Builder<T> add(Tree.Builder<T> builder);
-
-        @Override
-        public ErrorNode.Builder<T> addAll(NonTerminalNode.Builder<T> builder);
+    public static interface Builder<T> extends Tree.Builder<T> {
 
         @Override
         public ErrorNode<T> build();
@@ -36,16 +28,14 @@ public interface ErrorNode<T> extends NonTerminalNode<T> {
 
         public ErrorNode.Builder<T> setExpectedRule(Rule<T> expectedRule);
 
+        public ErrorNode.Builder<T> setFoundToken(Token<T> foundToken);
+
         public ErrorNode.Builder<T> setMessage(String message);
 
     }
 
-    public static <T> ErrorNode.Builder<T> builder(String name) {
-        return ParserProvider.load().createErrorNodeBuilder(name);
-    }
-
     public static <T> ErrorNode.Builder<T> builder() {
-        return ParserProvider.load().createErrorNodeBuilder(null);
+        return ParserProvider.load().createErrorNodeBuilder();
     }
 
     @Override
@@ -53,7 +43,25 @@ public interface ErrorNode<T> extends NonTerminalNode<T> {
         return Kind.ERROR;
     }
 
-     @Override
+    @Override
+    public default Position getPosition() {
+        if (getFoundToken() == null) {
+            return Position.UNKNOWN;
+        }
+        return getFoundToken().getPosition();
+    }
+
+    @Override
+    public default Stream<Tree<T>> subTrees() {
+        return Stream.ofNullable(getFoundToken());
+    }
+
+    @Override
+    public default Stream<T> values() {
+        return Stream.ofNullable(getFoundToken()).map(Token::getValue);
+    }
+
+    @Override
     public default <R, P> R accept(TreeVisitor<T, R, P> v, P p) {
         return v.visitError(this, p);
     }
@@ -64,7 +72,7 @@ public interface ErrorNode<T> extends NonTerminalNode<T> {
 
     public Rule<T> getExpectedRule();
 
-    public Tree<T> getFoundToken();
+    public Token<T> getFoundToken();
 
     public String getMessage();
 

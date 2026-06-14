@@ -38,6 +38,6 @@ public abstract class ParserProvider {
 
     public abstract <T> Token<T> createToken(String name, T value, Position position);
 
-    public abstract <T> ErrorNode.Builder<T> createErrorNodeBuilder(String name);
+    public abstract <T> ErrorNode.Builder<T> createErrorNodeBuilder();
 
 }

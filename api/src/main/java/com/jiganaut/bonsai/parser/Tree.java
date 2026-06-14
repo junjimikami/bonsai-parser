@@ -6,7 +6,7 @@ import java.util.stream.Stream;
  *
  * @author Junji Mikami
  */
-public sealed interface Tree<T> permits TerminalNode, NonTerminalNode {
+public sealed interface Tree<T> permits TerminalNode, NonTerminalNode, ErrorNode {
 
     /**
      *
@@ -30,8 +30,6 @@ public sealed interface Tree<T> permits TerminalNode, NonTerminalNode {
      * @return
      */
     public Kind getKind();
-
-    public String getName();
 
     public Position getPosition();
 

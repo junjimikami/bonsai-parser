@@ -8,6 +8,8 @@ import java.util.stream.Stream;
  */
 public non-sealed interface TerminalNode<T> extends Tree<T> {
 
+    public String getName();
+
     public T getValue();
 
     @Override

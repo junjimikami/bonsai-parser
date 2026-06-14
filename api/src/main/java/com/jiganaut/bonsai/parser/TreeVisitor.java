@@ -17,12 +17,10 @@ public interface TreeVisitor<T, R, P> {
         return tree.accept(this, p);
     }
 
-    public R visitTerminal(TerminalNode<T> tree, P p);
+    public R visitTerminal(TerminalNode<T> terminal, P p);
 
-    public R visitNonTerminal(NonTerminalNode<T> tree, P p);
+    public R visitNonTerminal(NonTerminalNode<T> nonTerminal, P p);
 
-    public default R visitError(ErrorNode<T> tree, P p) {
-        return visitNonTerminal(tree, p);
-    }
+    public R visitError(ErrorNode<T> error, P p);
 
 }

@@ -33,10 +33,6 @@ public non-sealed interface NonTerminalNode<T> extends Tree<T> {
         return ParserProvider.load().createNonTerminalNodeBuilder(name);
     }
 
-    public static <T> NonTerminalNode.Builder<T> builder() {
-        return ParserProvider.load().createNonTerminalNodeBuilder(null);
-    }
-
     @Override
     public default Kind getKind() {
         return Kind.NON_TERMINAL;
@@ -44,11 +40,12 @@ public non-sealed interface NonTerminalNode<T> extends Tree<T> {
 
     @Override
     public default Position getPosition() {
-        return getSubTrees().stream()
-                .limit(1)
-                .map(Tree::getPosition)
-                .findFirst()
-                .orElse(Position.UNKNOWN);
+        if (getSubTrees().isEmpty()) {
+            return Position.UNKNOWN;
+        }
+        var start = getSubTrees().getFirst().getPosition();
+        var end = getSubTrees().getLast().getPosition();
+        return Position.rangeOf(start, end);
     }
 
     @Override
@@ -67,5 +64,7 @@ public non-sealed interface NonTerminalNode<T> extends Tree<T> {
     }
 
     public List<Tree<T>> getSubTrees();
+
+    public String getName();
 
 }

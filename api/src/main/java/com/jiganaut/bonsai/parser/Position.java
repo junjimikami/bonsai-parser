@@ -229,6 +229,48 @@ public sealed interface Position permits Position.Unknown, Position.Offset {
         return new LineColumn(offset, line, column);
     }
 
+    public static Position rangeEndOf(Position position) {
+        if (position instanceof Position.Offset offset) {
+            return offset.hasRange() ? offset.rangeEnd() : offset;
+        }
+        return UNKNOWN;
+    }
+
+    public static Position rangeOf(Position start, Position end) {
+        if (start instanceof Position.LineColumn startLineColumn) {
+            if (end instanceof Position.LineColumn endLineColumn) {
+                var rangeEnd = endLineColumn.hasRange() ? endLineColumn.rangeEnd() : endLineColumn;
+                return startLineColumn.withRangeEnd(
+                        rangeEnd.offset(),
+                        rangeEnd.line(),
+                        rangeEnd.column());
+            }
+        }
+        if (start instanceof Position.Offset startOffset) {
+            if (end instanceof Position.Offset endOffset) {
+                var rangeEnd = endOffset.hasRange() ? endOffset.rangeEnd() : endOffset;
+                return startOffset.withRangeEnd(rangeEnd.offset());
+            }
+        }
+        return UNKNOWN;
+    }
+
+    public static Position collapse(Position position) {
+        if (position instanceof Position.LineColumn lineColumn) {
+            if (!lineColumn.hasRange()) {
+                return lineColumn;
+            }
+            return new LineColumn(lineColumn.offset(), lineColumn.line(), lineColumn.column());
+        }
+        if (position instanceof Position.Offset offset) {
+            if (!offset.hasRange()) {
+                return offset;
+            }
+            return new Offset(offset.offset());
+        }
+        return UNKNOWN;
+    }
+
     @Override
     public String toString();
 
