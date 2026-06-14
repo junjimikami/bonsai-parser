@@ -1,10 +1,5 @@
 package com.jiganaut.bonsai.parser.impl;
 
-import com.jiganaut.bonsai.grammar.ChoiceRule;
-import com.jiganaut.bonsai.grammar.EmptyRule;
-import com.jiganaut.bonsai.grammar.Rule;
-import com.jiganaut.bonsai.impl.Message;
-import com.jiganaut.bonsai.parser.ErrorNode;
 import com.jiganaut.bonsai.parser.ParseException;
 import com.jiganaut.bonsai.parser.Tree;
 
@@ -23,14 +18,5 @@ class TreeProcessor<T> extends Processor<T, Tree<T>> {
         }
         return trees;
     }
-
-    // ErrorNode<T> tokensRemaining(Rule<T> rule, Context<T> context) {
-    //     return ErrorNode.<T>builder()
-    //             .setMessage(Message.PARSER_TOKENS_REMAINING.format())
-    //             .setGrammar(context.grammar())
-    //             .setExpectedRule(rule)
-    //             .setFoundToken(context.peek())
-    //             .build();
-    // }
 
 }
