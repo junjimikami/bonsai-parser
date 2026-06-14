@@ -75,9 +75,6 @@ public sealed interface Position permits Position.Unknown, Position.Offset {
 
         @Override
         public String toString() {
-            if (opposite != null) {
-                return String.format("%d..%d", offset, opposite.offset);
-            }
             return Long.toString(offset);
         }
 
@@ -173,12 +170,7 @@ public sealed interface Position permits Position.Unknown, Position.Offset {
 
         @Override
         public String toString() {
-            if (opposite != null) {
-                return String.format("[%d,%d]..[%d,%d](%d..%d)",
-                        line, column, opposite.line, opposite.column,
-                        offset(), opposite.offset());
-            }
-            return String.format("[%d,%d](%d)", line, column, offset());
+            return String.format("[%d,%d](offset=%d)", line, column, offset());
         }
 
         @Override
