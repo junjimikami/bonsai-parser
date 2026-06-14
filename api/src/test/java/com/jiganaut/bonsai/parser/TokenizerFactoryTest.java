@@ -1,99 +1,63 @@
 package com.jiganaut.bonsai.parser;
 
+import static com.jiganaut.bonsai.parser.MockFactory.mockGrammar;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
 
-import java.util.ServiceConfigurationError;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestReporter;
 
-import com.jiganaut.bonsai.grammar.ChoiceGrammar;
-import com.jiganaut.bonsai.grammar.Grammar;
-import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
-
 /**
- * 
+ *
  * @author Junji Mikami
  */
 class TokenizerFactoryTest {
 
     @Test
-    @DisplayName("of(Grammar) [Null parameter]")
-    void ofInCaseNullParameter(TestReporter testReporter) throws Exception {
-        var ex = assertThrows(NullPointerException.class, () -> TokenizerFactory.of(null));
-        testReporter.publishEntry(ex.getMessage());
+    @DisplayName("of(gr:Grammar) [gr == null]")
+    void ofWhenGrIsNull(TestReporter testReporter) throws Exception {
+        var ex = assertThrows(NullPointerException.class, () -> TokenizerFactory.of(null, Collectors.joining()));
+        testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
     }
 
     @Test
-    @DisplayName("of(Grammar)")
+    @DisplayName("of(gr:Grammar)")
     void of() throws Exception {
-        var grammar = mock(Grammar.class);
-        var factory = TokenizerFactory.of(grammar);
+        var factory = TokenizerFactory.of(mockGrammar(), Collectors.joining());
 
         assertNotNull(factory);
     }
 
-    @Test
-    @DisplayName("load(st:String) [Null parameter]")
-    void loadStInCaseNullParameter(TestReporter testReporter) throws Exception {
-        var ex = assertThrows(NullPointerException.class, () -> TokenizerFactory.load((String) null));
-        testReporter.publishEntry(ex.getMessage());
-    }
-
-    @Test
-    @DisplayName("load(st:String) [No such factory]")
-    void loadStInCaseNoSuchFactory(TestReporter testReporter) throws Exception {
-        var ex = assertThrows(ServiceConfigurationError.class, () -> TokenizerFactory.load(""));
-        testReporter.publishEntry(ex.getMessage());
-    }
-
-    @Test
-    @DisplayName("load(cl:Class) [Null parameter]")
-    void loadClInCaseNullParameter(TestReporter testReporter) throws Exception {
-        var ex = assertThrows(NullPointerException.class, () -> TokenizerFactory.load((Class<?>) null));
-        testReporter.publishEntry(ex.getMessage());
-    }
-
-    @Test
-    @DisplayName("load(cl:Class) [No such factory]")
-    void loadClInCaseNoSuchFactory(TestReporter testReporter) throws Exception {
-        var ex = assertThrows(ServiceConfigurationError.class, () -> TokenizerFactory.load(Object.class));
-        testReporter.publishEntry(ex.getMessage());
-    }
-
     @Nested
-    class TestCase1 implements TokenizerFactoryTestCase {
+    class TestCase1 implements TokenizerFactoryTestCase<String, String> {
 
         @Override
-        public TokenizerFactory createTarget() {
-            var grammar = mock(Grammar.class);
-            return TokenizerFactory.of(grammar);
+        public TokenizerFactory<String, String> createTarget() {
+            return TokenizerFactory.of(mockGrammar(), Collectors.joining());
         }
 
     }
 
     @Nested
-    class TestCase2 implements TokenizerFactoryTestCase {
+    class TestCase2 implements TokenizerFactoryTestCase<String, String> {
 
         @Override
-        public TokenizerFactory createTarget() {
-            var grammar = mock(ChoiceGrammar.class);
-            return TokenizerFactory.of(grammar);
+        public TokenizerFactory<String, String> createTarget() {
+            return TokenizerFactory.of(mockGrammar(), Collectors.joining());
         }
 
     }
 
     @Nested
-    class TestCase3 implements TokenizerFactoryTestCase {
+    class TestCase3 implements TokenizerFactoryTestCase<String, String> {
 
         @Override
-        public TokenizerFactory createTarget() {
-            var grammar = mock(SingleOriginGrammar.class);
-            return TokenizerFactory.of(grammar);
+        public TokenizerFactory<String, String> createTarget() {
+            return TokenizerFactory.of(mockGrammar(), Collectors.joining());
         }
 
     }

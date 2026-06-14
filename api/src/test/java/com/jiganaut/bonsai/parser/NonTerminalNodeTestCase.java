@@ -1,10 +1,11 @@
 package com.jiganaut.bonsai.parser;
 
+import static com.jiganaut.bonsai.parser.MockFactory.mockNonTerminalNode;
+import static com.jiganaut.bonsai.parser.MockFactory.mockNonTerminalNodeBuilder;
+import static com.jiganaut.bonsai.parser.MockFactory.mockToken;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -16,92 +17,52 @@ import org.junit.jupiter.api.TestReporter;
 import com.jiganaut.bonsai.parser.Tree.Kind;
 
 /**
- * 
+ *
  * @author Junji Mikami
  */
-interface NonTerminalNodeTestCase extends TreeTestCase {
+interface NonTerminalNodeTestCase<T> extends TreeTestCase<T> {
 
-    interface BuilderTestCase extends TreeTestCase.BuilderTestCase {
+    interface BuilderTestCase<T> extends TreeTestCase.BuilderTestCase<T> {
 
-        NonTerminalNode.Builder createTarget();
+        NonTerminalNode.Builder<T> createTarget();
 
-        NonTerminalNode expectedTree();
-
-        boolean isSetName();
+        NonTerminalNode<T> expectedTree();
 
         @Override
-        default boolean canBuild() {
-            return isSetName();
-        }
-
-        @SuppressWarnings("exports")
-        @Test
-        @DisplayName("setName(String) [Null parameter]")
-        default void setNameInCaseOfNullParameter(TestReporter testReporter) throws Exception {
-            assumeFalse(isSetName());
-
-            var builder = createTarget();
-
-            var ex = assertThrows(NullPointerException.class, () -> builder.setName(null));
-            testReporter.publishEntry(ex.getMessage());
-        }
-
-        @SuppressWarnings("exports")
-        @Test
-        @DisplayName("build() [setName not excuted]")
-        default void buildInCaseOfSetNameNotExcuted(TestReporter testReporter) throws Exception {
-            assumeFalse(isSetName());
-
-            var builder = createTarget();
-
-            var ex = assertThrows(NullPointerException.class, () -> builder.build());
-            testReporter.publishEntry(ex.getMessage());
-        }
-
-        @SuppressWarnings("exports")
-        @Test
-        @DisplayName("add(Tree) [Null parameter]")
-        default void addInCaseOfNullParameter(TestReporter testReporter) throws Exception {
-            assumeFalse(isSetName());
-
-            var builder = createTarget();
-
-            var ex = assertThrows(NullPointerException.class, () -> builder.add(null));
-            testReporter.publishEntry(ex.getMessage());
-        }
+        boolean canBuild();
 
         @Test
-        @DisplayName("add(Tree)")
+        @DisplayName("add(t:Tree)")
         default void add() throws Exception {
             assumeTrue(canBuild());
 
             var builder = createTarget();
 
-            assertEquals(builder, builder.add(mock(Tree.class)));
+            assertEquals(builder, builder.add(mockToken()));
         }
 
         @SuppressWarnings("exports")
         @Test
-        @DisplayName("addAll(NonTerminalNode.Builder) [Null parameter]")
-        default void addAllInCaseOfNullParameter(TestReporter testReporter) throws Exception {
-            assumeFalse(isSetName());
+        @DisplayName("addAll(nb:NonTerminalNode.Builder) [nb == null]")
+        default void addAllWhenNbIsNull(TestReporter testReporter) throws Exception {
+            assumeTrue(canBuild());
 
             var builder = createTarget();
 
             var ex = assertThrows(NullPointerException.class, () -> builder.addAll(null));
-            testReporter.publishEntry(ex.getMessage());
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
         @Test
-        @DisplayName("addAll(NonTerminalNode.Builder)")
+        @DisplayName("addAll(nb:NonTerminalNode.Builder)")
         default void addAll() throws Exception {
             assumeTrue(canBuild());
 
             var builder = createTarget();
 
-            var mockNode = mock(NonTerminalNode.class);
+            NonTerminalNode<T> mockNode = mockNonTerminalNode();
             when(mockNode.getSubTrees()).thenReturn(List.of());
-            var mockBuilder = mock(NonTerminalNode.Builder.class);
+            NonTerminalNode.Builder<T> mockBuilder = mockNonTerminalNodeBuilder();
             when(mockBuilder.build()).thenReturn(mockNode);
             assertEquals(builder, builder.addAll(mockBuilder));
         }
@@ -109,11 +70,29 @@ interface NonTerminalNodeTestCase extends TreeTestCase {
     }
 
     @Override
-    NonTerminalNode createTarget();
+    NonTerminalNode<T> createTarget();
 
     @Override
     default Kind expectedKind() {
         return Kind.NON_TERMINAL;
     }
 
+    String expectedName();
+
+    @Override
+    default List<T> expectedValues() {
+        return expectedSubTrees().stream()
+                .flatMap(Tree::values)
+                .toList();
+    }
+
+    @Test
+    @DisplayName("getName()")
+    default void getName() throws Exception {
+        var target = createTarget();
+
+        assertEquals(expectedName(), target.getName());
+    }
+
 }
+

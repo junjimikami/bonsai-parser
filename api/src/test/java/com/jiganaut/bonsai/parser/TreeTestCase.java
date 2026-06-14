@@ -1,13 +1,14 @@
 package com.jiganaut.bonsai.parser;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static com.jiganaut.bonsai.parser.MockFactory.mockToken;
+import static com.jiganaut.bonsai.parser.MockFactory.mockTreeVisitor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import java.util.List;
 
@@ -23,75 +24,30 @@ import com.jiganaut.bonsai.TestCase;
 import com.jiganaut.bonsai.parser.Tree.Kind;
 
 /**
- * 
+ *
  * @author Junji Mikami
  */
-interface TreeTestCase extends TestCase {
+interface TreeTestCase<T> extends TestCase {
 
-    interface BuilderTestCase extends TestCase {
-        Tree.Builder createTarget();
+    interface BuilderTestCase<T> extends TestCase {
 
-        Tree expectedTree();
+        Tree.Builder<T> createTarget();
+
+        Tree<T> expectedTree();
 
         boolean canBuild();
 
         @SuppressWarnings("exports")
         @Test
-        @DisplayName("setName(String) [Post-build operation]")
-        default void setNameInCaseOfPostBuild(TestReporter testReporter) throws Exception {
-            assumeTrue(canBuild());
-
-            var builder = createTarget();
-            builder.build();
-
-            var ex = assertThrows(IllegalStateException.class, () -> builder.setName(""));
-            testReporter.publishEntry(ex.getMessage());
-        }
-
-        @SuppressWarnings("exports")
-        @Test
-        @DisplayName("setValue(String) [Post-build operation]")
-        default void setValueInCaseOfPostBuild(TestReporter testReporter) throws Exception {
-            assumeTrue(canBuild());
-
-            var builder = createTarget();
-            builder.build();
-
-            var ex = assertThrows(IllegalStateException.class, () -> builder.setValue(""));
-            testReporter.publishEntry(ex.getMessage());
-        }
-
-        @SuppressWarnings("exports")
-        @Test
-        @DisplayName("build() [Post-build operation]")
-        default void buildInCaseOfPostBuild(TestReporter testReporter) throws Exception {
+        @DisplayName("build() [Post-build]")
+        default void buildWhenPostBuild(TestReporter testReporter) throws Exception {
             assumeTrue(canBuild());
 
             var builder = createTarget();
             builder.build();
 
             var ex = assertThrows(IllegalStateException.class, () -> builder.build());
-            testReporter.publishEntry(ex.getMessage());
-        }
-
-        @ParameterizedTest
-        @EmptySource
-        @ValueSource(strings = { "1", "a", "[" })
-        @DisplayName("setName()")
-        default void setName(String name) throws Exception {
-            var builder = createTarget();
-
-            assertEquals(builder, builder.setName(name));
-        }
-
-        @ParameterizedTest
-        @EmptySource
-        @ValueSource(strings = { "1", "a", "[" })
-        @DisplayName("setValue()")
-        default void setValue(String value) throws Exception {
-            var builder = createTarget();
-
-            assertEquals(builder, builder.setName(value));
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
         @Test
@@ -106,47 +62,33 @@ interface TreeTestCase extends TestCase {
 
     }
 
-    Tree createTarget();
+    Tree<T> createTarget();
 
     Kind expectedKind();
 
-    String expectedName();
+    default Position expectedPosition() {
+        return Position.UNKNOWN;
+    }
 
-    String expectedValue();
+    List<Tree<T>> expectedSubTrees();
 
-    List<Tree> expectedSubTrees();
-
-    TreeVisitor<Object[], String> testVisitor = new TreeVisitor<>() {
-
-        @Override
-        public Object[] visitNonTerminal(NonTerminalNode node, String p) {
-            assertEquals(Tree.Kind.NON_TERMINAL, node.getKind());
-            return new Object[] { node, p };
-        }
-
-        @Override
-        public Object[] visitTerminal(TerminalNode node, String p) {
-            assertEquals(Tree.Kind.TERMINAL, node.getKind());
-            return new Object[] { node, p };
-        }
-
-    };
+    List<T> expectedValues();
 
     @Test
     @DisplayName("equals(Object)")
     default void equals(TestReporter testReporter) throws Exception {
         var target = createTarget();
 
-        assertFalse(target.equals(mock(Tree.class)));
+        assertFalse(target.equals(mockToken()));
         assertTrue(target.equals(createTarget()));
     }
 
     @Test
     @DisplayName("hashCode()")
-    default void hashCOde(TestReporter testReporter) throws Exception {
+    default void hashCode(TestReporter testReporter) throws Exception {
         var target = createTarget();
 
-        testReporter.publishEntry("hashCode()", String.valueOf(target.hashCode()));
+        testReporter.publishEntry("hashCode()=%s".formatted(String.valueOf(target.hashCode())));
     }
 
     @Test
@@ -154,7 +96,7 @@ interface TreeTestCase extends TestCase {
     default void toString(TestReporter testReporter) throws Exception {
         var target = createTarget();
 
-        testReporter.publishEntry("toString()", target.toString());
+        testReporter.publishEntry("toString()=%s".formatted(target.toString()));
     }
 
     @Test
@@ -166,64 +108,69 @@ interface TreeTestCase extends TestCase {
     }
 
     @Test
-    @DisplayName("getName()")
-    default void getName() throws Exception {
+    @DisplayName("getPosition()")
+    default void getPosition() throws Exception {
         var target = createTarget();
 
-        assertEquals(expectedName(), target.getName());
+        assertEquals(expectedPosition(), target.getPosition());
     }
 
     @Test
-    @DisplayName("getValue()")
-    default void getValue() throws Exception {
+    @DisplayName("subTrees()")
+    default void subTrees() throws Exception {
         var target = createTarget();
 
-        assertEquals(expectedValue(), target.getValue());
+        assertIterableEquals(expectedSubTrees(), target.subTrees().toList());
     }
 
     @Test
-    @DisplayName("getSubTrees()")
-    default void getSubTrees() throws Exception {
+    @DisplayName("values()")
+    default void values() throws Exception {
         var target = createTarget();
 
-        assertIterableEquals(expectedSubTrees(), target.getSubTrees());
+        assertIterableEquals(expectedValues(), target.values().toList());
     }
 
     @Test
-    @DisplayName("accept(ev:ElementVisitor) [Null parameter]")
-    default void acceptEvInCaseOfNullParameter(TestReporter testReporter) throws Exception {
+    @DisplayName("accept(tv:TreeVisitor) [tv == null]")
+    default void acceptTvWhenTvIsNull(TestReporter testReporter) throws Exception {
         var target = createTarget();
 
         var ex = assertThrows(NullPointerException.class, () -> target.accept(null));
-        testReporter.publishEntry(ex.getMessage());
+        testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
     }
 
     @Test
     @DisplayName("accept(tv:TreeVisitor)")
     default void acceptTv() throws Exception {
         var target = createTarget();
-        var visitor = testVisitor;
-        var expected = new Object[] { target, null };
-        var result = target.accept(visitor);
-        var result2 = visitor.visit(target);
+        TreeVisitor<T, Void, Void> visitor = mockTreeVisitor();
 
-        assertArrayEquals(expected, result);
-        assertArrayEquals(expected, result2);
+        target.accept(visitor);
+
+        switch (target) {
+            case NonTerminalNode<T> nonTerminal -> verify(visitor).visitNonTerminal(nonTerminal, null);
+            case TerminalNode<T> terminal -> verify(visitor).visitTerminal(terminal, null);
+            case ErrorNode<T> error -> verify(visitor).visitError(error, null);
+        }
     }
 
-    @DisplayName("accept(tv:treeVisitor, p:P)")
+    @DisplayName("accept(tv:TreeVisitor, p:P)")
     @ParameterizedTest
     @NullSource
     @EmptySource
     @ValueSource(strings = { "test" })
     default void acceptTvP(String arg) throws Exception {
-        var rule = createTarget();
-        var visitor = testVisitor;
-        var expected = new Object[] { rule, arg };
-        var result = rule.accept(visitor, arg);
-        var result2 = visitor.visit(rule, arg);
+        var target = createTarget();
+        TreeVisitor<T, Void, String> visitor = mockTreeVisitor();
 
-        assertArrayEquals(expected, result);
-        assertArrayEquals(expected, result2);
+        target.accept(visitor, arg);
+
+        switch (target) {
+            case NonTerminalNode<T> nonTerminal -> verify(visitor).visitNonTerminal(nonTerminal, arg);
+            case TerminalNode<T> terminal -> verify(visitor).visitTerminal(terminal, arg);
+            case ErrorNode<T> error -> verify(visitor).visitError(error, arg);
+        }
     }
 }
+

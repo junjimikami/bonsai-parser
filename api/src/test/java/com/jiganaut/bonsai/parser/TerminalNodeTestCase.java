@@ -1,63 +1,26 @@
 package com.jiganaut.bonsai.parser;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestReporter;
 
 import com.jiganaut.bonsai.parser.Tree.Kind;
 
 /**
- * 
+ *
  * @author Junji Mikami
  */
-interface TerminalNodeTestCase extends TreeTestCase {
-
-    interface BuilderTestCase extends TreeTestCase.BuilderTestCase {
-
-        TerminalNode.Builder createTarget();
-
-        TerminalNode expectedTree();
-
-        boolean isSetValue();
-
-        @Override
-        default boolean canBuild() {
-            return isSetValue();
-        }
-
-        @SuppressWarnings("exports")
-        @Test
-        @DisplayName("setValue(String) [Null parameter]")
-        default void setValueInCaseOfNullParameter(TestReporter testReporter) throws Exception {
-            assumeFalse(isSetValue());
-
-            var builder = createTarget();
-
-            var ex = assertThrows(NullPointerException.class, () -> builder.setValue(null));
-            testReporter.publishEntry(ex.getMessage());
-        }
-
-        @SuppressWarnings("exports")
-        @Test
-        @DisplayName("build() [setValue not excuted]")
-        default void buildInCaseOfSetValueNotExcuted(TestReporter testReporter) throws Exception {
-            assumeFalse(isSetValue());
-
-            var builder = createTarget();
-
-            var ex = assertThrows(NullPointerException.class, () -> builder.build());
-            testReporter.publishEntry(ex.getMessage());
-        }
-
-    }
+interface TerminalNodeTestCase<T> extends TreeTestCase<T> {
 
     @Override
-    TerminalNode createTarget();
+    TerminalNode<T> createTarget();
+
+    String expectedName();
+
+    T expectedValue();
 
     @Override
     default Kind expectedKind() {
@@ -65,8 +28,29 @@ interface TerminalNodeTestCase extends TreeTestCase {
     }
 
     @Override
-    default List<Tree> expectedSubTrees() {
+    default List<Tree<T>> expectedSubTrees() {
         return List.of();
+    }
+
+    @Override
+    default List<T> expectedValues() {
+        return List.of(expectedValue());
+    }
+
+    @Test
+    @DisplayName("getName()")
+    default void getName() throws Exception {
+        var target = createTarget();
+
+        assertEquals(expectedName(), target.getName());
+    }
+
+    @Test
+    @DisplayName("getValue()")
+    default void getValue() throws Exception {
+        var target = createTarget();
+
+        assertEquals(expectedValue(), target.getValue());
     }
 
 }
