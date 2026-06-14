@@ -16,6 +16,7 @@ final class MockFactory {
     static <T> ProductionRule<T> mockProductionRule(String symbol, Rule<T> rule) {
         @SuppressWarnings("unchecked")
         ProductionRule<T> productionRule = mock(ProductionRule.class);
+        when(productionRule.getKind()).thenReturn(Rule.Kind.PRODUCTION);
         when(productionRule.getSymbol()).thenReturn(symbol);
         when(productionRule.getRule()).thenReturn(rule);
         return productionRule;
@@ -24,6 +25,7 @@ final class MockFactory {
     static <T> ProductionRule<T> mockProductionRule(String symbol) {
         @SuppressWarnings("unchecked")
         ProductionRule<T> productionRule = mock(ProductionRule.class);
+        when(productionRule.getKind()).thenReturn(Rule.Kind.PRODUCTION);
         when(productionRule.getSymbol()).thenReturn(symbol);
         return productionRule;
     }
@@ -32,6 +34,55 @@ final class MockFactory {
         @SuppressWarnings("unchecked")
         Rule<T> rule = mock(Rule.class);
         when(rule.getKind()).thenReturn(Rule.Kind.MATCH);
+        return rule;
+    }
+
+    static <T> ChoiceRule<T> mockChoiceRule() {
+        @SuppressWarnings("unchecked")
+        ChoiceRule<T> rule = mock(ChoiceRule.class);
+        when(rule.getKind()).thenReturn(Rule.Kind.CHOICE);
+        return rule;
+    }
+
+    static <T> SequenceRule<T> mockSequenceRule() {
+        @SuppressWarnings("unchecked")
+        SequenceRule<T> rule = mock(SequenceRule.class);
+        when(rule.getKind()).thenReturn(Rule.Kind.SEQUENCE);
+        return rule;
+    }
+
+    static <T> MatchingRule<T> mockMatchingRule() {
+        @SuppressWarnings("unchecked")
+        MatchingRule<T> rule = mock(MatchingRule.class);
+        when(rule.getKind()).thenReturn(Rule.Kind.MATCH);
+        return rule;
+    }
+
+    static <T> ReferenceRule<T> mockReferenceRule() {
+        @SuppressWarnings("unchecked")
+        ReferenceRule<T> rule = mock(ReferenceRule.class);
+        when(rule.getKind()).thenReturn(Rule.Kind.REFERENCE);
+        return rule;
+    }
+
+    static <T> QuantifierRule<T> mockQuantifierRule() {
+        @SuppressWarnings("unchecked")
+        QuantifierRule<T> rule = mock(QuantifierRule.class);
+        when(rule.getKind()).thenReturn(Rule.Kind.QUANTIFIER);
+        return rule;
+    }
+
+    static <T> SkipRule<T> mockSkipRule() {
+        @SuppressWarnings("unchecked")
+        SkipRule<T> rule = mock(SkipRule.class);
+        when(rule.getKind()).thenReturn(Rule.Kind.SKIP);
+        return rule;
+    }
+
+    static <T> EmptyRule<T> mockEmptyRule() {
+        @SuppressWarnings("unchecked")
+        EmptyRule<T> rule = mock(EmptyRule.class);
+        when(rule.getKind()).thenReturn(Rule.Kind.EMPTY);
         return rule;
     }
 

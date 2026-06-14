@@ -7,7 +7,7 @@ package com.jiganaut.bonsai.grammar;
 public interface RuleVisitor<T, R, P> {
 
     public default R visit(Rule<T> rule) {
-        return visit(rule, null);
+        return rule.accept(this);
     }
 
     public default R visit(Rule<T> rule, P p) {
