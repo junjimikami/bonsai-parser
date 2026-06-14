@@ -2,71 +2,119 @@ package com.jiganaut.bonsai.parser.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
+import com.jiganaut.bonsai.impl.BaseBuilder;
 import com.jiganaut.bonsai.impl.Message;
+import com.jiganaut.bonsai.parser.ErrorNode;
 import com.jiganaut.bonsai.parser.NonTerminalNode;
+import com.jiganaut.bonsai.parser.TerminalNode;
 import com.jiganaut.bonsai.parser.Tree;
+import com.jiganaut.bonsai.parser.TreeVisitor;
 
 /**
- * 
+ *
  * @author Junji Mikami
  *
  */
-class DefaultNonTerminalNode extends AbstractTree implements NonTerminalNode {
+class DefaultNonTerminalNode<T> implements NonTerminalNode<T> {
 
     /**
-     * 
-     * @author Junji Mikami
+     *
      */
-    static class Builder extends AbstractTree.Builder implements NonTerminalNode.Builder {
+    static class Builder<T> extends BaseBuilder implements NonTerminalNode.Builder<T> {
 
-        private final List<Tree> list = new ArrayList<>();
+        private final List<Tree.Builder<T>> builders = new ArrayList<>();
+        private final String name;
 
-        @Override
-        public NonTerminalNode.Builder setName(String name) {
-            checkParameter(name);
-            return (Builder) super.setName(name);
+        Builder(String name) {
+            assert name != null;
+            this.name = name;
         }
 
         @Override
-        public NonTerminalNode.Builder setValue(String value) {
+        public NonTerminalNode.Builder<T> add(Tree.Builder<T> builder) {
             check();
-            return (Builder) super.setValue(value);
-        }
-
-        @Override
-        public NonTerminalNode build() {
-            Objects.requireNonNull(name, Message.NAME_NOT_SET.format());
-            checkForBuild();
-            return new DefaultNonTerminalNode(name, value, list);
-        }
-
-        @Override
-        public NonTerminalNode.Builder add(Tree tree) {
-            checkParameter(tree);
-            list.add(tree);
+            Objects.requireNonNull(builder, () -> Message.VALIDATION_PARAMETER_NULL.format("builder"));
+            builders.add(builder);
             return this;
         }
 
+        @Override
+        public NonTerminalNode.Builder<T> addAll(NonTerminalNode.Builder<T> builder) {
+            check();
+            Objects.requireNonNull(builder, () -> Message.VALIDATION_PARAMETER_NULL.format("builder"));
+            builder.forEach(this::add);
+            return this;
+        }
+
+        @Override
+        public NonTerminalNode<T> build() {
+            checkForBuild();
+            var list = builders.stream()
+                    .map(Tree.Builder::build)
+                    .filter(Objects::nonNull)
+                    .toList();
+            return new DefaultNonTerminalNode<>(name, list);
+        }
+
+        @Override
+        public Iterator<Tree.Builder<T>> iterator() {
+            return Collections.unmodifiableList(builders).iterator();
+        }
+
     }
+
+    private static final TreeVisitor<?, String, String> TO_STRING_VISITOR = new TreeVisitor<>() {
+
+        @Override
+        public String visitTerminal(TerminalNode<Object> terminal, String indent) {
+            var sb = new StringBuilder();
+            sb.append("\n");
+            sb.append(indent);
+            sb.append("- ");
+            if (terminal.getName() != null) {
+                sb.append(terminal.getName());
+                sb.append(": ");
+            }
+            sb.append(terminal.getValue());
+            return sb.toString();
+        }
+
+        @Override
+        public String visitNonTerminal(NonTerminalNode<Object> nonTerminal, String indent) {
+            var sb = new StringBuilder();
+            sb.append("\n");
+            sb.append(indent);
+            sb.append("- ");
+            sb.append(nonTerminal.getName());
+            sb.append(":");
+            nonTerminal.subTrees().forEach(t -> sb.append(visit(t, indent + "  ")));
+            return sb.toString();
+        }
+
+        @Override
+        public String visitError(ErrorNode<Object> error, String indent) {
+            var sb = new StringBuilder();
+            sb.append("\n");
+            sb.append(indent);
+            sb.append("- ");
+            sb.append(DefaultErrorNode.toString(error, indent + "  "));
+            return sb.toString();
+        }
+
+    };
 
     private final String name;
-    private final String value;
-    private final List<? extends Tree> list;
+    private final List<Tree<T>> subTrees;
 
-    DefaultNonTerminalNode(String name, String value, List<? extends Tree> list) {
+    private DefaultNonTerminalNode(String name, List<Tree<T>> subTrees) {
         assert name != null;
-        assert list != null;
+        assert subTrees != null;
         this.name = name;
-        this.value = value;
-        this.list = list;
-    }
-
-    DefaultNonTerminalNode(String name, List<? extends Tree> list) {
-        this(name, null, list);
+        this.subTrees = subTrees;
     }
 
     @Override
@@ -75,45 +123,34 @@ class DefaultNonTerminalNode extends AbstractTree implements NonTerminalNode {
     }
 
     @Override
-    public String getValue() {
-        return value;
-    }
-
-    @Override
-    public List<? extends Tree> getSubTrees() {
-        return Collections.unmodifiableList(list);
+    public List<Tree<T>> getSubTrees() {
+        return subTrees;
     }
 
     @Override
     public String toString() {
         var sb = new StringBuilder();
-        sb.append(Message.symbolEncode(name));
-        if (value != null) {
-            sb.append(":");
-            sb.append(Message.stringEncode(value));
-        }
-        if (!list.isEmpty()) {
-            sb.append(list.stream()
-                    .map(Tree::toString)
-                    .collect(Collectors.joining(", ", "(", ")")));
-        }
+        sb.append(name);
+        sb.append(":");
+        @SuppressWarnings("unchecked")
+        var visitor = (TreeVisitor<T, String, String>) TO_STRING_VISITOR;
+        subTrees.forEach(t -> sb.append(visitor.visit(t, "  ")));
         return sb.toString();
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof NonTerminalNode nt) {
-            return this.getKind() == nt.getKind()
-                    && this.getName().equals(nt.getName())
-                    && Objects.equals(this.getValue(), nt.getValue())
-                    && this.getSubTrees().equals(nt.getSubTrees());
+        if (obj instanceof NonTerminalNode<?> other) {
+            return this.getKind() == other.getKind()
+                    && Objects.equals(this.name, other.getName())
+                    && this.subTrees.equals(other.getSubTrees());
         }
         return super.equals(obj);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getKind(), getName(), getValue(), getSubTrees());
+        return Objects.hash(getKind(), name, subTrees);
     }
 
 }
