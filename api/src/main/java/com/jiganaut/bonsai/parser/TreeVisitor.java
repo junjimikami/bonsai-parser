@@ -10,7 +10,7 @@ package com.jiganaut.bonsai.parser;
 public interface TreeVisitor<T, R, P> {
 
     public default R visit(Tree<T> tree) {
-        return tree.accept(this, null);
+        return tree.accept(this);
     }
 
     public default R visit(Tree<T> tree, P p) {
