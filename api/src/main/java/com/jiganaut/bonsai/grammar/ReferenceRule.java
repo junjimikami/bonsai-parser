@@ -28,11 +28,10 @@ public interface ReferenceRule<T> extends Quantifiable<T> {
 
     public default ChoiceRule<T> lookup(Grammar<T> grammar) {
         Objects.requireNonNull(grammar, () -> Message.VALIDATION_PARAMETER_NULL.format("grammar"));
-        var builder = grammar.getProductionRules().stream()
+        var builder = ChoiceRule.<T>builder();
+        grammar.getProductionRules().stream()
                 .filter(e -> Objects.equals(getSymbol(), e.getSymbol()))
-                .collect(ChoiceRule::<T>builder,
-                     ChoiceRule.Builder::add,
-                     ChoiceRule.Builder::addAll);
+                .forEach(builder::add);
         if (grammar.isShortCircuit()) {
             builder.asShortCircuit();
         }

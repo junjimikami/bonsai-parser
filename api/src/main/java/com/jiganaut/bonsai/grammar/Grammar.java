@@ -41,11 +41,10 @@ public interface Grammar<T> {
     public boolean isShortCircuit();
 
     public default ChoiceRule<T> toChoiceRule() {
-        var builder = getProductionRules().stream()
+        var builder = ChoiceRule.<T>builder();
+        getProductionRules().stream()
                 .filter(e -> getStartSymbol() == null || getStartSymbol().equals(e.getSymbol()))
-                .collect(ChoiceRule::<T>builder,
-                        ChoiceRule.Builder::add,
-                        ChoiceRule.Builder::addAll);
+                .forEach(builder::add);
         if (isShortCircuit()) {
             builder.asShortCircuit();
         }
