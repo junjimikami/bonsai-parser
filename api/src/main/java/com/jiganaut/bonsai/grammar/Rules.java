@@ -146,8 +146,8 @@ public final class Rules {
         return builder.asShortCircuit().build();
     }
 
-    public static <T> ReferenceRule<T> reference(String reference) {
-        return ReferenceRule.of(reference);
+    public static <T> ReferenceRule<T> reference(String symbol) {
+        return ReferenceRule.of(symbol);
     }
 
     public static <T> EmptyRule<T> empty() {
