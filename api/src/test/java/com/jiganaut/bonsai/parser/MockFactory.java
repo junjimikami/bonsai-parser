@@ -4,6 +4,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.jiganaut.bonsai.grammar.Grammar;
+import com.jiganaut.bonsai.grammar.ProductionRule;
+import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.parser.Tree.Kind;
 
 final class MockFactory {
@@ -62,6 +64,20 @@ final class MockFactory {
         ErrorNode<T> node = mock(ErrorNode.class);
         when(node.getKind()).thenReturn(Kind.ERROR);
         return node;
+    }
+
+    static <T> Rule<T> mockRule() {
+        @SuppressWarnings("unchecked")
+        Rule<T> rule = mock(Rule.class);
+        when(rule.getKind()).thenReturn(Rule.Kind.EMPTY);
+        return rule;
+    }
+
+    static <T> ProductionRule<T> mockProductionRule() {
+        @SuppressWarnings("unchecked")
+        ProductionRule<T> rule = mock(ProductionRule.class);
+        when(rule.getKind()).thenReturn(Rule.Kind.PRODUCTION);
+        return rule;
     }
 
 }
