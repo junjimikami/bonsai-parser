@@ -72,6 +72,13 @@ class Cache<T> {
         return token;
     }
 
+    Token<T> last() {
+        if (pos == 0) {
+            return null;
+        }
+        return tokens.get(pos - 1);
+    }
+
     void add(Token<T> token) {
         assert token != null;
         assert state() == State.WRITE;

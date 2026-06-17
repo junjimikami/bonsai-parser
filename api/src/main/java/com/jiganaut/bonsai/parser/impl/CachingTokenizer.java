@@ -78,11 +78,7 @@ class CachingTokenizer<T> implements Tokenizer<T> {
     }
 
     Optional<Token<T>> last() {
-        var buffer = cache.buffer();
-        if (buffer.isEmpty()) {
-            return Optional.empty();
-        }
-        return Optional.of(buffer.getLast());
+        return Optional.ofNullable(cache.last());
     }
 
 }
