@@ -2,7 +2,6 @@ package com.jiganaut.bonsai.parser.impl;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import com.jiganaut.bonsai.grammar.Grammar;
 import com.jiganaut.bonsai.grammar.ProductionRule;
@@ -109,12 +108,12 @@ class DefaultErrorNode<T> implements ErrorNode<T> {
         // Expected rule
         sb.append("\n");
         sb.append(indent);
-        sb.append("expected rule: ");
+        sb.append("expected: ");
         sb.append(Objects.toString(error.getExpectedRule(), ""));
         // Found token
         sb.append("\n");
         sb.append(indent);
-        sb.append("found token: ");
+        sb.append("found: ");
         sb.append(foundTokenToString(error.getFoundToken(), indent + "  "));
         return sb.toString();
     }
@@ -124,17 +123,12 @@ class DefaultErrorNode<T> implements ErrorNode<T> {
             return "";
         }
         var sb = new StringBuilder();
-        sb.append("\n");
-        sb.append(indent);
-        sb.append("symbol set: ");
-        sb.append(grammar.getProductionRules().stream()
-                .map(ProductionRule::getSymbol)
-                .collect(Collectors.joining(", ", "{ ", " }")));
-        if (grammar.getStartSymbol() != null) {
+        for (var production : grammar.getProductionRules()) {
             sb.append("\n");
             sb.append(indent);
-            sb.append("start symbol: ");
-            sb.append(grammar.getStartSymbol());
+            sb.append(production.getSymbol());
+            sb.append(": ");
+            sb.append(production.getRule());
         }
         return sb.toString();
     }
@@ -144,7 +138,7 @@ class DefaultErrorNode<T> implements ErrorNode<T> {
             return "";
         }
         var sb = new StringBuilder();
-        productionPath.stream()
+        productionPath.reversed().stream()
                 .map(ProductionRule::getSymbol)
                 .forEach(s -> sb.append("\n")
                         .append(indent)
