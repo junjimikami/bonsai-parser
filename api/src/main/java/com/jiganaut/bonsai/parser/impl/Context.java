@@ -3,6 +3,7 @@ package com.jiganaut.bonsai.parser.impl;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import com.jiganaut.bonsai.grammar.Grammar;
@@ -20,7 +21,7 @@ class Context<T> extends CachingTokenizer<T> {
     private final Grammar<T> grammar;
     private final ProductionRule<T> production;
     private final EndOfRule<T> endOfRule;
-    private final Set<MatchingRule<T>> followSet;
+    private final Supplier<Set<MatchingRule<T>>> followSet;
 
     Context(Grammar<T> grammar, Tokenizer<T> tokenizer) {
         super(tokenizer);
@@ -29,23 +30,21 @@ class Context<T> extends CachingTokenizer<T> {
         this.grammar = grammar;
         this.production = null;
         this.endOfRule = new EndOfRule<>();
-        this.followSet = Set.of(endOfRule);
+        this.followSet = () -> Set.of(endOfRule);
     }
 
     private Context(
+            Tokenizer<T> tokenizer,
+            Cache<T> cache,
             Context<T> parent,
             Grammar<T> grammar,
             ProductionRule<T> production,
-            Tokenizer<T> tokenizer,
             EndOfRule<T> endOfRule,
-            Set<MatchingRule<T>> followSet,
-            Cache<T> cache) {
+            Supplier<Set<MatchingRule<T>>> followSet) {
         super(tokenizer, cache);
-        assert parent != null;
         assert grammar != null;
-        assert tokenizer != null;
+        assert endOfRule != null;
         assert followSet != null;
-        assert cache != null;
         this.parent = parent;
         this.grammar = grammar;
         this.production = production;
@@ -55,24 +54,35 @@ class Context<T> extends CachingTokenizer<T> {
 
     Context<T> subContext(ProductionRule<T> production) {
         return new Context<>(
+                this.tokenizer,
+                this.cache,
                 this,
                 this.grammar,
                 production,
-                this.tokenizer,
                 this.endOfRule,
-                this.followSet,
-                this.cache);
+                this.followSet);
     }
 
-    Context<T> subContext(Set<MatchingRule<T>> followSet) {
+    Context<T> subContext(Supplier<Set<MatchingRule<T>>> followSet) {
         return new Context<>(
+                this.tokenizer,
+                this.cache,
                 this,
                 this.grammar,
                 null,
-                this.tokenizer,
                 this.endOfRule,
-                followSet,
-                this.cache);
+                followSet);
+    }
+
+    Context<T> resetPath() {
+        return new Context<>(
+                this.tokenizer,
+                this.cache,
+                null,
+                this.grammar,
+                null,
+                this.endOfRule,
+                followSet);
     }
 
     Grammar<T> grammar() {
@@ -94,12 +104,12 @@ class Context<T> extends CachingTokenizer<T> {
     }
 
     Set<MatchingRule<T>> followSet() {
-        return followSet;
+        return followSet.get();
     }
 
     List<ProductionRule<T>> productionPath() {
         return Stream.iterate(this, Objects::nonNull, c -> c.parent)
-                .map(Context::production)
+                .map(e -> e.production)
                 .filter(Objects::nonNull)
                 .toList();
     }

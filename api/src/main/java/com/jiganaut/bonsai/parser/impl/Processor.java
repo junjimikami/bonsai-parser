@@ -37,8 +37,8 @@ abstract class Processor<T, R> implements RuleVisitor<T, Stream<Tree<T>>, Contex
             }
             cursor.reset();
         }
-        var message = noMatchingRule(choice, context);
-        throw new ParseException(message);
+        var errorNode = noMatchingRule(choice, context);
+        throw new ParseException(errorNode);
     }
 
     @Override
@@ -53,17 +53,17 @@ abstract class Processor<T, R> implements RuleVisitor<T, Stream<Tree<T>>, Contex
         if (candidates.size() == 1) {
             return visit(candidates.get(0), context);
         }
-        var subContext = context.subContext(Set.of());
+        var subContext = context.subContext(Set::of);
         candidates = candidates.stream()
                 .filter(e -> FirstSet.scan(e, subContext))
                 .toList();
         if (candidates.isEmpty()) {
-            var message = noMatchingRule(choice, context);
-            throw new ParseException(message);
+            var errorNode = noMatchingRule(choice, context);
+            throw new ParseException(errorNode);
         }
         if (1 < candidates.size()) {
-            var message = ambiguousChoice(choice, candidates, context);
-            throw new ParseException(message);
+            var errorNode = ambiguousChoice(choice, candidates, context);
+            throw new ParseException(errorNode);
         }
         return visit(candidates.get(0), context);
     }
@@ -74,8 +74,7 @@ abstract class Processor<T, R> implements RuleVisitor<T, Stream<Tree<T>>, Contex
         var rules = new ArrayListRule<>(sequence);
         while (!rules.isEmpty()) {
             var rule = rules.removeFirst();
-            var subFollowSet = FirstSet.of(rules, context);
-            var subContext = context.subContext(subFollowSet);
+            var subContext = context.subContext(() -> FirstSet.of(rules, context));
             if (!FirstSet.scan(rule, subContext)) {
                 var errorNode = noMatchingRule(rule, context);
                 throw new ParseException(errorNode);

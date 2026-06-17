@@ -28,7 +28,7 @@ final class FirstSet<T> implements RuleVisitor<T, Set<MatchingRule<T>>, Context<
     static <T> Set<MatchingRule<T>> of(Rule<T> rule, Context<T> context) {
         @SuppressWarnings("unchecked")
         var instance = (FirstSet<T>) INSTANCE;
-        return instance.visit(rule, context);
+        return instance.visit(rule, context.resetPath());
     }
 
     static <T> boolean scan(Rule<T> rule, Context<T> context) {
@@ -39,7 +39,7 @@ final class FirstSet<T> implements RuleVisitor<T, Set<MatchingRule<T>>, Context<
     @Override
     public Set<MatchingRule<T>> visitChoice(ChoiceRule<T> choice, Context<T> context) {
         if (choice.getChoices().isEmpty()) {
-            return Set.of();
+            return context.followSet();
         }
         var set = new HashSet<MatchingRule<T>>();
         for (var rule : choice.getChoices()) {
@@ -51,12 +51,11 @@ final class FirstSet<T> implements RuleVisitor<T, Set<MatchingRule<T>>, Context<
     @Override
     public Set<MatchingRule<T>> visitSequence(SequenceRule<T> sequence, Context<T> context) {
         if (sequence.getRules().isEmpty()) {
-            return Set.of();
+            return context.followSet();
         }
         var subRules = new ArrayListRule<T>(sequence);
         var rule = subRules.removeFirst();
-        var subFollowSet = visit(subRules, context);
-        var subContext = context.subContext(subFollowSet);
+        var subContext = context.subContext(() -> visit(subRules, context));
         return visit(rule, subContext);
     }
 
@@ -67,8 +66,8 @@ final class FirstSet<T> implements RuleVisitor<T, Set<MatchingRule<T>>, Context<
 
     @Override
     public Set<MatchingRule<T>> visitReference(ReferenceRule<T> reference, Context<T> context) {
-        var productionSet = reference.lookup(context.grammar());
-        return visit(productionSet, context);
+        var productionChoice = reference.lookup(context.grammar());
+        return visit(productionChoice, context);
     }
 
     @Override
@@ -78,7 +77,7 @@ final class FirstSet<T> implements RuleVisitor<T, Set<MatchingRule<T>>, Context<
                 .limit(1)
                 .findFirst();
         if (rule.isPresent()) {
-            var subContext = context.subContext(Set.of());
+            var subContext = context.subContext(Set::of);
             set.addAll(visit(rule.get(), subContext));
         }
         if (quantifier.getMinCount() == 0) {
@@ -99,7 +98,11 @@ final class FirstSet<T> implements RuleVisitor<T, Set<MatchingRule<T>>, Context<
 
     @Override
     public Set<MatchingRule<T>> visitProduction(ProductionRule<T> production, Context<T> context) {
-        return visit(production.getRule(), context);
+        if (context.productionPath().contains(production)) {
+            return Set.of();
+        }
+        var subContext = context.subContext(production);
+        return visit(production.getRule(), subContext);
     }
 
 }

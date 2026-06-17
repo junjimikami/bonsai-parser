@@ -27,7 +27,7 @@ final class FullLengthMatcher<T> implements RuleVisitor<T, Boolean, Context<T>> 
     static <T> boolean scan(Rule<T> rule, Context<T> context) {
         @SuppressWarnings("unchecked")
         var instance = (FullLengthMatcher<T>) INSTANCE;
-        return instance.visit(rule, context);
+        return instance.visit(rule, context.resetPath());
     }
 
     @Override
@@ -35,7 +35,6 @@ final class FullLengthMatcher<T> implements RuleVisitor<T, Boolean, Context<T>> 
         var cursor = context.startCache();
         for (var rule : choice.getChoices()) {
             if (visit(rule, context)) {
-                cursor.clear();
                 return true;
             }
             cursor.reset();
@@ -54,7 +53,7 @@ final class FullLengthMatcher<T> implements RuleVisitor<T, Boolean, Context<T>> 
         if (candidates.size() == 1) {
             return visit(candidates.get(0), context);
         }
-        var subContext = context.subContext(Set.of());
+        var subContext = context.subContext(Set::of);
         candidates = candidates.stream()
                 .filter(e -> FirstSet.scan(e, subContext))
                 .toList();
@@ -75,8 +74,7 @@ final class FullLengthMatcher<T> implements RuleVisitor<T, Boolean, Context<T>> 
         var rules = new ArrayListRule<>(sequence);
         while (!rules.isEmpty()) {
             var rule = rules.removeFirst();
-            var subFollowSet = FirstSet.of(rules, context);
-            var subContext = context.subContext(subFollowSet);
+            var subContext = context.subContext(() -> FirstSet.of(rules, context));
             if (!visit(rule, subContext)) {
                 return false;
             }
@@ -89,10 +87,11 @@ final class FullLengthMatcher<T> implements RuleVisitor<T, Boolean, Context<T>> 
         if (!context.hasNext()) {
             return false;
         }
-        var token = context.next();
+        var token = context.peek();
         if (!match.test(token)) {
             return false;
         }
+        context.next();
         return true;
     }
 
@@ -104,7 +103,9 @@ final class FullLengthMatcher<T> implements RuleVisitor<T, Boolean, Context<T>> 
 
     @Override
     public Boolean visitQuantifier(QuantifierRule<T> quantifier, Context<T> context) {
-        long count = quantifier.stream().takeWhile(e -> visit(e, context)).count();
+        long count = quantifier.stream()
+                .takeWhile(e -> visit(e, context))
+                .count();
         return quantifier.getMinCount() <= count;
     }
 
@@ -120,7 +121,8 @@ final class FullLengthMatcher<T> implements RuleVisitor<T, Boolean, Context<T>> 
 
     @Override
     public Boolean visitProduction(ProductionRule<T> production, Context<T> context) {
-        return visit(production.getRule(), context);
+        var subContext = context.subContext(production);
+        return visit(production.getRule(), subContext);
     }
 
 }
