@@ -45,8 +45,8 @@ interface ReferenceRuleTestCase<T> extends QuantifiableTestCase<T> {
         when(grammar.getProductionRules()).then(invocation -> {
             return Set.of(mockProductionRule(expectedSymbol()));
         });
-        var productionSet = target.lookup(grammar);
-        var production = productionSet.getChoices().stream()
+        var productionChoice = target.lookup(grammar);
+        var production = productionChoice.getChoices().stream()
                 .map(e -> (ProductionRule<?>) e)
                 .findFirst()
                 .orElseThrow();

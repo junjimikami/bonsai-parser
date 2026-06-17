@@ -165,14 +165,14 @@ interface GrammarTestCase<T> extends TestCase {
             assumeTrue(canBuild());
 
             var target = createTarget();
-            var productionSet = target.build();
+            var grammar = target.build();
 
-            assertNotNull(productionSet);
+            assertNotNull(grammar);
             var expectedString = expectedProductionRules().stream()
                     .map(e -> e.getSymbol() + ":" + e.getRule())
                     .sorted()
                     .collect(Collectors.joining(",", "{", "}"));
-            var actualString = productionSet.getProductionRules().stream()
+            var actualString = grammar.getProductionRules().stream()
                     .map(e -> e.getSymbol() + ":" + e.getRule())
                     .sorted()
                     .collect(Collectors.joining(",", "{", "}"));
