@@ -31,6 +31,8 @@ public sealed interface Tree<T> permits TerminalNode, NonTerminalNode, ErrorNode
      */
     public Kind getKind();
 
+    public String getName();
+
     public Position getPosition();
 
     public Stream<Tree<T>> subTrees();

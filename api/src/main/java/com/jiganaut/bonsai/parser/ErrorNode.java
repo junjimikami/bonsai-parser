@@ -46,6 +46,11 @@ public non-sealed interface ErrorNode<T> extends Tree<T> {
     }
 
     @Override
+    public default String getName() {
+        throw null;
+    }
+
+    @Override
     public default Position getPosition() {
         if (getFoundToken() == null) {
             return Position.UNKNOWN;

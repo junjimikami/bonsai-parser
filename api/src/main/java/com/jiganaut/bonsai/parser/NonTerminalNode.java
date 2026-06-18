@@ -68,6 +68,4 @@ public non-sealed interface NonTerminalNode<T> extends Tree<T> {
 
     public List<Tree<T>> getSubTrees();
 
-    public String getName();
-
 }

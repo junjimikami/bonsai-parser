@@ -11,8 +11,6 @@ import com.jiganaut.bonsai.impl.Message;
  */
 public non-sealed interface TerminalNode<T> extends Tree<T> {
 
-    public String getName();
-
     public T getValue();
 
     @Override
