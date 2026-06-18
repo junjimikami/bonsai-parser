@@ -8,7 +8,7 @@ import com.jiganaut.bonsai.impl.Message;
  * @author Junji Mikami
  *
  */
-public sealed interface Position permits Position.Unknown, Position.Offset {
+public sealed interface Position extends Comparable<Position> permits Position.Unknown, Position.Offset {
 
     /**
      *
@@ -24,6 +24,10 @@ public sealed interface Position permits Position.Unknown, Position.Offset {
             return "unknown";
         }
 
+        @Override
+        public int compareTo(Position o) {
+            return -1;
+        }
     }
 
     /**
@@ -96,6 +100,14 @@ public sealed interface Position permits Position.Unknown, Position.Offset {
         @Override
         public int hashCode() {
             return Objects.hash(offset, opposite);
+        }
+
+        @Override
+        public int compareTo(Position o) {
+            if (o instanceof Offset other) {
+                return Long.compare(this.offset, other.offset);
+            }
+            return 1;
         }
 
     }
