@@ -46,5 +46,8 @@ public interface SimpleRuleVisitor<T, R, P> extends RuleVisitor<T, R, P> {
         return defaultAction(production, p);
     }
 
-    public R defaultAction(Rule<T> rule, P p);
+    public default R defaultAction(Rule<T> rule, P p) {
+        return null;
+    }
+
 }

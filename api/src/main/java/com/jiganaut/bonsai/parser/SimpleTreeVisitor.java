@@ -24,6 +24,8 @@ public interface SimpleTreeVisitor<T, R, P> extends TreeVisitor<T, R, P> {
         return defaultAction(error, p);
     }
 
-    public R defaultAction(Tree<T> tree, P p);
+    public default R defaultAction(Tree<T> tree, P p) {
+        return null;
+    }
 
 }
