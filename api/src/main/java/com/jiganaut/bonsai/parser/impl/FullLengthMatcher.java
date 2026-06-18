@@ -1,5 +1,7 @@
 package com.jiganaut.bonsai.parser.impl;
 
+import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Set;
 
 import com.jiganaut.bonsai.grammar.ChoiceRule;
@@ -12,43 +14,49 @@ import com.jiganaut.bonsai.grammar.Rule;
 import com.jiganaut.bonsai.grammar.RuleVisitor;
 import com.jiganaut.bonsai.grammar.SequenceRule;
 import com.jiganaut.bonsai.grammar.SkipRule;
+import com.jiganaut.bonsai.parser.Token;
 
 /**
  * @author Junji Mikami
  *
  */
-final class FullLengthMatcher<T> implements RuleVisitor<T, Boolean, Context<T>> {
+final class FullLengthMatcher<T> implements RuleVisitor<T, Token<T>, Context<T>> {
 
     private static final FullLengthMatcher<?> INSTANCE = new FullLengthMatcher<>();
 
     private FullLengthMatcher() {
     }
 
-    static <T> boolean scan(Rule<T> rule, Context<T> context) {
+    static <T> Token<T> scan(Rule<T> rule, Context<T> context) {
         @SuppressWarnings("unchecked")
         var instance = (FullLengthMatcher<T>) INSTANCE;
         return instance.visit(rule, context.resetPath());
     }
 
     @Override
-    public Boolean visitChoiceAsShortCircuit(ChoiceRule<T> choice, Context<T> context) {
+    public Token<T> visitChoiceAsShortCircuit(ChoiceRule<T> choice, Context<T> context) {
+        var errorTokens = new ArrayList<Token<T>>();
         var cursor = context.startCache();
         for (var rule : choice.getChoices()) {
-            if (visit(rule, context)) {
-                return true;
+            var errorToken = visit(rule, context);
+            if (errorToken == null) {
+                return null;
             }
+            errorTokens.add(errorToken);
             cursor.reset();
         }
-        return false;
+        return errorTokens.stream()
+                .max((e1, e2) -> e1.getPosition().compareTo(e2.getPosition()))
+                .orElseGet(context::peek);
     }
 
     @Override
-    public Boolean visitChoice(ChoiceRule<T> choice, Context<T> context) {
+    public Token<T> visitChoice(ChoiceRule<T> choice, Context<T> context) {
         var candidates = choice.getChoices().stream()
                 .filter(e -> FirstSet.scan(e, context))
                 .toList();
         if (candidates.isEmpty()) {
-            return false;
+            return context.peek();
         }
         if (candidates.size() == 1) {
             return visit(candidates.get(0), context);
@@ -58,69 +66,70 @@ final class FullLengthMatcher<T> implements RuleVisitor<T, Boolean, Context<T>> 
                 .filter(e -> FirstSet.scan(e, subContext))
                 .toList();
         if (candidates.isEmpty()) {
-            return false;
+            return context.peek();
         }
         if (1 < candidates.size()) {
-            return false;
+            return context.peek();
         }
         return visit(candidates.get(0), context);
     }
 
     @Override
-    public Boolean visitSequence(SequenceRule<T> sequence, Context<T> context) {
-        if (sequence.getRules().isEmpty()) {
-            return false;
-        }
+    public Token<T> visitSequence(SequenceRule<T> sequence, Context<T> context) {
         var rules = new ArrayListRule<>(sequence);
         while (!rules.isEmpty()) {
             var rule = rules.removeFirst();
             var subContext = context.subContext(() -> FirstSet.of(rules, context));
-            if (!visit(rule, subContext)) {
-                return false;
+            var token = visit(rule, subContext);
+            if (token != null) {
+                return token;
             }
         }
-        return true;
+        return null;
     }
 
     @Override
-    public Boolean visitMatch(MatchingRule<T> match, Context<T> context) {
-        if (!context.hasNext()) {
-            return false;
-        }
+    public Token<T> visitMatch(MatchingRule<T> match, Context<T> context) {
         var token = context.peek();
         if (!match.test(token)) {
-            return false;
+            return token;
         }
         context.next();
-        return true;
+        return null;
     }
 
     @Override
-    public Boolean visitReference(ReferenceRule<T> reference, Context<T> context) {
+    public Token<T> visitReference(ReferenceRule<T> reference, Context<T> context) {
         var productionChoice = reference.lookup(context.grammar());
         return visit(productionChoice, context);
     }
 
     @Override
-    public Boolean visitQuantifier(QuantifierRule<T> quantifier, Context<T> context) {
+    public Token<T> visitQuantifier(QuantifierRule<T> quantifier, Context<T> context) {
         long count = quantifier.stream()
-                .takeWhile(e -> visit(e, context))
+                .map(e -> visit(e, context))
+                .takeWhile(Objects::isNull)
                 .count();
-        return quantifier.getMinCount() <= count;
+        if (count < quantifier.getMinCount()) {
+            return context.peek();
+        }
+        return null;
     }
 
     @Override
-    public Boolean visitSkip(SkipRule<T> skip, Context<T> context) {
+    public Token<T> visitSkip(SkipRule<T> skip, Context<T> context) {
         return visit(skip.getRule(), context);
     }
 
     @Override
-    public Boolean visitEmpty(EmptyRule<T> empty, Context<T> context) {
-        return context.followSet().stream().anyMatch(e -> e.test(context.peek()));
+    public Token<T> visitEmpty(EmptyRule<T> empty, Context<T> context) {
+        return context.followSet().stream().anyMatch(e -> e.test(context.peek()))
+                ? null
+                : context.peek();
     }
 
     @Override
-    public Boolean visitProduction(ProductionRule<T> production, Context<T> context) {
+    public Token<T> visitProduction(ProductionRule<T> production, Context<T> context) {
         var subContext = context.subContext(production);
         return visit(production.getRule(), subContext);
     }

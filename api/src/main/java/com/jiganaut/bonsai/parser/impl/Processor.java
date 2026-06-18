@@ -1,5 +1,6 @@
 package com.jiganaut.bonsai.parser.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -17,6 +18,7 @@ import com.jiganaut.bonsai.grammar.SkipRule;
 import com.jiganaut.bonsai.impl.Message;
 import com.jiganaut.bonsai.parser.ErrorNode;
 import com.jiganaut.bonsai.parser.ParseException;
+import com.jiganaut.bonsai.parser.Token;
 import com.jiganaut.bonsai.parser.Tree;
 
 /**
@@ -29,15 +31,21 @@ abstract class Processor<T, R> implements RuleVisitor<T, Stream<Tree<T>>, Contex
 
     @Override
     public Stream<Tree<T>> visitChoiceAsShortCircuit(ChoiceRule<T> choice, Context<T> context) {
+        var errorTokens = new ArrayList<Token<T>>();
         var cursor = context.startCache();
         for (var rule : choice.getChoices()) {
-            if (FullLengthMatcher.scan(rule, context)) {
+            var errorToken = FullLengthMatcher.scan(rule, context);
+            if (errorToken == null) {
                 cursor.clear();
                 return visit(rule, context);
             }
+            errorTokens.add(errorToken);
             cursor.reset();
         }
-        var errorNode = noMatchingRule(choice, context);
+        var errorToken = errorTokens.stream()
+                .max((e1, e2) -> e1.getPosition().compareTo(e2.getPosition()))
+                .orElseGet(context::peek);
+        var errorNode = noMatchingRule(choice, context, errorToken);
         throw new ParseException(errorNode);
     }
 
@@ -47,8 +55,8 @@ abstract class Processor<T, R> implements RuleVisitor<T, Stream<Tree<T>>, Contex
                 .filter(e -> FirstSet.scan(e, context))
                 .toList();
         if (candidates.isEmpty()) {
-            var message = noMatchingRule(choice, context);
-            throw new ParseException(message);
+            var errorNode = noMatchingRule(choice, context);
+            throw new ParseException(errorNode);
         }
         if (candidates.size() == 1) {
             return visit(candidates.get(0), context);
@@ -139,14 +147,18 @@ abstract class Processor<T, R> implements RuleVisitor<T, Stream<Tree<T>>, Contex
         return Stream.of(builder.build());
     }
 
-    ErrorNode<T> noMatchingRule(Rule<T> rule, Context<T> context) {
+    ErrorNode<T> noMatchingRule(Rule<T> rule, Context<T> context, Token<T> token) {
         return ErrorNode.<T>builder()
-                .setMessage(Message.PARSER_NO_MATCHING_RULE.format(rule, context.peek()))
+                .setMessage(Message.PARSER_NO_MATCHING_RULE.format(rule, token))
                 .setGrammar(context.grammar())
                 .setProductionPath(context.productionPath())
                 .setExpectedRule(rule)
-                .setFoundToken(context.peek())
+                .setFoundToken(token)
                 .build();
+    }
+
+    ErrorNode<T> noMatchingRule(Rule<T> rule, Context<T> context) {
+        return noMatchingRule(rule, context, context.peek());
     }
 
     ErrorNode<T> ambiguousChoice(Rule<T> rule, List<Rule<T>> candidates, Context<T> context) {
