@@ -114,7 +114,7 @@ class DefaultErrorNode<T> implements ErrorNode<T> {
         sb.append("\n");
         sb.append(indent);
         sb.append("found: ");
-        sb.append(foundTokenToString(error.getFoundToken(), indent + "  "));
+        sb.append(Objects.toString(error.getFoundToken(), ""));
         return sb.toString();
     }
 
@@ -144,34 +144,6 @@ class DefaultErrorNode<T> implements ErrorNode<T> {
                         .append(indent)
                         .append("- ")
                         .append(s));
-        return sb.toString();
-    }
-
-    private static String foundTokenToString(Token<?> foundToken, String indent) {
-        if (foundToken == null) {
-            return "null";
-        }
-        var sb = new StringBuilder();
-        if (foundToken.getName() != null) {
-            sb.append("\n");
-            sb.append(indent);
-            sb.append("name: ");
-            sb.append(foundToken.getName());
-        }
-        if (foundToken instanceof EndOfToken<?>) {
-            sb.append("\n");
-            sb.append(indent);
-            sb.append("kind: EOF");
-        } else {
-            sb.append("\n");
-            sb.append(indent);
-            sb.append("value: ");
-            sb.append(foundToken.getValue());
-        }
-        sb.append("\n");
-        sb.append(indent);
-        sb.append("position: ");
-        sb.append(foundToken.getPosition());
         return sb.toString();
     }
 
