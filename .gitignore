@@ -1,8 +1,10 @@
-api/target/
-api/.classpath
-api/.project
-api/.settings/
-sample/target/
-sample/.classpath
-sample/.project
-sample/.settings/
+# Build artifacts (Maven)
+**/target/
+
+# Eclipse/STS project metadata
+**/.classpath
+**/.project
+**/.settings/
+
+# Local VS Code workspace settings
+.vscode/
