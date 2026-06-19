@@ -4,77 +4,100 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.jiganaut.bonsai.grammar.ChoiceRule;
 import com.jiganaut.bonsai.grammar.Rule;
+import com.jiganaut.bonsai.impl.Message;
 
 /**
- * 
+ *
  * @author Junji Mikami
  *
  */
-class DefaultChoiceRule extends AbstractCompositeRule<Set<Rule>> implements ChoiceRule {
+class DefaultChoiceRule<T> extends CompositeRule<T, Set<Rule<T>>> implements ChoiceRule<T> {
+
     /**
-     * 
-     * @author Junji Mikami
+     *
      */
-    static class Builder extends AbstractCompositeRule.Builder implements ChoiceRule.Builder {
+    static class Builder<T> extends CompositeRule.Builder<T> implements ChoiceRule.Builder<T> {
 
-        @Override
-        public Builder add(Rule rule) {
-            return (Builder) super.add(rule);
+        private boolean shortCircuit = false;
+
+        Builder() {
+            super(new LinkedHashSet<>());
         }
 
         @Override
-        public Builder add(Rule.Builder builder) {
-            return (Builder) super.add(builder);
+        public Builder<T> add(Rule.Builder<T> builder) {
+            check();
+            Objects.requireNonNull(builder, () -> Message.VALIDATION_PARAMETER_NULL.format("builder"));
+            builders.add(builder);
+            return this;
         }
 
         @Override
-        public ChoiceRule build() {
+        public Builder<T> addAll(ChoiceRule.Builder<T> builder) {
+            check();
+            Objects.requireNonNull(builder, () -> Message.VALIDATION_PARAMETER_NULL.format("builder"));
+            builder.forEach(this::add);
+            return this;
+        }
+
+        @Override
+        public Builder<T> asShortCircuit() {
+            check();
+            shortCircuit = true;
+            return this;
+        }
+
+        @Override
+        public ChoiceRule<T> build() {
             checkForBuild();
-            var elements = suppliers.stream()
-                    .map(Supplier::get)
-                    .collect(LinkedHashSet<Rule>::new, Set::add, Set::addAll);
-            return new DefaultChoiceRule(elements, false);
+            var collector = shortCircuit
+                    ? Collectors.toCollection(LinkedHashSet<Rule<T>>::new)
+                    : Collectors.<Rule<T>>toSet();
+            var elements = builders.stream()
+                    .map(Rule.Builder::build)
+                    .filter(Objects::nonNull)
+                    .collect(collector);
+            return new DefaultChoiceRule<>(elements, shortCircuit);
         }
 
     }
 
     private final boolean shortCircuit;
+    private final String delimiter;
 
-    DefaultChoiceRule(Set<Rule> elements, boolean shortCircuit) {
+    private DefaultChoiceRule(Set<Rule<T>> elements, boolean shortCircuit) {
         super(Collections.unmodifiableSet(elements));
         this.shortCircuit = shortCircuit;
+        this.delimiter = shortCircuit ? " / " : " | ";
     }
 
     @Override
-    public Set<? extends Rule> getChoices() {
+    public Set<Rule<T>> getChoices() {
         return elements;
     }
 
     @Override
     public String toString() {
-        var delimiter = isShortCircuit() ? " / " : " | ";
         return elements.stream()
                 .map(e -> {
-                    try {
-                        return e.toString();
-                    } catch (Exception ex) {
-                        return "?";
+                    if (e.getKind().isComposite()) {
+                        return "( %s )".formatted(e.toString());
                     }
+                    return e.toString();
                 })
-                .collect(Collectors.joining(delimiter, "(", ")"));
+                .collect(Collectors.joining(delimiter));
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof ChoiceRule r) {
-            return this.getKind() == r.getKind()
-                    && this.shortCircuit == r.isShortCircuit()
-                    && this.elements.equals(r.getChoices());
+        if (obj instanceof ChoiceRule<?> other) {
+            return this.getKind() == other.getKind()
+                    && this.shortCircuit == other.isShortCircuit()
+                    && this.elements.equals(other.getChoices());
         }
         return super.equals(obj);
     }
@@ -87,11 +110,6 @@ class DefaultChoiceRule extends AbstractCompositeRule<Set<Rule>> implements Choi
     @Override
     public boolean isShortCircuit() {
         return shortCircuit;
-    }
-
-    @Override
-    public ChoiceRule shortCircuit() {
-        return new DefaultChoiceRule(elements, true);
     }
 
 }

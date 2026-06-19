@@ -1,7 +1,5 @@
 package com.jiganaut.bonsai.parser;
 
-import java.io.Reader;
-
 import com.jiganaut.bonsai.grammar.Grammar;
 import com.jiganaut.bonsai.parser.spi.ParserProvider;
 
@@ -9,21 +7,15 @@ import com.jiganaut.bonsai.parser.spi.ParserProvider;
  * @author Junji Mikami
  *
  */
-public interface ParserFactory {
+public interface ParserFactory<T> {
 
-    public static ParserFactory of(Grammar grammar) {
+    public static <T> ParserFactory<T> of(Grammar<T> grammar) {
         return ParserProvider.load().createParserFactory(grammar);
     }
 
-    public static ParserFactory load(String factoryName) {
-        return ParserProvider.load().loadParserFactory(factoryName);
+    public Parser<T> createParser(Tokenizer<T> tokenizer);
+
+    public default Parser<T> createParser(Source<T> source) {
+        return createParser(source.toTokenizer());
     }
-
-    public static ParserFactory load(Class<?> factoryClass) {
-        return load(factoryClass.getName());
-    }
-
-    public Parser createParser(Tokenizer tokenizer);
-
-    public Parser createParser(Reader reader);
 }

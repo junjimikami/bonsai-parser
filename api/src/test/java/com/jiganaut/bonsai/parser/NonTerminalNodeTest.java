@@ -1,70 +1,27 @@
 package com.jiganaut.bonsai.parser;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
+import static com.jiganaut.bonsai.parser.MockFactory.mockToken;
 
 import java.util.List;
-import java.util.stream.Stream;
-
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestReporter;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-
 import com.jiganaut.bonsai.parser.NonTerminalNode.Builder;
 
 /**
- * 
+ *
  * @author Junji Mikami
  */
 class NonTerminalNodeTest {
 
-    @Test
-    @DisplayName("of(String, String, Tree...) [Null parameter]")
-    void ofInCaseOfNullParameter(TestReporter testReporter) throws Exception {
-        var ex0 = assertThrows(NullPointerException.class, () -> NonTerminalNode.of(null, ""));
-        testReporter.publishEntry(ex0.getMessage());
-        var ex1 = assertThrows(NullPointerException.class, () -> NonTerminalNode.of("", "", (Tree[]) null));
-        testReporter.publishEntry(ex1.getMessage());
-    }
-
-    static Stream<Arguments> of() {
-        return Stream.of(
-                Arguments.arguments("", null, List.<Tree>of()),
-                Arguments.arguments("", "", List.<Tree>of()),
-                Arguments.arguments("1", "2", List.<Tree>of(mock(Tree.class))),
-                Arguments.arguments("a", "b", List.<Tree>of(mock(Tree.class), mock(Tree.class))),
-                Arguments.arguments("[", "*", List.<Tree>of()));
-    }
-
-    @ParameterizedTest
-    @MethodSource
-    @DisplayName("of(name:String, value:String)")
-    void of(String name, String value, List<Tree> trees) throws Exception {
-        var tree = NonTerminalNode.of(name, value, trees.toArray(Tree[]::new));
-
-        assertEquals(Tree.Kind.NON_TERMINAL, tree.getKind());
-        assertEquals(name, tree.getName());
-        assertEquals(value, tree.getValue());
-        assertIterableEquals(trees, tree.getSubTrees());
-    }
-
     @Nested
-    class TestCase1 implements NonTerminalNodeTestCase {
+    class TestCase1 implements NonTerminalNodeTestCase<String> {
 
-        List<Tree> testData = List.of(mock(Tree.class));
+        List<Tree<String>> testData = List.of(mockToken());
 
         @Override
-        public NonTerminalNode createTarget() {
-            return NonTerminalNode.of(
-                    expectedName(),
-                    expectedValue(),
-                    expectedSubTrees().toArray(Tree[]::new));
+        public NonTerminalNode<String> createTarget() {
+            var builder = NonTerminalNode.<String>builder(expectedName());
+            expectedSubTrees().forEach(builder::add);
+            return builder.build();
         }
 
         @Override
@@ -73,136 +30,75 @@ class NonTerminalNodeTest {
         }
 
         @Override
-        public String expectedValue() {
-            return "VALUE";
-        }
-
-        @Override
-        public List<Tree> expectedSubTrees() {
+        public List<Tree<String>> expectedSubTrees() {
             return testData;
         }
 
     }
 
     @Nested
-    class BuilderTestCase1 implements NonTerminalNodeTestCase.BuilderTestCase {
+    class BuilderTestCase3 implements NonTerminalNodeTestCase.BuilderTestCase<String> {
         @Override
-        public Builder createTarget() {
-            return NonTerminalNode.builder();
+        public Builder<String> createTarget() {
+            return NonTerminalNode.<String>builder("NAME");
         }
 
         @Override
-        public boolean isSetName() {
+        public boolean canBuild() {
             return false;
         }
 
         @Override
-        public NonTerminalNode expectedTree() {
+        public NonTerminalNode<String> expectedTree() {
             return null;
         }
     }
 
     @Nested
-    class BuilderTestCase2 implements NonTerminalNodeTestCase.BuilderTestCase {
-        @Override
-        public Builder createTarget() {
-            return NonTerminalNode.builder()
-                    .setValue("VALUE");
-        }
+    class BuilderTestCase5 implements NonTerminalNodeTestCase.BuilderTestCase<String> {
+
+        Tree<String> testData = mockToken();
 
         @Override
-        public boolean isSetName() {
-            return false;
-        }
-
-        @Override
-        public NonTerminalNode expectedTree() {
-            return null;
-        }
-    }
-
-    @Nested
-    class BuilderTestCase3 implements NonTerminalNodeTestCase.BuilderTestCase {
-        @Override
-        public Builder createTarget() {
-            return NonTerminalNode.builder()
-                    .setName("NAME");
-        }
-
-        @Override
-        public boolean isSetName() {
-            return true;
-        }
-
-        @Override
-        public NonTerminalNode expectedTree() {
-            return NonTerminalNode.of("NAME");
-        }
-    }
-
-    @Nested
-    class BuilderTestCase4 implements NonTerminalNodeTestCase.BuilderTestCase {
-        @Override
-        public Builder createTarget() {
-            return NonTerminalNode.builder()
-                    .setName("NAME")
-                    .setValue("VALUE");
-        }
-
-        @Override
-        public boolean isSetName() {
-            return true;
-        }
-
-        @Override
-        public NonTerminalNode expectedTree() {
-            return NonTerminalNode.of("NAME", "VALUE");
-        }
-    }
-
-    @Nested
-    class BuilderTestCase5 implements NonTerminalNodeTestCase.BuilderTestCase {
-
-        Tree testData = mock(Tree.class);
-
-        @Override
-        public Builder createTarget() {
-            return NonTerminalNode.builder()
-                    .setName("NAME")
+        public Builder<String> createTarget() {
+            return NonTerminalNode.<String>builder("NAME")
                     .add(testData);
         }
 
         @Override
-        public boolean isSetName() {
+        public boolean canBuild() {
             return true;
         }
 
         @Override
-        public NonTerminalNode expectedTree() {
-            return NonTerminalNode.of("NAME", testData);
+        public NonTerminalNode<String> expectedTree() {
+            return NonTerminalNode.<String>builder("NAME")
+                    .add(testData)
+                    .build();
         }
     }
 
     @Nested
-    class BuilderTestCase6 implements NonTerminalNodeTestCase.BuilderTestCase {
+    class BuilderTestCase6 implements NonTerminalNodeTestCase.BuilderTestCase<String> {
 
-        Tree testData = mock(Tree.class);
+        Tree<String> testData = mockToken();
 
         @Override
-        public Builder createTarget() {
-            return NonTerminalNode.builder()
-                    .add(testData)
-                    .setName("NAME");
+        public Builder<String> createTarget() {
+            return NonTerminalNode.<String>builder("NAME")
+                    .add(testData);
         }
 
         @Override
-        public boolean isSetName() {
+        public boolean canBuild() {
             return true;
         }
 
         @Override
-        public NonTerminalNode expectedTree() {
-            return NonTerminalNode.of("NAME", testData);
+        public NonTerminalNode<String> expectedTree() {
+            return NonTerminalNode.<String>builder("NAME")
+                    .add(testData)
+                    .build();
         }
     }
 

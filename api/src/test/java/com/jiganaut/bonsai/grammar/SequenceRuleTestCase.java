@@ -1,11 +1,14 @@
 package com.jiganaut.bonsai.grammar;
 
+import static com.jiganaut.bonsai.grammar.MockFactory.mockRule;
+import static com.jiganaut.bonsai.grammar.MockFactory.mockRuleBuilder;
+import static com.jiganaut.bonsai.grammar.MockFactory.mockSequenceRuleBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -15,98 +18,127 @@ import org.junit.jupiter.api.TestReporter;
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
 /**
- * 
+ *
  * @author Junji Mikami
  */
-interface SequenceRuleTestCase extends CompositeRuleTestCase<SequenceRule> {
+interface SequenceRuleTestCase<T> extends CompositeRuleTestCase<T> {
 
-    interface BuilderTestCase extends CompositeRuleTestCase.BuilderTestCase<SequenceRule.Builder> {
-
-        @Override
-        SequenceRule.Builder createTarget();
+    interface BuilderTestCase<T> extends CompositeRuleTestCase.BuilderTestCase<T> {
 
         @Override
-        SequenceRule expectedRule();
+        SequenceRule.Builder<T> createTarget();
+
+        @Override
+        SequenceRule<T> expectedRule();
 
         @SuppressWarnings("exports")
         @Test
-        @DisplayName("add(r:Rule) [Null parameter]")
-        default void addRInCaseOfNullParameter(TestReporter testReporter) throws Exception {
-            var builder = createTarget();
+        @DisplayName("add(rb:Rule.Builder) [rb == null]")
+        default void addRbWhenRbIsNull(TestReporter testReporter) throws Exception {
+            var target = createTarget();
 
-            var ex = assertThrows(NullPointerException.class, () -> builder.add((Rule) null));
-            testReporter.publishEntry(ex.getMessage());
+            var ex = assertThrows(NullPointerException.class, () -> target.add((Rule.Builder<T>) null));
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
         @SuppressWarnings("exports")
         @Test
-        @DisplayName("add(rb:Rule.Builder) [Null parameter]")
-        default void addRbInCaseOfNullParameter(TestReporter testReporter) throws Exception {
-            var builder = createTarget();
+        @DisplayName("addAll(rb:SequenceRule.Builder) [rb == null]")
+        default void addAllRbWhenRbIsNull(TestReporter testReporter) throws Exception {
+            var target = createTarget();
 
-            var ex = assertThrows(NullPointerException.class, () -> builder.add((Rule.Builder) null));
-            testReporter.publishEntry(ex.getMessage());
+            var ex = assertThrows(NullPointerException.class, () -> target.addAll((null)));
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
         @SuppressWarnings("exports")
         @Test
-        @DisplayName("add(r:Rule) [Post-build operation]")
-        default void addRInCaseOfPostBuild(TestReporter testReporter) throws Exception {
-            var builder = createTarget();
-            builder.build();
+        @DisplayName("add(r:Rule) [Post-build]")
+        default void addRWhenPostBuild(TestReporter testReporter) throws Exception {
+            var target = createTarget();
+            target.build();
 
-            var ex = assertThrows(IllegalStateException.class, () -> builder.add(mock(Rule.class)));
-            testReporter.publishEntry(ex.getMessage());
+            var ex = assertThrows(IllegalStateException.class, () -> target.add(mockRule()));
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
         @SuppressWarnings("exports")
         @Test
-        @DisplayName("add(rb:Rule.Builder) [Post-build operation]")
-        default void addRbInCaseOfPostBuild(TestReporter testReporter) throws Exception {
-            var builder = createTarget();
-            builder.build();
+        @DisplayName("add(rb:Rule.Builder) [Post-build]")
+        default void addRbWhenPostBuild(TestReporter testReporter) throws Exception {
+            var target = createTarget();
+            target.build();
 
-            var ex = assertThrows(IllegalStateException.class, () -> builder.add(mock(Rule.Builder.class)));
-            testReporter.publishEntry(ex.getMessage());
+            var ex = assertThrows(IllegalStateException.class, () -> target.add(mockRuleBuilder()));
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
+        }
+
+        @SuppressWarnings("exports")
+        @Test
+        @DisplayName("addAll(rb:Rule.Builder) [Post-build]")
+        default void addAllRbWhenPostBuild(TestReporter testReporter) throws Exception {
+            var target = createTarget();
+            target.build();
+
+            var ex = assertThrows(IllegalStateException.class, () -> target.addAll(mockSequenceRuleBuilder()));
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
         @Test
         @DisplayName("add(r:Rule)")
         default void addR() throws Exception {
-            var builder = createTarget();
+            var target = createTarget();
 
-            assertEquals(builder, builder.add(mock(Rule.class)));
+            assertEquals(target, target.add(mockRule()));
         }
 
         @Test
         @DisplayName("add(rb:Rule.Builder)")
         default void addRb() throws Exception {
-            var builder = createTarget();
+            var target = createTarget();
 
-            assertEquals(builder, builder.add(mock(Rule.Builder.class)));
+            assertEquals(target, target.add(mockRuleBuilder()));
+        }
+
+        @Test
+        @DisplayName("addAll(rb:Rule.Builder)")
+        default void addAllRb() throws Exception {
+            var target = createTarget();
+
+            assertEquals(target, target.addAll(mockSequenceRuleBuilder()));
         }
 
         @Test
         @DisplayName("build()")
         default void build() throws Exception {
-            var builder = createTarget();
-            var rule = builder.build();
+            var target = createTarget();
+            var rule = target.build();
 
             assertNotNull(rule);
             assertIterableEquals(expectedRule().getRules(), rule.getRules());
         }
 
+        @Test
+        @DisplayName("iterate()")
+        default void iterate() throws Exception {
+            var target = createTarget();
+
+            var rules = new ArrayList<Rule<T>>();
+            target.forEach(e -> rules.add(e.build()));
+            assertIterableEquals(expectedRule().getRules(), rules);
+        }
+
     }
 
     @Override
-    SequenceRule createTarget();
+    SequenceRule<T> createTarget();
 
     @Override
     default Kind expectedKind() {
         return Kind.SEQUENCE;
     }
 
-    List<? extends Rule> expectedRules();
+    List<Rule<T>> expectedRules();
 
     @Test
     @DisplayName("getRules()")

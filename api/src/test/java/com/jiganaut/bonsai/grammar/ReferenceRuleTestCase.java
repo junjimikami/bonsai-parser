@@ -1,11 +1,11 @@
 package com.jiganaut.bonsai.grammar;
 
+import static com.jiganaut.bonsai.grammar.MockFactory.mockGrammar;
+import static com.jiganaut.bonsai.grammar.MockFactory.mockProductionRule;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.stream.Stream;
+import java.util.Set;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,13 +13,13 @@ import org.junit.jupiter.api.Test;
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
 /**
- * 
+ *
  * @author Junji Mikami
  */
-interface ReferenceRuleTestCase extends RuleTestCase, QuantifiableTestCase {
+interface ReferenceRuleTestCase<T> extends QuantifiableTestCase<T> {
 
     @Override
-    ReferenceRule createTarget();
+    ReferenceRule<T> createTarget();
 
     @Override
     default Kind expectedKind() {
@@ -41,18 +41,17 @@ interface ReferenceRuleTestCase extends RuleTestCase, QuantifiableTestCase {
     default void lookup() throws Exception {
         var target = createTarget();
 
-        var grammar = mock(Grammar.class);
-        when(grammar.withSymbol(expectedSymbol())).then(invocation -> {
-            var p = mock(Production.class);
-            when(p.getSymbol()).thenReturn(expectedSymbol());
-            var ps = mock(ProductionSet.class);
-            when(ps.stream()).thenReturn(Stream.of(p));
-            return ps;
+        Grammar<T> grammar = mockGrammar();
+        when(grammar.getProductionRules()).then(invocation -> {
+            return Set.of(mockProductionRule(expectedSymbol()));
         });
-        var productionSet = target.lookup(grammar);
-        verify(grammar).withSymbol(expectedSymbol());
+        var productionChoice = target.lookup(grammar);
+        var production = productionChoice.getChoices().stream()
+                .map(e -> (ProductionRule<?>) e)
+                .findFirst()
+                .orElseThrow();
 
-        assertEquals(expectedSymbol(), productionSet.stream().findFirst().get().getSymbol());
+        assertEquals(expectedSymbol(), production.getSymbol());
     }
 
 }

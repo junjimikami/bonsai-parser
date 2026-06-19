@@ -1,12 +1,11 @@
 package com.jiganaut.bonsai.parser;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
 
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
@@ -15,471 +14,432 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestReporter;
 import org.junit.jupiter.api.function.Executable;
 
-import com.jiganaut.bonsai.grammar.ChoiceGrammar;
 import com.jiganaut.bonsai.grammar.ChoiceRule;
 import com.jiganaut.bonsai.grammar.Grammar;
-import com.jiganaut.bonsai.grammar.PatternRule;
 import com.jiganaut.bonsai.grammar.Quantifiable;
 import com.jiganaut.bonsai.grammar.ReferenceRule;
-import com.jiganaut.bonsai.grammar.Rule;
+import com.jiganaut.bonsai.grammar.Rules;
 import com.jiganaut.bonsai.grammar.SequenceRule;
-import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
 
 /**
- * 
+ *
  * @author Junji Mikami
  */
 class ParserTest {
-
-    @Test
-    @DisplayName("of(gr:Grammar, re:Reader) [Null parameter]")
-    void ofGrReInCaseNullParameter(TestReporter testReporter) throws Exception {
-        var ex1 = assertThrows(NullPointerException.class, () -> Parser.of(null, Reader.nullReader()));
-        testReporter.publishEntry(ex1.getMessage());
-        var ex2 = assertThrows(NullPointerException.class, () -> Parser.of(mock(Grammar.class), (Reader) null));
-        testReporter.publishEntry(ex2.getMessage());
-    }
-
-    @Test
-    @DisplayName("of(gr:Grammar, re:Reader)")
-    void ofGrRe() throws Exception {
-        var grammar = mock(Grammar.class);
-        var parser = Parser.of(grammar, Reader.nullReader());
-
-        assertNotNull(parser);
-    }
-
-    @Test
-    @DisplayName("of(gr:Grammar, to:Tokenizer) [Null parameter]")
-    void ofGrToInCaseNullParameter(TestReporter testReporter) throws Exception {
-        var ex1 = assertThrows(NullPointerException.class, () -> Parser.of(null, mock(Tokenizer.class)));
-        testReporter.publishEntry(ex1.getMessage());
-        var ex2 = assertThrows(NullPointerException.class, () -> Parser.of(mock(Grammar.class), (Tokenizer) null));
-        testReporter.publishEntry(ex2.getMessage());
-    }
-
-    @Test
-    @DisplayName("of(gr:Grammar, to:Tokenizer)")
-    void ofGrTo() throws Exception {
-        var grammar = mock(Grammar.class);
-        var tokenizer = mock(Tokenizer.class);
-        var parser = Parser.of(grammar, tokenizer);
-
-        assertNotNull(parser);
-    }
 
     @Nested
     class ParseExceptionTestCase1 implements ParseExceptionTestCase {
 
         @Override
-        public Executable createTarget(Grammar grammar, Reader reader) {
+        public Executable createTarget(Grammar<String> grammar, Reader reader) {
             var factory = ParserFactory.of(grammar);
-            var parser = factory.createParser(reader);
+            var parser = factory.createParser(TextSource.of(reader));
             return () -> parser.parse();
         }
 
         @Test
-        @DisplayName("[Tokens remained]")
-        void tokensRemained(TestReporter testReporter) throws Exception {
-            var grammar = SingleOriginGrammar.builder()
-                    .add("S", () -> PatternRule.of("1"))
+        @DisplayName("throws ParseException when tokens remain")
+        void throwsParseExceptionWhenTokensRemain(TestReporter testReporter) throws Exception {
+            var grammar = Grammar.<String>builder("S")
+                    .add("S", () -> Rules.pattern("1"))
                     .build();
             var factory = ParserFactory.of(grammar);
-            var parser = factory.createParser(new StringReader("12"));
+            var parser = factory.createParser(TextSource.of(new StringReader("12")));
 
             var ex = assertThrows(ParseException.class, () -> parser.parse());
-            testReporter.publishEntry(ex.getMessage());
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
     }
 
     @Nested
-    class SingleOriginGrammarTestCase {
+    class TestCase1 implements ParserTestCase<String> {
 
-        @Nested
-        class TestCase1 implements ParserTestCase {
-
-            @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
-                        .add("S", SequenceRule.builder()
-                                .add(PatternRule.of("0"))
-                                .add(ReferenceRule.of("A")))
-                        .add("A", PatternRule.of("0"))
-                        .build();
-                var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("00"));
-            }
-
-            @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S",
-                        TerminalNode.ofUnnamed("0"),
-                        NonTerminalNode.of("A", TerminalNode.ofUnnamed("0")));
-            }
-
+        @Override
+        public Parser<String> createTarget() {
+            var grammar = Grammar.<String>builder("S")
+                    .add("S", SequenceRule.<String>builder()
+                            .add(Rules.pattern("0"))
+                            .add(ReferenceRule.of("A")))
+                    .add("A", Rules.pattern("0"))
+                    .build();
+            var factory = ParserFactory.of(grammar);
+            return factory.createParser(TextSource.of(new StringReader("00")));
         }
 
-        @Nested
-        class TestCase2 implements ParserTestCase {
-
-            @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
-                        .add("S", SequenceRule.builder()
-                                .add(PatternRule.of("0"))
-                                .add(ReferenceRule.of("A")))
-                        .add("S", PatternRule.of("1"))
-                        .add("A", PatternRule.of("0"))
-                        .build();
-                var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("00"));
-            }
-
-            @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S",
-                        TerminalNode.ofUnnamed("0"),
-                        NonTerminalNode.of("A", TerminalNode.ofUnnamed("0")));
-            }
-
-        }
-
-        @Nested
-        class TestCase3 implements ParserTestCase {
-
-            @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
-                        .add("S", SequenceRule.builder()
-                                .add(PatternRule.of("0"))
-                                .add(ReferenceRule.of("A")))
-                        .add("S", PatternRule.of("1"))
-                        .add("A", PatternRule.of("0"))
-                        .build();
-                var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("1"));
-            }
-
-            @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S",
-                        TerminalNode.ofUnnamed("1"));
-            }
-
-        }
-
-        @Nested
-        class TestCase4 implements ParserTestCase {
-
-            @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
-                        .add("S", SequenceRule.builder()
-                                .add(PatternRule.of("0"))
-                                .add(ReferenceRule.of("A")))
-                        .add("S", SequenceRule.builder()
-                                .add(PatternRule.of("0"))
-                                .add(ReferenceRule.of("B")))
-                        .add("A", PatternRule.of("1"))
-                        .add("B", PatternRule.of("2"))
-                        .shortCircuit();
-                var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("01"));
-            }
-
-            @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S",
-                        TerminalNode.ofUnnamed("0"),
-                        NonTerminalNode.of("A", TerminalNode.ofUnnamed("1")));
-            }
-
-        }
-
-        @Nested
-        class TestCase5 implements ParserTestCase {
-
-            @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
-                        .add("S", SequenceRule.builder()
-                                .add(PatternRule.of("0"))
-                                .add(ReferenceRule.of("A")))
-                        .add("S", SequenceRule.builder()
-                                .add(PatternRule.of("0"))
-                                .add(ReferenceRule.of("B")))
-                        .add("A", PatternRule.of("1"))
-                        .add("B", PatternRule.of("2"))
-                        .shortCircuit();
-                var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("02"));
-            }
-
-            @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S",
-                        TerminalNode.ofUnnamed("0"),
-                        NonTerminalNode.of("B", TerminalNode.ofUnnamed("2")));
-            }
-
-        }
-
-        @Nested
-        class TestCase6 implements ParserTestCase {
-
-            @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
-                        .add("S", SequenceRule.builder()
-                                .add(PatternRule.of("0"))
-                                .add(ReferenceRule.of("A")))
-                        .add("S", ChoiceRule.builder()
-                                .add(SequenceRule.builder()
-                                        .add(PatternRule.of("0"))
-                                        .add(ReferenceRule.of("C")))
-                                .add(SequenceRule.builder()
-                                        .add(PatternRule.of("0"))
-                                        .add(ReferenceRule.of("B")))
-                                .shortCircuit())
-                        .add("A", PatternRule.of("1"))
-                        .add("B", PatternRule.of("2"))
-                        .add("C", PatternRule.of("3"))
-                        .shortCircuit();
-                var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("02"));
-            }
-
-            @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S",
-                        TerminalNode.ofUnnamed("0"),
-                        NonTerminalNode.of("B", TerminalNode.ofUnnamed("2")));
-            }
-
+        @Override
+        public Tree<String> expectedTree() {
+            return NonTerminalNode.<String>builder("S")
+                    .add(Token.ofUnnamed("0", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                    .add(NonTerminalNode.<String>builder("A")
+                            .add(Token.ofUnnamed("0", Position.of(1, 1, 2).withRangeEnd(2, 1, 3)))
+                            .build())
+                    .build();
         }
 
     }
 
     @Nested
-    class ChoiceGrammarTestCase {
+    class TestCase2 implements ParserTestCase<String> {
 
-        @Nested
-        class TestCase1 implements ParserTestCase {
-
-            @Override
-            public Parser createTarget() {
-                var grammar = ChoiceGrammar.builder()
-                        .add("A", PatternRule.of("0"))
-                        .add("B", PatternRule.of("1"))
-                        .build();
-                var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("0"));
-            }
-
-            @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("A", TerminalNode.ofUnnamed("0"));
-            }
-
+        @Override
+        public Parser<String> createTarget() {
+            var grammar = Grammar.<String>builder("S")
+                    .add("S", SequenceRule.<String>builder()
+                            .add(Rules.pattern("0"))
+                            .add(ReferenceRule.of("A")))
+                    .add("S", Rules.pattern("1"))
+                    .add("A", Rules.pattern("0"))
+                    .build();
+            var factory = ParserFactory.of(grammar);
+            return factory.createParser(TextSource.of(new StringReader("00")));
         }
 
-        @Nested
-        class TestCase2 implements ParserTestCase {
-
-            @Override
-            public Parser createTarget() {
-                var grammar = ChoiceGrammar.builder()
-                        .add("A", PatternRule.of("0"))
-                        .add("B", PatternRule.of("1"))
-                        .build();
-                var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("1"));
-            }
-
-            @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("B", TerminalNode.ofUnnamed("1"));
-            }
-
+        @Override
+        public Tree<String> expectedTree() {
+            return NonTerminalNode.<String>builder("S")
+                    .add(Token.ofUnnamed("0", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                    .add(NonTerminalNode.<String>builder("A")
+                            .add(Token.ofUnnamed("0", Position.of(1, 1, 2).withRangeEnd(2, 1, 3)))
+                            .build())
+                    .build();
         }
 
-        @Nested
-        class TestCase3 implements ParserTestCase {
+    }
 
-            @Override
-            public Parser createTarget() {
-                var grammar = ChoiceGrammar.builder()
-                        .add("A", PatternRule.of("0"))
-                        .add("A", PatternRule.of("1"))
-                        .build();
-                var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("0"));
-            }
+    @Nested
+    class TestCase3 implements ParserTestCase<String> {
 
-            @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("A", TerminalNode.ofUnnamed("0"));
-            }
-
+        @Override
+        public Parser<String> createTarget() {
+            var grammar = Grammar.<String>builder("S")
+                    .add("S", SequenceRule.<String>builder()
+                            .add(Rules.pattern("0"))
+                            .add(ReferenceRule.of("A")))
+                    .add("S", Rules.pattern("1"))
+                    .add("A", Rules.pattern("0"))
+                    .build();
+            var factory = ParserFactory.of(grammar);
+            return factory.createParser(TextSource.of(new StringReader("1")));
         }
 
-        @Nested
-        class TestCase4 implements ParserTestCase {
-
-            @Override
-            public Parser createTarget() {
-                var grammar = ChoiceGrammar.builder()
-                        .add("A", PatternRule.of("0"))
-                        .add("A", PatternRule.of("1"))
-                        .build();
-                var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("1"));
-            }
-
-            @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("A", TerminalNode.ofUnnamed("1"));
-            }
-
+        @Override
+        public Tree<String> expectedTree() {
+            return NonTerminalNode.<String>builder("S")
+                    .add(Token.ofUnnamed("1", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                    .build();
         }
 
-        @Nested
-        class TestCase5 implements ParserTestCase {
+    }
 
-            @Override
-            public Parser createTarget() {
-                var grammar = ChoiceGrammar.builder()
-                        .add("A", PatternRule.of("0"))
-                        .add("B", PatternRule.of("0"))
-                        .shortCircuit();
-                var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("0"));
-            }
+    @Nested
+    class TestCase4 implements ParserTestCase<String> {
 
-            @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("A", TerminalNode.ofUnnamed("0"));
-            }
-
+        @Override
+        public Parser<String> createTarget() {
+            var grammar = Grammar.<String>builder("S")
+                    .add("S", SequenceRule.<String>builder()
+                            .add(Rules.pattern("0"))
+                            .add(ReferenceRule.of("A")))
+                    .add("S", SequenceRule.<String>builder()
+                            .add(Rules.pattern("0"))
+                            .add(ReferenceRule.of("B")))
+                    .add("A", Rules.pattern("1"))
+                    .add("B", Rules.pattern("2"))
+                    .asShortCircuit()
+                    .build();
+            var factory = ParserFactory.of(grammar);
+            return factory.createParser(TextSource.of(new StringReader("01")));
         }
 
-        @Nested
-        class TestCase6 implements ParserTestCase {
-
-            @Override
-            public Parser createTarget() {
-                var grammar = ChoiceGrammar.builder()
-                        .add("A", SequenceRule.builder()
-                                .add(PatternRule.of("0"))
-                                .add(PatternRule.of("1"))
-                                .add(PatternRule.of("8")))
-                        .add("B", SequenceRule.builder()
-                                .add(PatternRule.of("0"))
-                                .add(PatternRule.of("1"))
-                                .add(PatternRule.of("9")))
-                        .shortCircuit();
-                var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("018"));
-            }
-
-            @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("A",
-                        TerminalNode.ofUnnamed("0"),
-                        TerminalNode.ofUnnamed("1"),
-                        TerminalNode.ofUnnamed("8"));
-            }
-
+        @Override
+        public Tree<String> expectedTree() {
+            return NonTerminalNode.<String>builder("S")
+                    .add(Token.ofUnnamed("0", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                    .add(NonTerminalNode.<String>builder("A")
+                            .add(Token.ofUnnamed("1", Position.of(1, 1, 2).withRangeEnd(2, 1, 3)))
+                            .build())
+                    .build();
         }
 
-        @Nested
-        class TestCase7 implements ParserTestCase {
+    }
 
-            @Override
-            public Parser createTarget() {
-                var grammar = ChoiceGrammar.builder()
-                        .add("A", SequenceRule.builder()
-                                .add(PatternRule.of("0"))
-                                .add(PatternRule.of("1"))
-                                .add(PatternRule.of("8")))
-                        .add("B", SequenceRule.builder()
-                                .add(PatternRule.of("0"))
-                                .add(PatternRule.of("1"))
-                                .add(PatternRule.of("9")))
-                        .shortCircuit();
-                var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("019"));
-            }
+    @Nested
+    class TestCase5 implements ParserTestCase<String> {
 
-            @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("B",
-                        TerminalNode.ofUnnamed("0"),
-                        TerminalNode.ofUnnamed("1"),
-                        TerminalNode.ofUnnamed("9"));
-            }
-
+        @Override
+        public Parser<String> createTarget() {
+            var grammar = Grammar.<String>builder("S")
+                    .add("S", SequenceRule.<String>builder()
+                            .add(Rules.pattern("0"))
+                            .add(ReferenceRule.of("A")))
+                    .add("S", SequenceRule.<String>builder()
+                            .add(Rules.pattern("0"))
+                            .add(ReferenceRule.of("B")))
+                    .add("A", Rules.pattern("1"))
+                    .add("B", Rules.pattern("2"))
+                    .asShortCircuit()
+                    .build();
+            var factory = ParserFactory.of(grammar);
+            return factory.createParser(TextSource.of(new StringReader("02")));
         }
 
-        @Nested
-        class TestCase8 implements ParserTestCase {
-
-            @Override
-            public Parser createTarget() {
-                var grammar = ChoiceGrammar.builder()
-                        .add("A", SequenceRule.builder()
-                                .add(PatternRule.of("0"))
-                                .add(PatternRule.of("1"))
-                                .add(PatternRule.of("8")))
-                        .add("B", ChoiceRule.builder()
-                                .add(SequenceRule.builder()
-                                        .add(PatternRule.of("0"))
-                                        .add(PatternRule.of("1"))
-                                        .add(PatternRule.of("7")))
-                                .add(SequenceRule.builder()
-                                        .add(PatternRule.of("0"))
-                                        .add(PatternRule.of("1"))
-                                        .add(PatternRule.of("9")))
-                                .shortCircuit())
-                        .shortCircuit();
-                var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("019"));
-            }
-
-            @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("B",
-                        TerminalNode.ofUnnamed("0"),
-                        TerminalNode.ofUnnamed("1"),
-                        TerminalNode.ofUnnamed("9"));
-            }
-
+        @Override
+        public Tree<String> expectedTree() {
+            return NonTerminalNode.<String>builder("S")
+                    .add(Token.ofUnnamed("0", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                    .add(NonTerminalNode.<String>builder("B")
+                            .add(Token.ofUnnamed("2", Position.of(1, 1, 2).withRangeEnd(2, 1, 3)))
+                            .build())
+                    .build();
         }
 
-        @Nested
-        class TestCase9 implements ParserTestCase {
+    }
 
-            @Override
-            public Parser createTarget() {
-                var grammar = ChoiceGrammar.builder()
-                        .add("A", SequenceRule.builder()
-                                .add(PatternRule.of("0"))
-                                .add(ReferenceRule.of("B")))
-                        .hidden()
-                        .add("B", PatternRule.of("0"))
-                        .build();
-                var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("00"));
-            }
+    @Nested
+    class TestCase6 implements ParserTestCase<String> {
 
-            @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("A",
-                        TerminalNode.ofUnnamed("0"),
-                        NonTerminalNode.of("B", TerminalNode.ofUnnamed("0")));
-            }
+        @Override
+        public Parser<String> createTarget() {
+            var grammar = Grammar.<String>builder("S")
+                    .add("S", SequenceRule.<String>builder()
+                            .add(Rules.pattern("0"))
+                            .add(ReferenceRule.of("A")))
+                    .add("S", ChoiceRule.<String>builder()
+                            .add(SequenceRule.<String>builder()
+                                    .add(Rules.pattern("0"))
+                                    .add(ReferenceRule.of("C")))
+                            .add(SequenceRule.<String>builder()
+                                    .add(Rules.pattern("0"))
+                                    .add(ReferenceRule.of("B")))
+                            .asShortCircuit())
+                    .add("A", Rules.pattern("1"))
+                    .add("B", Rules.pattern("2"))
+                    .add("C", Rules.pattern("3"))
+                    .asShortCircuit()
+                    .build();
+            var factory = ParserFactory.of(grammar);
+            return factory.createParser(TextSource.of(new StringReader("02")));
+        }
 
+        @Override
+        public Tree<String> expectedTree() {
+            return NonTerminalNode.<String>builder("S")
+                    .add(Token.ofUnnamed("0", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                    .add(NonTerminalNode.<String>builder("B")
+                            .add(Token.ofUnnamed("2", Position.of(1, 1, 2).withRangeEnd(2, 1, 3)))
+                            .build())
+                    .build();
+        }
+
+    }
+
+    @Nested
+    class TestCase7 implements ParserTestCase<String> {
+
+        @Override
+        public Parser<String> createTarget() {
+            var grammar = Grammar.<String>builder()
+                    .add("A", Rules.pattern("0"))
+                    .add("B", Rules.pattern("1"))
+                    .build();
+            var factory = ParserFactory.of(grammar);
+            return factory.createParser(TextSource.of(new StringReader("0")));
+        }
+
+        @Override
+        public Tree<String> expectedTree() {
+            return NonTerminalNode.<String>builder("A")
+                    .add(Token.ofUnnamed("0", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                    .build();
+        }
+
+    }
+
+    @Nested
+    class TestCase8 implements ParserTestCase<String> {
+
+        @Override
+        public Parser<String> createTarget() {
+            var grammar = Grammar.<String>builder()
+                    .add("A", Rules.pattern("0"))
+                    .add("B", Rules.pattern("1"))
+                    .build();
+            var factory = ParserFactory.of(grammar);
+            return factory.createParser(TextSource.of(new StringReader("1")));
+        }
+
+        @Override
+        public Tree<String> expectedTree() {
+            return NonTerminalNode.<String>builder("B")
+                    .add(Token.ofUnnamed("1", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                    .build();
+        }
+
+    }
+
+    @Nested
+    class TestCase9 implements ParserTestCase<String> {
+
+        @Override
+        public Parser<String> createTarget() {
+            var grammar = Grammar.<String>builder()
+                    .add("A", Rules.pattern("0"))
+                    .add("A", Rules.pattern("1"))
+                    .build();
+            var factory = ParserFactory.of(grammar);
+            return factory.createParser(TextSource.of(new StringReader("0")));
+        }
+
+        @Override
+        public Tree<String> expectedTree() {
+            return NonTerminalNode.<String>builder("A")
+                    .add(Token.ofUnnamed("0", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                    .build();
+        }
+
+    }
+
+    @Nested
+    class TestCase10 implements ParserTestCase<String> {
+
+        @Override
+        public Parser<String> createTarget() {
+            var grammar = Grammar.<String>builder()
+                    .add("A", Rules.pattern("0"))
+                    .add("A", Rules.pattern("1"))
+                    .build();
+            var factory = ParserFactory.of(grammar);
+            return factory.createParser(TextSource.of(new StringReader("1")));
+        }
+
+        @Override
+        public Tree<String> expectedTree() {
+            return NonTerminalNode.<String>builder("A")
+                    .add(Token.ofUnnamed("1", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                    .build();
+        }
+
+    }
+
+    @Nested
+    class TestCase11 implements ParserTestCase<String> {
+
+        @Override
+        public Parser<String> createTarget() {
+            var grammar = Grammar.<String>builder()
+                    .add("A", Rules.pattern("0"))
+                    .add("B", Rules.pattern("0"))
+                    .asShortCircuit()
+                    .build();
+            var factory = ParserFactory.of(grammar);
+            return factory.createParser(TextSource.of(new StringReader("0")));
+        }
+
+        @Override
+        public Tree<String> expectedTree() {
+            return NonTerminalNode.<String>builder("A")
+                    .add(Token.ofUnnamed("0", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                    .build();
+        }
+
+    }
+
+    @Nested
+    class TestCase12 implements ParserTestCase<String> {
+
+        @Override
+        public Parser<String> createTarget() {
+            var grammar = Grammar.<String>builder()
+                    .add("A", SequenceRule.<String>builder()
+                            .add(Rules.pattern("0"))
+                            .add(Rules.pattern("1"))
+                            .add(Rules.pattern("8")))
+                    .add("B", SequenceRule.<String>builder()
+                            .add(Rules.pattern("0"))
+                            .add(Rules.pattern("1"))
+                            .add(Rules.pattern("9")))
+                    .asShortCircuit()
+                    .build();
+            var factory = ParserFactory.of(grammar);
+            return factory.createParser(TextSource.of(new StringReader("018")));
+        }
+
+        @Override
+        public Tree<String> expectedTree() {
+            return NonTerminalNode.<String>builder("A")
+                    .add(Token.ofUnnamed("0", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                    .add(Token.ofUnnamed("1", Position.of(1, 1, 2).withRangeEnd(2, 1, 3)))
+                    .add(Token.ofUnnamed("8", Position.of(2, 1, 3).withRangeEnd(3, 1, 4)))
+                    .build();
+        }
+
+    }
+
+    @Nested
+    class TestCase13 implements ParserTestCase<String> {
+
+        @Override
+        public Parser<String> createTarget() {
+            var grammar = Grammar.<String>builder()
+                    .add("A", SequenceRule.<String>builder()
+                            .add(Rules.pattern("0"))
+                            .add(Rules.pattern("1"))
+                            .add(Rules.pattern("8")))
+                    .add("B", SequenceRule.<String>builder()
+                            .add(Rules.pattern("0"))
+                            .add(Rules.pattern("1"))
+                            .add(Rules.pattern("9")))
+                    .asShortCircuit()
+                    .build();
+            var factory = ParserFactory.of(grammar);
+            return factory.createParser(TextSource.of(new StringReader("019")));
+        }
+
+        @Override
+        public Tree<String> expectedTree() {
+            return NonTerminalNode.<String>builder("B")
+                    .add(Token.ofUnnamed("0", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                    .add(Token.ofUnnamed("1", Position.of(1, 1, 2).withRangeEnd(2, 1, 3)))
+                    .add(Token.ofUnnamed("9", Position.of(2, 1, 3).withRangeEnd(3, 1, 4)))
+                    .build();
+        }
+
+    }
+
+    @Nested
+    class TestCase14 implements ParserTestCase<String> {
+
+        @Override
+        public Parser<String> createTarget() {
+            var grammar = Grammar.<String>builder()
+                    .add("A", SequenceRule.<String>builder()
+                            .add(Rules.pattern("0"))
+                            .add(Rules.pattern("1"))
+                            .add(Rules.pattern("8")))
+                    .add("B", ChoiceRule.<String>builder()
+                            .add(SequenceRule.<String>builder()
+                                    .add(Rules.pattern("0"))
+                                    .add(Rules.pattern("1"))
+                                    .add(Rules.pattern("7")))
+                            .add(SequenceRule.<String>builder()
+                                    .add(Rules.pattern("0"))
+                                    .add(Rules.pattern("1"))
+                                    .add(Rules.pattern("9")))
+                            .asShortCircuit())
+                    .asShortCircuit()
+                    .build();
+            var factory = ParserFactory.of(grammar);
+            return factory.createParser(TextSource.of(new StringReader("019")));
+        }
+
+        @Override
+        public Tree<String> expectedTree() {
+            return NonTerminalNode.<String>builder("B")
+                    .add(Token.ofUnnamed("0", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                    .add(Token.ofUnnamed("1", Position.of(1, 1, 2).withRangeEnd(2, 1, 3)))
+                    .add(Token.ofUnnamed("9", Position.of(2, 1, 3).withRangeEnd(3, 1, 4)))
+                    .build();
         }
 
     }
@@ -488,85 +448,91 @@ class ParserTest {
     class EmptyRuleTestCase {
 
         @Nested
-        class TestCase1 implements ParserTestCase {
+        class TestCase1 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
-                        .add("S", Rule.EMPTY)
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
+                        .add("S", Rules.empty())
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(Reader.nullReader());
+                return factory.createParser(TextSource.of(Reader.nullReader()));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S");
+            public Tree<String> expectedTree() {
+                return NonTerminalNode.<String>builder("S")
+                        .build();
             }
 
         }
 
         @Nested
-        class TestCase2 implements ParserTestCase {
+        class TestCase2 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
-                        .add("S", SequenceRule.builder()
-                                .add(Rule.EMPTY)
-                                .add(PatternRule.of("0")))
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
+                        .add("S", SequenceRule.<String>builder()
+                                .add(Rules.empty())
+                                .add(Rules.pattern("0")))
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("0"));
+                return factory.createParser(TextSource.of(new StringReader("0")));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S", TerminalNode.ofUnnamed("0"));
+            public Tree<String> expectedTree() {
+                return NonTerminalNode.<String>builder("S")
+                        .add(Token.ofUnnamed("0", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                        .build();
             }
 
         }
 
         @Nested
-        class TestCase3 implements ParserTestCase {
+        class TestCase3 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
-                        .add("S", ChoiceRule.builder()
-                                .add(Rule.EMPTY)
-                                .add(PatternRule.of("1")))
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
+                        .add("S", ChoiceRule.<String>builder()
+                                .add(Rules.empty())
+                                .add(Rules.pattern("1")))
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(Reader.nullReader());
+                return factory.createParser(TextSource.of(Reader.nullReader()));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S");
+            public Tree<String> expectedTree() {
+                return NonTerminalNode.<String>builder("S")
+                        .build();
             }
 
         }
 
         @Nested
-        class TestCase4 implements ParserTestCase {
+        class TestCase4 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
-                        .add("S", SequenceRule.builder()
-                                .add(ChoiceRule.builder()
-                                        .add(PatternRule.of("1"))
-                                        .add(Rule.EMPTY))
-                                .add(PatternRule.of("0")))
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
+                        .add("S", SequenceRule.<String>builder()
+                                .add(ChoiceRule.<String>builder()
+                                        .add(Rules.pattern("1"))
+                                        .add(Rules.empty()))
+                                .add(Rules.pattern("0")))
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("0"));
+                return factory.createParser(TextSource.of(new StringReader("0")));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S", TerminalNode.ofUnnamed("0"));
+            public Tree<String> expectedTree() {
+                return NonTerminalNode.<String>builder("S")
+                        .add(Token.ofUnnamed("0", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                        .build();
             }
 
         }
@@ -574,80 +540,88 @@ class ParserTest {
     }
 
     @Nested
-    class PatternRuleTestCase {
+    class MatchingRuleTestCase {
 
         @Nested
-        class TestCase1 implements ParserTestCase {
+        class TestCase1 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
-                        .add("S", PatternRule.of("0"))
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
+                        .add("S", Rules.pattern("0"))
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("0"));
+                return factory.createParser(TextSource.of(new StringReader("0")));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S", TerminalNode.ofUnnamed("0"));
+            public Tree<String> expectedTree() {
+                return NonTerminalNode.<String>builder("S")
+                        .add(Token.ofUnnamed("0", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                        .build();
             }
 
         }
 
         @Nested
-        class TestCase2 implements ParserTestCase {
+        class TestCase2 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
-                        .add("S", PatternRule.of("."))
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
+                        .add("S", Rules.pattern("."))
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("0"));
+                return factory.createParser(TextSource.of(new StringReader("0")));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S", TerminalNode.ofUnnamed("0"));
+            public Tree<String> expectedTree() {
+                return NonTerminalNode.<String>builder("S")
+                        .add(Token.ofUnnamed("0", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                        .build();
             }
 
         }
 
         @Nested
-        class TestCase3 implements ParserTestCase {
+        class TestCase3 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
-                        .add("S", PatternRule.of(Pattern.compile(".", Pattern.LITERAL)))
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
+                        .add("S", Rules.pattern(Pattern.compile(".", Pattern.LITERAL)))
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("."));
+                return factory.createParser(TextSource.of(new StringReader(".")));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S", TerminalNode.ofUnnamed("."));
+            public Tree<String> expectedTree() {
+                return NonTerminalNode.<String>builder("S")
+                        .add(Token.ofUnnamed(".", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                        .build();
             }
 
         }
 
         @Nested
-        class TestCase4 implements ParserTestCase {
+        class TestCase4 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
-                        .add("S", PatternRule.of("𝒜"))
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
+                        .add("S", Rules.pattern("𝒜"))
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("𝒜"));
+                return factory.createParser(TextSource.of(new StringReader("𝒜")));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S", TerminalNode.ofUnnamed("𝒜"));
+            public Tree<String> expectedTree() {
+                return NonTerminalNode.<String>builder("S")
+                        .add(Token.ofUnnamed("𝒜", Position.of(0, 1, 1).withRangeEnd(2, 1, 3)))
+                        .build();
             }
 
         }
@@ -658,70 +632,74 @@ class ParserTest {
     class SequenceRuleTestCase {
 
         @Nested
-        class TestCase1 implements ParserTestCase {
+        class TestCase1 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
-                        .add("S", SequenceRule.builder()
-                                .add(PatternRule.of("0")))
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
+                        .add("S", SequenceRule.<String>builder()
+                                .add(Rules.pattern("0")))
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("0"));
+                return factory.createParser(TextSource.of(new StringReader("0")));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S", TerminalNode.ofUnnamed("0"));
+            public Tree<String> expectedTree() {
+                return NonTerminalNode.<String>builder("S")
+                        .add(Token.ofUnnamed("0", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                        .build();
             }
 
         }
 
         @Nested
-        class TestCase2 implements ParserTestCase {
+        class TestCase2 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
-                        .add("S", SequenceRule.builder()
-                                .add(PatternRule.of("0"))
-                                .add(PatternRule.of("1")))
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
+                        .add("S", SequenceRule.<String>builder()
+                                .add(Rules.pattern("0"))
+                                .add(Rules.pattern("1")))
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("01"));
+                return factory.createParser(TextSource.of(new StringReader("01")));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S",
-                        TerminalNode.ofUnnamed("0"),
-                        TerminalNode.ofUnnamed("1"));
+            public Tree<String> expectedTree() {
+                return NonTerminalNode.<String>builder("S")
+                        .add(Token.ofUnnamed("0", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                        .add(Token.ofUnnamed("1", Position.of(1, 1, 2).withRangeEnd(2, 1, 3)))
+                        .build();
             }
 
         }
 
         @Nested
-        class TestCase3 implements ParserTestCase {
+        class TestCase3 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
-                        .add("S", SequenceRule.builder()
-                                .add(PatternRule.of("0"))
-                                .add(SequenceRule.builder()
-                                        .add(PatternRule.of("1"))
-                                        .add(PatternRule.of("2"))))
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
+                        .add("S", SequenceRule.<String>builder()
+                                .add(Rules.pattern("0"))
+                                .add(SequenceRule.<String>builder()
+                                        .add(Rules.pattern("1"))
+                                        .add(Rules.pattern("2"))))
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("012"));
+                return factory.createParser(TextSource.of(new StringReader("012")));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S",
-                        TerminalNode.ofUnnamed("0"),
-                        TerminalNode.ofUnnamed("1"),
-                        TerminalNode.ofUnnamed("2"));
+            public Tree<String> expectedTree() {
+                return NonTerminalNode.<String>builder("S")
+                        .add(Token.ofUnnamed("0", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                        .add(Token.ofUnnamed("1", Position.of(1, 1, 2).withRangeEnd(2, 1, 3)))
+                        .add(Token.ofUnnamed("2", Position.of(2, 1, 3).withRangeEnd(3, 1, 4)))
+                        .build();
             }
 
         }
@@ -732,176 +710,187 @@ class ParserTest {
     class ChoiceRuleTestCase {
 
         @Nested
-        class TestCase1 implements ParserTestCase {
+        class TestCase1 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
-                        .add("S", ChoiceRule.builder()
-                                .add(PatternRule.of("0")))
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
+                        .add("S", ChoiceRule.<String>builder()
+                                .add(Rules.pattern("0")))
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("0"));
+                return factory.createParser(TextSource.of(new StringReader("0")));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S", TerminalNode.ofUnnamed("0"));
+            public Tree<String> expectedTree() {
+                return NonTerminalNode.<String>builder("S")
+                        .add(Token.ofUnnamed("0", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                        .build();
             }
 
         }
 
         @Nested
-        class TestCase2 implements ParserTestCase {
+        class TestCase2 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
-                        .add("S", ChoiceRule.builder()
-                                .add(PatternRule.of("0"))
-                                .add(PatternRule.of("1")))
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
+                        .add("S", ChoiceRule.<String>builder()
+                                .add(Rules.pattern("0"))
+                                .add(Rules.pattern("1")))
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("1"));
+                return factory.createParser(TextSource.of(new StringReader("1")));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S", TerminalNode.ofUnnamed("1"));
+            public Tree<String> expectedTree() {
+                return NonTerminalNode.<String>builder("S")
+                        .add(Token.ofUnnamed("1", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                        .build();
             }
 
         }
 
         @Nested
-        class TestCase3 implements ParserTestCase {
+        class TestCase3 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
-                        .add("S", ChoiceRule.builder()
-                                .add(PatternRule.of("0"))
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
+                        .add("S", ChoiceRule.<String>builder()
+                                .add(Rules.pattern("0"))
                                 .addEmpty())
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(Reader.nullReader());
+                return factory.createParser(TextSource.of(Reader.nullReader()));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S");
+            public Tree<String> expectedTree() {
+                return NonTerminalNode.<String>builder("S")
+                        .build();
             }
 
         }
 
         @Nested
-        class TestCase4 implements ParserTestCase {
+        class TestCase4 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
-                        .add("S", ChoiceRule.builder()
-                                .add(PatternRule.of("0"))
-                                .add(ChoiceRule.builder()
-                                        .add(PatternRule.of("1"))
-                                        .add(PatternRule.of("2"))))
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
+                        .add("S", ChoiceRule.<String>builder()
+                                .add(Rules.pattern("0"))
+                                .add(ChoiceRule.<String>builder()
+                                        .add(Rules.pattern("1"))
+                                        .add(Rules.pattern("2"))))
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("2"));
+                return factory.createParser(TextSource.of(new StringReader("2")));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S", TerminalNode.ofUnnamed("2"));
+            public Tree<String> expectedTree() {
+                return NonTerminalNode.<String>builder("S")
+                        .add(Token.ofUnnamed("2", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                        .build();
             }
 
         }
 
         @Nested
-        class TestCase5 implements ParserTestCase {
+        class TestCase5 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
-                        .add("S", ChoiceRule.builder()
-                                .add(PatternRule.of("1"))
-                                .add(PatternRule.of("."))
-                                .shortCircuit())
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
+                        .add("S", ChoiceRule.<String>builder()
+                                .add(Rules.pattern("1"))
+                                .add(Rules.pattern("."))
+                                .asShortCircuit())
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("1"));
+                return factory.createParser(TextSource.of(new StringReader("1")));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S", TerminalNode.ofUnnamed("1"));
+            public Tree<String> expectedTree() {
+                return NonTerminalNode.<String>builder("S")
+                        .add(Token.ofUnnamed("1", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                        .build();
             }
 
         }
 
         @Nested
-        class TestCase6 implements ParserTestCase {
+        class TestCase6 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
-                        .add("S", ChoiceRule.builder()
-                                .add(SequenceRule.builder()
-                                        .add(PatternRule.of("0"))
-                                        .add(PatternRule.of("1"))
-                                        .add(PatternRule.of("8")))
-                                .add(SequenceRule.builder()
-                                        .add(PatternRule.of("0"))
-                                        .add(PatternRule.of("1"))
-                                        .add(PatternRule.of("9")))
-                                .shortCircuit())
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
+                        .add("S", ChoiceRule.<String>builder()
+                                .add(SequenceRule.<String>builder()
+                                        .add(Rules.pattern("0"))
+                                        .add(Rules.pattern("1"))
+                                        .add(Rules.pattern("8")))
+                                .add(SequenceRule.<String>builder()
+                                        .add(Rules.pattern("0"))
+                                        .add(Rules.pattern("1"))
+                                        .add(Rules.pattern("9")))
+                                .asShortCircuit())
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("019"));
+                return factory.createParser(TextSource.of(new StringReader("019")));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S",
-                        TerminalNode.ofUnnamed("0"),
-                        TerminalNode.ofUnnamed("1"),
-                        TerminalNode.ofUnnamed("9"));
+            public Tree<String> expectedTree() {
+                return NonTerminalNode.<String>builder("S")
+                        .add(Token.ofUnnamed("0", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                        .add(Token.ofUnnamed("1", Position.of(1, 1, 2).withRangeEnd(2, 1, 3)))
+                        .add(Token.ofUnnamed("9", Position.of(2, 1, 3).withRangeEnd(3, 1, 4)))
+                        .build();
             }
 
         }
 
         @Nested
-        class TestCase7 implements ParserTestCase {
+        class TestCase7 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
-                        .add("S", ChoiceRule.builder()
-                                .add(SequenceRule.builder()
-                                        .add(PatternRule.of("0"))
-                                        .add(PatternRule.of("1"))
-                                        .add(PatternRule.of("8")))
-                                .add(ChoiceRule.builder()
-                                        .add(SequenceRule.builder()
-                                                .add(PatternRule.of("0"))
-                                                .add(PatternRule.of("1"))
-                                                .add(PatternRule.of("7")))
-                                        .add(SequenceRule.builder()
-                                                .add(PatternRule.of("0"))
-                                                .add(PatternRule.of("1"))
-                                                .add(PatternRule.of("9")))
-                                        .shortCircuit())
-                                .shortCircuit())
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
+                        .add("S", ChoiceRule.<String>builder()
+                                .add(SequenceRule.<String>builder()
+                                        .add(Rules.pattern("0"))
+                                        .add(Rules.pattern("1"))
+                                        .add(Rules.pattern("8")))
+                                .add(ChoiceRule.<String>builder()
+                                        .add(SequenceRule.<String>builder()
+                                                .add(Rules.pattern("0"))
+                                                .add(Rules.pattern("1"))
+                                                .add(Rules.pattern("7")))
+                                        .add(SequenceRule.<String>builder()
+                                                .add(Rules.pattern("0"))
+                                                .add(Rules.pattern("1"))
+                                                .add(Rules.pattern("9")))
+                                        .asShortCircuit())
+                                .asShortCircuit())
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("019"));
+                return factory.createParser(TextSource.of(new StringReader("019")));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S",
-                        TerminalNode.ofUnnamed("0"),
-                        TerminalNode.ofUnnamed("1"),
-                        TerminalNode.ofUnnamed("9"));
+            public Tree<String> expectedTree() {
+                return NonTerminalNode.<String>builder("S")
+                        .add(Token.ofUnnamed("0", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                        .add(Token.ofUnnamed("1", Position.of(1, 1, 2).withRangeEnd(2, 1, 3)))
+                        .add(Token.ofUnnamed("9", Position.of(2, 1, 3).withRangeEnd(3, 1, 4)))
+                        .build();
             }
 
         }
@@ -912,238 +901,235 @@ class ParserTest {
     class ReferenceRuleTestCase {
 
         @Nested
-        class TestCase1 implements ParserTestCase {
+        class TestCase1 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
                         .add("S", ReferenceRule.of("A"))
-                        .add("A", PatternRule.of("0"))
+                        .add("A", Rules.pattern("0"))
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("0"));
+                return factory.createParser(TextSource.of(new StringReader("0")));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S", NonTerminalNode.of("A", TerminalNode.ofUnnamed("0")));
+            public Tree<String> expectedTree() {
+                return NonTerminalNode.<String>builder("S")
+                        .add(NonTerminalNode.<String>builder("A")
+                                .add(Token.ofUnnamed("0", Position.of(0, 1, 1).withRangeEnd(1, 1, 2)))
+                                .build())
+                        .build();
             }
 
         }
 
     }
 
-    abstract class QuantifierRuleTestCase {
+    abstract class ParserTestCaseForQuantifierRule {
 
-        abstract Quantifiable createRule();
+        abstract Quantifiable<String> createRule();
 
         abstract String createInput();
 
-        abstract Stream<Tree> expectedSubTree();
+        abstract Stream<Tree<String>> expectedSubTree(int times);
 
         @Nested
-        class TestCase1 implements ParserTestCase {
+        class TestCase1 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
                         .add("S", createRule().opt())
-                        .add("A", PatternRule.of("0"))
+                        .add("A", Rules.pattern("0"))
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader(createInput().repeat(0)));
+                return factory.createParser(TextSource.of(new StringReader(createInput().repeat(0))));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S", Stream.generate(() -> expectedSubTree())
-                        .limit(0)
-                        .flatMap(e -> e)
-                        .toArray(Tree[]::new));
+            public Tree<String> expectedTree() {
+                var builder = NonTerminalNode.<String>builder("S");
+                expectedSubTree(0).forEach(builder::add);
+                return builder.build();
             }
 
         }
 
         @Nested
-        class TestCase2 implements ParserTestCase {
+        class TestCase2 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
                         .add("S", createRule().zeroOrMore())
-                        .add("A", PatternRule.of("0"))
+                        .add("A", Rules.pattern("0"))
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader(createInput().repeat(0)));
+                return factory.createParser(TextSource.of(new StringReader(createInput().repeat(0))));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S", Stream.generate(() -> expectedSubTree())
-                        .limit(0)
-                        .flatMap(e -> e)
-                        .toArray(Tree[]::new));
+            public Tree<String> expectedTree() {
+                var builder = NonTerminalNode.<String>builder("S");
+                expectedSubTree(0).forEach(builder::add);
+                return builder.build();
             }
 
         }
 
         @Nested
-        class TestCase3 implements ParserTestCase {
+        class TestCase3 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
                         .add("S", createRule().oneOrMore())
-                        .add("A", PatternRule.of("0"))
+                        .add("A", Rules.pattern("0"))
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader(createInput().repeat(1)));
+                return factory.createParser(TextSource.of(new StringReader(createInput().repeat(1))));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S", Stream.generate(() -> expectedSubTree())
-                        .limit(1)
-                        .flatMap(e -> e)
-                        .toArray(Tree[]::new));
+            public Tree<String> expectedTree() {
+                var builder = NonTerminalNode.<String>builder("S");
+                expectedSubTree(1).forEach(builder::add);
+                return builder.build();
             }
 
         }
 
         @Nested
-        class TestCase4 implements ParserTestCase {
+        class TestCase4 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
                         .add("S", createRule().oneOrMore())
-                        .add("A", PatternRule.of("0"))
+                        .add("A", Rules.pattern("0"))
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader(createInput().repeat(2)));
+                return factory.createParser(TextSource.of(new StringReader(createInput().repeat(2))));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S", Stream.generate(() -> expectedSubTree())
-                        .limit(2)
-                        .flatMap(e -> e)
-                        .toArray(Tree[]::new));
+            public Tree<String> expectedTree() {
+                return expectedSubTree(2)
+                        .reduce(NonTerminalNode.<String>builder("S"),
+                                NonTerminalNode.Builder::add,
+                                NonTerminalNode.Builder::addAll)
+                        .build();
             }
 
         }
 
         @Nested
-        class TestCase5 implements ParserTestCase {
+        class TestCase5 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
                         .add("S", createRule().exactly(2))
-                        .add("A", PatternRule.of("0"))
+                        .add("A", Rules.pattern("0"))
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader(createInput().repeat(2)));
+                return factory.createParser(TextSource.of(new StringReader(createInput().repeat(2))));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S", Stream.generate(() -> expectedSubTree())
-                        .limit(2)
-                        .flatMap(e -> e)
-                        .toArray(Tree[]::new));
+            public Tree<String> expectedTree() {
+                var builder = NonTerminalNode.<String>builder("S");
+                expectedSubTree(2).forEach(builder::add);
+                return builder.build();
             }
 
         }
 
         @Nested
-        class TestCase6 implements ParserTestCase {
+        class TestCase6 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
                         .add("S", createRule().atLeast(1))
-                        .add("A", PatternRule.of("0"))
+                        .add("A", Rules.pattern("0"))
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader(createInput().repeat(1)));
+                return factory.createParser(TextSource.of(new StringReader(createInput().repeat(1))));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S", Stream.generate(() -> expectedSubTree())
-                        .limit(1)
-                        .flatMap(e -> e)
-                        .toArray(Tree[]::new));
+            public Tree<String> expectedTree() {
+                var builder = NonTerminalNode.<String>builder("S");
+                expectedSubTree(1).forEach(builder::add);
+                return builder.build();
             }
 
         }
 
         @Nested
-        class TestCase7 implements ParserTestCase {
+        class TestCase7 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
                         .add("S", createRule().atLeast(1))
-                        .add("A", PatternRule.of("0"))
+                        .add("A", Rules.pattern("0"))
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader(createInput().repeat(2)));
+                return factory.createParser(TextSource.of(new StringReader(createInput().repeat(2))));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S", Stream.generate(() -> expectedSubTree())
-                        .limit(2)
-                        .flatMap(e -> e)
-                        .toArray(Tree[]::new));
+            public Tree<String> expectedTree() {
+                var builder = NonTerminalNode.<String>builder("S");
+                expectedSubTree(2).forEach(builder::add);
+                return builder.build();
             }
 
         }
 
         @Nested
-        class TestCase8 implements ParserTestCase {
+        class TestCase8 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
                         .add("S", createRule().range(1, 2))
-                        .add("A", PatternRule.of("0"))
+                        .add("A", Rules.pattern("0"))
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader(createInput().repeat(1)));
+                return factory.createParser(TextSource.of(new StringReader(createInput().repeat(1))));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S", Stream.generate(() -> expectedSubTree())
-                        .limit(1)
-                        .flatMap(e -> e)
-                        .toArray(Tree[]::new));
+            public Tree<String> expectedTree() {
+                var builder = NonTerminalNode.<String>builder("S");
+                expectedSubTree(1).forEach(builder::add);
+                return builder.build();
             }
 
         }
 
         @Nested
-        class TestCase9 implements ParserTestCase {
+        class TestCase9 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
                         .add("S", createRule().range(1, 2))
-                        .add("A", PatternRule.of("0"))
+                        .add("A", Rules.pattern("0"))
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader(createInput().repeat(2)));
+                return factory.createParser(TextSource.of(new StringReader(createInput().repeat(2))));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S", Stream.generate(() -> expectedSubTree())
-                        .limit(2)
-                        .flatMap(e -> e)
-                        .toArray(Tree[]::new));
+            public Tree<String> expectedTree() {
+                var builder = NonTerminalNode.<String>builder("S");
+                expectedSubTree(2).forEach(builder::add);
+                return builder.build();
             }
 
         }
@@ -1151,87 +1137,102 @@ class ParserTest {
     }
 
     @Nested
-    class QuantifierRuleTestCase1 extends QuantifierRuleTestCase {
+    class QuantifierRuleTestCase {
 
-        @Override
-        Quantifiable createRule() {
-            return PatternRule.of("0");
+        @Nested
+        class QuantifierRuleTestCase1 extends ParserTestCaseForQuantifierRule {
+
+            @Override
+            Quantifiable<String> createRule() {
+                return Rules.pattern("0");
+            }
+
+            @Override
+            String createInput() {
+                return "0";
+            }
+
+            @Override
+            Stream<Tree<String>> expectedSubTree(int times) {
+                String[] values = {"0"};
+                return IntStream.range(0, values.length * times)
+                        .mapToObj(i -> Token.ofUnnamed(values[i % values.length], Position.of(i, 1, i + 1).withRangeEnd(i + 1, 1, i + 2)));
+            }
+
         }
 
-        @Override
-        String createInput() {
-            return "0";
+        @Nested
+        class QuantifierRuleTestCase2 extends ParserTestCaseForQuantifierRule {
+
+            @Override
+            Quantifiable<String> createRule() {
+                return SequenceRule.<String>builder()
+                        .add(Rules.pattern("0"))
+                        .add(Rules.pattern("1"))
+                        .build();
+            }
+
+            @Override
+            String createInput() {
+                return "01";
+            }
+
+            @Override
+            Stream<Tree<String>> expectedSubTree(int times) {
+                String[] values = {"0", "1"};
+                return IntStream.range(0, values.length * times)
+                        .mapToObj(i -> Token.ofUnnamed(values[i % values.length], Position.of(i, 1, i + 1).withRangeEnd(i + 1, 1, i + 2)));
+            }
+
         }
 
-        @Override
-        Stream<Tree> expectedSubTree() {
-            return Stream.of(TerminalNode.ofUnnamed("0"));
+        @Nested
+        class QuantifierRuleTestCase3 extends ParserTestCaseForQuantifierRule {
+
+            @Override
+            Quantifiable<String> createRule() {
+                return ChoiceRule.<String>builder()
+                        .add(Rules.pattern("0"))
+                        .add(Rules.pattern("1"))
+                        .build();
+            }
+
+            @Override
+            String createInput() {
+                return "1";
+            }
+
+            @Override
+            Stream<Tree<String>> expectedSubTree(int times) {
+                String[] values = {"1"};
+                return IntStream.range(0, values.length * times)
+                        .mapToObj(i -> Token.ofUnnamed(values[i % values.length], Position.of(i, 1, i + 1).withRangeEnd(i + 1, 1, i + 2)));
+            }
+
         }
 
-    }
+        @Nested
+        class QuantifierRuleTestCase4 extends ParserTestCaseForQuantifierRule {
 
-    @Nested
-    class QuantifierRuleTestCase2 extends QuantifierRuleTestCase {
+            @Override
+            Quantifiable<String> createRule() {
+                return ReferenceRule.of("A");
+            }
 
-        @Override
-        Quantifiable createRule() {
-            return SequenceRule.builder()
-                    .add(PatternRule.of("0"))
-                    .add(PatternRule.of("1"));
-        }
+            @Override
+            String createInput() {
+                return "0";
+            }
 
-        @Override
-        String createInput() {
-            return "01";
-        }
+            @Override
+            Stream<Tree<String>> expectedSubTree(int times) {
+                String[] values = {"0"};
+                return IntStream.range(0, values.length * times)
+                        .mapToObj(i -> NonTerminalNode.<String>builder("A")
+                                .add(Token.ofUnnamed(values[i % values.length], Position.of(i, 1, i + 1).withRangeEnd(i + 1, 1, i + 2)))
+                                .build());
+            }
 
-        @Override
-        Stream<Tree> expectedSubTree() {
-            return Stream.of(
-                    TerminalNode.ofUnnamed("0"),
-                    TerminalNode.ofUnnamed("1"));
-        }
-
-    }
-
-    @Nested
-    class QuantifierRuleTestCase3 extends QuantifierRuleTestCase {
-
-        @Override
-        Quantifiable createRule() {
-            return ChoiceRule.builder()
-                    .add(PatternRule.of("0"))
-                    .add(PatternRule.of("1"));
-        }
-
-        @Override
-        String createInput() {
-            return "1";
-        }
-
-        @Override
-        Stream<Tree> expectedSubTree() {
-            return Stream.of(TerminalNode.ofUnnamed("1"));
-        }
-
-    }
-
-    @Nested
-    class QuantifierRuleTestCase4 extends QuantifierRuleTestCase {
-
-        @Override
-        Quantifiable createRule() {
-            return ReferenceRule.of("A");
-        }
-
-        @Override
-        String createInput() {
-            return "0";
-        }
-
-        @Override
-        Stream<Tree> expectedSubTree() {
-            return Stream.of(NonTerminalNode.of("A", TerminalNode.ofUnnamed("0")));
         }
 
     }
@@ -1240,42 +1241,45 @@ class ParserTest {
     class SkipRuleTestCase {
 
         @Nested
-        class TestCase1 implements ParserTestCase {
+        class TestCase1 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
-                        .add("S", PatternRule.of("0").skip())
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
+                        .add("S", Rules.pattern("0").skip())
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("0"));
+                return factory.createParser(TextSource.of(new StringReader("0")));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S");
+            public Tree<String> expectedTree() {
+                return NonTerminalNode.<String>builder("S")
+                        .build();
             }
 
         }
 
         @Nested
-        class TestCase2 implements ParserTestCase {
+        class TestCase2 implements ParserTestCase<String> {
 
             @Override
-            public Parser createTarget() {
-                var grammar = SingleOriginGrammar.builder()
-                        .add("S", SequenceRule.builder()
-                                .add(PatternRule.of("0").skip())
-                                .add(PatternRule.of("1"))
-                                .add(PatternRule.of("2").skip()))
+            public Parser<String> createTarget() {
+                var grammar = Grammar.<String>builder("S")
+                        .add("S", SequenceRule.<String>builder()
+                                .add(Rules.pattern("0").skip())
+                                .add(Rules.pattern("1"))
+                                .add(Rules.pattern("2").skip()))
                         .build();
                 var factory = ParserFactory.of(grammar);
-                return factory.createParser(new StringReader("012"));
+                return factory.createParser(TextSource.of(new StringReader("012")));
             }
 
             @Override
-            public Tree expectedTree() {
-                return NonTerminalNode.of("S", TerminalNode.ofUnnamed("1"));
+            public Tree<String> expectedTree() {
+                return NonTerminalNode.<String>builder("S")
+                        .add(Token.ofUnnamed("1", Position.of(1, 1, 2).withRangeEnd(2, 1, 3)))
+                        .build();
             }
 
         }

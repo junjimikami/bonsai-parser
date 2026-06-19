@@ -5,23 +5,22 @@ import java.io.PushbackReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.regex.Pattern;
-
 import com.jiganaut.bonsai.impl.Message;
+import com.jiganaut.bonsai.parser.Position;
 import com.jiganaut.bonsai.parser.Token;
+import com.jiganaut.bonsai.parser.Tokenizer;
 
 /**
- * 
+ *
  * @author Junji Mikami
  */
-class ReaderTokenizer extends AbstractTokenizer {
+class ReaderTokenizer implements Tokenizer<String> {
 
     private final PushbackReader reader;
     private String nextToken;
-    private String currentToken;
-    private long lineNumber = 1;
-    private long index = 0;
+    private long offset = 0;
+    private long line = 1;
+    private long column = 1;
     private int lineIncrement = 0;
 
     /**
@@ -74,21 +73,6 @@ class ReaderTokenizer extends AbstractTokenizer {
         }
     }
 
-    private void writeCurrent() {
-        if (nextToken == null) {
-            throw new NoSuchElementException(Message.NO_TOKENS_REMAINING.format());
-        }
-        if (lineIncrement != 0) {
-            lineNumber += lineIncrement;
-            lineIncrement = 0;
-            index = 0;
-        } else {
-            index += nextToken.length();
-        }
-        currentToken = nextToken;
-        nextToken = null;
-    }
-
     @Override
     public boolean hasNext() {
         readNext();
@@ -96,66 +80,29 @@ class ReaderTokenizer extends AbstractTokenizer {
     }
 
     @Override
-    public boolean hasNextName(String name) {
-        return false;
-    }
-
-    @Override
-    public boolean hasNextValue(String regex) {
-        Objects.requireNonNull(regex, Message.NULL_PARAMETER.format());
-        var pattern = Pattern.compile(regex);
-        return hasNextValue(pattern);
-    }
-
-    @Override
-    public boolean hasNextValue(Pattern pattern) {
-        Objects.requireNonNull(pattern, Message.NULL_PARAMETER.format());
-        if (!hasNext()) {
-            return false;
+    public Token<String> next() {
+        readNext();
+        if (nextToken == null) {
+            throw new NoSuchElementException(Message.TOKENIZER_NO_MORE_TOKENS.format());
         }
-        var matcher = pattern.matcher(nextToken);
-        return matcher.matches();
-    }
-
-    @Override
-    public Token next() {
-        readNext();
-        writeCurrent();
-        return new DefaultToken(null, currentToken);
-    }
-
-    @Override
-    public String nextName() {
-        readNext();
-        writeCurrent();
-        return null;
-    }
-
-    @Override
-    public String nextValue() {
-        readNext();
-        writeCurrent();
-        return currentToken;
-    }
-
-    @Override
-    public String getName() {
-        return null;
-    }
-
-    @Override
-    public String getValue() {
-        return currentToken;
-    }
-
-    @Override
-    public long getLineNumber() {
-        return lineNumber;
-    }
-
-    @Override
-    public long getIndex() {
-        return index;
+        long startOffset = offset;
+        long startLine = line;
+        long startColumn = column;
+        offset += nextToken.length();
+        if (lineIncrement != 0) {
+            line += lineIncrement;
+            lineIncrement = 0;
+            column = 1;
+        } else {
+            column += nextToken.length();
+        }
+        long endOffset = offset;
+        long endLine = line;
+        long endColumn = column;
+        var position = Position.of(startOffset, startLine, startColumn).withRangeEnd(endOffset, endLine, endColumn);
+        var value = nextToken;
+        nextToken = null;
+        return new DefaultToken<>(null, value, position);
     }
 
     @Override

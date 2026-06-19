@@ -11,39 +11,41 @@ A parsing library designed for low learning cost and ease of starting to use.
 Part of the following sample code import:
 ```
 import static com.jiganaut.bonsai.grammar.Rules.concat;
+import static com.jiganaut.bonsai.grammar.Rules.matching;
 import static com.jiganaut.bonsai.grammar.Rules.oneOf;
 import static com.jiganaut.bonsai.grammar.Rules.pattern;
 import static com.jiganaut.bonsai.grammar.Rules.reference;
 
-import com.jiganaut.bonsai.grammar.ChoiceGrammar;
-import com.jiganaut.bonsai.grammar.SingleOriginGrammar;
-import com.jiganaut.bonsai.parser.Parser;
-import com.jiganaut.bonsai.parser.Tokenizer;
+import java.io.StringReader;
+
+import com.jiganaut.bonsai.grammar.Grammar;
+import com.jiganaut.bonsai.parser.ParseException;
+import com.jiganaut.bonsai.parser.TextSource;
 ```
 
 Sample to get a parse tree:
 ```
-var lexicalGrammar = ChoiceGrammar.builder()
+var lexicalGrammar = Grammar.<String>builder()
         .add("WORD", pattern("\\S").oneOrMore())
         .add("WS", pattern("\\s").skip())
         .build();
-var syntacticGrammar = SingleOriginGrammar.builder()
+var syntacticGrammar = Grammar.<String>builder("HELLO")
         .add("HELLO", concat(
-                pattern("Hello"),
+                matching("Hello"),
                 reference("SOMETHING")))
         .add("SOMETHING", oneOf(
-                pattern("World"),
-                pattern("Bonsai")))
+                matching("World"),
+                matching("Bonsai")))
         .build();
 
-try (var reader = new StringReader("Hello World");
-        var tokenizer = Tokenizer.of(lexicalGrammar, reader);
-        var parser = Parser.of(syntacticGrammar, tokenizer)) {
+try (var parser = TextSource.of(new StringReader("Hello World"))
+        .addLayer(lexicalGrammar)
+        .toParser(syntacticGrammar)) {
 
     var tree = parser.parse();
     System.out.println(tree);
 
-} catch (IOException ex) {
+} catch (ParseException ex) {
     ex.printStackTrace();
 }
 ```

@@ -1,10 +1,8 @@
 package com.jiganaut.bonsai.parser;
 
+import static com.jiganaut.bonsai.parser.MockFactory.mockTokenizer;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-
-import java.io.Reader;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,21 +11,21 @@ import org.junit.jupiter.api.TestReporter;
 import com.jiganaut.bonsai.TestCase;
 
 /**
- * 
+ *
  * @author Junji Mikami
  */
-interface TokenizerFactoryTestCase extends TestCase {
+interface TokenizerFactoryTestCase<T, R> extends TestCase {
 
     @Override
-    TokenizerFactory createTarget();
+    TokenizerFactory<T, R> createTarget();
 
     @Test
-    @DisplayName("createTokenizer(to:Tokenizer) [Null parameter]")
-    default void createTokenizerToInCaseOfNullParameter(TestReporter testReporter) throws Exception {
+    @DisplayName("createTokenizer(to:Tokenizer) [to == null]")
+    default void createTokenizerToWhenToIsNull(TestReporter testReporter) throws Exception {
         var target = createTarget();
 
-        var ex = assertThrows(NullPointerException.class, () -> target.createTokenizer((Tokenizer) null));
-        testReporter.publishEntry(ex.getMessage());
+        var ex = assertThrows(NullPointerException.class, () -> target.createTokenizer((Tokenizer<T>) null));
+        testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
     }
 
     @Test
@@ -35,26 +33,8 @@ interface TokenizerFactoryTestCase extends TestCase {
     default void createTokenizerTo() throws Exception {
         var target = createTarget();
 
-        var tokenizer = mock(Tokenizer.class);
-        assertDoesNotThrow(() -> target.createTokenizer(tokenizer));
-    }
-
-    @Test
-    @DisplayName("createTokenizer(re:Reader) [Null parameter]")
-    default void createTokenizerReInCaseOfNullParameter(TestReporter testReporter) throws Exception {
-        var target = createTarget();
-
-        var ex = assertThrows(NullPointerException.class, () -> target.createTokenizer((Reader) null));
-        testReporter.publishEntry(ex.getMessage());
-    }
-
-    @Test
-    @DisplayName("createTokenizer(re:Reader)")
-    default void createTokenizerRe() throws Exception {
-        var target = createTarget();
-
-        var reader = Reader.nullReader();
-        assertDoesNotThrow(() -> target.createTokenizer(reader));
+        assertDoesNotThrow(() -> target.createTokenizer(mockTokenizer()));
     }
 
 }
+

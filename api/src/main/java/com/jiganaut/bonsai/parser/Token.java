@@ -1,14 +1,27 @@
 package com.jiganaut.bonsai.parser;
 
+import com.jiganaut.bonsai.parser.spi.ParserProvider;
+
 /**
  *
  * @author Junji Mikami
  */
-public interface Token extends TerminalNode {
+public interface Token<T> extends TerminalNode<T> {
 
-    public String getName();
-    public String getValue();
+    public static <T> Token<T> of(String name, T value) {
+        return ParserProvider.load().createToken(name, value, Position.UNKNOWN);
+    }
 
-    @Override
-    public String toString();
+    public static <T> Token<T> of(String name, T value, Position position) {
+        return ParserProvider.load().createToken(name, value, position);
+    }
+
+    public static <T> Token<T> ofUnnamed(T value) {
+        return ParserProvider.load().createToken(null, value, Position.UNKNOWN);
+    }
+
+    public static <T> Token<T> ofUnnamed(T value, Position position) {
+        return ParserProvider.load().createToken(null, value, position);
+    }
+
 }

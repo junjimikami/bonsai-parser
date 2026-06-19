@@ -1,48 +1,17 @@
 package com.jiganaut.bonsai.parser;
 
-import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
-import com.jiganaut.bonsai.parser.spi.ParserProvider;
+import com.jiganaut.bonsai.impl.Message;
 
 /**
  *
  * @author Junji Mikami
  */
-public interface TerminalNode extends Tree {
+public non-sealed interface TerminalNode<T> extends Tree<T> {
 
-    /**
-     * 
-     * @author Junji Mikami
-     */
-    public static interface Builder extends Tree.Builder {
-
-        @Override
-        public TerminalNode.Builder setName(String name);
-
-        @Override
-        public TerminalNode.Builder setValue(String value);
-
-        @Override
-        public TerminalNode build();
-
-    }
-
-    public static TerminalNode.Builder builder() {
-        return ParserProvider.load().createTerminalNodeBuilder();
-    }
-
-    public static TerminalNode of(String name, String value) {
-        return builder()
-                .setName(name)
-                .setValue(value)
-                .build();
-    }
-
-    public static TerminalNode ofUnnamed(String value) {
-        return builder()
-                .setValue(value)
-                .build();
-    }
+    public T getValue();
 
     @Override
     public default Kind getKind() {
@@ -50,13 +19,19 @@ public interface TerminalNode extends Tree {
     }
 
     @Override
-    public default List<? extends Tree> getSubTrees() {
-        return List.of();
+    public default Stream<Tree<T>> subTrees() {
+        return Stream.empty();
     }
 
     @Override
-    public default <R, P> R accept(TreeVisitor<R, P> v, P p) {
-        return v.visitTerminal(this, p);
+    public default Stream<T> values() {
+        return Stream.of(getValue());
+    }
+
+    @Override
+    public default <R, P> R accept(TreeVisitor<T, R, P> visitor, P p) {
+        Objects.requireNonNull(visitor, () -> Message.VALIDATION_PARAMETER_NULL.format("visitor"));
+        return visitor.visitTerminal(this, p);
     }
 
 }

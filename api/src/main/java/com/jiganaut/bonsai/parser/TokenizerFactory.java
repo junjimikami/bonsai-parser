@@ -1,29 +1,25 @@
 package com.jiganaut.bonsai.parser;
 
-import java.io.Reader;
+import java.util.stream.Collector;
 
 import com.jiganaut.bonsai.grammar.Grammar;
 import com.jiganaut.bonsai.parser.spi.ParserProvider;
 
 /**
- * 
+ *
  * @author Junji Mikami
  *
  */
-public interface TokenizerFactory {
+public interface TokenizerFactory<T, R> {
 
-    public static TokenizerFactory of(Grammar grammar) {
-        return ParserProvider.load().createTokenizerFactory(grammar);
+    public static <T, R> TokenizerFactory<T, R> of(Grammar<T> grammar, Collector<? super T, ?, R> collector) {
+        return ParserProvider.load().createTokenizerFactory(grammar, collector);
     }
 
-    public static TokenizerFactory load(String factoryName) {
-        return ParserProvider.load().loadTokenizerFactory(factoryName);
+    public Tokenizer<R> createTokenizer(Tokenizer<T> tokenizer);
+
+    public default Tokenizer<R> createTokenizer(Source<T> source) {
+        return createTokenizer(source.toTokenizer());
     }
 
-    public static TokenizerFactory load(Class<?> factoryClass) {
-        return load(factoryClass.getName());
-    }
-
-    public Tokenizer createTokenizer(Reader reader);
-    public Tokenizer createTokenizer(Tokenizer tokenizer);
 }

@@ -1,27 +1,54 @@
 package com.jiganaut.bonsai.grammar;
 
+import java.util.Set;
+
+import com.jiganaut.bonsai.grammar.spi.GrammarProvider;
+
 /**
- * 
+ *
  * @author Junji Mikami
  */
-public interface Grammar extends ProductionSet {
+public interface Grammar<T> {
 
     /**
-     * 
-     * @author Junji Mikami
+     *
      */
-    public static interface Builder {
-        public Grammar.Builder add(String symbol, Rule rule);
+    public static interface Builder<T> {
+        public default Grammar.Builder<T> add(String symbol, Rule<T> rule) {
+            return add(symbol, () -> rule);
+        }
 
-        public Grammar.Builder add(String symbol, Rule.Builder builder);
+        public Grammar.Builder<T> add(String symbol, Rule.Builder<T> builder);
 
-        public Grammar build();
+        public Grammar.Builder<T> asShortCircuit();
 
-        public Grammar shortCircuit();
+        public Grammar<T> build();
+
     }
 
-    public ProductionSet productionSet();
+    public static <T> Builder<T> builder() {
+        return GrammarProvider.load().createGrammarBuilder(null);
+    }
 
-    @Override
-    public Grammar shortCircuit();
+    public static <T> Builder<T> builder(String startSymbol) {
+        return GrammarProvider.load().createGrammarBuilder(startSymbol);
+    }
+
+    public String getStartSymbol();
+
+    public Set<ProductionRule<T>> getProductionRules();
+
+    public boolean isShortCircuit();
+
+    public default ChoiceRule<T> toChoiceRule() {
+        var builder = ChoiceRule.<T>builder();
+        getProductionRules().stream()
+                .filter(e -> getStartSymbol() == null || getStartSymbol().equals(e.getSymbol()))
+                .forEach(builder::add);
+        if (isShortCircuit()) {
+            builder.asShortCircuit();
+        }
+        return builder.build();
+    }
+
 }

@@ -3,13 +3,13 @@ package com.jiganaut.bonsai.grammar.impl;
 import java.util.Objects;
 
 import com.jiganaut.bonsai.grammar.ReferenceRule;
-import com.jiganaut.bonsai.impl.Message;
 
 /**
  * @author Junji Mikami
  *
  */
-class DefaultReferenceRule extends AbstractRule implements ReferenceRule, DefaultQuantifiableRule {
+class DefaultReferenceRule<T> implements ReferenceRule<T> {
+
     private final String symbol;
 
     DefaultReferenceRule(String symbol) {
@@ -24,14 +24,14 @@ class DefaultReferenceRule extends AbstractRule implements ReferenceRule, Defaul
 
     @Override
     public String toString() {
-        return Message.symbolEncode(symbol);
+        return symbol;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof ReferenceRule r) {
-            return this.getKind() == r.getKind()
-                    && this.getSymbol().equals(r.getSymbol());
+        if (obj instanceof ReferenceRule<?> other) {
+            return this.getKind() == other.getKind()
+                    && this.symbol.equals(other.getSymbol());
         }
         return super.equals(obj);
     }

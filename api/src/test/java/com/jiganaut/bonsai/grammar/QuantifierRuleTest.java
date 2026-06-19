@@ -5,7 +5,7 @@ import java.util.OptionalInt;
 import org.junit.jupiter.api.Nested;
 
 /**
- * 
+ *
  * @author Junji Mikami
  */
 class QuantifierRuleTest {
@@ -14,11 +14,13 @@ class QuantifierRuleTest {
     class ChoiceRuleTestCase {
 
         @Nested
-        class TestCase1 implements QuantifierRuleTestCase {
+        class TestCase1 implements QuantifierRuleTestCase<String> {
 
             @Override
-            public QuantifierRule createTarget() {
-                return ChoiceRule.builder().opt();
+            public QuantifierRule<String> createTarget() {
+                return ChoiceRule.<String>builder()
+                        .build()
+                        .opt();
             }
 
             @Override
@@ -32,18 +34,20 @@ class QuantifierRuleTest {
             }
 
             @Override
-            public Rule expectedRule() {
-                return ChoiceRule.of();
+            public ChoiceRule<String> expectedRule() {
+                return ChoiceRule.<String>builder().build();
             }
 
         }
 
         @Nested
-        class TestCase2 implements QuantifierRuleTestCase {
+        class TestCase2 implements QuantifierRuleTestCase<String> {
 
             @Override
-            public QuantifierRule createTarget() {
-                return ChoiceRule.builder().zeroOrMore();
+            public QuantifierRule<String> createTarget() {
+                return ChoiceRule.<String>builder()
+                        .build()
+                        .zeroOrMore();
             }
 
             @Override
@@ -57,18 +61,20 @@ class QuantifierRuleTest {
             }
 
             @Override
-            public Rule expectedRule() {
-                return ChoiceRule.of();
+            public ChoiceRule<String> expectedRule() {
+                return ChoiceRule.<String>builder().build();
             }
 
         }
 
         @Nested
-        class TestCase3 implements QuantifierRuleTestCase {
+        class TestCase3 implements QuantifierRuleTestCase<String> {
 
             @Override
-            public QuantifierRule createTarget() {
-                return ChoiceRule.builder().oneOrMore();
+            public QuantifierRule<String> createTarget() {
+                return ChoiceRule.<String>builder()
+                        .build()
+                        .oneOrMore();
             }
 
             @Override
@@ -82,18 +88,20 @@ class QuantifierRuleTest {
             }
 
             @Override
-            public Rule expectedRule() {
-                return ChoiceRule.of();
+            public ChoiceRule<String> expectedRule() {
+                return ChoiceRule.<String>builder().build();
             }
 
         }
 
         @Nested
-        class TestCase4 implements QuantifierRuleTestCase {
+        class TestCase4 implements QuantifierRuleTestCase<String> {
 
             @Override
-            public QuantifierRule createTarget() {
-                return ChoiceRule.builder().atLeast(2);
+            public QuantifierRule<String> createTarget() {
+                return ChoiceRule.<String>builder()
+                        .build()
+                        .atLeast(2);
             }
 
             @Override
@@ -107,18 +115,20 @@ class QuantifierRuleTest {
             }
 
             @Override
-            public Rule expectedRule() {
-                return ChoiceRule.of();
+            public ChoiceRule<String> expectedRule() {
+                return ChoiceRule.<String>builder().build();
             }
 
         }
 
         @Nested
-        class TestCase5 implements QuantifierRuleTestCase {
+        class TestCase5 implements QuantifierRuleTestCase<String> {
 
             @Override
-            public QuantifierRule createTarget() {
-                return ChoiceRule.builder().exactly(2);
+            public QuantifierRule<String> createTarget() {
+                return ChoiceRule.<String>builder()
+                        .build()
+                        .exactly(2);
             }
 
             @Override
@@ -132,18 +142,20 @@ class QuantifierRuleTest {
             }
 
             @Override
-            public Rule expectedRule() {
-                return ChoiceRule.of();
+            public ChoiceRule<String> expectedRule() {
+                return ChoiceRule.<String>builder().build();
             }
 
         }
 
         @Nested
-        class TestCase6 implements QuantifierRuleTestCase {
+        class TestCase6 implements QuantifierRuleTestCase<String> {
 
             @Override
-            public QuantifierRule createTarget() {
-                return ChoiceRule.builder().range(1, 2);
+            public QuantifierRule<String> createTarget() {
+                return ChoiceRule.<String>builder()
+                        .build()
+                        .range(1, 2);
             }
 
             @Override
@@ -157,8 +169,116 @@ class QuantifierRuleTest {
             }
 
             @Override
-            public Rule expectedRule() {
-                return ChoiceRule.of();
+            public ChoiceRule<String> expectedRule() {
+                return ChoiceRule.<String>builder().build();
+            }
+
+        }
+
+        @Nested
+        class BuilderTestCase1 implements QuantifierRuleTestCase.BuilderTestCase<String> {
+
+            @Override
+            public QuantifierRule.Builder<String> createTarget() {
+                return ChoiceRule.<String>builder()
+                        .opt();
+            }
+
+            @Override
+            public QuantifierRule<String> expectedRule() {
+                return ChoiceRule.<String>builder()
+                        .opt()
+                        .build();
+            }
+
+        }
+
+        @Nested
+        class BuilderTestCase2 implements QuantifierRuleTestCase.BuilderTestCase<String> {
+
+            @Override
+            public QuantifierRule.Builder<String> createTarget() {
+                return ChoiceRule.<String>builder()
+                        .zeroOrMore();
+            }
+
+            @Override
+            public QuantifierRule<String> expectedRule() {
+                return ChoiceRule.<String>builder()
+                        .zeroOrMore()
+                        .build();
+            }
+
+        }
+
+        @Nested
+        class BuilderTestCase3 implements QuantifierRuleTestCase.BuilderTestCase<String> {
+
+            @Override
+            public QuantifierRule.Builder<String> createTarget() {
+                return ChoiceRule.<String>builder()
+                        .oneOrMore();
+            }
+
+            @Override
+            public QuantifierRule<String> expectedRule() {
+                return ChoiceRule.<String>builder()
+                        .oneOrMore()
+                        .build();
+            }
+
+        }
+
+        @Nested
+        class BuilderTestCase4 implements QuantifierRuleTestCase.BuilderTestCase<String> {
+
+            @Override
+            public QuantifierRule.Builder<String> createTarget() {
+                return ChoiceRule.<String>builder()
+                        .atLeast(2);
+            }
+
+            @Override
+            public QuantifierRule<String> expectedRule() {
+                return ChoiceRule.<String>builder()
+                        .atLeast(2)
+                        .build();
+            }
+
+        }
+
+        @Nested
+        class BuilderTestCase5 implements QuantifierRuleTestCase.BuilderTestCase<String> {
+
+            @Override
+            public QuantifierRule.Builder<String> createTarget() {
+                return ChoiceRule.<String>builder()
+                        .exactly(2);
+            }
+
+            @Override
+            public QuantifierRule<String> expectedRule() {
+                return ChoiceRule.<String>builder()
+                        .exactly(2)
+                        .build();
+            }
+
+        }
+
+        @Nested
+        class BuilderTestCase6 implements QuantifierRuleTestCase.BuilderTestCase<String> {
+
+            @Override
+            public QuantifierRule.Builder<String> createTarget() {
+                return ChoiceRule.<String>builder()
+                        .range(1, 2);
+            }
+
+            @Override
+            public QuantifierRule<String> expectedRule() {
+                return ChoiceRule.<String>builder()
+                        .range(1, 2)
+                        .build();
             }
 
         }
@@ -169,11 +289,13 @@ class QuantifierRuleTest {
     class SequenceRuleTestCase {
 
         @Nested
-        class TestCase1 implements QuantifierRuleTestCase {
+        class TestCase1 implements QuantifierRuleTestCase<String> {
 
             @Override
-            public QuantifierRule createTarget() {
-                return SequenceRule.builder().opt();
+            public QuantifierRule<String> createTarget() {
+                return SequenceRule.<String>builder()
+                        .build()
+                        .opt();
             }
 
             @Override
@@ -187,18 +309,20 @@ class QuantifierRuleTest {
             }
 
             @Override
-            public Rule expectedRule() {
-                return SequenceRule.of();
+            public SequenceRule<String> expectedRule() {
+                return SequenceRule.<String>builder().build();
             }
 
         }
 
         @Nested
-        class TestCase2 implements QuantifierRuleTestCase {
+        class TestCase2 implements QuantifierRuleTestCase<String> {
 
             @Override
-            public QuantifierRule createTarget() {
-                return SequenceRule.builder().zeroOrMore();
+            public QuantifierRule<String> createTarget() {
+                return SequenceRule.<String>builder()
+                        .build()
+                        .zeroOrMore();
             }
 
             @Override
@@ -212,18 +336,20 @@ class QuantifierRuleTest {
             }
 
             @Override
-            public Rule expectedRule() {
-                return SequenceRule.of();
+            public SequenceRule<String> expectedRule() {
+                return SequenceRule.<String>builder().build();
             }
 
         }
 
         @Nested
-        class TestCase3 implements QuantifierRuleTestCase {
+        class TestCase3 implements QuantifierRuleTestCase<String> {
 
             @Override
-            public QuantifierRule createTarget() {
-                return SequenceRule.builder().oneOrMore();
+            public QuantifierRule<String> createTarget() {
+                return SequenceRule.<String>builder()
+                        .build()
+                        .oneOrMore();
             }
 
             @Override
@@ -237,18 +363,20 @@ class QuantifierRuleTest {
             }
 
             @Override
-            public Rule expectedRule() {
-                return SequenceRule.of();
+            public SequenceRule<String> expectedRule() {
+                return SequenceRule.<String>builder().build();
             }
 
         }
 
         @Nested
-        class TestCase4 implements QuantifierRuleTestCase {
+        class TestCase4 implements QuantifierRuleTestCase<String> {
 
             @Override
-            public QuantifierRule createTarget() {
-                return SequenceRule.builder().atLeast(2);
+            public QuantifierRule<String> createTarget() {
+                return SequenceRule.<String>builder()
+                        .build()
+                        .atLeast(2);
             }
 
             @Override
@@ -262,18 +390,20 @@ class QuantifierRuleTest {
             }
 
             @Override
-            public Rule expectedRule() {
-                return SequenceRule.of();
+            public SequenceRule<String> expectedRule() {
+                return SequenceRule.<String>builder().build();
             }
 
         }
 
         @Nested
-        class TestCase5 implements QuantifierRuleTestCase {
+        class TestCase5 implements QuantifierRuleTestCase<String> {
 
             @Override
-            public QuantifierRule createTarget() {
-                return SequenceRule.builder().exactly(2);
+            public QuantifierRule<String> createTarget() {
+                return SequenceRule.<String>builder()
+                        .build()
+                        .exactly(2);
             }
 
             @Override
@@ -287,18 +417,20 @@ class QuantifierRuleTest {
             }
 
             @Override
-            public Rule expectedRule() {
-                return SequenceRule.of();
+            public SequenceRule<String> expectedRule() {
+                return SequenceRule.<String>builder().build();
             }
 
         }
 
         @Nested
-        class TestCase6 implements QuantifierRuleTestCase {
+        class TestCase6 implements QuantifierRuleTestCase<String> {
 
             @Override
-            public QuantifierRule createTarget() {
-                return SequenceRule.builder().range(1, 2);
+            public QuantifierRule<String> createTarget() {
+                return SequenceRule.<String>builder()
+                        .build()
+                        .range(1, 2);
             }
 
             @Override
@@ -312,8 +444,116 @@ class QuantifierRuleTest {
             }
 
             @Override
-            public Rule expectedRule() {
-                return SequenceRule.of();
+            public SequenceRule<String> expectedRule() {
+                return SequenceRule.<String>builder().build();
+            }
+
+        }
+
+        @Nested
+        class BuilderTestCase1 implements QuantifierRuleTestCase.BuilderTestCase<String> {
+
+            @Override
+            public QuantifierRule.Builder<String> createTarget() {
+                return SequenceRule.<String>builder()
+                        .opt();
+            }
+
+            @Override
+            public QuantifierRule<String> expectedRule() {
+                return SequenceRule.<String>builder()
+                        .opt()
+                        .build();
+            }
+
+        }
+
+        @Nested
+        class BuilderTestCase2 implements QuantifierRuleTestCase.BuilderTestCase<String> {
+
+            @Override
+            public QuantifierRule.Builder<String> createTarget() {
+                return SequenceRule.<String>builder()
+                        .zeroOrMore();
+            }
+
+            @Override
+            public QuantifierRule<String> expectedRule() {
+                return SequenceRule.<String>builder()
+                        .zeroOrMore()
+                        .build();
+            }
+
+        }
+
+        @Nested
+        class BuilderTestCase3 implements QuantifierRuleTestCase.BuilderTestCase<String> {
+
+            @Override
+            public QuantifierRule.Builder<String> createTarget() {
+                return SequenceRule.<String>builder()
+                        .oneOrMore();
+            }
+
+            @Override
+            public QuantifierRule<String> expectedRule() {
+                return SequenceRule.<String>builder()
+                        .oneOrMore()
+                        .build();
+            }
+
+        }
+
+        @Nested
+        class BuilderTestCase4 implements QuantifierRuleTestCase.BuilderTestCase<String> {
+
+            @Override
+            public QuantifierRule.Builder<String> createTarget() {
+                return SequenceRule.<String>builder()
+                        .atLeast(2);
+            }
+
+            @Override
+            public QuantifierRule<String> expectedRule() {
+                return SequenceRule.<String>builder()
+                        .atLeast(2)
+                        .build();
+            }
+
+        }
+
+        @Nested
+        class BuilderTestCase5 implements QuantifierRuleTestCase.BuilderTestCase<String> {
+
+            @Override
+            public QuantifierRule.Builder<String> createTarget() {
+                return SequenceRule.<String>builder()
+                        .exactly(2);
+            }
+
+            @Override
+            public QuantifierRule<String> expectedRule() {
+                return SequenceRule.<String>builder()
+                        .exactly(2)
+                        .build();
+            }
+
+        }
+
+        @Nested
+        class BuilderTestCase6 implements QuantifierRuleTestCase.BuilderTestCase<String> {
+
+            @Override
+            public QuantifierRule.Builder<String> createTarget() {
+                return SequenceRule.<String>builder()
+                        .range(1, 2);
+            }
+
+            @Override
+            public QuantifierRule<String> expectedRule() {
+                return SequenceRule.<String>builder()
+                        .range(1, 2)
+                        .build();
             }
 
         }
@@ -321,14 +561,14 @@ class QuantifierRuleTest {
     }
 
     @Nested
-    class PatternRuleTestCase {
+    class MatchingRuleTestCase {
 
         @Nested
-        class TestCase1 implements QuantifierRuleTestCase {
+        class TestCase1 implements QuantifierRuleTestCase<String> {
 
             @Override
-            public QuantifierRule createTarget() {
-                return PatternRule.of("").opt();
+            public QuantifierRule<String> createTarget() {
+                return Rules.pattern("").opt();
             }
 
             @Override
@@ -342,18 +582,18 @@ class QuantifierRuleTest {
             }
 
             @Override
-            public Rule expectedRule() {
-                return PatternRule.of("");
+            public MatchingRule<String> expectedRule() {
+                return Rules.pattern("");
             }
 
         }
 
         @Nested
-        class TestCase2 implements QuantifierRuleTestCase {
+        class TestCase2 implements QuantifierRuleTestCase<String> {
 
             @Override
-            public QuantifierRule createTarget() {
-                return PatternRule.of("").zeroOrMore();
+            public QuantifierRule<String> createTarget() {
+                return Rules.pattern("").zeroOrMore();
             }
 
             @Override
@@ -367,18 +607,18 @@ class QuantifierRuleTest {
             }
 
             @Override
-            public Rule expectedRule() {
-                return PatternRule.of("");
+            public MatchingRule<String> expectedRule() {
+                return Rules.pattern("");
             }
 
         }
 
         @Nested
-        class TestCase3 implements QuantifierRuleTestCase {
+        class TestCase3 implements QuantifierRuleTestCase<String> {
 
             @Override
-            public QuantifierRule createTarget() {
-                return PatternRule.of("").oneOrMore();
+            public QuantifierRule<String> createTarget() {
+                return Rules.pattern("").oneOrMore();
             }
 
             @Override
@@ -392,18 +632,18 @@ class QuantifierRuleTest {
             }
 
             @Override
-            public Rule expectedRule() {
-                return PatternRule.of("");
+            public MatchingRule<String> expectedRule() {
+                return Rules.pattern("");
             }
 
         }
 
         @Nested
-        class TestCase4 implements QuantifierRuleTestCase {
+        class TestCase4 implements QuantifierRuleTestCase<String> {
 
             @Override
-            public QuantifierRule createTarget() {
-                return PatternRule.of("").atLeast(2);
+            public QuantifierRule<String> createTarget() {
+                return Rules.pattern("").atLeast(2);
             }
 
             @Override
@@ -417,18 +657,18 @@ class QuantifierRuleTest {
             }
 
             @Override
-            public Rule expectedRule() {
-                return PatternRule.of("");
+            public MatchingRule<String> expectedRule() {
+                return Rules.pattern("");
             }
 
         }
 
         @Nested
-        class TestCase5 implements QuantifierRuleTestCase {
+        class TestCase5 implements QuantifierRuleTestCase<String> {
 
             @Override
-            public QuantifierRule createTarget() {
-                return PatternRule.of("").exactly(2);
+            public QuantifierRule<String> createTarget() {
+                return Rules.pattern("").exactly(2);
             }
 
             @Override
@@ -442,18 +682,18 @@ class QuantifierRuleTest {
             }
 
             @Override
-            public Rule expectedRule() {
-                return PatternRule.of("");
+            public MatchingRule<String> expectedRule() {
+                return Rules.pattern("");
             }
 
         }
 
         @Nested
-        class TestCase6 implements QuantifierRuleTestCase {
+        class TestCase6 implements QuantifierRuleTestCase<String> {
 
             @Override
-            public QuantifierRule createTarget() {
-                return PatternRule.of("").range(1, 2);
+            public QuantifierRule<String> createTarget() {
+                return Rules.pattern("").range(1, 2);
             }
 
             @Override
@@ -467,8 +707,8 @@ class QuantifierRuleTest {
             }
 
             @Override
-            public Rule expectedRule() {
-                return PatternRule.of("");
+            public MatchingRule<String> expectedRule() {
+                return Rules.pattern("");
             }
 
         }
@@ -479,11 +719,11 @@ class QuantifierRuleTest {
     class ReferenceRuleTestCase {
 
         @Nested
-        class TestCase1 implements QuantifierRuleTestCase {
+        class TestCase1 implements QuantifierRuleTestCase<String> {
 
             @Override
-            public QuantifierRule createTarget() {
-                return ReferenceRule.of("").opt();
+            public QuantifierRule<String> createTarget() {
+                return ReferenceRule.<String>of("").opt();
             }
 
             @Override
@@ -497,18 +737,18 @@ class QuantifierRuleTest {
             }
 
             @Override
-            public Rule expectedRule() {
-                return ReferenceRule.of("");
+            public ReferenceRule<String> expectedRule() {
+                return ReferenceRule.<String>of("");
             }
 
         }
 
         @Nested
-        class TestCase2 implements QuantifierRuleTestCase {
+        class TestCase2 implements QuantifierRuleTestCase<String> {
 
             @Override
-            public QuantifierRule createTarget() {
-                return ReferenceRule.of("").zeroOrMore();
+            public QuantifierRule<String> createTarget() {
+                return ReferenceRule.<String>of("").zeroOrMore();
             }
 
             @Override
@@ -522,18 +762,18 @@ class QuantifierRuleTest {
             }
 
             @Override
-            public Rule expectedRule() {
-                return ReferenceRule.of("");
+            public ReferenceRule<String> expectedRule() {
+                return ReferenceRule.<String>of("");
             }
 
         }
 
         @Nested
-        class TestCase3 implements QuantifierRuleTestCase {
+        class TestCase3 implements QuantifierRuleTestCase<String> {
 
             @Override
-            public QuantifierRule createTarget() {
-                return ReferenceRule.of("").oneOrMore();
+            public QuantifierRule<String> createTarget() {
+                return ReferenceRule.<String>of("").oneOrMore();
             }
 
             @Override
@@ -547,18 +787,18 @@ class QuantifierRuleTest {
             }
 
             @Override
-            public Rule expectedRule() {
-                return ReferenceRule.of("");
+            public ReferenceRule<String> expectedRule() {
+                return ReferenceRule.<String>of("");
             }
 
         }
 
         @Nested
-        class TestCase4 implements QuantifierRuleTestCase {
+        class TestCase4 implements QuantifierRuleTestCase<String> {
 
             @Override
-            public QuantifierRule createTarget() {
-                return ReferenceRule.of("").atLeast(2);
+            public QuantifierRule<String> createTarget() {
+                return ReferenceRule.<String>of("").atLeast(2);
             }
 
             @Override
@@ -572,18 +812,18 @@ class QuantifierRuleTest {
             }
 
             @Override
-            public Rule expectedRule() {
-                return ReferenceRule.of("");
+            public ReferenceRule<String> expectedRule() {
+                return ReferenceRule.<String>of("");
             }
 
         }
 
         @Nested
-        class TestCase5 implements QuantifierRuleTestCase {
+        class TestCase5 implements QuantifierRuleTestCase<String> {
 
             @Override
-            public QuantifierRule createTarget() {
-                return ReferenceRule.of("").exactly(2);
+            public QuantifierRule<String> createTarget() {
+                return ReferenceRule.<String>of("").exactly(2);
             }
 
             @Override
@@ -597,18 +837,18 @@ class QuantifierRuleTest {
             }
 
             @Override
-            public Rule expectedRule() {
-                return ReferenceRule.of("");
+            public ReferenceRule<String> expectedRule() {
+                return ReferenceRule.<String>of("");
             }
 
         }
 
         @Nested
-        class TestCase6 implements QuantifierRuleTestCase {
+        class TestCase6 implements QuantifierRuleTestCase<String> {
 
             @Override
-            public QuantifierRule createTarget() {
-                return ReferenceRule.of("").range(1, 2);
+            public QuantifierRule<String> createTarget() {
+                return ReferenceRule.<String>of("").range(1, 2);
             }
 
             @Override
@@ -622,8 +862,8 @@ class QuantifierRuleTest {
             }
 
             @Override
-            public Rule expectedRule() {
-                return ReferenceRule.of("");
+            public ReferenceRule<String> expectedRule() {
+                return ReferenceRule.<String>of("");
             }
 
         }

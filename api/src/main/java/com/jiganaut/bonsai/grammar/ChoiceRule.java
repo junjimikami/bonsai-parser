@@ -1,42 +1,36 @@
 package com.jiganaut.bonsai.grammar;
 
+import java.util.Objects;
 import java.util.Set;
 
 import com.jiganaut.bonsai.grammar.spi.GrammarProvider;
+import com.jiganaut.bonsai.impl.Message;
 
 /**
  * @author Junji Mikami
  *
  */
-public interface ChoiceRule extends Rule, Quantifiable {
+public interface ChoiceRule<T> extends Quantifiable<T>, Skippable<T> {
 
     /**
-     * 
-     * @author Junji Mikami
+     *
      */
-    public static interface Builder extends Rule.Builder, Quantifiable {
-        public ChoiceRule.Builder add(Rule rule);
-        public ChoiceRule.Builder add(Rule.Builder builder);
-        public default ChoiceRule.Builder addEmpty() {
-            return add(EMPTY);
+    public static interface Builder<T> extends Quantifiable.Builder<T>, Skippable.Builder<T>, Iterable<Rule.Builder<T>> {
+        public default ChoiceRule.Builder<T> add(Rule<T> rule) {
+            return add(() -> rule);
         }
+        public ChoiceRule.Builder<T> add(Rule.Builder<T> builder);
+        public ChoiceRule.Builder<T> addAll(ChoiceRule.Builder<T> builder);
+        public default ChoiceRule.Builder<T> addEmpty() {
+            return add(EmptyRule::empty);
+        }
+        public ChoiceRule.Builder<T> asShortCircuit();
         @Override
-        public ChoiceRule build();
-        public default ChoiceRule shortCircuit() {
-            return build().shortCircuit();
-        }
+        public ChoiceRule<T> build();
     }
 
-    public static Builder builder() {
+    public static <T> Builder<T> builder() {
         return GrammarProvider.load().createChoiceBuilder();
-    }
-
-    public static ChoiceRule of(Rule... rules) {
-        var builder = builder();
-        for (var rule : rules) {
-            builder.add(rule);
-        }
-        return builder.build();
     }
 
     @Override
@@ -45,13 +39,16 @@ public interface ChoiceRule extends Rule, Quantifiable {
     }
 
     @Override
-    public default <R, P> R accept(RuleVisitor<R, P> visitor, P p) {
+    public default <R, P> R accept(RuleVisitor<T, R, P> visitor, P p) {
+        Objects.requireNonNull(visitor, () -> Message.VALIDATION_PARAMETER_NULL.format("visitor"));
+        if (isShortCircuit()) {
+            return visitor.visitChoiceAsShortCircuit(this, p);
+        }
         return visitor.visitChoice(this, p);
     }
 
-    public Set<? extends Rule> getChoices();
+    public Set<Rule<T>> getChoices();
 
     public boolean isShortCircuit();
-    
-    public ChoiceRule shortCircuit();
+
 }

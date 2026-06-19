@@ -1,6 +1,7 @@
 package com.jiganaut.bonsai.grammar;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.OptionalInt;
 import java.util.stream.Stream;
@@ -11,13 +12,32 @@ import org.junit.jupiter.api.Test;
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
 /**
- * 
+ *
  * @author Junji Mikami
  */
-interface QuantifierRuleTestCase extends RuleTestCase {
+interface QuantifierRuleTestCase<T> extends RuleTestCase<T> {
+
+    interface BuilderTestCase<T> extends RuleTestCase.BuilderTestCase<T> {
+
+        @Override
+        QuantifierRule.Builder<T> createTarget();
+
+        @Override
+        QuantifierRule<T> expectedRule();
+
+        @Test
+        @DisplayName("build()")
+        default void build() throws Exception {
+            var target = createTarget();
+            var rule = target.build();
+
+            assertNotNull(rule);
+            assertEquals(expectedRule(), rule);
+        }
+    }
 
     @Override
-    QuantifierRule createTarget();
+    QuantifierRule<T> createTarget();
 
     @Override
     default Kind expectedKind() {
@@ -28,7 +48,7 @@ interface QuantifierRuleTestCase extends RuleTestCase {
 
     OptionalInt expectedMaxCount();
 
-    Rule expectedRule();
+    Quantifiable<T> expectedRule();
 
     @Test
     @DisplayName("getMinCount()")

@@ -1,60 +1,56 @@
 package com.jiganaut.bonsai.parser;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 /**
  *
  * @author Junji Mikami
  */
-public interface Tree {
+public sealed interface Tree<T> permits TerminalNode, NonTerminalNode, ErrorNode {
 
     /**
-     * 
-     * @author Junji Mikami
+     *
      *
      */
     public static enum Kind {
         TERMINAL,
-        NON_TERMINAL;
-
+        NON_TERMINAL,
+        ERROR;
     }
 
     /**
-     * 
-     * @author Junji Mikami
+     *
      */
-    public static interface Builder {
-        public Tree.Builder setName(String name);
-
-        public Tree.Builder setValue(String value);
-
-        public Tree build();
+    public static interface Builder<T> {
+        public Tree<T> build();
     }
 
     /**
-     * 
+     *
      * @return
      */
     public Kind getKind();
 
     public String getName();
 
-    public String getValue();
+    public Position getPosition();
 
-    public List<? extends Tree> getSubTrees();
+    public Stream<Tree<T>> subTrees();
+
+    public Stream<T> values();
 
     /**
-     * 
+     *
      * @param <R>
      * @param <P>
-     * @param v
+     * @param visitor
      * @param p
      * @return
      */
-    public <R, P> R accept(TreeVisitor<R, P> v, P p);
+    public <R, P> R accept(TreeVisitor<T, R, P> visitor, P p);
 
-    public default <R, P> R accept(TreeVisitor<R, P> v) {
-        return accept(v, null);
+    public default <R, P> R accept(TreeVisitor<T, R, P> visitor) {
+        return accept(visitor, null);
     }
 
 }

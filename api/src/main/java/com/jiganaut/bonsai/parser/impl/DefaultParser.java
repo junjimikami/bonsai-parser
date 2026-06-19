@@ -1,7 +1,6 @@
 package com.jiganaut.bonsai.parser.impl;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 
 import com.jiganaut.bonsai.grammar.Grammar;
 import com.jiganaut.bonsai.impl.Message;
@@ -10,29 +9,29 @@ import com.jiganaut.bonsai.parser.Tokenizer;
 import com.jiganaut.bonsai.parser.Tree;
 
 /**
- * 
+ *
  * @author Junji Mikami
  */
-class DefaultParser implements Parser {
-    private final Context context;
+class DefaultParser<T> implements Parser<T> {
+
+    private final Context<T> context;
+    private final TreeProcessor<T> processor;
     private boolean isParsed;
 
-    DefaultParser(Grammar grammar, Tokenizer tokenizer) {
+    DefaultParser(Grammar<T> grammar, Tokenizer<T> tokenizer) {
         assert grammar != null;
         assert tokenizer != null;
-        context = new Context(grammar, tokenizer);
+        context = new Context<>(grammar, tokenizer);
+        processor = new TreeProcessor<>();
     }
 
     @Override
-    public Tree parse() {
+    public Tree<T> parse() {
         if (isParsed) {
-            throw new IllegalStateException(Message.ALREADY_PARSED.format());
+            throw new IllegalStateException(Message.STATE_ALREADY_COMPLETED.format("parse"));
         }
         try {
-            var derivation = new Derivation();
-            return derivation.process(context);
-        } catch (UncheckedIOException ex) {
-            throw new IllegalStateException(ex);
+            return processor.process(context);
         } finally {
             isParsed = true;
         }

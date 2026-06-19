@@ -1,7 +1,10 @@
 package com.jiganaut.bonsai.grammar;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
+import static com.jiganaut.bonsai.grammar.MockFactory.mockRule;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -11,109 +14,139 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestReporter;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
- * 
+ *
  * @author Junji Mikami
  */
 class RulesTest {
 
     @Test
-    @DisplayName("pattern(st:String) [Null parameter]")
-    void patternStInCaseOfNullParameter(TestReporter testReporter) throws Exception {
-
+    @DisplayName("pattern(st:String) [st == null]")
+    void patternStWhenStIsNull(TestReporter testReporter) throws Exception {
         var ex = assertThrows(NullPointerException.class, () -> Rules.pattern((String) null));
-        testReporter.publishEntry(ex.getMessage());
+        testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
     }
 
     @Test
-    @DisplayName("pattern(pa:Pattern) [Null parameter]")
-    void patternPaInCaseOfNullParameter(TestReporter testReporter) throws Exception {
-
+    @DisplayName("pattern(pa:Pattern) [pa == null]")
+    void patternPaWhenPaIsNull(TestReporter testReporter) throws Exception {
         var ex = assertThrows(NullPointerException.class, () -> Rules.pattern((Pattern) null));
-        testReporter.publishEntry(ex.getMessage());
+        testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
     }
 
     @Test
-    @DisplayName("concat(Rule...) [Null parameter]")
-    void concatInCaseOfNullParameter(TestReporter testReporter) throws Exception {
-
-        var ex = assertThrows(NullPointerException.class, () -> Rules.concat((Rule[]) null));
-        testReporter.publishEntry(ex.getMessage());
+    @DisplayName("concat(rules:Rule...) [rules == null]")
+    void concatRulesWhenRulesIsNull(TestReporter testReporter) throws Exception {
+        var ex = assertThrows(NullPointerException.class, () -> Rules.concat((Rule<String>[]) null));
+        testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
     }
 
     @Test
-    @DisplayName("oneOf(Rule...) [Null parameter]")
-    void oneOfInCaseOfNullParameter(TestReporter testReporter) throws Exception {
-
-        var ex = assertThrows(NullPointerException.class, () -> Rules.oneOf((Rule[]) null));
-        testReporter.publishEntry(ex.getMessage());
+    @DisplayName("oneOf(choices:Rule...) [choices == null]")
+    void oneOfChoicesWhenChoicesIsNull(TestReporter testReporter) throws Exception {
+        var ex = assertThrows(NullPointerException.class, () -> Rules.oneOf((Rule<String>[]) null));
+        testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
     }
 
     @Test
-    @DisplayName("firstOf(Rule...) [Null parameter]")
-    void firstOfInCaseOfNullParameter(TestReporter testReporter) throws Exception {
-
-        var ex = assertThrows(NullPointerException.class, () -> Rules.firstOf((Rule[]) null));
-        testReporter.publishEntry(ex.getMessage());
+    @DisplayName("firstOf(choices:Rule...) [choices == null]")
+    void firstOfChoicesWhenChoicesIsNull(TestReporter testReporter) throws Exception {
+        var ex = assertThrows(NullPointerException.class, () -> Rules.firstOf((Rule<String>[]) null));
+        testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
     }
 
     @Test
-    @DisplayName("reference(String) [Null parameter]")
-    void referenceInCaseOfNullParameter(TestReporter testReporter) throws Exception {
-
+    @DisplayName("reference(st:String) [st == null]")
+    void referenceWhenStIsNull(TestReporter testReporter) throws Exception {
         var ex = assertThrows(NullPointerException.class, () -> Rules.reference(null));
-        testReporter.publishEntry(ex.getMessage());
+        testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
     }
 
-    @Test
-    @DisplayName("quote(String) [Null parameter]")
-    void quoteInCaseOfNullParameter(TestReporter testReporter) throws Exception {
-
-        var ex = assertThrows(NullPointerException.class, () -> Rules.quote(null));
-        testReporter.publishEntry(ex.getMessage());
-    }
-
-    static Stream<String> regexParameters() {
-        return Stream.of("1", "a", "A", ".");
+    static Stream<Arguments> nameValueParameters() {
+        return Stream.of(
+                Arguments.of(null, null),
+                Arguments.of(null, "value"),
+                Arguments.of("name", null),
+                Arguments.of("", "++++"),
+                Arguments.of("****", "")
+        );
     }
 
     @ParameterizedTest
-    @EmptySource
+    @MethodSource("nameValueParameters")
+    @DisplayName("token(name:String, value:String)")
+    void tokenNameValue(String name, String value) throws Exception {
+        var actual = Rules.token(name, value);
+
+        assertTrue(actual.test(name, value));
+        assertFalse(actual.test("other name", "other value"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("nameValueParameters")
+    @DisplayName("token(name:String)")
+    void tokenName(String name, String value) throws Exception {
+        var actual = Rules.token(name);
+
+        assertTrue(actual.test(name, value));
+        assertFalse(actual.test("other name", "other value"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("nameValueParameters")
+    @DisplayName("matching(value:String)")
+    void matching(String name, String value) throws Exception {
+        var actual = Rules.matching(value);
+
+        assertTrue(actual.test(name, value));
+        assertFalse(actual.test("other name", "other value"));
+    }
+
+    static Stream<Arguments> regexParameters() {
+        return Stream.of(
+                Arguments.of("1", "1"),
+                Arguments.of("a", "a"),
+                Arguments.of("A", "A"),
+                Arguments.of(".", "Z")
+        );
+    }
+
+    @ParameterizedTest
     @MethodSource("regexParameters")
     @DisplayName("pattern(st:String)")
-    void patternSt(String regex) throws Exception {
-        var expected = PatternRule.of(regex);
+    void patternSt(String regex, String value) throws Exception {
         var actual = Rules.pattern(regex);
 
-        assertEquals(expected, actual);
+        assertTrue(actual.test(null, value));
     }
 
     @ParameterizedTest
-    @EmptySource
     @MethodSource("regexParameters")
     @DisplayName("pattern(pa:Pattern)")
-    void patternPa(String regex) throws Exception {
-        var expected = PatternRule.of(regex);
+    void patternPa(String regex, String value) throws Exception {
         var actual = Rules.pattern(Pattern.compile(regex));
 
-        assertEquals(expected, actual);
+        assertTrue(actual.test(null, value));
     }
 
-    static Stream<List<Rule>> ruleParameters() {
+    static Stream<List<Rule<String>>> ruleParameters() {
         return Stream.of(
-                List.of(mock(Rule.class)),
-                List.of(mock(Rule.class), mock(Rule.class)));
+                List.of(mockRule()),
+                List.of(mockRule(), mockRule()));
     }
 
+    @SuppressWarnings("unchecked")
     @ParameterizedTest
     @EmptySource
     @MethodSource("ruleParameters")
     @DisplayName("concat(Rule...)")
-    void concat(List<Rule> list) throws Exception {
-        var builder = SequenceRule.builder();
+    void concat(List<Rule<String>> list) throws Exception {
+        var builder = SequenceRule.<String>builder();
         list.forEach(builder::add);
         var expected = builder.build();
         var actual = Rules.concat(list.toArray(Rule[]::new));
@@ -121,12 +154,13 @@ class RulesTest {
         assertEquals(expected, actual);
     }
 
+    @SuppressWarnings("unchecked")
     @ParameterizedTest
     @EmptySource
     @MethodSource("ruleParameters")
     @DisplayName("oneOf(Rule...)")
-    void oneOf(List<Rule> list) throws Exception {
-        var builder = ChoiceRule.builder();
+    void oneOf(List<Rule<String>> list) throws Exception {
+        var builder = ChoiceRule.<String>builder();
         list.forEach(builder::add);
         var expected = builder.build();
         var actual = Rules.oneOf(list.toArray(Rule[]::new));
@@ -138,22 +172,19 @@ class RulesTest {
     @EmptySource
     @MethodSource("ruleParameters")
     @DisplayName("firstOf(Rule...)")
-    void firstOf(List<Rule> list) throws Exception {
-        var builder = ChoiceRule.builder();
+    @SuppressWarnings("unchecked")
+    void firstOf(List<Rule<String>> list) throws Exception {
+        var builder = ChoiceRule.<String>builder();
         list.forEach(builder::add);
-        var expected = builder.shortCircuit();
+        var expected = builder.asShortCircuit().build();
         var actual = Rules.firstOf(list.toArray(Rule[]::new));
 
         assertEquals(expected, actual);
     }
 
-    static Stream<String> stringParameters() {
-        return Stream.concat(regexParameters(), Stream.of("["));
-    }
-
     @ParameterizedTest
     @EmptySource
-    @MethodSource("stringParameters")
+    @ValueSource(strings = {"1", "a", "A", ".", "["})
     @DisplayName("reference(String)")
     void reference(String s) throws Exception {
         var expected = ReferenceRule.of(s);
@@ -162,21 +193,10 @@ class RulesTest {
         assertEquals(expected, actual);
     }
 
-    @ParameterizedTest
-    @EmptySource
-    @MethodSource("stringParameters")
-    @DisplayName("quote(String)")
-    void quote(String s) throws Exception {
-        var expected = PatternRule.of(Pattern.quote(s));
-        var actual = Rules.quote(s);
-
-        assertEquals(expected, actual);
-    }
-
     @Test
     @DisplayName("empty()")
     void empty() throws Exception {
-        var expected = Rule.EMPTY;
+        var expected = EmptyRule.empty();
         var actual = Rules.empty();
 
         assertEquals(expected, actual);

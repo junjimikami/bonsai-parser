@@ -1,6 +1,7 @@
 package com.jiganaut.bonsai.impl;
 
 import java.text.MessageFormat;
+import java.util.ResourceBundle;
 
 /**
  * @author Junji Mikami
@@ -8,73 +9,30 @@ import java.text.MessageFormat;
  */
 public enum Message {
 
-    ALREADY_BUILT("Already built."),
-    SYMBOL_ADDED_VISIBLE("Symbol \"{0}\" has already been added as visible."),
-    SYMBOL_NOT_FOUND("Symbol \"{0}\" not found."),
-    EMPTY_GRAMMAR("Grammar is empty."),
-    EMPTY_CHOICE("Choice rule is empty."),
-    EMPTY_SEQUENCE("Sequence rule is empty."),
-    NULL_BUILD("Build returned null."),
-    NULL_PARAMETER("Parameter cannot be null."),
-    NEGATIVE_QUANTIFIER("Quantifier is negative."),
-    INVALID_RANGE("Invalid range."),
+    VALIDATION_PARAMETER_NULL("validation.parameter.null"),
+    VALIDATION_PARAMETER_MIN("validation.parameter.min"),
+    VALIDATION_RANGE_INVALID("validation.range.invalid"),
 
-    NAME_NOT_SET("Name not set."),
-    VALUE_NOT_SET("Value not set."),
-    ALREADY_PARSED("Already parsed."),
-    FACTORY_NOT_FOUND("Factory \"{0}\" not found."),
-    NO_TOKENS_REMAINING("No tokens remaining."),
+    STATE_ALREADY_COMPLETED("state.already.completed"),
 
-    /**
-     * {0}: ProductionSet {1}: Token {2}: Line number {3}: Index
-     */
-    NO_MATCHING_PRODUCTION_RULE("""
-            No matching production rule found.
-            Expected: {0}
-            Token: {1} at line {2}, index {3}
-            """),
-    AMBIGUOUS_GRAMMAR("""
-            Grammar is ambiguous.
-            Found: {0}
-            Token: {1} at line {2}, index {3}
-            """),
-    NO_MATCHING_RULE("""
-            No matching rule found.
-            Expected: {0} in production rule {1}
-            Token: {2} at line {3}, index {4}
-            """),
-    AMBIGUOUS_CHOICE("""
-            Choice rule is ambiguous.
-            Found: {0} in production rule {1}
-            Token: {2} at line {3}, index {4}
-            """),
-    TOKENS_REMAINING("""
-            Tokens still remain.
-            Token: {0} at line {1}, index {2}
-            """),
+    GRAMMAR_SYMBOL_NOT_FOUND("grammar.symbol.not_found"),
+
+    TOKENIZER_NO_MORE_TOKENS("tokenizer.no_more_tokens"),
+
+    PARSER_NO_MATCHING_RULE("parser.no_matching_rule"),
+    PARSER_AMBIGUOUS_CHOICE("parser.ambiguous_choice"),
     ;
 
-    private final MessageFormat msg;
+    private static final ResourceBundle MESSAGES = ResourceBundle.getBundle("messages");
+    private final String key;
 
-    private Message(String message) {
-        this.msg = new MessageFormat(message);
+    private Message(String key) {
+        this.key = key;
     }
 
     public String format(Object... args) {
-        return msg.format(args);
-    }
-
-    public static String symbolEncode(String s) {
-        return "<" + s.replaceAll("\\s", "_")
-                .replace("<", "`<`")
-                .replace(">", "`>`")
-                + ">";
-    }
-
-    public static String stringEncode(String s) {
-        return "\"" + s.replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                + "\"";
+        var pattern = MESSAGES.getString(key);
+        return MessageFormat.format(pattern, args);
     }
 
 }

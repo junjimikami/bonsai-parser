@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
+import java.io.UncheckedIOException;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestReporter;
@@ -12,36 +14,36 @@ import org.junit.jupiter.api.TestReporter;
 import com.jiganaut.bonsai.TestCase;
 
 /**
- * 
+ *
  * @author Junji Mikami
  */
-interface ParserTestCase extends TestCase {
+interface ParserTestCase<T> extends TestCase {
 
     @Override
-    Parser createTarget();
+    Parser<T> createTarget();
 
-    Tree expectedTree();
+    Tree<T> expectedTree();
 
     @Test
-    @DisplayName("parse() [Closed input stream]")
-    default void parseInCaseOfClosedInputStream(TestReporter testReporter) throws Exception {
+    @DisplayName("parse() [Post-close]")
+    default void parseWhenPostClose(TestReporter testReporter) throws Exception {
         var target = createTarget();
         target.close();
 
-        var ex = assertThrows(IllegalStateException.class, () -> target.parse());
-        testReporter.publishEntry(ex.getMessage());
+        var ex = assertThrows(UncheckedIOException.class, () -> target.parse());
+        testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
     }
 
     @Test
-    @DisplayName("parse() [Post-parse operation]")
-    default void parseInCaseOfPostParseOperation(TestReporter testReporter) throws Exception {
-        assumeFalse(expectedTree().getSubTrees().isEmpty());
+    @DisplayName("parse() [Post-parse]")
+    default void parseWhenPostParse(TestReporter testReporter) throws Exception {
+        assumeFalse(expectedTree().subTrees().findAny().isEmpty());
 
         var target = createTarget();
         target.parse();
 
         var ex = assertThrows(IllegalStateException.class, () -> target.parse());
-        testReporter.publishEntry(ex.getMessage());
+        testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
     }
 
     @Test
@@ -62,3 +64,4 @@ interface ParserTestCase extends TestCase {
     }
 
 }
+

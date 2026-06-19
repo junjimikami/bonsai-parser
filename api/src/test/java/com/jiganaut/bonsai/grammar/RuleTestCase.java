@@ -1,11 +1,12 @@
 package com.jiganaut.bonsai.grammar;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static com.jiganaut.bonsai.grammar.MockFactory.mockRule;
+import static com.jiganaut.bonsai.grammar.MockFactory.mockRuleVisitor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,145 +20,126 @@ import com.jiganaut.bonsai.TestCase;
 import com.jiganaut.bonsai.grammar.Rule.Kind;
 
 /**
- * 
+ *
  * @author Junji Mikami
  */
-interface RuleTestCase extends TestCase {
+interface RuleTestCase<T> extends TestCase {
 
-    interface BuilderTestCase extends TestCase {
-        Rule.Builder createTarget();
+    interface BuilderTestCase<T> extends TestCase {
+        @Override
+        Rule.Builder<T> createTarget();
 
-        Rule expectedRule();
+        Rule<T> expectedRule();
 
         @SuppressWarnings("exports")
         @Test
-        @DisplayName("build() [Post-build operation]")
-        default void buildInCaseOfPostBuild(TestReporter testReporter) throws Exception {
-            var builder = createTarget();
-            builder.build();
+        @DisplayName("build() [Post-build]")
+        default void buildWhenPostBuild(TestReporter testReporter) throws Exception {
+            var target = createTarget();
+            target.build();
 
-            var ex = assertThrows(IllegalStateException.class, () -> builder.build());
-            testReporter.publishEntry(ex.getMessage());
+            var ex = assertThrows(IllegalStateException.class, () -> target.build());
+            testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
         }
 
         void build() throws Exception;
 
     }
 
-    Rule createTarget();
+    @Override
+    Rule<T> createTarget();
 
     Kind expectedKind();
-
-    RuleVisitor<Object[], String> testVisitor = new SimpleRuleVisitor<>() {
-
-        @Override
-        public Object[] visitChoice(ChoiceRule choice, String p) {
-            assertEquals(Rule.Kind.CHOICE, choice.getKind());
-            return SimpleRuleVisitor.super.visitChoice(choice, p);
-        }
-
-        @Override
-        public Object[] visitSequence(SequenceRule sequence, String p) {
-            assertEquals(Rule.Kind.SEQUENCE, sequence.getKind());
-            return SimpleRuleVisitor.super.visitSequence(sequence, p);
-        }
-
-        @Override
-        public Object[] visitPattern(PatternRule pattern, String p) {
-            assertEquals(Rule.Kind.PATTERN, pattern.getKind());
-            return SimpleRuleVisitor.super.visitPattern(pattern, p);
-        }
-
-        @Override
-        public Object[] visitReference(ReferenceRule reference, String p) {
-            assertEquals(Rule.Kind.REFERENCE, reference.getKind());
-            return SimpleRuleVisitor.super.visitReference(reference, p);
-        }
-
-        @Override
-        public Object[] visitQuantifier(QuantifierRule quantifier, String p) {
-            assertEquals(Rule.Kind.QUANTIFIER, quantifier.getKind());
-            return SimpleRuleVisitor.super.visitQuantifier(quantifier, p);
-        }
-
-        @Override
-        public Object[] visitSkip(SkipRule skip, String p) {
-            assertEquals(Rule.Kind.SKIP, skip.getKind());
-            return SimpleRuleVisitor.super.visitSkip(skip, p);
-        }
-
-        @Override
-        public Object[] visitEmpty(Rule empty, String p) {
-            assertEquals(Rule.Kind.EMPTY, empty.getKind());
-            return SimpleRuleVisitor.super.visitEmpty(empty, p);
-        }
-
-        @Override
-        public Object[] defaultAction(Rule rule, String p) {
-            return new Object[] { rule, p };
-        }
-    };
 
     @Test
     @DisplayName("equals(Object)")
     default void equals(TestReporter testReporter) throws Exception {
-        var rule = createTarget();
+        var target = createTarget();
 
-        assertFalse(rule.equals(mock(Rule.class)));
-        assertTrue(rule.equals(createTarget()));
+        assertFalse(target.equals(mockRule()));
+        assertFalse(target.equals(null));
+        assertTrue(target.equals(createTarget()));
+    }
+
+    @Test
+    @DisplayName("hashCode()")
+    default void hashCode(TestReporter testReporter) throws Exception {
+        var target = createTarget();
+
+        assertTrue(target.hashCode() == createTarget().hashCode());
+
+        testReporter.publishEntry("hashCode()=%d".formatted(target.hashCode()));
     }
 
     @Test
     @DisplayName("toString()")
     default void toString(TestReporter testReporter) throws Exception {
-        var rule = createTarget();
+        var target = createTarget();
 
-        testReporter.publishEntry("toString()", rule.toString());
+        testReporter.publishEntry("toString()=\"%s\"".formatted(target.toString()));
     }
 
     @Test
     @DisplayName("getKind()")
     default void getKind() throws Exception {
-        var rule = createTarget();
+        var target = createTarget();
 
-        assertEquals(expectedKind(), rule.getKind());
+        assertEquals(expectedKind(), target.getKind());
     }
 
     @Test
-    @DisplayName("accept(ev:ElementVisitor) [Null parameter]")
-    default void acceptEvInCaseOfNullParameter(TestReporter testReporter) throws Exception {
-        var rule = createTarget();
+    @DisplayName("accept(rv:RuleVisitor) [rv == null]")
+    default void acceptRvWhenRvIsNull(TestReporter testReporter) throws Exception {
+        var target = createTarget();
 
-        var ex = assertThrows(NullPointerException.class, () -> rule.accept(null));
-        testReporter.publishEntry(ex.getMessage());
+        var ex = assertThrows(NullPointerException.class, () -> target.accept(null));
+        testReporter.publishEntry("Exception: %s".formatted(ex.getMessage()));
     }
 
     @Test
     @DisplayName("accept(rv:RuleVisitor)")
     default void acceptRv() throws Exception {
-        var rule = createTarget();
-        var visitor = testVisitor;
-        var expected = new Object[] { rule, null };
-        var result = rule.accept(visitor);
-        var result2 = visitor.visit(rule);
+        var target = createTarget();
+        RuleVisitor<T, Void, Void> visitor = mockRuleVisitor();
 
-        assertArrayEquals(expected, result);
-        assertArrayEquals(expected, result2);
+        target.accept(visitor);
+
+        switch (target) {
+            case ChoiceRule<T> choice when choice.isShortCircuit() -> verify(visitor).visitChoiceAsShortCircuit(choice, null);
+            case ChoiceRule<T> choice -> verify(visitor).visitChoice(choice, null);
+            case SequenceRule<T> sequence -> verify(visitor).visitSequence(sequence, null);
+            case MatchingRule<T> match -> verify(visitor).visitMatch(match, null);
+            case ReferenceRule<T> reference -> verify(visitor).visitReference(reference, null);
+            case QuantifierRule<T> quantifier -> verify(visitor).visitQuantifier(quantifier, null);
+            case SkipRule<T> skip -> verify(visitor).visitSkip(skip, null);
+            case EmptyRule<T> empty -> verify(visitor).visitEmpty(empty, null);
+            case ProductionRule<T> production -> verify(visitor).visitProduction(production, null);
+            default -> throw new AssertionError();
+        }
     }
 
-    @DisplayName("accept(rv:RuleVisitor, pos:P)")
+    @DisplayName("accept(rv:RuleVisitor, p:P)")
     @ParameterizedTest
     @NullSource
     @EmptySource
     @ValueSource(strings = { "test" })
     default void acceptRvP(String arg) throws Exception {
-        var rule = createTarget();
-        var visitor = testVisitor;
-        var expected = new Object[] { rule, arg };
-        var result = rule.accept(visitor, arg);
-        var result2 = visitor.visit(rule, arg);
+        var target = createTarget();
+        RuleVisitor<T, Void, String> visitor = mockRuleVisitor();
 
-        assertArrayEquals(expected, result);
-        assertArrayEquals(expected, result2);
+        target.accept(visitor, arg);
+
+        switch (target) {
+            case ChoiceRule<T> choice when choice.isShortCircuit() -> verify(visitor).visitChoiceAsShortCircuit(choice, arg);
+            case ChoiceRule<T> choice -> verify(visitor).visitChoice(choice, arg);
+            case SequenceRule<T> sequence -> verify(visitor).visitSequence(sequence, arg);
+            case MatchingRule<T> match -> verify(visitor).visitMatch(match, arg);
+            case ReferenceRule<T> reference -> verify(visitor).visitReference(reference, arg);
+            case QuantifierRule<T> quantifier -> verify(visitor).visitQuantifier(quantifier, arg);
+            case SkipRule<T> skip -> verify(visitor).visitSkip(skip, arg);
+            case EmptyRule<T> empty -> verify(visitor).visitEmpty(empty, arg);
+            case ProductionRule<T> production -> verify(visitor).visitProduction(production, arg);
+            default -> throw new AssertionError();
+        }
     }
 }

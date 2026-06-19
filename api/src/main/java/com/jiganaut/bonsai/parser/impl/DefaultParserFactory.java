@@ -1,6 +1,5 @@
 package com.jiganaut.bonsai.parser.impl;
 
-import java.io.Reader;
 import java.util.Objects;
 
 import com.jiganaut.bonsai.grammar.Grammar;
@@ -13,25 +12,19 @@ import com.jiganaut.bonsai.parser.Tokenizer;
  * @author Junji Mikami
  *
  */
-class DefaultParserFactory implements ParserFactory {
-    private final Grammar grammar;
+class DefaultParserFactory<T> implements ParserFactory<T> {
 
-    DefaultParserFactory(Grammar grammar) {
+    private final Grammar<T> grammar;
+
+    DefaultParserFactory(Grammar<T> grammar) {
         assert grammar != null;
         this.grammar = grammar;
     }
 
     @Override
-    public Parser createParser(Tokenizer tokenizer) {
-        Objects.requireNonNull(tokenizer, Message.NULL_PARAMETER.format());
-        return new DefaultParser(grammar, tokenizer);
-    }
-
-    @Override
-    public Parser createParser(Reader reader) {
-        Objects.requireNonNull(reader, Message.NULL_PARAMETER.format());
-        var tokenizer = new ReaderTokenizer(reader);
-        return createParser(tokenizer);
+    public Parser<T> createParser(Tokenizer<T> tokenizer) {
+        Objects.requireNonNull(tokenizer, () -> Message.VALIDATION_PARAMETER_NULL.format("tokenizer"));
+        return new DefaultParser<>(grammar, tokenizer);
     }
 
 }

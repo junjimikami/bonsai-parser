@@ -1,23 +1,26 @@
 package com.jiganaut.bonsai.parser;
 
 /**
- * 
+ *
  * @author Junji Mikami
  *
  * @param <R>
  * @param <P>
  */
-public interface TreeVisitor<R, P> {
+public interface TreeVisitor<T, R, P> {
 
-    public default R visit(Tree tree) {
-        return visit(tree, null);
+    public default R visit(Tree<T> tree) {
+        return tree.accept(this);
     }
 
-    public default R visit(Tree tree, P p) {
+    public default R visit(Tree<T> tree, P p) {
         return tree.accept(this, p);
     }
 
-    public R visitTerminal(TerminalNode tree, P p);
+    public R visitTerminal(TerminalNode<T> terminal, P p);
 
-    public R visitNonTerminal(NonTerminalNode tree, P p);
+    public R visitNonTerminal(NonTerminalNode<T> nonTerminal, P p);
+
+    public R visitError(ErrorNode<T> error, P p);
+
 }

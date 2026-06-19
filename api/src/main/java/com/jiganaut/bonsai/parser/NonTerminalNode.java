@@ -1,58 +1,38 @@
 package com.jiganaut.bonsai.parser;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
+
+import com.jiganaut.bonsai.impl.Message;
 import com.jiganaut.bonsai.parser.spi.ParserProvider;
 
 /**
  *
  * @author Junji Mikami
  */
-public interface NonTerminalNode extends Tree {
+public non-sealed interface NonTerminalNode<T> extends Tree<T> {
 
     /**
-     * 
-     * @author Junji Mikami
+     *
      */
-    public static interface Builder extends Tree.Builder {
+    public static interface Builder<T> extends Tree.Builder<T>, Iterable<Tree.Builder<T>> {
 
         @Override
-        public NonTerminalNode.Builder setName(String name);
+        public NonTerminalNode<T> build();
 
-        @Override
-        public NonTerminalNode.Builder setValue(String value);
-
-        @Override
-        public NonTerminalNode build();
-
-        public NonTerminalNode.Builder add(Tree tree);
-
-        public default NonTerminalNode.Builder addAll(NonTerminalNode.Builder builder) {
-            builder.build().getSubTrees().forEach(this::add);
-            return this;
+        public default NonTerminalNode.Builder<T> add(Tree<T> tree) {
+            return add(() -> tree);
         }
+
+        public NonTerminalNode.Builder<T> add(Tree.Builder<T> builder);
+
+        public NonTerminalNode.Builder<T> addAll(NonTerminalNode.Builder<T> builder);
 
     }
 
-    public static NonTerminalNode.Builder builder() {
-        return ParserProvider.load().createNonTerminalNodeBuilder();
-    }
-
-    public static NonTerminalNode of(String name, String value, Tree... trees) {
-        var builder = builder()
-                .setName(name)
-                .setValue(value);
-        for (var tree : trees) {
-            builder.add(tree);
-        }
-        return builder.build();
-    }
-
-    public static NonTerminalNode of(String name, Tree... trees) {
-        var builder = builder()
-                .setName(name);
-        for (var tree : trees) {
-            builder.add(tree);
-        }
-        return builder.build();
+    public static <T> NonTerminalNode.Builder<T> builder(String name) {
+        return ParserProvider.load().createNonTerminalNodeBuilder(name);
     }
 
     @Override
@@ -61,8 +41,31 @@ public interface NonTerminalNode extends Tree {
     }
 
     @Override
-    public default <R, P> R accept(TreeVisitor<R, P> v, P p) {
-        return v.visitNonTerminal(this, p);
+    public default Position getPosition() {
+        if (getSubTrees().isEmpty()) {
+            return Position.UNKNOWN;
+        }
+        var start = getSubTrees().getFirst().getPosition();
+        var end = getSubTrees().getLast().getPosition();
+        return Position.rangeOf(start, end);
     }
+
+    @Override
+    public default Stream<Tree<T>> subTrees() {
+        return getSubTrees().stream();
+    }
+
+    @Override
+    public default Stream<T> values() {
+        return getSubTrees().stream().flatMap(Tree::values);
+    }
+
+    @Override
+    public default <R, P> R accept(TreeVisitor<T, R, P> visitor, P p) {
+        Objects.requireNonNull(visitor, () -> Message.VALIDATION_PARAMETER_NULL.format("visitor"));
+        return visitor.visitNonTerminal(this, p);
+    }
+
+    public List<Tree<T>> getSubTrees();
 
 }
